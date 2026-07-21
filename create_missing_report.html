@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<title>Signaler un enfant disparu - Étape 1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-on-surface": "#f4eefd",
+                      "surface-bright": "#F5F4F2",
+                      "surface-container": "#f1ebfa",
+                      "on-tertiary-fixed": "#331200",
+                      "surface-container-highest": "#e5e0ef",
+                      "primary-fixed": "#e5deff",
+                      "secondary": "#5f5e60",
+                      "on-surface": "#1c1a24",
+                      "inverse-surface": "#312f3a",
+                      "surface-dim": "#ddd8e6",
+                      "secondary-fixed-dim": "#c8c6c8",
+                      "error-container": "#ffdad6",
+                      "on-primary-container": "#f6f0ff",
+                      "on-secondary-fixed-variant": "#474649",
+                      "on-background": "#1c1a24",
+                      "tertiary": "#8f3e00",
+                      "on-secondary": "#ffffff",
+                      "secondary-fixed": "#e4e2e4",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed-variant": "#4206d7",
+                      "on-primary-fixed": "#190064",
+                      "on-primary": "#ffffff",
+                      "surface-container-high": "#ebe6f4",
+                      "tertiary-container": "#b55100",
+                      "primary-container": "#6c4dff",
+                      "primary-fixed-dim": "#c8bfff",
+                      "surface-tint": "#5b38ee",
+                      "secondary-container": "#e2dfe1",
+                      "surface-variant": "#e5e0ef",
+                      "outline": "#787588",
+                      "tertiary-fixed-dim": "#ffb68e",
+                      "outline-variant": "#c9c4d9",
+                      "on-secondary-container": "#636264",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#773300",
+                      "background": "#F5F4F2",
+                      "primary": "#532ce6",
+                      "on-error": "#ffffff",
+                      "on-tertiary-container": "#ffefe9",
+                      "on-secondary-fixed": "#1b1b1d",
+                      "error": "#ba1a1a",
+                      "inverse-primary": "#c8bfff",
+                      "on-surface-variant": "#474556",
+                      "on-error-container": "#93000a",
+                      "surface-container-low": "#F5F4F2",
+                      "surface": "#F5F4F2",
+                      "tertiary-fixed": "#ffdbca"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "24px",
+                      "xl": "32px",
+                      "container-margin": "20px",
+                      "xs": "8px",
+                      "md": "16px",
+                      "gutter": "16px",
+                      "base": "4px",
+                      "sm": "12px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "label-bold": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "display": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-bold": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Soft Diffusion Shadows */
+        .shadow-soft {
+            box-shadow: 0px 4px 20px rgba(108, 77, 255, 0.06);
+        }
+        
+        .shadow-urgent {
+            box-shadow: 0px 8px 24px rgba(255, 77, 79, 0.12);
+        }
+
+        /* Custom Form Inputs */
+        input[type="text"], input[type="number"], select {
+            transition: all 0.2s ease-in-out;
+        }
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
+            box-shadow: 0 0 0 4px rgba(108, 77, 255, 0.15);
+            border-color: #532ce6;
+        }
+
+        /* Hide scrollbar for clean UI */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        * {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased min-h-screen pb-32">
+<!-- Top App Bar (Modified for focused task flow) -->
+<header class="sticky top-0 z-40 bg-surface shadow-sm">
+<div class="flex items-center justify-between px-container-margin h-16 w-full max-w-7xl mx-auto">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-on-surface" onclick="history.back()">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-surface">Signaler un disparu</h1>
+<div class="w-10 h-10"></div> <!-- Spacer for centering -->
+</div>
+</header>
+<main class="w-full max-w-md mx-auto px-container-margin pt-md">
+<!-- Progress Tracker -->
+<div class="flex items-center justify-center space-x-4 mb-xl mt-sm">
+<div class="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-on-primary font-label-bold text-label-bold shadow-soft">
+                1
+            </div>
+<div class="w-12 h-0.5 bg-outline-variant rounded-full"></div>
+<div class="flex items-center justify-center w-6 h-6 rounded-full bg-surface-container-highest text-on-surface-variant font-label-bold text-label-bold">
+                2
+            </div>
+<div class="w-12 h-0.5 bg-outline-variant rounded-full"></div>
+<div class="flex items-center justify-center w-6 h-6 rounded-full bg-surface-container-highest text-on-surface-variant font-label-bold text-label-bold">
+                3
+            </div>
+</div>
+<div class="text-center mb-lg">
+<h2 class="font-headline-md text-headline-md text-primary mb-2">Identité de l'enfant</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Veuillez fournir les informations de base et une photo récente.</p>
+</div>
+<form class="space-y-6">
+<!-- Photo Upload Area -->
+<div class="bg-surface rounded-xl p-6 border-2 border-dashed border-outline-variant flex flex-col items-center justify-center text-center cursor-pointer hover:bg-surface-container-low hover:border-primary transition-all group shadow-soft relative overflow-hidden">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 group-hover:scale-110 transition-transform text-primary">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 0;">add_a_photo</span>
+</div>
+<p class="font-label-bold text-label-bold text-on-surface mb-1">Ajouter une photo</p>
+<p class="font-body-md text-body-md text-on-surface-variant text-xs">Visage dégagé de préférence</p>
+<input accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
+</div>
+<!-- Identité Form Section -->
+<div class="bg-surface rounded-xl p-md shadow-soft space-y-md">
+<!-- Nom complet -->
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-2" for="fullName">Nom complet de l'enfant</label>
+<input class="w-full h-12 px-4 bg-surface rounded-xl border border-outline-variant text-on-surface font-body-md text-body-md focus:outline-none placeholder-outline" id="fullName" placeholder="Ex: Kevin Martin" type="text"/>
+</div>
+<!-- Age and Gender Row -->
+<div class="grid grid-cols-2 gap-md">
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-2" for="age">Âge (approx.)</label>
+<input class="w-full h-12 px-4 bg-surface rounded-xl border border-outline-variant text-on-surface font-body-md text-body-md focus:outline-none placeholder-outline" id="age" placeholder="Ex: 8" type="number"/>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-2" for="gender">Sexe</label>
+<div class="relative">
+<select class="w-full h-12 px-4 bg-surface rounded-xl border border-outline-variant text-on-surface font-body-md text-body-md focus:outline-none appearance-none cursor-pointer" id="gender">
+<option disabled="" selected="" value="">Sélectionner</option>
+<option value="garcon">Garçon</option>
+<option value="fille">Fille</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-on-surface-variant">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Taille -->
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-2" for="height">Taille (approx. en m)</label>
+<input class="w-full h-12 px-4 bg-surface rounded-xl border border-outline-variant text-on-surface font-body-md text-body-md focus:outline-none placeholder-outline" id="height" placeholder="Ex: 1m20" type="text"/>
+</div>
+</div>
+</form>
+</main>
+<!-- Fixed Bottom Action Area -->
+<div class="fixed bottom-0 left-0 w-full bg-surface-container-lowest border-t border-surface-container p-container-margin shadow-[0px_-4px_20px_rgba(108,77,255,0.06)] z-50">
+<div class="max-w-md mx-auto">
+<button class="w-full h-12 bg-primary text-on-primary rounded-full font-label-bold text-label-bold flex items-center justify-center hover:bg-surface-tint transition-colors active:scale-[0.98]" type="button" onclick="window.location.href='./v_rifier_le_lien_de_parent.html'">
+                Suivant
+                <span class="material-symbols-outlined ml-2" style="font-size: 20px;">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Navigation Suppressed as per instructions for transactional/task-focused pages -->
+</body></html>

@@ -1,0 +1,7 @@
+:root{
+  --cs-radius-sm: 12px;
+  --cs-radius-md: 16px;
+  --cs-radius-lg: 20px;
+  --cs-radius-xl: 24px;
+  --cs-radius-pill: 9999px;
+}

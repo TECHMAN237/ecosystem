@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<title>Guardian Flow - Onboarding</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#ebe6f4",
+                    "on-background": "#1c1a24",
+                    "tertiary": "#8f3e00",
+                    "surface-container-low": "#F5F4F2",
+                    "on-primary-fixed-variant": "#4206d7",
+                    "inverse-surface": "#312f3a",
+                    "primary-fixed-dim": "#c8bfff",
+                    "surface-bright": "#F5F4F2",
+                    "on-secondary-container": "#636264",
+                    "outline": "#787588",
+                    "on-secondary": "#ffffff",
+                    "surface": "#F5F4F2",
+                    "on-primary": "#ffffff",
+                    "primary": "#532ce6",
+                    "on-tertiary-fixed": "#331200",
+                    "on-secondary-fixed-variant": "#474649",
+                    "inverse-primary": "#c8bfff",
+                    "secondary-fixed": "#e4e2e4",
+                    "secondary-fixed-dim": "#c8c6c8",
+                    "on-primary-container": "#f6f0ff",
+                    "inverse-on-surface": "#f4eefd",
+                    "tertiary-container": "#b55100",
+                    "tertiary-fixed-dim": "#ffb68e",
+                    "tertiary-fixed": "#ffdbca",
+                    "on-error-container": "#93000a",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "secondary": "#5f5e60",
+                    "secondary-container": "#e2dfe1",
+                    "background": "#F5F4F2",
+                    "primary-container": "#6c4dff",
+                    "outline-variant": "#c9c4d9",
+                    "surface-container-highest": "#e5e0ef",
+                    "error": "#ba1a1a",
+                    "on-surface": "#1c1a24",
+                    "on-secondary-fixed": "#1b1b1d",
+                    "surface-variant": "#e5e0ef",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#e5deff",
+                    "on-tertiary-container": "#ffefe9",
+                    "surface-tint": "#5b38ee",
+                    "surface-container": "#f1ebfa",
+                    "on-surface-variant": "#474556",
+                    "on-tertiary-fixed-variant": "#773300",
+                    "surface-dim": "#ddd8e6",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#190064"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "12px",
+                    "gutter": "16px",
+                    "container-margin": "20px",
+                    "xs": "8px",
+                    "xl": "32px",
+                    "md": "16px",
+                    "base": "4px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "label-bold": ["Inter"],
+                    "display": ["Plus Jakarta Sans"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
+                    "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glow-effect {
+            box-shadow: 0 0 30px rgba(108, 77, 255, 0.2);
+        }
+        .step-ring {
+            background: conic-gradient(#532ce6 33%, #e5e0ef 0);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col overflow-x-hidden">
+<!-- Top Navigation / Skip -->
+<header class="flex justify-end px-container-margin py-md sticky top-0 z-10">
+<button class="font-label-bold text-label-bold text-primary px-md py-xs rounded-full hover:bg-primary-fixed transition-colors" onclick="window.location.href='./home_child_safety_v1.html'">
+            Skip
+        </button>
+</header>
+<main class="flex-1 flex flex-col px-container-margin">
+<!-- Step Indicator Header -->
+<div class="flex items-center gap-md mb-xl">
+<div class="relative w-10 h-10 rounded-full flex items-center justify-center p-[3px] step-ring">
+<div class="bg-white w-full h-full rounded-full flex items-center justify-center">
+<span class="font-label-bold text-label-bold text-primary">1</span>
+</div>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Community Protection</h1>
+</div>
+<!-- Central Illustration Card -->
+<div class="flex-1 flex items-center justify-center min-h-[300px] mb-xl">
+<div class="relative w-full aspect-square max-w-[320px] rounded-xl glass-card flex items-center justify-center overflow-visible glow-effect">
+<!-- Shield Badge (Top Right) -->
+<div class="absolute -top-4 -right-4 w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-lg text-white">
+<span class="material-symbols-outlined text-[28px]" data-icon="security">security</span>
+</div>
+<!-- Network Illustration Placeholder -->
+<div class="w-full h-full p-xl flex items-center justify-center">
+<img alt="Community Network Visual" class="w-full h-auto object-contain opacity-90" data-alt="A futuristic network visualization featuring glowing violet nodes connected by delicate luminescent lines on a soft-focus background. The visual style is minimalist and clean, utilizing a professional light-mode aesthetic with ethereal purple and blue highlights. Subtle gradients create a sense of deep connectivity and technological safety, maintaining a calm and trustworthy mood suitable for a child safety application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuADqFPuj3wSERecz-BxOUAtUWf8eTn5rf1opX0BUl5DSoq6Tf4w2HSEEp5pWN7c9VWU1T85asUWVuMNNwseeugbOUcLH3tA9Lyh3LWXle6VmcIEMOcmaX3NVtsEPUY1cjMwxFXWwvRw0Ux2qPPut-KjXF1D8ETLaEgyRV-fyBrkd-czG3lUSIPJPYKtOaHUtysfY921Xz-RepXiXcU2QvsaPDckzvlnHGbzvLjdD7_YY0ycX9qhqzEJ-acJNEhoh2Js959TZ9w18E5J"/>
+</div>
+<!-- Community Badge (Bottom Left) -->
+<div class="absolute -bottom-4 -left-4 w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-lg text-primary border-2 border-primary-fixed">
+<span class="material-symbols-outlined text-[28px]" data-icon="group">group</span>
+</div>
+</div>
+</div>
+<!-- Content Area -->
+<div class="text-center space-y-md mb-xl">
+<h2 class="font-display text-display text-on-background">Community Protection</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[300px] mx-auto leading-relaxed">
+                Together, we create a secure network. Report incidents and receive real-time alerts to keep children safe in your area.
+            </p>
+</div>
+<!-- Footer Actions -->
+<footer class="mt-auto pb-xl flex flex-col items-center gap-xl">
+<!-- Pagination Dots -->
+<div class="flex gap-xs">
+<!-- Active Step -->
+<div class="w-6 h-2 rounded-full bg-primary-container"></div>
+<!-- Inactive Steps -->
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+</div>
+<!-- Primary Action Button -->
+<button class="w-full bg-primary-container text-on-primary-container font-headline-md text-headline-md py-md px-xl rounded-full flex items-center justify-center gap-sm active:scale-95 transition-transform duration-200 shadow-md" onclick="window.location.href='./onboarding_reporter.html'">
+<span>Next</span>
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</footer>
+</main>
+<!-- Background Decoration -->
+<div class="fixed inset-0 -z-10 bg-gradient-to-br from-[#F5F4F2] via-[#F5F4F2] to-[#e5deff] opacity-50"></div>
+<div class="fixed -bottom-20 -left-20 w-64 h-64 bg-primary opacity-[0.03] rounded-full blur-3xl"></div>
+<div class="fixed -top-20 -right-20 w-80 h-80 bg-surface-tint opacity-[0.05] rounded-full blur-3xl"></div>
+</body></html>

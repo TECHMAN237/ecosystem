@@ -1,0 +1,11 @@
+:root{
+  --cs-space-xxs: 8px;
+  --cs-space-xs: 12px;
+  --cs-space-sm: 16px;
+  --cs-space-md: 16px;
+  --cs-space-lg: 24px;
+  --cs-space-xl: 32px;
+
+  --cs-space-section: 28px;
+  --cs-space-block: 16px;
+}

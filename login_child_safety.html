@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<title>Login | Child Safety</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb68e",
+                    "on-primary-container": "#f6f0ff",
+                    "secondary-fixed": "#e4e2e4",
+                    "primary-container": "#6c4dff",
+                    "on-secondary-container": "#636264",
+                    "on-primary-fixed": "#190064",
+                    "on-tertiary-fixed": "#331200",
+                    "surface-container-highest": "#e5e0ef",
+                    "surface-container-high": "#ebe6f4",
+                    "on-tertiary-fixed-variant": "#773300",
+                    "on-error-container": "#93000a",
+                    "surface-container-low": "#F5F4F2",
+                    "on-primary": "#ffffff",
+                    "outline": "#787588",
+                    "surface-dim": "#ddd8e6",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#1b1b1d",
+                    "surface-tint": "#5b38ee",
+                    "secondary-fixed-dim": "#c8c6c8",
+                    "on-secondary-fixed-variant": "#474649",
+                    "surface-container": "#f1ebfa",
+                    "primary-fixed": "#e5deff",
+                    "on-surface": "#1c1a24",
+                    "error": "#ba1a1a",
+                    "tertiary-container": "#b55100",
+                    "surface": "#F5F4F2",
+                    "secondary-container": "#e2dfe1",
+                    "background": "#F5F4F2",
+                    "secondary": "#5f5e60",
+                    "tertiary-fixed": "#ffdbca",
+                    "on-tertiary-container": "#ffefe9",
+                    "outline-variant": "#c9c4d9",
+                    "primary-fixed-dim": "#c8bfff",
+                    "on-secondary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#F5F4F2",
+                    "inverse-primary": "#c8bfff",
+                    "on-background": "#1c1a24",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#4206d7",
+                    "inverse-on-surface": "#f4eefd",
+                    "surface-variant": "#e5e0ef",
+                    "primary": "#532ce6",
+                    "tertiary": "#8f3e00",
+                    "on-surface-variant": "#474556",
+                    "inverse-surface": "#312f3a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "12px",
+                    "gutter": "16px",
+                    "base": "4px",
+                    "xs": "8px",
+                    "md": "16px",
+                    "container-margin": "20px",
+                    "xl": "32px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "display": ["Plus Jakarta Sans"],
+                    "body-md": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #F5F4F2; /* Soft lavender-tinted surface */
+            background-image: radial-gradient(circle at 0% 0%, rgba(108, 77, 255, 0.03) 0%, transparent 50%),
+                              radial-gradient(circle at 100% 100%, rgba(108, 77, 255, 0.05) 0%, transparent 50%);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .input-glow:focus-within {
+            box-shadow: 0 0 0 4px rgba(83, 44, 230, 0.1);
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-surface min-h-screen flex flex-col items-center justify-center p-container-margin">
+<!-- App Identity -->
+<div class="mb-lg flex flex-col items-center">
+<div class="w-16 h-16 bg-primary rounded-lg flex items-center justify-center shadow-[0px_8px_24px_rgba(83,44,230,0.2)] mb-md float-animation">
+<span class="material-symbols-outlined text-on-primary text-[32px]" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight font-extrabold">Child Safety</h1>
+</div>
+<!-- Login Container -->
+<div class="w-full max-w-[420px] glass-card rounded-xl p-xl shadow-[0px_4px_20px_rgba(108,77,255,0.06)] flex flex-col">
+<header class="mb-xl">
+<h2 class="font-display text-display mb-xs">Welcome Back</h2>
+<p class="text-on-surface-variant font-body-md">Log in to keep your children protected and connected.</p>
+</header>
+<!-- Form Elements -->
+<form action="./home_child_safety_v1.html" class="space-y-lg">
+<!-- Email Field -->
+<div class="space-y-xs group">
+<label class="font-label-bold text-label-bold text-on-surface-variant ml-base" for="email">Email Address</label>
+<div class="relative flex items-center input-glow rounded-lg">
+<span class="material-symbols-outlined absolute left-md text-outline">mail</span>
+<input class="w-full h-12 pl-[52px] pr-md bg-surface-container-lowest border-outline-variant border rounded-lg focus:border-primary focus:ring-0 transition-all outline-none text-body-md" id="email" name="email" placeholder="name@example.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-xs group">
+<div class="flex justify-between items-center px-base">
+<label class="font-label-bold text-label-bold text-on-surface-variant" for="password">Password</label>
+<a class="text-primary font-label-bold text-label-bold hover:underline" href="./home_child_safety_v1.html">Forgot Password?</a>
+</div>
+<div class="relative flex items-center input-glow rounded-lg">
+<span class="material-symbols-outlined absolute left-md text-outline">lock</span>
+<input class="w-full h-12 pl-[52px] pr-[52px] bg-surface-container-lowest border-outline-variant border rounded-lg focus:border-primary focus:ring-0 transition-all outline-none text-body-md" id="password" name="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-md text-outline hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<!-- Sign In Button -->
+<button class="w-full h-14 bg-primary text-on-primary font-headline-md text-headline-md rounded-full shadow-[0px_4px_12px_rgba(83,44,230,0.24)] hover:shadow-[0px_8px_20px_rgba(83,44,230,0.32)] active:scale-95 transition-all duration-200" type="submit">
+                Sign In
+            </button>
+</form>
+<!-- Divider -->
+<div class="flex items-center my-xl">
+<div class="flex-grow h-[1px] bg-outline-variant"></div>
+<span class="px-md text-label-sm text-on-surface-variant font-medium">OR CONTINUE WITH</span>
+<div class="flex-grow h-[1px] bg-outline-variant"></div>
+</div>
+<!-- Social Logins -->
+<div class="grid grid-cols-2 gap-md">
+<button class="flex items-center justify-center h-12 bg-surface-container-lowest border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors active:scale-95">
+<img alt="Google Logo" class="w-5 h-5 mr-xs" data-alt="A clean, isolated Google logo icon with its signature primary colors on a white background, representing modern digital authentication and security." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvkjOOLpdvndRY9jv_Yc6UGTeCRGjDmVjaHfP0FgrzJzZYcRcqXI5FSxeyuJ8CH-paKR1EO9T3K5fAIUQwneV6QTYmy99ud72D1PAkH60o9x677_zXjnZYNaLfqQtXOKTyq5vHtvHssgr33Z4btbrqOwdMGYdaEzAFqQ9tgHG7lKlTmCA4F7A86apLWMNqU6GDzV0txMATkheKJC_sAzDd87uIaiekdqBfejaPN5RyqFCmujkHrqbtLr0k3tv-AuTl-jjqKOD_Y0cL"/>
+<span class="font-label-bold text-label-bold">Google</span>
+</button>
+<button class="flex items-center justify-center h-12 bg-surface-container-lowest border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[20px] mr-xs" style="font-variation-settings: 'FILL' 1;">ios</span>
+<span class="font-label-bold text-label-bold">Apple</span>
+</button>
+</div>
+</div>
+<!-- Footer Redirect -->
+<div class="mt-md text-center">
+<p class="font-body-md text-on-surface-variant">
+            <a class="text-primary font-label-bold text-label-bold hover:underline" href="./home_child_safety_v1.html">Continue as Guest</a>
+</p>
+</div>
+<div class="mt-lg text-center">
+<p class="font-body-md text-on-surface-variant">
+            Don't have an account? 
+            <a class="text-primary font-label-bold text-label-bold hover:underline ml-xs" href="./sign_up_child_safety.html">Create Account</a>
+</p>
+</div>
+<!-- Illustration Background Decorative (Optional for trust) -->
+<div class="fixed top-1/2 -translate-y-1/2 left-[-100px] opacity-[0.03] pointer-events-none select-none hidden lg:block">
+<span class="material-symbols-outlined text-[400px]">family_restroom</span>
+</div>
+<div class="fixed top-1/2 -translate-y-1/2 right-[-100px] opacity-[0.03] pointer-events-none select-none hidden lg:block">
+<span class="material-symbols-outlined text-[400px]">verified_user</span>
+</div>
+<script>
+        // Simple Interaction logic
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => btn.classList.add('scale-95'));
+            btn.addEventListener('mouseup', () => btn.classList.remove('scale-95'));
+            btn.addEventListener('mouseleave', () => btn.classList.remove('scale-95'));
+        });
+
+        // Toggle Password Visibility
+        const passToggle = document.querySelector('button .material-symbols-outlined:contains("visibility")');
+        if (passToggle) {
+            passToggle.parentElement.addEventListener('click', () => {
+                const input = document.getElementById('password');
+                const icon = passToggle;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.textContent = 'visibility_off';
+                } else {
+                    input.type = 'password';
+                    icon.textContent = 'visibility';
+                }
+            });
+        }
+    </script>
+</body></html>

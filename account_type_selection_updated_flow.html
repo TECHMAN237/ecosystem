@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<title>Guardian Flow - Account Type Selection</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#190064",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#F5F4F2",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "surface-container": "#f1ebfa",
+                    "on-surface-variant": "#474556",
+                    "surface": "#F5F4F2",
+                    "background": "#F5F4F2",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#4206d7",
+                    "inverse-surface": "#312f3a",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#e4e2e4",
+                    "inverse-on-surface": "#f4eefd",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#b55100",
+                    "on-secondary-fixed-variant": "#474649",
+                    "surface-container-low": "#F5F4F2",
+                    "on-secondary-container": "#636264",
+                    "secondary-container": "#e2dfe1",
+                    "on-background": "#1c1a24",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#ebe6f4",
+                    "surface-dim": "#ddd8e6",
+                    "surface-variant": "#e5e0ef",
+                    "secondary-fixed-dim": "#c8c6c8",
+                    "on-surface": "#1c1a24",
+                    "outline-variant": "#c9c4d9",
+                    "outline": "#787588",
+                    "tertiary": "#8f3e00",
+                    "on-tertiary-fixed-variant": "#773300",
+                    "surface-container-highest": "#e5e0ef",
+                    "primary-fixed-dim": "#c8bfff",
+                    "on-primary-container": "#f6f0ff",
+                    "tertiary-fixed-dim": "#ffb68e",
+                    "on-error-container": "#93000a",
+                    "secondary": "#5f5e60",
+                    "on-secondary-fixed": "#1b1b1d",
+                    "surface-tint": "#5b38ee",
+                    "on-tertiary-fixed": "#331200",
+                    "inverse-primary": "#c8bfff",
+                    "primary-fixed": "#e5deff",
+                    "tertiary-fixed": "#ffdbca",
+                    "primary-container": "#6c4dff",
+                    "on-tertiary-container": "#ffefe9",
+                    "primary": "#532ce6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-margin": "20px",
+                    "xs": "8px",
+                    "md": "16px",
+                    "xl": "32px",
+                    "sm": "12px",
+                    "lg": "24px",
+                    "base": "4px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "display": ["Plus Jakarta Sans"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .active-selection {
+            border: 2px solid #532ce6 !important;
+            background-color: #f6f0ff !important;
+            box-shadow: 0px 4px 20px rgba(108, 77, 255, 0.12) !important;
+        }
+        .progress-pill {
+            width: 24px;
+            height: 8px;
+            border-radius: 999px;
+            background-color: #532ce6;
+        }
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background-color: #e5e0ef;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-40 bg-background flex items-center px-container-margin py-md">
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors p-xs rounded-full active:scale-95 transition-transform" onclick="history.back()">arrow_back</button>
+<h1 class="font-headline-lg text-headline-lg text-primary">Guardian Flow</h1>
+</div>
+</header>
+<main class="flex-1 px-container-margin pt-md pb-xl">
+<!-- Progress Tracker -->
+<div class="flex items-center gap-xs mb-lg">
+<div class="progress-pill"></div>
+<div class="progress-dot"></div>
+<div class="progress-dot"></div>
+<span class="text-label-sm text-outline ml-xs">Step 1 of 3</span>
+</div>
+<!-- Header Section -->
+<section class="mb-xl">
+<h2 class="font-display text-display text-on-surface mb-xs">How would you like to use Child Safety?</h2>
+<p class="font-body-lg text-body-lg text-secondary">Help us personalize your experience.</p>
+</section>
+<!-- Bento Selection Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-md mb-xl" id="selection-grid">
+<!-- Parent -->
+<!-- Mother -->
+<button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
+<div class="mb-md p-sm bg-primary-fixed rounded-full">
+<span class="material-symbols-outlined text-primary text-[32px]">woman</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Mother</h3>
+<p class="text-label-sm text-outline">Primary safety coordinator</p>
+</button>
+<!-- Father -->
+<button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
+<div class="mb-md p-sm bg-primary-fixed rounded-full">
+<span class="material-symbols-outlined text-primary text-[32px]">man</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Father</h3>
+<p class="text-label-sm text-outline">Reliable family protection</p>
+</button>
+<!-- Guardian -->
+<button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
+<div class="mb-md p-sm bg-primary-fixed rounded-full">
+<span class="material-symbols-outlined text-primary text-[32px]">shield_person</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Guardian</h3>
+<p class="text-label-sm text-outline">Legal safety supervisor</p>
+</button>
+<!-- Community Member -->
+<button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
+<div class="mb-md p-sm bg-primary-fixed rounded-full">
+<span class="material-symbols-outlined text-primary text-[32px]">groups</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Community Member</h3>
+<p class="text-label-sm text-outline">Local safety advocate</p>
+</button>
+<!-- Volunteer Helper -->
+<button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
+<div class="mb-md p-sm bg-primary-fixed rounded-full">
+<span class="material-symbols-outlined text-primary text-[32px]">volunteer_activism</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Volunteer Helper</h3>
+<p class="text-label-sm text-outline">Emergency response support</p>
+</button>
+</div>
+<!-- Illustrations Section (Asymmetric) -->
+<div class="mt-lg relative overflow-hidden rounded-xl h-48 w-full bg-surface-container-high hidden md:block">
+<img alt="Community Protection" class="w-full h-full object-cover mix-blend-multiply opacity-80" data-alt="A warm and protective digital illustration showing a diverse community of caregivers and parents holding hands in a circle around a glowing safety emblem. The style is modern minimalist with soft gradients of primary purple and violet, set against a bright white background that exudes trust and calm efficiency. The lighting is soft and high-key, reinforcing a sense of collective security and proactive child safety." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEqG2XeYZhg4TvgTZHCRny59tUyebkzUOr4buS6bXJr0vhLPI1Kbmmaws1gWvaYucmlGQp-jucM_tkOHdEeu2RsyAZXlYLnhAXmagRGw_OUFUA6dMZfFXlacCNWCZAGG_rmJLQPGZV7wt5ngT53h5-kWZgEP3hQ8vp6RJ_TghEsSKZ2YHFRe6dG0ApgblD_k1ZI4jwnMI8QUWFWaU6HrMstOpkzMd7TMt5k-PzluINXFeBdWbiGcsIfrjuWQTcqV3qnFxGqv5HXEzf"/>
+<div class="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent flex items-center px-lg">
+<div class="max-w-xs">
+<h4 class="font-headline-md text-primary">Joining a Safe Network</h4>
+<p class="text-body-md text-secondary">Every choice strengthens our child safety community.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar -->
+<footer class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-lg rounded-t-lg flex flex-col gap-sm px-container-margin py-md">
+<button class="w-full py-md bg-outline text-on-primary rounded-full font-label-bold flex items-center justify-center gap-xs transition-all opacity-50 cursor-not-allowed" disabled="" id="continue-btn" onclick="window.location.href='./basic_information.html'">
+            Continue
+            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+<button class="w-full py-md text-primary font-label-bold hover:bg-surface-container-low transition-colors rounded-full flex items-center justify-center" onclick="window.location.href='./login_child_safety.html'">
+            I already have an account
+        </button>
+</footer>
+<!-- Spacer for fixed footer -->
+<div class="h-32"></div>
+<script>
+        function selectAccount(element) {
+            // Remove active class from all cards
+            document.querySelectorAll('.account-card').forEach(card => {
+                card.classList.remove('active-selection');
+            });
+            
+            // Add active class to selected card
+            element.classList.add('active-selection');
+            const role = element.querySelector('h3')?.innerText?.trim() || '';
+            sessionStorage.setItem('childSafetyAccountType', role);
+            
+            // Enable and style continue button
+            const continueBtn = document.getElementById('continue-btn');
+            continueBtn.disabled = false;
+            continueBtn.classList.remove('bg-outline', 'opacity-50', 'cursor-not-allowed');
+            continueBtn.classList.add('bg-primary', 'active:scale-95', 'hover:opacity-90');
+        }
+    </script>
+</body></html>

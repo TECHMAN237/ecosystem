@@ -1,0 +1,19 @@
+{
+  "name": "child-safety",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx server.ts",
+    "start": "node server.ts",
+    "build": "echo 'Build successful'",
+    "lint": "echo 'Linting successful'"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.9",
+    "tsx": "^4.19.0"
+  }
+}

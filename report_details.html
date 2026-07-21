@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<title>Child Safety - Report Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-on-surface": "#f4eefd",
+                      "surface-bright": "#F5F4F2",
+                      "surface-container": "#f1ebfa",
+                      "on-tertiary-fixed": "#331200",
+                      "surface-container-highest": "#e5e0ef",
+                      "primary-fixed": "#e5deff",
+                      "secondary": "#5f5e60",
+                      "on-surface": "#1c1a24",
+                      "inverse-surface": "#312f3a",
+                      "surface-dim": "#ddd8e6",
+                      "secondary-fixed-dim": "#c8c6c8",
+                      "error-container": "#ffdad6",
+                      "on-primary-container": "#f6f0ff",
+                      "on-secondary-fixed-variant": "#474649",
+                      "on-background": "#1c1a24",
+                      "tertiary": "#8f3e00",
+                      "on-secondary": "#ffffff",
+                      "secondary-fixed": "#e4e2e4",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed-variant": "#4206d7",
+                      "on-primary-fixed": "#190064",
+                      "on-primary": "#ffffff",
+                      "surface-container-high": "#ebe6f4",
+                      "tertiary-container": "#b55100",
+                      "primary-container": "#6c4dff",
+                      "primary-fixed-dim": "#c8bfff",
+                      "surface-tint": "#5b38ee",
+                      "secondary-container": "#e2dfe1",
+                      "surface-variant": "#e5e0ef",
+                      "outline": "#787588",
+                      "tertiary-fixed-dim": "#ffb68e",
+                      "outline-variant": "#c9c4d9",
+                      "on-secondary-container": "#636264",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#773300",
+                      "background": "#F5F4F2",
+                      "primary": "#532ce6",
+                      "on-error": "#ffffff",
+                      "on-tertiary-container": "#ffefe9",
+                      "on-secondary-fixed": "#1b1b1d",
+                      "error": "#ba1a1a",
+                      "inverse-primary": "#c8bfff",
+                      "on-surface-variant": "#474556",
+                      "on-error-container": "#93000a",
+                      "surface-container-low": "#F5F4F2",
+                      "surface": "#F5F4F2",
+                      "tertiary-fixed": "#ffdbca"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "24px",
+                      "xl": "32px",
+                      "container-margin": "20px",
+                      "xs": "8px",
+                      "md": "16px",
+                      "gutter": "16px",
+                      "base": "4px",
+                      "sm": "12px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "label-bold": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "display": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-bold": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+          font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Soft pulsing animation for urgent elements */
+        @keyframes urgentPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 77, 79, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 77, 79, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 77, 79, 0); }
+        }
+        .animate-urgent {
+            animation: urgentPulse 2s infinite;
+        }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-bright text-on-surface antialiased font-body-lg min-h-screen flex justify-center selection:bg-primary-container selection:text-on-primary-container">
+<!-- Mobile Container Wrapper -->
+<div class="w-full max-w-[480px] bg-surface relative min-h-screen shadow-2xl flex flex-col overflow-hidden pb-24">
+<!-- Top App Bar (Task-Focused / Sub-page Style) -->
+<header class="flex items-center justify-between px-container-margin h-16 w-full z-40 bg-surface/80 backdrop-blur-md sticky top-0 transition-all duration-300 border-b border-outline-variant/30">
+<button aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface hover:bg-surface-container-high transition-colors shadow-sm" onclick="history.back()">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<div class="flex flex-col items-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Report Details</span>
+<span class="font-label-bold text-label-bold text-error tracking-tight">Missing Child</span>
+</div>
+<button aria-label="More options" class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface hover:bg-surface-container-high transition-colors shadow-sm">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</header>
+<main class="flex-1 flex flex-col w-full pb-safe">
+<!-- Hero Image Section -->
+<section class="relative w-full aspect-[4/5] bg-surface-container-high shrink-0 overflow-hidden group">
+<img alt="Photo of Kevin" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" data-alt="A portrait photograph of a young boy of African descent, around 8 years old, looking directly at the camera with a neutral expression. He has short dark hair and is wearing a dark blue t-shirt. The background is a soft, blurred studio grey. The lighting is soft and natural, emphasizing a calm and high-quality aesthetic suitable for a professional safety profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3fpZHXDIzZgE5MH5MNEky3ApR34mV_nr6IjJCoGx2aFXhYT1p5CdI6ejJ8GLdRaRWOd4GdiUqvTeDWPHwnRA_iFaUBWWg6iZcpZhMi2MUxNJZRBD402R-7l95PAb2kD0W8W6aeGk9pb5B7PiNrc8PxVFUXXnqbC51pUArzLbv2070oEccx6prYipqje8VZtOCGx1r9IN6yqzE5wT-o5awmX6v5OhZx3rkSWwz8XMPVR7TDR4PTawdZjUqizLhAfuIMVahbd2X9dhR"/>
+<!-- Gradient Overlay for text readability -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
+<!-- Urgent Badge -->
+<div class="absolute top-4 left-4 bg-[#FF4D4F] text-white px-3 py-1.5 rounded-full font-label-bold text-label-bold flex items-center gap-1 shadow-lg animate-urgent z-10">
+<span class="material-symbols-outlined fill text-[14px]">error</span>
+                    URGENT
+                </div>
+<!-- Share Overlay Action -->
+<div class="absolute top-4 right-4 z-10">
+<button class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/40 transition-colors border border-white/30 shadow-lg">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+</div>
+<!-- Core Identity Overlay -->
+<div class="absolute bottom-0 left-0 w-full p-container-margin text-white z-10 flex flex-col gap-2">
+<h1 class="font-display text-display text-white mb-1 drop-shadow-md">Kevin, 8 ans</h1>
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-white/90">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span>Yaoundé, Centre</span>
+</div>
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-white/90">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>12/05/2024 • 14:30</span>
+</div>
+</div>
+</section>
+<!-- Detailed Info Canvas -->
+<section class="flex-1 bg-surface-bright -mt-6 rounded-t-xl z-20 relative px-container-margin pt-8 pb-12 flex flex-col gap-lg shadow-[0px_-8px_24px_rgba(0,0,0,0.06)]">
+<!-- Physical Attributes Bento Grid -->
+<div class="grid grid-cols-3 gap-3">
+<div class="bg-surface-container-lowest border border-surface-variant rounded-lg p-3 flex flex-col items-center justify-center shadow-sm">
+<span class="text-on-surface-variant font-label-sm text-label-sm mb-1">Sexe</span>
+<span class="font-label-bold text-label-bold text-on-surface">Garçon</span>
+</div>
+<div class="bg-surface-container-lowest border border-surface-variant rounded-lg p-3 flex flex-col items-center justify-center shadow-sm">
+<span class="text-on-surface-variant font-label-sm text-label-sm mb-1">Taille</span>
+<span class="font-label-bold text-label-bold text-on-surface">1m20</span>
+</div>
+<div class="bg-surface-container-lowest border border-surface-variant rounded-lg p-3 flex flex-col items-center justify-center shadow-sm">
+<span class="text-on-surface-variant font-label-sm text-label-sm mb-1">Poids</span>
+<span class="font-label-bold text-label-bold text-on-surface">25kg</span>
+</div>
+</div>
+<div class="w-full h-px bg-outline-variant/40"></div>
+<!-- Description Block -->
+<div class="flex flex-col gap-2">
+<h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">description</span>
+                        Description
+                    </h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed bg-surface-container-lowest p-4 rounded-lg border border-surface-variant shadow-sm">
+                        Portait un t-shirt bleu et un pantalon noir lors de la disparition. Il a une petite cicatrice sur le sourcil gauche. Il pourrait être effrayé et ne pas répondre à son nom.
+                    </p>
+</div>
+<!-- Location Block -->
+<div class="flex flex-col gap-2">
+<h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">my_location</span>
+                        Dernière localisation connue
+                    </h2>
+<div class="bg-surface-container-lowest rounded-lg overflow-hidden border border-surface-variant shadow-sm">
+<div class="p-3 border-b border-surface-variant flex items-start gap-2 bg-surface-container-low">
+<span class="material-symbols-outlined text-on-surface-variant mt-0.5 text-[18px]">push_pin</span>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Avenue Kennedy, Yaoundé</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Près du marché central</p>
+</div>
+</div>
+<div class="h-32 bg-surface-variant w-full relative">
+<!-- Placeholder Map -->
+<img alt="Map location" class="w-full h-full object-cover opacity-80" data-alt="A stylized, light-mode digital map interface centered on an urban area. The map uses a soft color palette of light greys, whites, and subtle blues for water bodies. A distinct, pulsing purple marker pinpoints a specific location on a main avenue. The aesthetic is clean, modern, and highly legible, prioritizing clarity." data-location="Yaoundé" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLflxXD0K1PfLL7IEOnjqNC8ZowVFYFcse0HKyoighbGiEsEk7qtKO9OGebFGjRynf9ow9zmEJkcjCpU_cjlCrqWGGy7ZIFgDi3i3IHnHNcvJdMWqgL3imsAWZW7PYeCCiUVIMQ6U_kEh_4knthj7p-qHL0gk1bnSpXdpwl4gmFFq_spUSX3elbs6tYJ84uHfze-wKoXb0aiWRNOdjjA3KM3YD-2CRSTWo4apUK4APalUu8PVmcEASv76GVJOrsNFKcoHG3iBU6OuA"/>
+</div>
+</div>
+</div>
+<!-- Contact Block -->
+<div class="flex flex-col gap-2">
+<h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">contact_phone</span>
+                        Contact
+                    </h2>
+<div class="bg-primary/5 rounded-lg border border-primary/20 p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined fill">phone_in_talk</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Famille de l'enfant</p>
+<p class="font-headline-md text-[18px] font-bold text-primary">+237 6 79 12 34 56</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Fixed Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 w-full max-w-[480px] left-1/2 -translate-x-1/2 bg-surface-container-lowest/90 backdrop-blur-xl border-t border-outline-variant/30 px-container-margin py-4 flex items-center gap-3 shadow-[0px_-12px_32px_rgba(0,0,0,0.08)] z-50 pb-safe">
+<button class="flex-1 bg-surface-container border-2 border-primary text-primary font-label-bold text-label-bold h-[48px] rounded-full flex items-center justify-center gap-2 hover:bg-primary-container/20 transition-colors">
+<span class="material-symbols-outlined text-[20px]">share</span>
+                Partager
+            </button>
+<button class="flex-[2] bg-primary text-on-primary font-label-bold text-label-bold h-[48px] rounded-full flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors shadow-md" onclick="window.location.href='./signaler_un_enfant_trouv_tape_1.html'">
+<span class="material-symbols-outlined fill text-[20px]">support_agent</span>
+                J'ai une info
+            </button>
+</div>
+</div>
+</body></html>

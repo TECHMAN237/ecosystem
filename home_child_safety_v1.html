@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<link rel="stylesheet" href="./design/design-system.css"/>
+<title>Child Safety - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-on-surface": "#f4eefd",
+                      "surface-bright": "#F5F4F2",
+                      "surface-container": "#f1ebfa",
+                      "on-tertiary-fixed": "#331200",
+                      "surface-container-highest": "#e5e0ef",
+                      "primary-fixed": "#e5deff",
+                      "secondary": "#5f5e60",
+                      "on-surface": "#1c1a24",
+                      "inverse-surface": "#312f3a",
+                      "surface-dim": "#ddd8e6",
+                      "secondary-fixed-dim": "#c8c6c8",
+                      "error-container": "#ffdad6",
+                      "on-primary-container": "#f6f0ff",
+                      "on-secondary-fixed-variant": "#474649",
+                      "on-background": "#1c1a24",
+                      "tertiary": "#8f3e00",
+                      "on-secondary": "#ffffff",
+                      "secondary-fixed": "#e4e2e4",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed-variant": "#4206d7",
+                      "on-primary-fixed": "#190064",
+                      "on-primary": "#ffffff",
+                      "surface-container-high": "#ebe6f4",
+                      "tertiary-container": "#b55100",
+                      "primary-container": "#6c4dff",
+                      "primary-fixed-dim": "#c8bfff",
+                      "surface-tint": "#5b38ee",
+                      "secondary-container": "#e2dfe1",
+                      "surface-variant": "#e5e0ef",
+                      "outline": "#787588",
+                      "tertiary-fixed-dim": "#ffb68e",
+                      "outline-variant": "#c9c4d9",
+                      "on-secondary-container": "#636264",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#773300",
+                      "background": "#F5F4F2",
+                      "primary": "#532ce6",
+                      "on-error": "#ffffff",
+                      "on-tertiary-container": "#ffefe9",
+                      "on-secondary-fixed": "#1b1b1d",
+                      "error": "#ba1a1a",
+                      "inverse-primary": "#c8bfff",
+                      "on-surface-variant": "#474556",
+                      "on-error-container": "#93000a",
+                      "surface-container-low": "#F5F4F2",
+                      "surface": "#F5F4F2",
+                      "tertiary-fixed": "#ffdbca"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "24px",
+                      "xl": "32px",
+                      "container-margin": "20px",
+                      "xs": "8px",
+                      "md": "16px",
+                      "gutter": "16px",
+                      "base": "4px",
+                      "sm": "12px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "label-bold": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "display": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-bold": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+  </head>
+<body class="bg-background text-on-background font-body-lg antialiased pb-[100px] md:pb-0">
+<!-- Hidden Top App Bar to satisfy DOM/JS requirements without interfering with profile card -->
+<header class="hidden" id="topAppBar"></header>
+
+<!-- Desktop Sidebar Navigation (Hidden on mobile) -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest shadow-[4px_0_24px_rgba(108,77,255,0.06)] z-40 pt-8">
+<div class="flex items-center gap-3 px-8 mb-12 text-primary font-headline-lg text-headline-lg font-bold tracking-tight">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">security</span>
+<span>Child Safety</span>
+</div>
+<nav class="flex flex-col gap-2 px-4">
+<a class="flex items-center gap-4 px-4 py-3 bg-primary-container text-on-primary-container rounded-xl font-label-bold" href="./home_child_safety_v1.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+                Home
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors font-label-bold" href="./reports_directory.html">
+<span class="material-symbols-outlined">assignment</span>
+                Reports
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors font-label-bold" href="./alert_center.html">
+<span class="material-symbols-outlined">notifications_active</span>
+                Alerts
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors font-label-bold" href="./guardian_profile_updated_my_reports.html">
+<span class="material-symbols-outlined">person</span>
+                Profile
+            </a>
+</nav>
+</aside>
+
+<!-- Main Content Area -->
+<main class="pt-2 md:pt-3 md:ml-64 px-container-margin max-w-7xl mx-auto space-y-6 pb-24">
+<!-- Top Profile Card Header (Mockup Alignment) -->
+<section class="profile-header-card p-4 flex items-center justify-between">
+  <div class="flex items-center gap-4">
+    <div class="relative">
+      <img src="./mbolo_brenda_avatar.png" alt="Mbolo Brenda" class="w-14 h-14 rounded-full object-cover border-2 border-primary/20 shadow-sm">
+      <span class="absolute -bottom-1 -right-1 bg-primary text-white w-5 h-5 rounded-full flex items-center justify-center border border-white">
+        <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+      </span>
+    </div>
+    <div class="flex flex-col">
+      <span class="text-xs text-on-surface-variant font-medium leading-none mb-0.5">Welcome</span>
+      <h1 class="text-lg font-bold text-on-surface leading-tight flex items-center gap-1">
+        Mbolo Brenda <span class="text-base">👋</span>
+      </h1>
+      <span class="text-[11px] text-primary font-bold flex items-center gap-0.5 mt-0.5">
+        <span class="material-symbols-outlined text-[13px] text-primary" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+        Verified Volunteer
+      </span>
+    </div>
+  </div>
+  <button onclick="window.location.href='./alert_center.html'" class="relative text-on-surface-variant p-3 rounded-full hover:bg-surface-container-high transition-colors">
+    <span class="material-symbols-outlined text-[24px]">notifications</span>
+    <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full"></span>
+  </button>
+</section>
+
+<!-- Emergency Banner (Active Alert Card - DO NOT redesign, keep exact style/logic) -->
+<div class="bg-error-container text-on-error-container rounded-xl p-4 flex items-start gap-4 shadow-sm border border-error/20">
+<span class="material-symbols-outlined mt-1" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div>
+<h3 class="font-label-bold text-label-bold uppercase tracking-wide mb-1">Active Alert in your area</h3>
+<p class="font-body-md text-body-md">A child was reported missing 2 miles away. Please review the details below and stay vigilant.</p>
+</div>
+</div>
+
+<!-- Recent Missing Children Carousel -->
+<section>
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Recent Missing Children</h2>
+    <button class="text-primary font-bold text-sm flex items-center gap-1 hover:underline" onclick="window.location.href='./reports_directory.html'">
+      <span>View All</span>
+      <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+    </button>
+  </div>
+  <div class="flex overflow-x-auto gap-4 pb-3 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-5 px-5">
+    <!-- Card 1 (Emmanuel T.) -->
+    <div class="flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 shadow-[0_6px_24px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.02)] border border-outline-variant/20 flex gap-3.5 items-center hover:shadow-[0_12px_32px_rgba(83,44,230,0.06)] hover:-translate-y-0.5 transition-all duration-300">
+      <div class="w-[96px] h-[112px] rounded-[14px] overflow-hidden flex-shrink-0 bg-surface-container-high relative shadow-inner">
+        <img alt="Emmanuel T." class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmFiiiTnfSMtj7u6lzjiqBQmqA2nk0VNfloOjmVkB4UB3ULfFxAubtlZmSrZj_LXfIwaXlIJuGSpbctsdnRvofC-jZGfUf6Eh3T5IExb9IquO7A0G25UpF9AQ4NIJ8mdJQo8_1lzm_XJsdaCsKByXtnY8i777qp2mLhX4Ie-RGGFFIL658DpYScxeiPjhrAChA3Ycj9tUJvTNC3lleY0Z9-nHSn2UCY4a9zWmo6w0pLrTJof3qs9wetp1RscW9Q9a1UoP1Dkm_4Eg_" />
+      </div>
+      <div class="flex-1 flex flex-col h-full justify-between py-0.5">
+        <div>
+          <h3 class="font-bold text-[16px] text-on-surface leading-snug mb-0.5">Emmanuel T.</h3>
+          <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1.5">
+            <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
+            2 miles away
+          </p>
+          <div class="mb-2">
+            <span class="bg-error-container text-error text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Urgent</span>
+          </div>
+        </div>
+        <button class="w-full py-2 px-3 border border-primary/20 text-primary rounded-full font-bold text-[11px] flex items-center justify-between hover:bg-primary/5 active:scale-98 transition-all" onclick="window.location.href='./report_details.html'">
+          <span>View Details</span>
+          <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Card 2 (Amina K.) -->
+    <div class="flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 shadow-[0_6px_24px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.02)] border border-outline-variant/20 flex gap-3.5 items-center hover:shadow-[0_12px_32px_rgba(83,44,230,0.06)] hover:-translate-y-0.5 transition-all duration-300">
+      <div class="w-[96px] h-[112px] rounded-[14px] overflow-hidden flex-shrink-0 bg-surface-container-high relative shadow-inner">
+        <img alt="Amina K." class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCO-1VPeGH3pNTvLINQZZfy4SdsNFWylyC8EJx3kp7rZrbLvJ6gMmzzZoUgJiS4ECu7-gGL4A1NtdgI19bVA313dXaelvqbDFInVeIhmam_2thFH_w54Ot1piZ4ia_lAYJJjT0uGYb6g4bIZBIHBlVVc1KhU0OoxncSPquQrGvJuKo338Py4g3iZY7cpyZMtHX7CMo_L88UVAFMdnu5hU6YPypTpga_9wzCbqfGIo3LJrafgqChM2ta7N_wj8g1LOafdmjryFmqRc_" />
+      </div>
+      <div class="flex-1 flex flex-col h-full justify-between py-0.5">
+        <div>
+          <h3 class="font-bold text-[16px] text-on-surface leading-snug mb-0.5">Amina K.</h3>
+          <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1.5">
+            <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
+            3 miles away
+          </p>
+          <div class="mb-2">
+            <span class="bg-error-container text-error text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Urgent</span>
+          </div>
+        </div>
+        <button class="w-full py-2 px-3 border border-primary/20 text-primary rounded-full font-bold text-[11px] flex items-center justify-between hover:bg-primary/5 active:scale-98 transition-all" onclick="window.location.href='./report_details.html'">
+          <span>View Details</span>
+          <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Report Action Buttons (Redesigned with rich gradients and icons) -->
+<section class="grid grid-cols-2 gap-3.5">
+  <button class="bg-gradient-to-r from-[#FF5C5C] to-[#E53E3E] text-white rounded-[18px] py-3 px-3.5 shadow-[0_4px_14px_rgba(229,62,62,0.18)] hover:opacity-95 active:scale-95 transition-all flex items-center justify-between group" onclick="window.location.href='./signaler_un_disparu_tape_1.html'">
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-105 transition-transform">
+        <span class="material-symbols-outlined text-white text-[20px]" style="font-variation-settings: 'FILL' 1;">security</span>
+      </div>
+      <span class="font-bold text-sm">Report Missing</span>
+    </div>
+    <span class="material-symbols-outlined text-white/80 text-[16px]">chevron_right</span>
+  </button>
+
+  <button class="bg-gradient-to-r from-[#6C5CE7] to-[#532CE6] text-white rounded-[18px] py-3 px-3.5 shadow-[0_4px_14px_rgba(83,44,230,0.18)] hover:opacity-95 active:scale-95 transition-all flex items-center justify-between group" onclick="window.location.href='./signaler_un_enfant_trouv_tape_1.html'">
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-105 transition-transform">
+        <span class="material-symbols-outlined text-white text-[20px]" style="font-variation-settings: 'FILL' 1;">location_on</span>
+      </div>
+      <span class="font-bold text-sm">Report Found</span>
+    </div>
+    <span class="material-symbols-outlined text-white/80 text-[16px]">chevron_right</span>
+  </button>
+</section>
+
+<!-- Browse Reports Card (Premium Purple Gradient Layout) -->
+<section>
+  <button class="w-full bg-gradient-to-r from-[#532ce6] to-[#8b6aff] text-white rounded-[24px] p-6 shadow-[0px_8px_30px_rgba(83,44,230,0.12)] hover:opacity-95 transition-all flex flex-row items-center justify-between group overflow-hidden relative" onclick="window.location.href='./reports_directory.html'">
+    <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+    <div class="flex flex-col items-start gap-1 z-10 text-left">
+      <h3 class="font-bold text-xl leading-tight">Browse Reports</h3>
+      <p class="text-sm text-white/85">View nearby active cases</p>
+    </div>
+    <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center z-10 group-hover:bg-white/30 transition-colors">
+      <span class="material-symbols-outlined text-white text-[24px]">arrow_forward</span>
+    </div>
+  </button>
+</section>
+
+<!-- Bottom Info Cards (Enfants trouvés récemment / Cas de disparition actifs) -->
+<section class="space-y-3">
+  <!-- Card 1 -->
+  <div class="bg-white rounded-[24px] p-4 shadow-sm border border-outline-variant/30 flex items-center justify-between hover:bg-surface-container-low transition-colors cursor-pointer" onclick="window.location.href='./reports_directory.html'">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-[18px] bg-[#E8E7FD] text-[#532ce6] flex items-center justify-center">
+        <span class="material-symbols-outlined text-[24px]">person</span>
+      </div>
+      <div class="text-left">
+        <h4 class="font-bold text-base text-on-surface">Enfants trouvés récemment</h4>
+        <p class="text-xs text-on-surface-variant">No found reports yet.</p>
+      </div>
+    </div>
+    <span class="material-symbols-outlined text-on-surface-variant text-[20px]">chevron_right</span>
+  </div>
+
+  <!-- Card 2 -->
+  <div class="bg-white rounded-[24px] p-4 shadow-sm border border-outline-variant/30 flex items-center justify-between hover:bg-surface-container-low transition-colors cursor-pointer" onclick="window.location.href='./reports_directory.html'">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-[18px] bg-[#FFDAD6] text-[#ba1a1a] flex items-center justify-center">
+        <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">warning</span>
+      </div>
+      <div class="text-left">
+        <h4 class="font-bold text-base text-on-surface">Cas de disparition actifs</h4>
+        <p class="text-xs text-on-surface-variant">No active missing cases.</p>
+      </div>
+    </div>
+    <span class="material-symbols-outlined text-on-surface-variant text-[20px]">chevron_right</span>
+  </div>
+</section>
+</main>
+
+<!-- Smart Device FAB (V2 Preview) -->
+<button aria-label="Smart Radar" onclick="window.location.href='./v2_smart_device_preview.html'" class="fixed right-6 bottom-24 md:bottom-8 w-16 h-16 rounded-full glass-fab text-white flex items-center justify-center z-50 hover:scale-105 transition-transform group">
+<span class="material-symbols-outlined text-[28px] group-hover:animate-pulse">radar</span>
+<span class="absolute -top-2 -right-2 bg-error text-white text-[10px] font-bold px-2 py-0.5 rounded-full border-2 border-surface">NEW</span>
+</button>
+
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-4 pb-safe bg-surface-container-lowest shadow-[0px_-12px_32px_rgba(0,0,0,0.08)] rounded-t-lg">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5 transition-transform duration-150 ease-in-out scale-95" href="./home_child_safety_v1.html">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-container px-4 py-1.5 hover:bg-surface-container-high rounded-xl transition-all" href="./reports_directory.html">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-sm text-label-sm mt-1">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-container px-4 py-1.5 hover:bg-surface-container-high rounded-xl transition-all relative" href="./alert_center.html">
+<span class="material-symbols-outlined">notifications_active</span>
+<span class="font-label-sm text-label-sm mt-1">Alerts</span>
+<span class="absolute top-1 right-3 w-2 h-2 bg-error rounded-full"></span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-container px-4 py-1.5 hover:bg-surface-container-high rounded-xl transition-all" href="./guardian_profile_updated_my_reports.html">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+
+<script>
+        // Hide Report Missing for Community Member / Volunteer (cannot report missing)
+        (function() {
+            const role = sessionStorage.getItem('childSafetyAccountType') || '';
+            const restricted = /Community Member|Volunteer Helper/i.test(role);
+            if (restricted) {
+                document.querySelectorAll('button').forEach(btn => {
+                    if (btn.textContent.includes('Report Missing')) {
+                        btn.style.display = 'none';
+                    }
+                });
+            }
+        })();
+    </script>
+</body></html>

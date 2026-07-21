@@ -1,0 +1,19 @@
+:root{
+  /* Base */
+  --cs-primary: #532ce6;
+  --cs-primary-soft: rgba(83, 44, 230, 0.1);
+  --cs-outline: #c9c4d9;
+  --cs-outline-subtle: rgba(201, 196, 217, 0.55);
+  --cs-surface: #F4F3F0;
+
+  --cs-surface-card: #ffffff;
+
+  --cs-on-surface: #1c1a24;
+  --cs-on-variant: #474556;
+
+  --cs-error: #ba1a1a;
+  --cs-success: #1b7a4e;
+
+  /* Tailwind-like semantic mapping used across pages */
+  --cs-background: #F4F3F0;
+}

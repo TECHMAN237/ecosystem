@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<title>Smart Wearable Protection System - Coming Soon</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#f4eefd",
+                        "surface-bright": "#F5F4F2",
+                        "surface-container": "#f1ebfa",
+                        "on-tertiary-fixed": "#331200",
+                        "surface-container-highest": "#e5e0ef",
+                        "primary-fixed": "#e5deff",
+                        "secondary": "#5f5e60",
+                        "on-surface": "#1c1a24",
+                        "inverse-surface": "#312f3a",
+                        "surface-dim": "#ddd8e6",
+                        "secondary-fixed-dim": "#c8c6c8",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#f6f0ff",
+                        "on-secondary-fixed-variant": "#474649",
+                        "on-background": "#1c1a24",
+                        "tertiary": "#8f3e00",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#e4e2e4",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#4206d7",
+                        "on-primary-fixed": "#190064",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#ebe6f4",
+                        "tertiary-container": "#b55100",
+                        "primary-container": "#6c4dff",
+                        "primary-fixed-dim": "#c8bfff",
+                        "surface-tint": "#5b38ee",
+                        "secondary-container": "#e2dfe1",
+                        "surface-variant": "#e5e0ef",
+                        "outline": "#787588",
+                        "tertiary-fixed-dim": "#ffb68e",
+                        "outline-variant": "#c9c4d9",
+                        "on-secondary-container": "#636264",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#773300",
+                        "background": "#0f0c29", /* Override for high-tech aesthetic */
+                        "primary": "#532ce6",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#ffefe9",
+                        "on-secondary-fixed": "#1b1b1d",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#c8bfff",
+                        "on-surface-variant": "#c8c6c8", /* Lightened for dark bg */
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#1a1638", /* Darkened */
+                        "surface": "#13102a", /* Darkened */
+                        "tertiary-fixed": "#ffdbca",
+                        "accent-glow": "#00f0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "xl": "32px",
+                        "container-margin": "20px",
+                        "xs": "8px",
+                        "md": "16px",
+                        "gutter": "16px",
+                        "base": "4px",
+                        "sm": "12px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"],
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "label-bold": ["12px", { "lineHeight": "16px", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    },
+                    "backgroundImage": {
+                        'cyber-grid': 'linear-gradient(rgba(83, 44, 230, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(83, 44, 230, 0.1) 1px, transparent 1px)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0f0c29;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .bg-cyber-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px), 
+                linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+        }
+
+        .glow-effect {
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.2);
+        }
+
+        .glass-panel {
+            background: rgba(19, 16, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(83, 44, 230, 0.3);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen bg-cyber-grid relative">
+<!-- TopAppBar - Adapted for Teaser -->
+<header class="flex items-center justify-between px-container-margin h-16 w-full max-w-7xl mx-auto glass-panel sticky top-0 z-50 shadow-[0px_4px_20px_rgba(0,240,255,0.06)] border-b border-primary/20">
+<div onclick="window.location.href='./home_child_safety_v1.html'" class="flex items-center gap-sm cursor-pointer hover:bg-surface-container-low/50 p-2 rounded-xl transition-colors duration-200">
+<span class="material-symbols-outlined text-accent-glow" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+<span class="text-on-surface-variant font-label-sm">Back to Dashboard</span>
+</div>
+<div class="font-headline-md text-headline-md font-bold tracking-tight text-white flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">security</span>
+            V2 Preview
+        </div>
+<div class="w-10"></div> <!-- Spacer -->
+</header>
+<main class="max-w-7xl mx-auto px-container-margin py-xl relative flex flex-col items-center justify-center min-h-[calc(100vh-64px)]">
+<!-- Ambient Glow Background -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-primary rounded-full blur-[120px] opacity-20 pointer-events-none"></div>
+<div class="text-center mb-xl relative z-10 w-full max-w-3xl">
+<div class="inline-block px-4 py-1.5 rounded-full glass-panel text-accent-glow font-label-bold uppercase tracking-widest mb-md border border-accent-glow/30">
+                Coming Soon
+            </div>
+<h1 class="font-display text-display text-white mb-md">
+                Smart Wearable <br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent-glow">Protection System</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+                Next-generation hardware integration for uncompromising safety. Real-time tracking and immediate SOS response, designed for the Child Safety ecosystem.
+            </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl w-full max-w-5xl relative z-10 items-center">
+<!-- Product Mockup Area -->
+<div class="relative flex justify-center items-center h-[400px] md:h-[500px] glass-panel rounded-[3rem] glow-effect overflow-hidden group">
+<!-- Decorative concentric circles -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="w-64 h-64 rounded-full border border-primary/20 animate-[spin_10s_linear_infinite]"></div>
+<div class="absolute w-48 h-48 rounded-full border border-accent-glow/20 animate-[spin_15s_linear_infinite_reverse]"></div>
+</div>
+<img alt="Smart Bracelet Mockup" class="relative z-10 w-3/4 object-contain transition-transform duration-700 group-hover:scale-105" data-alt="A highly detailed, photorealistic 3D render of a futuristic smart wearable bracelet for children, floating in a dark, high-tech environment. The bracelet features a sleek, matte black rubberized strap with glowing neon blue and purple accents. A minimal digital display shows GPS coordinates and a heartbeat icon. The lighting is cinematic, with soft rim lights highlighting the curves of the device against a deep space background, conveying a sense of advanced security and modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxUs54l-vxtY7BXwZBR0FvLBDMcd6NyP7tJzKDEpzQsOSw9vsjKe4mopMbZ6gnFVLGn2I4WM5RL-N_9Xws7YUyWpIyntQ9KtYrxrTFn2WUHx88ZsUj_zx4jap1uiG9pEJM3Eq1HxLyB73NebllegmBSq161ELYGnziVjoRFE3czsHh1MRwbL13iwCULiBUErbuMkRPO2WYU3hyWGWG3BcP2jPm11Y5gEQClU-MQQ4W3sjkH5CBjKLNPTPXOipu8bqmh_o7HcGDoQxD"/>
+<!-- Floating Info Tags -->
+<div class="absolute top-10 right-10 glass-panel px-sm py-xs rounded-xl flex items-center gap-xs border border-primary/30 animate-pulse">
+<div class="w-2 h-2 rounded-full bg-accent-glow"></div>
+<span class="font-label-sm text-white">GPS Active</span>
+</div>
+</div>
+<!-- Features List -->
+<div class="flex flex-col gap-md">
+<div class="glass-panel p-lg rounded-3xl border border-primary/20 hover:border-primary/50 transition-colors duration-300 transform hover:-translate-y-1">
+<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">my_location</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-white mb-xs">Sub-Meter GPS Tracking</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Continuous GSM/GPS location syncing with the main app dashboard. Pinpoint accuracy even in dense urban environments.
+                    </p>
+</div>
+<div class="glass-panel p-lg rounded-3xl border border-error/20 hover:border-error/50 transition-colors duration-300 transform hover:-translate-y-1">
+<div class="w-12 h-12 rounded-full bg-error/20 flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">emergency_home</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-white mb-xs">Instant SOS Alerts</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        A dedicated, tactile panic button that immediately broadcasts location and opens a direct audio channel to guardians.
+                    </p>
+</div>
+<div class="glass-panel p-lg rounded-3xl border border-accent-glow/20 hover:border-accent-glow/50 transition-colors duration-300 transform hover:-translate-y-1">
+<div class="w-12 h-12 rounded-full bg-accent-glow/20 flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-accent-glow" style="font-variation-settings: 'FILL' 1;">share_location</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-white mb-xs">Dynamic Geofencing</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Set safe zones (school, home) and receive instant push notifications if the wearer breaches the perimeter.
+                    </p>
+</div>
+</div>
+</div>
+<div class="mt-xl relative z-10">
+<button onclick="history.back()" class="bg-primary hover:bg-primary-fixed text-white font-label-bold py-md px-xl rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(83,44,230,0.4)] hover:shadow-[0_0_30px_rgba(83,44,230,0.6)] flex items-center gap-sm">
+                Join the Waitlist
+                <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</main>
+<!-- Suppress BottomNavBar for this landing/teaser page as per rules -->
+</body></html>

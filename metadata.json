@@ -1,0 +1,8 @@
+{
+  "name": "Child Safety",
+  "description": "Community-Powered Child Protection application to report and track missing children and find safety information.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

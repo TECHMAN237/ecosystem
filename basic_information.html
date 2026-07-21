@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<title>Guardian Flow — Basic Information</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#190064",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#F5F4F2",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "surface-container": "#f1ebfa",
+                    "on-surface-variant": "#474556",
+                    "surface": "#F5F4F2",
+                    "background": "#F5F4F2",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#4206d7",
+                    "inverse-surface": "#312f3a",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#e4e2e4",
+                    "inverse-on-surface": "#f4eefd",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#b55100",
+                    "on-secondary-fixed-variant": "#474649",
+                    "surface-container-low": "#F5F4F2",
+                    "on-secondary-container": "#636264",
+                    "secondary-container": "#e2dfe1",
+                    "on-background": "#1c1a24",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#ebe6f4",
+                    "surface-dim": "#ddd8e6",
+                    "surface-variant": "#e5e0ef",
+                    "secondary-fixed-dim": "#c8c6c8",
+                    "on-surface": "#1c1a24",
+                    "outline-variant": "#c9c4d9",
+                    "outline": "#787588",
+                    "tertiary": "#8f3e00",
+                    "on-tertiary-fixed-variant": "#773300",
+                    "surface-container-highest": "#e5e0ef",
+                    "primary-fixed-dim": "#c8bfff",
+                    "on-primary-container": "#f6f0ff",
+                    "tertiary-fixed-dim": "#ffb68e",
+                    "on-error-container": "#93000a",
+                    "secondary": "#5f5e60",
+                    "on-secondary-fixed": "#1b1b1d",
+                    "surface-tint": "#5b38ee",
+                    "on-tertiary-fixed": "#331200",
+                    "inverse-primary": "#c8bfff",
+                    "primary-fixed": "#e5deff",
+                    "tertiary-fixed": "#ffdbca",
+                    "primary-container": "#6c4dff",
+                    "on-tertiary-container": "#ffefe9",
+                    "primary": "#532ce6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-margin": "20px",
+                    "xs": "8px",
+                    "md": "16px",
+                    "xl": "32px",
+                    "sm": "12px",
+                    "lg": "24px",
+                    "base": "4px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "display": ["Plus Jakarta Sans"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .form-input-glow:focus-within {
+            box-shadow: 0 0 0 4px rgba(108, 77, 255, 0.12);
+        }
+        .step-active { width: 24px; border-radius: 9999px; }
+        .step-inactive { width: 8px; border-radius: 50%; }
+        
+        /* Custom scrollbar for better UI */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e5e0ef; border-radius: 10px; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="w-full top-0 sticky z-50 bg-background flex items-center px-container-margin py-md">
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors p-xs rounded-full active:scale-95 transition-transform" onclick="history.back()">
+                arrow_back
+            </button>
+<h1 class="font-display text-headline-lg text-primary">Guardian Flow</h1>
+</div>
+</header>
+<main class="flex-1 px-container-margin pb-32">
+<div class="max-w-md mx-auto pt-lg">
+<!-- Progress Tracker -->
+<div class="flex items-center gap-xs mb-xl">
+<div class="h-2 step-inactive bg-primary-fixed"></div>
+<div class="h-2 step-active bg-primary transition-all duration-500"></div>
+<div class="h-2 step-inactive bg-outline-variant"></div>
+<span class="ml-sm font-label-bold text-label-bold text-outline">Step 2 of 3</span>
+</div>
+<!-- Header Content -->
+<div class="mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-background mb-base">Tell us about yourself</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">We need a few more details to set up your secure account.</p>
+</div>
+<!-- Form Fields -->
+<form class="space-y-lg" id="basicInfoForm" action="./onboarding_community_protection_step_1.html">
+<!-- Full Name -->
+<div class="space-y-xs">
+<label class="font-label-bold text-label-bold text-on-surface ml-xs">Full Name</label>
+<div class="relative group form-input-glow transition-all rounded-lg">
+<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="Enter your full name" type="text"/>
+</div>
+</div>
+<!-- Username -->
+<div class="space-y-xs">
+<label class="font-label-bold text-label-bold text-on-surface ml-xs">Username</label>
+<div class="relative group form-input-glow transition-all rounded-lg">
+<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="@username" type="text"/>
+</div>
+</div>
+<!-- Phone Number Grid -->
+<div class="grid grid-cols-4 gap-sm">
+<div class="col-span-1 space-y-xs">
+<label class="font-label-bold text-label-bold text-on-surface ml-xs text-nowrap">Code</label>
+<div class="relative group form-input-glow transition-all rounded-lg">
+<select class="w-full h-[56px] px-md bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 appearance-none">
+<option>+1</option>
+<option>+44</option>
+<option>+91</option>
+<option>+61</option>
+</select>
+</div>
+</div>
+<div class="col-span-3 space-y-xs">
+<label class="font-label-bold text-label-bold text-on-surface ml-xs">Phone Number</label>
+<div class="relative group form-input-glow transition-all rounded-lg">
+<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="000 000 0000" type="tel"/>
+</div>
+</div>
+</div>
+<!-- Email Address (Optional) -->
+<div class="space-y-xs">
+<div class="flex justify-between items-center ml-xs">
+<label class="font-label-bold text-label-bold text-on-surface">Email Address</label>
+<span class="text-[10px] font-label-bold text-outline uppercase tracking-wider">Optional</span>
+</div>
+<div class="relative group form-input-glow transition-all rounded-lg">
+<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="email@example.com" type="email"/>
+</div>
+</div>
+<!-- City -->
+<div class="space-y-xs">
+<label class="font-label-bold text-label-bold text-on-surface ml-xs">City</label>
+<div class="relative group form-input-glow transition-all rounded-lg">
+<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="Where do you live?" type="text"/>
+</div>
+</div>
+<!-- Password Container -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="space-y-xs">
+<label class="font-label-bold text-label-bold text-on-surface ml-xs">Password</label>
+<div class="relative group form-input-glow transition-all rounded-lg">
+<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="••••••••" type="password"/>
+<button class="absolute right-md top-1/2 -translate-y-1/2 text-outline material-symbols-outlined hover:text-primary transition-colors" type="button">
+                                visibility
+                            </button>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-bold text-label-bold text-on-surface ml-xs">Confirm Password</label>
+<div class="relative group form-input-glow transition-all rounded-lg">
+<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="••••••••" type="password"/>
+</div>
+</div>
+</div>
+<!-- Validation State Example (Hidden by default, shown for demo) -->
+<div class="flex items-start gap-xs p-md bg-surface-container-low rounded-lg border border-outline-variant/30">
+<span class="material-symbols-outlined text-primary text-[18px]">info</span>
+<p class="text-[12px] leading-relaxed text-on-surface-variant font-body-md">
+                        Password must be at least 8 characters long and include a mix of uppercase letters, numbers, and symbols for maximum security.
+                    </p>
+</div>
+</form>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Action Area) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-container-margin py-md bg-surface-container-lowest shadow-[0px_-4px_20px_rgba(108,77,255,0.06)] rounded-t-lg">
+<button class="flex flex-col items-center justify-center text-secondary px-lg py-sm hover:opacity-90 active:scale-98 transition-all duration-200 group" onclick="history.back()">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined">chevron_left</span>
+<span class="font-label-bold text-label-bold">Previous</span>
+</div>
+</button>
+<button class="flex items-center justify-center bg-primary text-on-primary rounded-full px-xl py-md shadow-lg hover:opacity-95 active:scale-95 transition-all duration-200" onclick="window.location.href='./onboarding_community_protection_step_1.html'" type="button">
+<span class="font-label-bold text-label-bold mr-xs uppercase tracking-wide">Continue</span>
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</nav>
+<!-- Atmosphere/Decorative Element (Subtle Glass Gradient) -->
+<div class="fixed top-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
+<div class="fixed bottom-[-5%] left-[-5%] w-[30%] h-[30%] bg-primary/3 rounded-full blur-[100px] pointer-events-none z-0"></div>
+<script>
+        // Simple Interaction: Toggle Password Visibility
+        const togglePass = document.querySelectorAll('.material-symbols-outlined');
+        togglePass.forEach(btn => {
+            if (btn.innerText === 'visibility') {
+                btn.addEventListener('click', function() {
+                    const input = this.parentElement.querySelector('input');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        this.innerText = 'visibility_off';
+                    } else {
+                        input.type = 'password';
+                        this.innerText = 'visibility';
+                    }
+                });
+            }
+        });
+
+        // Micro-interaction: Input focus effects handled by Tailwind focus-within and form-input-glow
+    </script>
+</body></html>

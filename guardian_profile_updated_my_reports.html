@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-secondary-fixed-variant": "#474649",
+                  "on-secondary": "#ffffff",
+                  "surface-container-high": "#ebe6f4",
+                  "secondary": "#5f5e60",
+                  "error-container": "#ffdad6",
+                  "on-surface-variant": "#474556",
+                  "on-primary-fixed-variant": "#4206d7",
+                  "secondary-container": "#e2dfe1",
+                  "tertiary-fixed-dim": "#ffb68e",
+                  "surface": "#F5F4F2",
+                  "surface-container-low": "#F5F4F2",
+                  "tertiary-fixed": "#ffdbca",
+                  "secondary-fixed": "#e4e2e4",
+                  "inverse-surface": "#312f3a",
+                  "tertiary-container": "#b55100",
+                  "on-surface": "#1c1a24",
+                  "on-secondary-container": "#636264",
+                  "inverse-primary": "#c8bfff",
+                  "inverse-on-surface": "#f4eefd",
+                  "error": "#ba1a1a",
+                  "surface-tint": "#5b38ee",
+                  "on-tertiary": "#ffffff",
+                  "background": "#F5F4F2",
+                  "primary-fixed-dim": "#c8bfff",
+                  "on-tertiary-fixed-variant": "#773300",
+                  "on-tertiary-fixed": "#331200",
+                  "on-primary": "#ffffff",
+                  "on-background": "#1c1a24",
+                  "surface-container-highest": "#e5e0ef",
+                  "surface-variant": "#e5e0ef",
+                  "surface-container-lowest": "#ffffff",
+                  "surface-bright": "#F5F4F2",
+                  "primary": "#532ce6",
+                  "surface-container": "#f1ebfa",
+                  "on-error": "#ffffff",
+                  "on-primary-fixed": "#190064",
+                  "on-error-container": "#93000a",
+                  "surface-dim": "#ddd8e6",
+                  "outline": "#787588",
+                  "on-tertiary-container": "#ffefe9",
+                  "primary-container": "#6c4dff",
+                  "primary-fixed": "#e5deff",
+                  "on-secondary-fixed": "#1b1b1d",
+                  "tertiary": "#8f3e00",
+                  "on-primary-container": "#f6f0ff",
+                  "secondary-fixed-dim": "#c8c6c8",
+                  "outline-variant": "#c9c4d9"
+          },
+          "borderRadius": {
+                  "DEFAULT": "1rem",
+                  "lg": "2rem",
+                  "xl": "3rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "xs": "8px",
+                  "container-margin": "20px",
+                  "sm": "12px",
+                  "gutter": "16px",
+                  "xl": "32px",
+                  "md": "16px",
+                  "lg": "24px",
+                  "base": "4px"
+          },
+          "fontFamily": {
+                  "label-sm": ["Inter"],
+                  "label-bold": ["Inter"],
+                  "display": ["Plus Jakarta Sans"],
+                  "body-lg": ["Inter"],
+                  "body-md": ["Inter"],
+                  "headline-md": ["Plus Jakarta Sans"],
+                  "headline-lg": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+                  "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                  "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
+                  "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                  "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                  "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                  "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                  "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                  "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .custom-shadow {
+      box-shadow: 0px 4px 20px rgba(108, 77, 255, 0.06);
+    }
+    .gradient-header {
+      background: linear-gradient(135deg, #6c4dff 0%, #a389ff 100%);
+    }
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+    }
+    .fab-glow {
+      box-shadow: 0px 0px 15px rgba(108, 77, 255, 0.4);
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen pb-32">
+<!-- Top Navigation Shell -->
+<header class="w-full top-0 left-0 sticky flex justify-between items-center px-container-margin py-md bg-surface dark:bg-background shadow-[0px_4px_20px_rgba(108,77,255,0.06)] z-40">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary font-bold text-headline-lg-mobile">security</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed">Guardian Flow</h1>
+</div>
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed hover:opacity-80 transition-opacity active:scale-95 duration-200" onclick="window.location.href='./alert_center.html'">notifications</button>
+</header>
+<!-- Hero Profile Section -->
+<section class="gradient-header pt-lg pb-xl px-container-margin rounded-b-xl relative overflow-hidden">
+<!-- Abstract Shapes for Premium Feel -->
+<div class="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-24 -mt-12"></div>
+<div class="absolute bottom-0 left-0 w-32 h-32 bg-primary-container/20 rounded-full -ml-16 -mb-8"></div>
+<div class="flex flex-col items-center gap-md relative z-10">
+<div class="relative">
+<div class="w-24 h-24 rounded-full border-4 border-white/30 overflow-hidden custom-shadow">
+<img class="w-full h-full object-cover" data-alt="A professional portrait of a woman named Elena Rodriguez with a warm, confident expression. She has dark hair and is wearing a smart casual outfit. The lighting is soft and natural, emphasizing a trustworthy and reliable personality. The background is a clean, minimalist studio setting with soft purple and white tones consistent with a premium mobile application interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClC0M3fj535NrT_e6O1qyk0jz7aObxZ-bz41CTQC0qBLlCZmd807Rta2Hw7GhNhGW4x_UhiTrC5ro5C2R8EEwvhqXB3kUQhpa6D-uGNpyoJkUfa0r7zTXe_96bVZ9Yj7xeqAmTbIX3RQkVxaefGmDf0DOaoqa9Td2R5neesC4v_UnUHma8w9LTQIVneBzufAe_0nFcOsjGmT4g0GMvnPWt373nHKwXM1MaNHi4AdeLWIr3YyU2-g-y2wPOpR0YzhSjpTOoMMrDYqpH"/>
+</div>
+<div class="absolute bottom-1 right-1 bg-primary text-white w-7 h-7 rounded-full flex items-center justify-center border-2 border-white">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div class="text-center">
+<h2 class="font-headline-lg text-headline-lg text-white">Elena Rodriguez</h2>
+<p class="font-label-sm text-label-sm text-white/80 tracking-wide uppercase">Community Guardian Elite</p>
+</div>
+</div>
+</section>
+<main class="px-container-margin -mt-8 relative z-20 space-y-lg">
+<!-- Stats Section -->
+<div class="grid grid-cols-2 gap-md">
+<div class="bg-surface-container-lowest p-lg rounded-lg custom-shadow flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-primary mb-xs" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="font-headline-md text-headline-md text-on-surface">14</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Reports Made</span>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-lg custom-shadow flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-tertiary mb-xs" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+<span class="font-headline-md text-headline-md text-on-surface">850</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Karma</span>
+</div>
+</div>
+<!-- Community Mode Section -->
+<section class="bg-surface-container-lowest p-lg rounded-lg custom-shadow">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" id="mode-icon">radar</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Active Mode</h3>
+<p class="font-label-sm text-label-sm text-primary" id="mode-status">I Can Help</p>
+</div>
+</div>
+<!-- Modern Toggle Switch -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" id="mode-toggle" type="checkbox"/>
+<div class="w-14 h-8 bg-surface-container-high rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        When Active, you'll receive emergency SOS alerts from children or parents within 500 meters of your current location. Your vigilance saves lives.
+      </p>
+</section>
+<!-- My Cases & Reports Card -->
+<section class="bg-surface-container-lowest p-lg rounded-lg custom-shadow">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-md">My Cases &amp; Reports</h3>
+<button class="w-full bg-primary hover:bg-primary-container text-white py-md px-lg rounded-full font-headline-md flex items-center justify-center gap-sm transition-all active:scale-95 mb-md" onclick="window.location.href='./my_case_dashboard_refined_actions.html'">
+<span class="material-symbols-outlined">description</span>
+<span>View My Reports</span>
+</button>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+Access your full log of missing and found child reports. Track and manage all cases you've reported.
+</p>
+</section>
+<!-- V2 Device Preview Card -->
+<section class="relative bg-inverse-surface p-lg rounded-lg overflow-hidden flex items-center gap-lg">
+<div class="absolute -right-8 -top-8 w-32 h-32 bg-primary/20 rounded-full blur-2xl"></div>
+<div class="relative z-10 w-24 h-24 flex-shrink-0">
+<div class="w-full h-full bg-surface/5 rounded-lg border border-white/10 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover mix-blend-screen" data-alt="A futuristic, sleek smart wearable bracelet specifically designed for child safety. The device features a soft matte purple finish with a hidden LED interface that subtly glows. It is presented as a high-end tech product against a dark, atmospheric background with soft, ethereal lighting that highlights its organic, rounded geometry and premium materials." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgY96otwHFZCR9CAwDZsgwe11tSv5pZE4roETcVUokmz2uKe5BVyypv770bFXxdE1heZt8AHIKNJTwxWsZ793J-p_zpSInubjYn4Zdv2iNjb7hgzheqREcfWi2-dReCgpKIAqXR5j6r8vKKeyMtaL-J7FdMSD1l0sdlWWuhaICKaO0tC1p7Km_aNeIfbI_ixfrbsZ_nbnQ0j6gETW-T56jYw_pVwEp9H13tYYVma7exe5jxqtsgFhpkfjLLuauyTP53RDVgbdCxnUS"/>
+</div>
+</div>
+<div class="relative z-10 flex-1">
+<h3 class="font-headline-md text-headline-md text-white mb-xs">Protection V2</h3>
+<p class="font-label-sm text-label-sm text-white/60 mb-md">Smart Wearable Protection System Coming Soon.</p>
+<button class="bg-primary hover:bg-primary-container text-white px-md py-xs rounded-full font-label-bold text-label-bold transition-all active:scale-95" onclick="window.location.href='./v2_smart_device_preview.html'">
+          Learn More
+        </button>
+</div>
+</section>
+<!-- Settings List -->
+<div class="bg-surface-container-lowest rounded-lg custom-shadow overflow-hidden mb-8">
+<div class="divide-y divide-surface-container">
+<button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./notifications_settings.html'">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">notifications</span>
+<span class="font-body-lg text-body-lg text-on-surface">Notifications</span>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./privacy_settings.html'">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">lock</span>
+<span class="font-body-lg text-body-lg text-on-surface">Privacy</span>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./emergency_preferences.html'">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">emergency</span>
+<span class="font-body-lg text-body-lg text-on-surface">Emergency Preferences</span>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./help_center.html'">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">help</span>
+<span class="font-body-lg text-body-lg text-on-surface">Help Center</span>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./about_safeguardian.html'">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">info</span>
+<span class="font-body-lg text-body-lg text-on-surface">About</span>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./login_child_safety.html'">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-error">logout</span>
+<span class="font-body-lg text-body-lg text-error">Logout</span>
+</div>
+</button>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter py-xs pb-safe bg-surface-container-lowest dark:bg-inverse-surface shadow-[0px_-4px_20px_rgba(108,77,255,0.06)] rounded-t-lg">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-transform duration-200" href="./home_child_safety_v1.html">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-transform duration-200" href="./reports_directory.html">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-sm text-label-sm">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-transform duration-200" href="./alert_center.html">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-sm text-label-sm">Alerts</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-2 hover:opacity-80 transition-opacity active:scale-90 transition-transform duration-200" href="./guardian_profile_updated_my_reports.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+<script>
+    const modeToggle = document.getElementById('mode-toggle');
+    const modeStatus = document.getElementById('mode-status');
+    const modeIcon = document.getElementById('mode-icon');
+
+    modeToggle.addEventListener('change', (e) => {
+      if(e.target.checked) {
+        modeStatus.innerText = 'I Can Help';
+        modeStatus.classList.remove('text-on-surface-variant');
+        modeStatus.classList.add('text-primary');
+        modeIcon.innerText = 'radar';
+      } else {
+        modeStatus.innerText = 'Passive Mode';
+        modeStatus.classList.remove('text-primary');
+        modeStatus.classList.add('text-on-surface-variant');
+        modeIcon.innerText = 'do_not_disturb_on';
+      }
+    });
+
+    // Simple interaction feedback for buttons
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('touchstart', () => {
+        btn.classList.add('opacity-70');
+      });
+      btn.addEventListener('touchend', () => {
+        btn.classList.remove('opacity-70');
+      });
+    });
+  </script>
+</body></html>

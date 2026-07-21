@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            -webkit-tap-highlight-color: transparent;
+            background-color: #F5F4F2;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#5f5e60",
+                        "on-surface": "#1c1a24",
+                        "primary-container": "#6c4dff",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#312f3a",
+                        "primary": "#532ce6",
+                        "surface-container-high": "#ebe6f4",
+                        "surface-container": "#f1ebfa",
+                        "surface": "#F5F4F2",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#1c1a24",
+                        "outline": "#787588",
+                        "outline-variant": "#c9c4d9",
+                        "on-primary": "#ffffff",
+                        "background": "#F5F4F2",
+                        "on-primary-container": "#f6f0ff",
+                        "surface-variant": "#e5e0ef",
+                        "error": "#FF4D4F"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-margin": "20px",
+                        "xl": "32px",
+                        "sm": "12px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "xs": "8px",
+                        "gutter": "16px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen font-body-md overflow-x-hidden pb-24">
+<!-- Top App Bar -->
+<header class="w-full top-0 left-0 sticky z-50 bg-surface dark:bg-background shadow-[0px_4px_20px_rgba(108,77,255,0.06)] flex justify-between items-center px-container-margin py-md">
+<div class="flex items-center gap-md">
+<button class="active:scale-95 duration-200 text-primary transition-opacity hover:opacity-80" onclick="history.back()">
+<span class="material-symbols-outlined text-headline-lg">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Signaler un enfant trouvé</h1>
+</div>
+<button class="active:scale-95 duration-200 text-primary transition-opacity hover:opacity-80">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</header>
+<main class="px-container-margin py-lg space-y-lg pb-28">
+<!-- Step Indicator -->
+<div class="flex items-center justify-center gap-xs">
+<div class="flex items-center justify-center w-8 h-8 rounded-full bg-primary-container text-on-tertiary font-bold shadow-md">1</div>
+<div class="w-12 h-0.5 bg-outline-variant rounded-full"></div>
+<div class="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant font-medium">2</div>
+<div class="w-12 h-0.5 bg-outline-variant rounded-full"></div>
+<div class="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant font-medium">3</div>
+</div>
+<!-- Title Section -->
+<div class="space-y-xs">
+<h2 class="font-headline-md text-headline-md text-primary-container">Détails de la découverte</h2>
+<p class="font-body-md text-on-surface-variant opacity-80">Veuillez fournir les informations sur le lieu et le moment de la découverte.</p>
+</div>
+<!-- Photo Upload Section -->
+<div class="relative group cursor-pointer active:scale-[0.98] transition-all duration-300">
+<div class="border-2 border-dashed border-primary-container/30 bg-surface-container-lowest rounded-lg p-xl flex flex-col items-center justify-center text-center space-y-sm shadow-[0px_4px_20px_rgba(108,77,255,0.06)]">
+<div class="w-16 h-16 rounded-full bg-primary-container/10 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[32px]">photo_camera</span>
+</div>
+<div class="space-y-base">
+<p class="font-headline-md text-primary-container">Ajouter une photo</p>
+<p class="font-label-sm text-on-surface-variant">Visage dégagé de préférence</p>
+</div>
+</div>
+<input accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" type="file"/>
+</div>
+<!-- Form Fields -->
+<div class="space-y-md">
+<!-- Location Input -->
+<div class="space-y-xs">
+<label class="font-label-sm text-on-surface-variant ml-xs">Lieu exact</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-md text-primary-container">location_on</span>
+<input class="w-full pl-[48px] pr-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-4 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none text-body-lg" placeholder="Ex: Marché Central, Yaoundé" type="text"/>
+</div>
+</div>
+<!-- Row: Time and Sex -->
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="font-label-sm text-on-surface-variant ml-xs">Heure approx.</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-md text-primary-container">schedule</span>
+<input class="w-full pl-[48px] pr-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-4 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none text-body-lg" placeholder="Ex: 14:30" type="text"/>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-on-surface-variant ml-xs">Sexe</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-md text-primary-container">wc</span>
+<select class="w-full pl-[48px] pr-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-4 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none text-body-lg appearance-none">
+<option value="">Sélectionner</option>
+<option value="M">Masculin</option>
+<option value="F">Féminin</option>
+<option value="U">Inconnu</option>
+</select>
+<span class="material-symbols-outlined absolute right-md pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Clothing Description -->
+<div class="space-y-xs">
+<label class="font-label-sm text-on-surface-variant ml-xs">Tenue vestimentaire (description)</label>
+<textarea class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-4 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none text-body-lg resize-none" placeholder="Ex: T-shirt bleu, short gris" rows="3"></textarea>
+</div>
+</div>
+<!-- Primary Button -->
+<button class="w-full bg-primary-container text-on-tertiary py-md px-lg rounded-full font-headline-md flex items-center justify-center gap-sm shadow-lg active:scale-95 transition-transform duration-200 hover:opacity-90" onclick="window.location.href='./v_rifier_le_signalement_tape_2_evidence.html'">
+<span>Suivant</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter py-xs pb-safe bg-surface-container-lowest dark:bg-inverse-surface shadow-[0px_-4px_20px_rgba(108,77,255,0.06)] rounded-t-lg">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high transition-colors active:scale-90 duration-200" href="./home_child_safety_v1.html"> <span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-2 active:scale-90 transition-transform duration-200" href="./reports_directory.html">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-sm text-label-sm">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high transition-colors active:scale-90 duration-200" href="./v_rifier_le_signalement_tape_2_evidence.html">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-label-sm text-label-sm">Alerts</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high transition-colors active:scale-90 duration-200" href="./guardian_profile_updated_my_reports.html">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for the file input
+        const dropZone = document.querySelector('.relative.group');
+        const fileInput = document.querySelector('input[type="file"]');
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                const container = dropZone.querySelector('.border-2');
+                container.classList.remove('border-primary-container/30');
+                container.classList.add('border-primary-container', 'bg-primary-container/5');
+                container.querySelector('p').textContent = "Photo sélectionnée";
+                container.querySelector('.font-label-sm').textContent = fileName;
+            }
+        });
+    </script>
+</body></html>

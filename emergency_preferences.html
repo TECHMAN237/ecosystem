@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<title>Emergency Preferences - SafeGuardian</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#e5deff",
+                        "tertiary-fixed-dim": "#ffb68e",
+                        "surface-tint": "#5b38ee",
+                        "surface-container": "#f1ebfa",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#c8bfff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#6c4dff",
+                        "on-error": "#ffffff",
+                        "secondary": "#5f5e60",
+                        "surface-dim": "#ddd8e6",
+                        "secondary-container": "#e2dfe1",
+                        "primary": "#532ce6",
+                        "on-tertiary-fixed": "#331200",
+                        "on-primary-fixed-variant": "#4206d7",
+                        "primary-fixed-dim": "#c8bfff",
+                        "on-surface-variant": "#474556",
+                        "on-tertiary-fixed-variant": "#773300",
+                        "inverse-on-surface": "#f4eefd",
+                        "tertiary-fixed": "#ffdbca",
+                        "surface-variant": "#e5e0ef",
+                        "secondary-fixed": "#e4e2e4",
+                        "on-secondary-fixed-variant": "#474649",
+                        "on-secondary-fixed": "#1b1b1d",
+                        "on-error-container": "#93000a",
+                        "on-background": "#1c1a24",
+                        "error": "#ba1a1a",
+                        "background": "#F5F4F2",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#F5F4F2",
+                        "secondary-fixed-dim": "#c8c6c8",
+                        "tertiary": "#8f3e00",
+                        "surface-container-high": "#ebe6f4",
+                        "on-secondary-container": "#636264",
+                        "inverse-surface": "#312f3a",
+                        "on-primary-container": "#f6f0ff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#190064",
+                        "outline-variant": "#c9c4d9",
+                        "on-tertiary-container": "#ffefe9",
+                        "outline": "#787588",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#b55100",
+                        "surface-container-highest": "#e5e0ef",
+                        "on-surface": "#1c1a24",
+                        "surface": "#F5F4F2",
+                        "surface-bright": "#F5F4F2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "sm": "12px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "xs": "8px",
+                        "gutter": "16px",
+                        "base": "4px",
+                        "container-margin": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "label-bold": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #f7f7fa;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .soft-shadow {
+            box-shadow: 0px 4px 20px rgba(108, 77, 255, 0.06);
+        }
+        .urgent-accent {
+            border-left: 4px solid #FF4D4F;
+        }
+        .custom-toggle:checked + .toggle-dot {
+            transform: translateX(100%);
+            background-color: #ffffff;
+        }
+        .custom-toggle:checked + .toggle-bg {
+            background-color: #532ce6;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-surface">
+<!-- Top AppBar -->
+<header class="sticky top-0 z-50 bg-surface dark:bg-surface-dim shadow-[0px_4px_20px_rgba(108,77,255,0.06)] h-16 w-full">
+<div class="flex items-center justify-between px-container-margin h-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-200" onclick="history.back()">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary">Emergency Preferences</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</button>
+</div>
+</header>
+<main class="max-w-xl mx-auto px-container-margin pt-lg pb-32">
+<!-- Introduction -->
+<section class="mb-lg">
+<p class="font-body-lg text-on-surface-variant">Configure how SafeGuardian responds in critical moments. These settings are encrypted and shared only with your chosen responders.</p>
+</section>
+<!-- Primary Contact Card -->
+<section class="bg-surface-container-lowest rounded-lg p-xl soft-shadow mb-lg border border-surface-variant/50">
+<div class="flex items-center gap-3 mb-lg">
+<div class="bg-primary-fixed p-3 rounded-full">
+<span class="material-symbols-outlined text-primary">contact_emergency</span>
+</div>
+<h2 class="font-headline-md text-headline-md">Primary Contact</h2>
+</div>
+<div class="space-y-md">
+<div>
+<label class="font-label-bold text-label-bold text-on-surface-variant block mb-base ml-base">CONTACT NAME</label>
+<input class="w-full h-12 px-md bg-surface border border-outline-variant rounded-full focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-body-md" placeholder="Enter name" type="text" value="Sarah Jenkins"/>
+</div>
+<div>
+<label class="font-label-bold text-label-bold text-on-surface-variant block mb-base ml-base">PHONE NUMBER</label>
+<input class="w-full h-12 px-md bg-surface border border-outline-variant rounded-full focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-body-md" placeholder="Enter phone" type="tel" value="+1 (555) 012-3456"/>
+</div>
+</div>
+</section>
+<!-- Location Sharing Card -->
+<section class="bg-surface-container-lowest rounded-lg p-xl soft-shadow mb-lg border border-surface-variant/50">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-primary-fixed p-3 rounded-full">
+<span class="material-symbols-outlined text-primary">location_on</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md">Location Sharing</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Always share during alerts</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer custom-toggle" type="checkbox"/>
+<div class="w-14 h-8 bg-surface-container-highest rounded-full transition-all duration-300 toggle-bg"></div>
+<div class="absolute left-1 top-1 w-6 h-6 bg-outline rounded-full transition-all duration-300 transform toggle-dot"></div>
+</label>
+</div>
+</section>
+<!-- Auto-SOS Card -->
+<section class="bg-surface-container-lowest rounded-lg p-xl soft-shadow mb-lg border border-surface-variant/50 urgent-accent">
+<div class="flex items-center gap-3 mb-md">
+<div class="bg-error-container p-3 rounded-full">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">emergency</span>
+</div>
+<h2 class="font-headline-md text-headline-md">Auto-SOS Trigger</h2>
+</div>
+<p class="font-body-md text-on-surface-variant mb-lg">Automatically initiate emergency protocols if high-impact motion or prolonged inactivity is detected while traveling.</p>
+<div class="space-y-sm">
+<button class="w-full flex items-center justify-between p-md rounded-lg hover:bg-surface-container-high transition-all active:scale-[0.98] group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">sensors</span>
+<span class="font-label-bold text-label-bold">Impact Sensitivity</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-md text-primary">High</span>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</button>
+<button class="w-full flex items-center justify-between p-md rounded-lg hover:bg-surface-container-high transition-all active:scale-[0.98] group">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">timer</span>
+<span class="font-label-bold text-label-bold">Inactivity Buffer</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-md text-primary">2 Minutes</span>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</button>
+</div>
+</section>
+<!-- Advanced Actions -->
+<section class="grid grid-cols-2 gap-md">
+<button class="flex flex-col items-center justify-center p-lg bg-surface-container-low rounded-lg border border-dashed border-outline-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-primary mb-2">shield_with_heart</span>
+<span class="font-label-bold text-label-bold text-center">Safety Network</span>
+</button>
+<button class="flex flex-col items-center justify-center p-lg bg-surface-container-low rounded-lg border border-dashed border-outline-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-primary mb-2">history</span>
+<span class="font-label-bold text-label-bold text-center">Alert History</span>
+</button>
+</section>
+<!-- Save Button -->
+<div class="mt-xl">
+<button class="w-full bg-primary text-on-primary font-headline-md text-headline-md py-4 rounded-full shadow-lg active:scale-95 transition-transform">
+                Save Preferences
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-4 pb-safe bg-surface-container-lowest dark:bg-inverse-surface shadow-[0px_-12px_32px_rgba(0,0,0,0.08)] rounded-t-lg">
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim px-4 py-1.5 hover:bg-surface-container-high transition-all" href="./home_child_safety_v1.html">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim px-4 py-1.5 hover:bg-surface-container-high transition-all" href="./reports_directory.html">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-sm text-label-sm">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim px-4 py-1.5 hover:bg-surface-container-high transition-all" href="./alert_center.html">
+<span class="material-symbols-outlined">notifications_active</span>
+<span class="font-label-sm text-label-sm">Alerts</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-1.5 scale-90 duration-150 ease-in-out" href="./guardian_profile_updated_my_reports.html">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for toggle and buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('touchstart', function() {
+                this.classList.add('scale-95');
+            });
+            btn.addEventListener('touchend', function() {
+                this.classList.remove('scale-95');
+            });
+        });
+    </script>
+</body></html>

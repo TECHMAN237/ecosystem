@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#F5F4F2",
+                        "primary-fixed-dim": "#c8bfff",
+                        "surface-dim": "#ddd8e6",
+                        "tertiary-fixed": "#ffdbca",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#F5F4F2",
+                        "secondary": "#5f5e60",
+                        "tertiary-container": "#b55100",
+                        "surface-container-high": "#ebe6f4",
+                        "on-secondary-fixed-variant": "#474649",
+                        "on-primary-fixed": "#190064",
+                        "background": "#F5F4F2",
+                        "outline": "#787588",
+                        "surface-variant": "#e5e0ef",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#F5F4F2",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#f4eefd",
+                        "on-tertiary-fixed-variant": "#773300",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#e4e2e4",
+                        "tertiary": "#8f3e00",
+                        "surface-container": "#f1ebfa",
+                        "secondary-container": "#e2dfe1",
+                        "primary": "#532ce6",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#c9c4d9",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#1b1b1d",
+                        "on-surface-variant": "#474556",
+                        "surface-container-highest": "#e5e0ef",
+                        "surface-tint": "#5b38ee",
+                        "primary-fixed": "#e5deff",
+                        "primary-container": "#6c4dff",
+                        "on-tertiary-fixed": "#331200",
+                        "on-tertiary-container": "#ffefe9",
+                        "on-primary-container": "#f6f0ff",
+                        "tertiary-fixed-dim": "#ffb68e",
+                        "inverse-primary": "#c8bfff",
+                        "on-surface": "#1c1a24",
+                        "inverse-surface": "#312f3a",
+                        "on-primary-fixed-variant": "#4206d7",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#636264",
+                        "on-background": "#1c1a24",
+                        "secondary-fixed-dim": "#c8c6c8",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "xl": "32px",
+                        "sm": "12px",
+                        "container-margin": "20px",
+                        "base": "4px",
+                        "xs": "8px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-bold": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .custom-shadow {
+            shadow: 0px 4px 20px rgba(108, 77, 255, 0.06);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-pill {
+            width: 24px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #532ce6 !important;
+            box-shadow: 0 0 0 4px rgba(108, 77, 255, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-32">
+<!-- Top Navigation Bar -->
+<header class="w-full top-0 sticky z-50 bg-background flex items-center px-container-margin py-md">
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors p-2 rounded-full active:scale-95" onclick="history.back()">arrow_back</button>
+<h1 class="ml-4 font-headline-md text-headline-md text-primary truncate">Guardian Flow</h1>
+</header>
+<main class="px-container-margin mt-md max-w-xl mx-auto">
+<!-- Progress Indicator -->
+<div class="flex items-center gap-xs mb-xl">
+<div class="h-2 bg-primary active-pill rounded-full"></div>
+<div class="h-2 w-2 bg-outline-variant rounded-full"></div>
+<div class="h-2 w-2 bg-outline-variant rounded-full"></div>
+<span class="ml-xs font-label-bold text-label-bold text-outline">Étape 1 sur 3</span>
+</div>
+<h2 class="font-display text-display text-on-surface mb-lg">Signaler un enfant trouvé</h2>
+<form class="space-y-lg">
+<!-- Child Photo Upload Area -->
+<div class="relative">
+<label class="block font-label-bold text-label-bold text-outline mb-xs">Photo de l'enfant</label>
+<div class="border-2 border-dashed border-primary-container rounded-lg aspect-square w-full flex flex-col items-center justify-center bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="w-16 h-16 bg-primary-container/10 rounded-full flex items-center justify-center mb-md group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-3xl">add_a_photo</span>
+</div>
+<span class="font-headline-md text-headline-md text-primary">Prendre une photo</span>
+<span class="font-body-md text-body-md text-outline mt-xs text-center px-xl">Capturez le visage de l'enfant de manière claire si possible</span>
+</div>
+</div>
+<!-- Two column grid for basic info -->
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="block font-label-bold text-label-bold text-outline">Âge approx.</label>
+<input class="w-full px-md py-sm bg-surface-container-lowest border border-outline-variant rounded-full font-body-lg text-body-lg" placeholder="ex: 5" type="number"/>
+</div>
+<div class="space-y-xs">
+<label class="block font-label-bold text-label-bold text-outline">Sexe</label>
+<select class="w-full px-md py-sm bg-surface-container-lowest border border-outline-variant rounded-full font-body-lg text-body-lg appearance-none">
+<option value="">Sélectionner</option>
+<option value="fille">Fille</option>
+<option value="garcon">Garçon</option>
+<option value="inconnu">Inconnu</option>
+</select>
+</div>
+</div>
+<!-- Physical Description -->
+<div class="space-y-xs">
+<label class="block font-label-bold text-label-bold text-outline">Description physique</label>
+<textarea class="w-full px-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg font-body-lg text-body-lg" placeholder="Teint, cheveux, signes distinctifs..." rows="3"></textarea>
+</div>
+<!-- Clothing Description -->
+<div class="space-y-xs">
+<label class="block font-label-bold text-label-bold text-outline">Description des vêtements</label>
+<textarea class="w-full px-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg font-body-lg text-body-lg" placeholder="Couleur du t-shirt, type de chaussures..." rows="3"></textarea>
+</div>
+<!-- Location Found -->
+<div class="space-y-xs">
+<label class="block font-label-bold text-label-bold text-outline">Lieu de la découverte</label>
+<div class="relative">
+<input class="w-full pl-xl pr-md py-sm bg-surface-container-lowest border border-outline-variant rounded-full font-body-lg text-body-lg" placeholder="Saisir l'adresse ou le lieu" type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">location_on</span>
+</div>
+</div>
+<!-- Date Found -->
+<div class="space-y-xs">
+<label class="block font-label-bold text-label-bold text-outline">Date de la découverte</label>
+<div class="relative">
+<input class="w-full pl-xl pr-md py-sm bg-surface-container-lowest border border-outline-variant rounded-full font-body-lg text-body-lg" type="date"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">calendar_today</span>
+</div>
+</div>
+<!-- Additional Notes -->
+<div class="space-y-xs">
+<label class="block font-label-bold text-label-bold text-outline">Notes additionnelles</label>
+<textarea class="w-full px-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg font-body-lg text-body-lg" placeholder="Circonstances, comportement de l'enfant..." rows="2"></textarea>
+</div>
+</form>
+</main>
+<!-- Bottom Navigation Bar (Mandatory styling from JSON) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-container-margin py-md bg-surface-container-lowest dark:bg-surface-dim shadow-[0px_-4px_20px_rgba(108,77,255,0.06)] rounded-t-lg">
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim px-lg py-sm hover:opacity-90 active:scale-98 transition-all duration-200" onclick="history.back()">
+<span class="material-symbols-outlined mb-1">chevron_left</span>
+<span class="font-label-bold text-label-bold">Previous</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container rounded-full px-xl py-md hover:opacity-90 active:scale-98 transition-all duration-200 shadow-lg" onclick="window.location.href='./signaler_un_enfant_trouv_d_tails_de_la_d_couverte.html'">
+<div class="flex items-center gap-xs">
+<span class="font-label-bold text-label-bold uppercase tracking-wider">Continue</span>
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</button>
+</nav>
+<!-- Micro-interaction for the active step indicator -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const formInputs = document.querySelectorAll('input, textarea, select');
+            formInputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    // Visual feedback for focused fields could be added here
+                });
+            });
+        });
+    </script>
+</body></html>

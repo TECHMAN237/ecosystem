@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<title>SafeGuardian - Privacy Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed": "#e5deff",
+                    "tertiary-fixed-dim": "#ffb68e",
+                    "surface-tint": "#5b38ee",
+                    "surface-container": "#f1ebfa",
+                    "on-primary": "#ffffff",
+                    "inverse-primary": "#c8bfff",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#6c4dff",
+                    "on-error": "#ffffff",
+                    "secondary": "#5f5e60",
+                    "surface-dim": "#ddd8e6",
+                    "secondary-container": "#e2dfe1",
+                    "primary": "#532ce6",
+                    "on-tertiary-fixed": "#331200",
+                    "on-primary-fixed-variant": "#4206d7",
+                    "primary-fixed-dim": "#c8bfff",
+                    "on-surface-variant": "#474556",
+                    "on-tertiary-fixed-variant": "#773300",
+                    "inverse-on-surface": "#f4eefd",
+                    "tertiary-fixed": "#ffdbca",
+                    "surface-variant": "#e5e0ef",
+                    "secondary-fixed": "#e4e2e4",
+                    "on-secondary-fixed-variant": "#474649",
+                    "on-secondary-fixed": "#1b1b1d",
+                    "on-error-container": "#93000a",
+                    "on-background": "#1c1a24",
+                    "error": "#ba1a1a",
+                    "background": "#F5F4F2",
+                    "on-secondary": "#ffffff",
+                    "surface-container-low": "#F5F4F2",
+                    "secondary-fixed-dim": "#c8c6c8",
+                    "tertiary": "#8f3e00",
+                    "surface-container-high": "#ebe6f4",
+                    "on-secondary-container": "#636264",
+                    "inverse-surface": "#312f3a",
+                    "on-primary-container": "#f6f0ff",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#190064",
+                    "outline-variant": "#c9c4d9",
+                    "on-tertiary-container": "#ffefe9",
+                    "outline": "#787588",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#b55100",
+                    "surface-container-highest": "#e5e0ef",
+                    "on-surface": "#1c1a24",
+                    "surface": "#F5F4F2",
+                    "surface-bright": "#F5F4F2"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "sm": "12px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "xs": "8px",
+                    "gutter": "16px",
+                    "base": "4px",
+                    "container-margin": "20px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "label-bold": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display": ["Plus Jakarta Sans"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            user-select: none;
+        }
+        
+        .toggle-checkbox:checked + .toggle-slot {
+            background-color: #6c4dff;
+        }
+        .toggle-checkbox:checked + .toggle-slot .toggle-knob {
+            transform: translateX(20px);
+            background-color: white;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e5e0ef;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen pb-32">
+<!-- Top AppBar (JSON Structure) -->
+<header class="bg-surface dark:bg-surface-dim shadow-[0px_4px_20px_rgba(108,77,255,0.06)] fixed top-0 left-0 w-full z-50">
+<div class="flex items-center justify-between px-container-margin h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform hover:bg-surface-container-high p-2 rounded-full" onclick="history.back()">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-surface">Privacy</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="hover:bg-surface-container-high transition-colors duration-200 p-2 rounded-full active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-24 px-container-margin max-w-2xl mx-auto space-y-lg">
+<!-- Hero Illustration / Context -->
+<div class="relative w-full h-40 rounded-lg overflow-hidden bg-primary-container/10 flex items-center justify-center">
+<img class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay" data-alt="A clean and modern high-tech digital shield icon floating over a soft gradient background of lavender and deep purple. The lighting is bright and ethereal, suggesting safety and protection within a premium software interface. The overall aesthetic is minimalist with organic soft edges and a high-key light mode feel that evokes trust and clarity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3Q3JHf8Ao9IPaN2YZ4yMchP5EHIYQn7Xi3LpC_XnQENwj_lVmc-MXyinJUFBoQdz-OvC1XgL07NerBQ1jY6VF1tCpvnYpDeZM8Bp5Kh4zVipmNJZYa4cJ5lXgdkyP1_LsbzQ64Rp4kOUdlEnAq8qeAs5FQb7hvfjJCV82MXDLgyftRxB6SfImNXGgzj4-LlgSfXHJ78Ouoic-62dDYqjcSsNKU2rrbgan5F8nMPHlIikDplUDkcXBX8JwCzoTesPWgh-nb7jKqG7V"/>
+<div class="text-center z-10 px-md">
+<span class="material-symbols-outlined text-[48px] text-primary mb-2" style="font-variation-settings: 'FILL' 1;">security</span>
+<p class="font-body-md text-on-surface-variant max-w-[280px] mx-auto">Manage how your information is shared and kept secure within SafeGuardian.</p>
+</div>
+</div>
+<!-- Privacy Controls Card -->
+<section class="bg-surface-container-lowest rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] p-xl space-y-lg border border-outline-variant/30">
+<h2 class="font-headline-md text-headline-md text-on-surface">Visibility &amp; Identity</h2>
+<!-- Anonymous Reporting Toggle -->
+<div class="flex items-center justify-between py-xs">
+<div class="flex flex-col gap-1 pr-4">
+<span class="font-body-lg text-body-lg text-on-surface font-semibold">Anonymous Reporting</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Hide your identity when submitting safety reports to local authorities.</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only toggle-checkbox" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant rounded-full transition-colors toggle-slot">
+<div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform toggle-knob shadow-sm"></div>
+</div>
+</label>
+</div>
+<div class="h-px bg-outline-variant/20 w-full"></div>
+<!-- Profile Visibility Toggle -->
+<div class="flex items-center justify-between py-xs">
+<div class="flex flex-col gap-1 pr-4">
+<span class="font-body-lg text-body-lg text-on-surface font-semibold">Profile Visibility</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Allow other verified parents to see your profile in community groups.</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only toggle-checkbox" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant rounded-full transition-colors toggle-slot">
+<div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform toggle-knob shadow-sm"></div>
+</div>
+</label>
+</div>
+</section>
+<!-- Blocked Users Section -->
+<button class="w-full flex items-center justify-between bg-surface-container-lowest rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] p-lg border border-outline-variant/30 active:scale-[0.98] transition-transform">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="block">block</span>
+</div>
+<div class="text-left">
+<span class="font-body-lg text-body-lg text-on-surface font-semibold block">Block Users</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Manage 0 blocked accounts</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</button>
+<!-- Data Management Card -->
+<section class="bg-surface-container-lowest rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] p-xl border border-outline-variant/30 overflow-hidden relative">
+<!-- Subtle accent for data management -->
+<div class="absolute top-0 left-0 w-1 h-full bg-primary/20"></div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-xs">Data Management</h2>
+<p class="font-body-md text-on-surface-variant mb-lg">Taking control of your stored data helps keep your device performance high and your privacy intact.</p>
+<div class="flex flex-col gap-3">
+<button class="w-full py-md px-lg rounded-full border border-error/30 text-error font-semibold flex items-center justify-center gap-2 hover:bg-error/5 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">delete_sweep</span>
+                    Clear Local Data
+                </button>
+<button class="w-full py-md px-lg rounded-full bg-surface-container-high text-on-surface font-semibold flex items-center justify-center gap-2 hover:bg-surface-variant active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">download</span>
+                    Export My Data
+                </button>
+</div>
+</section>
+<!-- Legal Links Footer -->
+<div class="flex flex-wrap justify-center gap-gutter pt-md pb-xl">
+<a class="text-label-sm text-primary hover:underline" href="./alert_center.html">Privacy Policy</a>
+<span class="text-outline-variant">•</span>
+<a class="text-label-sm text-primary hover:underline" href="./home_child_safety_v1.html">Terms of Service</a>
+<span class="text-outline-variant">•</span>
+<a class="text-label-sm text-primary hover:underline" href="./home_child_safety_v1.html">Cookie Policy</a>
+</div>
+</main>
+<!-- BottomNavBar (JSON Structure) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-4 pb-safe bg-surface-container-lowest shadow-[0px_-12px_32px_rgba(0,0,0,0.08)] rounded-t-lg">
+<button class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim px-4 py-1.5 hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim px-4 py-1.5 hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-label-sm text-label-sm">Reports</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-container dark:text-secondary-fixed-dim px-4 py-1.5 hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+<span class="font-label-sm text-label-sm">Alerts</span>
+</button>
+<!-- Active Tab: Profile -->
+<button class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-1.5 scale-90 duration-150 ease-in-out">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</button>
+</nav>
+<script>
+        // Micro-interactions for toggles
+        document.querySelectorAll('.toggle-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const label = this.closest('div').querySelector('.font-body-lg');
+                if (this.checked) {
+                    console.log(`${label.textContent} enabled`);
+                } else {
+                    console.log(`${label.textContent} disabled`);
+                }
+            });
+        });
+
+        // Ripples or click effect simulation
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                btn.style.transform = 'scale(0.95)';
+            });
+            btn.addEventListener('mouseup', () => {
+                btn.style.transform = '';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = '';
+            });
+        });
+    </script>
+</body></html>

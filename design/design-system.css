@@ -1,0 +1,43 @@
+/* Unified Design System (shared tokens/utilities for all screens) */
+@import url("./colors.css");
+@import url("./spacing.css");
+@import url("./radii.css");
+@import url("./shadows.css");
+@import url("./typography.css");
+@import url("./navigation.css");
+
+/* Base (matches existing ui-polish.css intent, but keep minimal and shared) */
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--cs-on-surface);
+  line-height: 1.45;
+}
+
+/* Shared utilities currently used by Home (avoid page-specific styles) */
+.glass-fab {
+  background: linear-gradient(135deg, #532ce6 0%, #8b6aff 100%);
+  box-shadow: 0 8px 32px rgba(83, 44, 230, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.urgent-card {
+  border-left: 4px solid #FF4D4F;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Section rhythm used by multiple screens (match existing ui-polish.css idea) */
+main > section,
+main > div > section {
+  margin-bottom: var(--cs-space-section);
+}
+
+/* Horizontal padding token intent */
+[class*="px-container-margin"] {
+  padding-left: max(20px, env(safe-area-inset-left, 0px)) !important;
+  padding-right: max(20px, env(safe-area-inset-right, 0px)) !important;
+}

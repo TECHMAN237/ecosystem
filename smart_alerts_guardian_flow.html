@@ -1,0 +1,292 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Guardian Flow - Alerts</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./ui-polish.css"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed-variant": "#474649",
+                      "on-secondary": "#ffffff",
+                      "surface-container-high": "#ebe6f4",
+                      "secondary": "#5f5e60",
+                      "error-container": "#ffdad6",
+                      "on-surface-variant": "#474556",
+                      "on-primary-fixed-variant": "#4206d7",
+                      "secondary-container": "#e2dfe1",
+                      "tertiary-fixed-dim": "#ffb68e",
+                      "surface": "#F5F4F2",
+                      "surface-container-low": "#F5F4F2",
+                      "tertiary-fixed": "#ffdbca",
+                      "secondary-fixed": "#e4e2e4",
+                      "inverse-surface": "#312f3a",
+                      "tertiary-container": "#b55100",
+                      "on-surface": "#1c1a24",
+                      "on-secondary-container": "#636264",
+                      "inverse-primary": "#c8bfff",
+                      "inverse-on-surface": "#f4eefd",
+                      "error": "#ba1a1a",
+                      "surface-tint": "#5b38ee",
+                      "on-tertiary": "#ffffff",
+                      "background": "#F5F4F2",
+                      "primary-fixed-dim": "#c8bfff",
+                      "on-tertiary-fixed-variant": "#773300",
+                      "on-tertiary-fixed": "#331200",
+                      "on-primary": "#ffffff",
+                      "on-background": "#1c1a24",
+                      "surface-container-highest": "#e5e0ef",
+                      "surface-variant": "#e5e0ef",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-bright": "#F5F4F2",
+                      "primary": "#532ce6",
+                      "surface-container": "#f1ebfa",
+                      "on-error": "#ffffff",
+                      "on-primary-fixed": "#190064",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#ddd8e6",
+                      "outline": "#787588",
+                      "on-tertiary-container": "#ffefe9",
+                      "primary-container": "#6c4dff",
+                      "primary-fixed": "#e5deff",
+                      "on-secondary-fixed": "#1b1b1d",
+                      "tertiary": "#8f3e00",
+                      "on-primary-container": "#f6f0ff",
+                      "secondary-fixed-dim": "#c8c6c8",
+                      "outline-variant": "#c9c4d9"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xs": "8px",
+                      "container-margin": "20px",
+                      "sm": "12px",
+                      "gutter": "16px",
+                      "xl": "32px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Inter"],
+                      "label-bold": ["Inter"],
+                      "display": ["Plus Jakarta Sans"],
+                      "body-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "headline-lg": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
+                      "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pulse-red {
+            animation: pulse-red 2s infinite linear;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(186, 26, 26, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(186, 26, 26, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(186, 26, 26, 0); }
+        }
+        .glass-v2 {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-[#F7F7FA] text-on-surface font-body-md text-body-md antialiased mb-32">
+<!-- Top App Bar -->
+<header class="w-full top-0 left-0 sticky z-40 bg-surface dark:bg-background shadow-[0px_4px_20px_rgba(108,77,255,0.06)] flex justify-between items-center px-container-margin py-md">
+<div class="flex items-center gap-sm active:scale-95 duration-200 transition-opacity hover:opacity-80 cursor-pointer">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-icon="security">security</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed">Guardian Flow</h1>
+</div>
+<div class="flex items-center gap-md">
+<button class="relative active:scale-95 duration-200 transition-opacity hover:opacity-80">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="tune">tune</span>
+</button>
+<button class="relative active:scale-95 duration-200 transition-opacity hover:opacity-80">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full ring-2 ring-surface"></span>
+</button>
+</div>
+</header>
+<main class="px-container-margin py-lg space-y-lg pb-28">
+<section class="flex items-center justify-between">
+<h2 class="font-headline-lg text-headline-lg text-on-background">Alerts</h2>
+<div class="flex gap-xs">
+<span class="bg-primary/10 text-primary px-sm py-1 rounded-full font-label-bold text-label-bold">4 Active</span>
+</div>
+</section>
+<!-- 1. EMERGENCY SOS ALERT -->
+<div class="bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] border-l-4 border-error p-lg overflow-hidden relative pulse-red">
+<div class="flex justify-between items-start mb-md">
+<div class="space-y-1">
+<span class="bg-error text-on-error font-label-bold text-label-bold px-sm py-base rounded-full uppercase tracking-wider">High Urgency</span>
+<h3 class="font-headline-md text-headline-md text-on-surface pt-xs">Liam is Missing</h3>
+</div>
+<span class="text-on-surface-variant font-label-sm text-label-sm">2m ago</span>
+</div>
+<div class="flex items-center gap-md mb-lg">
+<div class="w-16 h-16 rounded-xl overflow-hidden ring-2 ring-error/20 shrink-0">
+<img alt="Profile Liam" class="w-full h-full object-cover" data-alt="A portrait of a five-year-old boy named Liam with blond hair and a bright, friendly smile. He is wearing a blue polo shirt. The lighting is soft and natural, emphasizing a high-end, clean light-mode photography style. The image is framed as a square profile shot against a neutral, blurred background to ensure professional UI integration." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDahcdspleBtJ9kwrkJ9BsGj8sic2lbK5T8Sg-947EpCFpYdKxJL_qFELh-VZ19CIQgfcMQpUHI2H9gnUJC88x57jgb988sT5VSFFPAFGT_pbGISkJdMrYlp7ap-56KFlkYOjQJhK-uGc2zl3k7P3Gq-0eAyaCVXeOwKop3De8LLpu1MYPUNw83vTLxFLWNyCx9Yzb5u8ErUKLQvYEgVN0Wwd0HoTXy302Cf3hs2H82fqdPlLLsbNStmluRMqHp9xsei_B49uzHoSFj">
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="location_on">location_on</span>
+<span class="font-body-md text-body-md">Central Park, North Sector</span>
+</div>
+<p class="text-on-surface-variant mt-1">Last seen near the water fountain wearing a yellow hoodie.</p>
+</div>
+</div>
+<button class="w-full bg-error text-on-error py-md rounded-full font-headline-md text-headline-md flex items-center justify-center gap-sm active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined" data-icon="emergency_share">emergency_share</span>
+                View Details
+            </button>
+</div>
+<!-- 2. POSSIBLE MATCH ALERT -->
+<div class="bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] p-lg border-l-4 border-[#4CAF50]">
+<div class="flex justify-between items-center mb-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-[#4CAF50]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#4CAF50]" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<span class="text-[#4CAF50] font-label-bold text-label-bold uppercase">Potential Match Found</span>
+</div>
+<div class="bg-[#4CAF50]/10 text-[#4CAF50] font-label-bold text-label-bold px-sm py-base rounded-full">98% Confidence</div>
+</div>
+<div class="flex items-center justify-center gap-lg py-md bg-surface-container-low rounded-xl mb-md">
+<div class="flex flex-col items-center gap-xs">
+<img alt="Search Target" class="w-14 h-14 rounded-full object-cover ring-2 ring-white" data-alt="A small circular profile thumbnail of a young child with blond hair, appearing in a bright, modern UI context. The style is professional and clean, with soft lighting and a minimalist white background to align with a child safety application's aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdVEumFerLOcjzYeLcENy8zPqwIavXPalj_pH17eO2lLAY7MPMPahoiIxi2vhxNT5KB38L5VXUdBpVisoLq97dYYLml5gpLNoT4xVP6PFH9RbxlMeg0w0ILfinB5etGyM6u5j0FR64hPW9I_TR1f4A9ge_WqmtJHl8Fvrg_UbihbJWhktX432RhQubju5Ip5XTwiAradTgPqoYPd7ePFb7EAYbRV3wNbDiH3b1oDD8xQqxHUjRuyUSfF3L6-aqUzbGqJN40O4INqFC">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Database</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="compare_arrows">compare_arrows</span>
+<div class="flex flex-col items-center gap-xs">
+<img alt="Sighting Match" class="w-14 h-14 rounded-full object-cover ring-2 ring-[#4CAF50]" data-alt="A CCTV-style candid capture of a young child in a park, slightly grainy but clear enough to distinguish facial features matching a missing person database. The lighting is sunny and daylight-filtered, maintaining the app's clean and safe visual tone with soft purple-tinted shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjra1FxJ5zGDoO2HSKTs9rZ2HGAaPRi7sMnq1jGajjJmeNwaQgwRVBFeJ0R9hHsFbxG4hUcaQ_knMKX_nEAu4yQiEYD6zB1KoMdFH1s4Oj2Eae1uJh_sm1x-egEFB__fjqPGN-djImYFm7zFGMP3W-ghZF9Vrng6-23X1tiI7gSSuPah8wK4f7RQZM5NCqWp-LapAZgXzZGweUcxicNH4ym8fe6zSPjJJbuuWh74abfTAFbf0m07o5tZoTtsMAd-9pw0yVqviSbVCr">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Live Feed</span>
+</div>
+</div>
+<p class="text-on-surface-variant text-center mb-lg">Visual identification systems have flagged a high-confidence match at Subway Station A12.</p>
+<div class="flex gap-md">
+<button class="flex-1 bg-surface-container-highest text-on-surface py-md rounded-full font-label-bold text-label-bold hover:bg-surface-container-high transition-colors">Dismiss</button>
+<button class="flex-1 bg-primary text-on-primary py-md rounded-full font-label-bold text-label-bold hover:shadow-lg transition-all">Review Feed</button>
+</div>
+</div>
+<!-- 3. COMMUNITY ALERT -->
+<div class="bg-surface-container-low rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] p-lg border-l-4 border-primary-container">
+<div class="flex items-center gap-md mb-md">
+<div class="w-12 h-12 bg-primary-container rounded-xl flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary-container" data-icon="group">group</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Nearby Missing Child</h3>
+<p class="text-on-surface-variant text-body-md">Community Beacon active 1.2 miles away</p>
+</div>
+</div>
+<button class="w-full bg-white border border-primary-container text-primary-container py-md rounded-full font-label-bold text-label-bold hover:bg-primary-container hover:text-on-primary-container transition-all flex items-center justify-center gap-xs">
+                Help Nearby
+                <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- 4. DEVICE ALERT (V2) -->
+<div class="bg-inverse-surface text-inverse-on-surface rounded-lg shadow-lg p-lg relative overflow-hidden group" style="transition: transform 0.5s; transform: perspective(1000px) rotateY(0deg) rotateX(0deg);">
+<div class="absolute -right-4 -top-4 opacity-10 group-hover:scale-110 transition-transform duration-700">
+<span class="material-symbols-outlined text-8xl" data-icon="radar">radar</span>
+</div>
+<div class="flex items-center justify-between mb-sm">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary-fixed-dim" data-icon="battery_2_bar">battery_2_bar</span>
+<span class="font-label-bold text-label-bold text-primary-fixed-dim uppercase tracking-widest">System Warning</span>
+</div>
+<div class="bg-primary/30 px-sm py-1 rounded-full text-[10px] border border-primary/40 font-bold uppercase">V2 PREVIEW</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-white">Low Battery - V2 Tracker</h3>
+<p class="text-secondary-fixed-dim text-body-md mt-xs opacity-80">Device 'Backpack Beacon' is at 12%. Advanced tracking features will enter low-power mode soon.</p>
+</div>
+</main>
+<!-- Navigation Bar Logic & Rendering -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-gutter py-xs pb-safe bg-surface-container-lowest dark:bg-inverse-surface shadow-[0px_-4px_20px_rgba(108,77,255,0.06)] rounded-t-lg">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-transform duration-200" href="./home_child_safety_v1.html"> <span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-transform duration-200" href="./reports_directory.html">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-sm text-label-sm">Reports</span>
+</a><a class="flex flex-col items-center justify-center transition-transform active:scale-90" href="./alert_center.html">
+  <div class="w-14 h-14 bg-primary rounded-full flex flex-col items-center justify-center shadow-lg shadow-primary/20">
+    <span class="material-symbols-outlined text-white text-[24px]" data-icon="notifications_active" style="font-variation-settings: 'FILL' 1;">notifications_active</span>
+    <span class="font-label-sm text-[10px] leading-tight font-bold text-white uppercase tracking-tighter">Alerts</span>
+  </div>
+</a>
+<!-- V2 PREVIEW FAB-style Middle Item -->
+
+
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-transform duration-200" href="./guardian_profile_updated_my_reports.html">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for alert cards
+        document.querySelectorAll('.active\\:scale-95').forEach(button => {
+            button.addEventListener('touchstart', () => {
+                button.classList.add('scale-95');
+            });
+            button.addEventListener('touchend', () => {
+                button.classList.remove('scale-95');
+            });
+        });
+
+        // Atmospheric effect: Subtle movement for the V2 tracker card
+        const v2Card = document.querySelector('.bg-inverse-surface');
+        if (v2Card) {
+            v2Card.addEventListener('mousemove', (e) => {
+                const rect = v2Card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const xc = rect.width / 2;
+                const yc = rect.height / 2;
+                const dx = x - xc;
+                const dy = y - yc;
+                v2Card.style.transform = `perspective(1000px) rotateY(${dx/20}deg) rotateX(${-dy/10}deg)`;
+            });
+            v2Card.addEventListener('mouseleave', () => {
+                v2Card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+                v2Card.style.transition = 'transform 0.5s ease';
+            });
+            v2Card.addEventListener('mouseenter', () => {
+                v2Card.style.transition = 'none';
+            });
+        }
+    </script>
+
+
+</body></html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<title>Guardian Flow - Report Under Review</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            -webkit-tap-highlight-color: transparent;
+            scroll-behavior: smooth;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#F5F4F2",
+                      "primary-fixed-dim": "#c8bfff",
+                      "surface-dim": "#ddd8e6",
+                      "tertiary-fixed": "#ffdbca",
+                      "error-container": "#ffdad6",
+                      "surface-bright": "#F5F4F2",
+                      "secondary": "#5f5e60",
+                      "tertiary-container": "#b55100",
+                      "surface-container-high": "#ebe6f4",
+                      "on-secondary-fixed-variant": "#474649",
+                      "on-primary-fixed": "#190064",
+                      "background": "#F5F4F2",
+                      "outline": "#787588",
+                      "surface-variant": "#e5e0ef",
+                      "on-tertiary": "#ffffff",
+                      "surface": "#F5F4F2",
+                      "surface-container-lowest": "#ffffff",
+                      "inverse-on-surface": "#f4eefd",
+                      "on-tertiary-fixed-variant": "#773300",
+                      "error": "#ba1a1a",
+                      "secondary-fixed": "#e4e2e4",
+                      "tertiary": "#8f3e00",
+                      "surface-container": "#f1ebfa",
+                      "secondary-container": "#e2dfe1",
+                      "primary": "#532ce6",
+                      "on-error-container": "#93000a",
+                      "outline-variant": "#c9c4d9",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed": "#1b1b1d",
+                      "on-surface-variant": "#474556",
+                      "surface-container-highest": "#e5e0ef",
+                      "surface-tint": "#5b38ee",
+                      "primary-fixed": "#e5deff",
+                      "primary-container": "#6c4dff",
+                      "on-tertiary-fixed": "#331200",
+                      "on-tertiary-container": "#ffefe9",
+                      "on-primary-container": "#f6f0ff",
+                      "tertiary-fixed-dim": "#ffb68e",
+                      "inverse-primary": "#c8bfff",
+                      "on-surface": "#1c1a24",
+                      "inverse-surface": "#312f3a",
+                      "on-primary-fixed-variant": "#4206d7",
+                      "on-primary": "#ffffff",
+                      "on-secondary-container": "#636264",
+                      "on-background": "#1c1a24",
+                      "secondary-fixed-dim": "#c8c6c8",
+                      "on-secondary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "24px",
+                      "gutter": "16px",
+                      "xl": "32px",
+                      "sm": "12px",
+                      "container-margin": "20px",
+                      "base": "4px",
+                      "xs": "8px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "label-bold": ["Inter"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "display": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-background dark:bg-background flex items-center px-container-margin py-md z-50">
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors p-xs rounded-full active:scale-95 transition-transform" onclick="history.back()">
+                arrow_back
+            </button>
+<h1 class="font-display text-display text-primary dark:text-primary-fixed-dim">Guardian Flow</h1>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col items-center justify-center px-container-margin py-xl text-center max-w-lg mx-auto">
+<!-- Illustration Section -->
+<div class="relative w-full aspect-square max-w-[320px] mb-xl animate-fade-in">
+<div class="absolute inset-0 bg-primary-container/10 rounded-full blur-3xl transform scale-90"></div>
+<img alt="Verification success illustration" class="relative z-10 w-full h-full object-contain rounded-xl" data-alt="A premium 3D digital illustration of a glowing holographic shield icon floating above a stack of verified documents. The visual style is minimalist and clean, using a palette of soft primary purples and crisp whites against a light-mode background. Warm, diffused lighting creates a safe and trustworthy atmosphere, with subtle geometric sparkles signifying precision and digital security. The overall mood is calm, professional, and reassuring for a child safety platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8iX4n2L3Ux3BtTjs6m6cV18A9w_Lsj1ci9VDbP1unb9kZ6q_qkU2JY9fBI59AkGqxMupqsNCb0FcxwkPLXVS2wtjrcvSO40iqknvIWpOzvr5oC9jEkJubIzVapM4GJU-mNV0rvCVfXT9S6FIXmOwwRXWBGkCAMWCpKQYvow3cLL9qjPxMCdyEENLyNYws2iIOLbft4wTFVin-MA_NUWQAw84aQ44ILOKbxVsOdP9x9W3N9xGwjMA_fxHO-y8kkngES4sOBjOYSTac"/>
+</div>
+<!-- Text Content -->
+<div class="space-y-md">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface md:font-headline-lg md:text-headline-lg">
+                Report Under Review
+            </h2>
+<p class="font-body-lg text-body-lg text-secondary px-sm">
+                Your report and supporting documents have been submitted successfully. Our moderation team is currently reviewing the information provided. You will receive future updates through the Alerts section.
+            </p>
+</div>
+<!-- Action Button (Contextual Replacement for BottomNav FAB logic) -->
+<div class="mt-xl w-full">
+<button class="w-full h-[56px] bg-primary text-on-primary rounded-full font-headline-md text-headline-md shadow-[0px_4px_20px_rgba(108,77,255,0.15)] hover:opacity-90 active:scale-98 transition-all duration-200" onclick="window.location.href='./home_child_safety_v1.html'">
+                Return Home
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation (Contextual Filter: Since this is a Success/Transactional screen, navigation is simplified to primary action only, but mapped to the required BottomNavBar structure for layout balance) -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-container-margin py-md bg-surface-container-lowest dark:bg-surface-dim shadow-[0px_-4px_20px_rgba(108,77,255,0.06)] rounded-t-lg">
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim px-lg py-sm hover:opacity-90 active:scale-98 transition-all duration-200" onclick="history.back()">
+<span class="material-symbols-outlined mb-xs">chevron_left</span>
+<span class="font-label-bold text-label-bold">Previous</span>
+</button>
+<!-- Active state for 'Continue' / Primary path -->
+<button class="flex flex-col items-center justify-center bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container rounded-full px-lg py-sm hover:opacity-90 active:scale-98 transition-all duration-200 shadow-lg" onclick="window.location.href='./home_child_safety_v1.html'">
+<span class="material-symbols-outlined mb-xs">chevron_right</span>
+<span class="font-label-bold text-label-bold">Continue</span>
+</button>
+</footer>
+<!-- Spacer for fixed bottom bar -->
+<div class="h-32 md:h-40"></div>
+<script>
+        // Micro-interaction for the illustration
+        document.addEventListener('DOMContentLoaded', () => {
+            const illustration = document.querySelector('img[data-alt]');
+            if (illustration) {
+                illustration.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                illustration.style.transform = 'translateY(20px) scale(0.95)';
+                illustration.style.opacity = '0';
+                
+                setTimeout(() => {
+                    illustration.style.transform = 'translateY(0) scale(1)';
+                    illustration.style.opacity = '1';
+                }, 100);
+            }
+        });
+    </script>
+</body></html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<title>Welcome to Guardian Flow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#190064",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#F5F4F2",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "surface-container": "#f1ebfa",
+                    "on-surface-variant": "#474556",
+                    "surface": "#F5F4F2",
+                    "background": "#F5F4F2",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#4206d7",
+                    "inverse-surface": "#312f3a",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#e4e2e4",
+                    "inverse-on-surface": "#f4eefd",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#b55100",
+                    "on-secondary-fixed-variant": "#474649",
+                    "surface-container-low": "#F5F4F2",
+                    "on-surface-variant": "#474556",
+                    "on-secondary-container": "#636264",
+                    "secondary-container": "#e2dfe1",
+                    "on-background": "#1c1a24",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#ebe6f4",
+                    "surface-dim": "#ddd8e6",
+                    "surface-variant": "#e5e0ef",
+                    "secondary-fixed-dim": "#c8c6c8",
+                    "on-surface": "#1c1a24",
+                    "outline-variant": "#c9c4d9",
+                    "outline": "#787588",
+                    "tertiary": "#8f3e00",
+                    "on-tertiary-fixed-variant": "#773300",
+                    "surface-container-highest": "#e5e0ef",
+                    "primary-fixed-dim": "#c8bfff",
+                    "on-primary-container": "#f6f0ff",
+                    "tertiary-fixed-dim": "#ffb68e",
+                    "on-error-container": "#93000a",
+                    "secondary": "#5f5e60",
+                    "on-secondary-fixed": "#1b1b1d",
+                    "surface-tint": "#5b38ee",
+                    "on-tertiary-fixed": "#331200",
+                    "inverse-primary": "#c8bfff",
+                    "primary-fixed": "#e5deff",
+                    "tertiary-fixed": "#ffdbca",
+                    "primary-container": "#6c4dff",
+                    "on-tertiary-container": "#ffefe9",
+                    "primary": "#532ce6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-margin": "20px",
+                    "xs": "8px",
+                    "md": "16px",
+                    "xl": "32px",
+                    "sm": "12px",
+                    "lg": "24px",
+                    "base": "4px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "display": ["Plus Jakarta Sans"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .celebratory-glow {
+            background: radial-gradient(circle at 50% 50%, rgba(108, 77, 255, 0.1) 0%, rgba(253, 248, 255, 0) 70%);
+        }
+        .confetti-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            opacity: 0;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-x-hidden">
+<!-- Success Shell (Navigation Suppressed as per Linear/Transactional Rule) -->
+<main class="flex-grow flex flex-col items-center justify-center px-container-margin py-xl celebratory-glow relative">
+<!-- Animated Confetti Container (Micro-interaction) -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden" id="confetti-anchor"></div>
+<!-- Success Content Card -->
+<div class="w-full max-w-md flex flex-col items-center text-center space-y-xl z-10">
+<!-- Illustration Area -->
+<div class="relative w-full aspect-square max-h-[320px] rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(108,77,255,0.06)] bg-surface-container-lowest flex items-center justify-center p-md">
+<img class="w-full h-full object-contain rounded-lg" data-alt="A heartwarming, premium digital illustration of diverse community members standing together around a central glowing protective shield icon. The art style is clean and minimalist with organic curves and soft lighting, using a professional palette of deep primary purple and soft lavender. The background is a bright, calm light-mode environment that feels safe, trustworthy, and technologically advanced, symbolizing child safety collaboration." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTV-t1X7SzDcZKMfTOm3-ZvxlrPPUBudExlrOlXa5mr7x1JN_tuqokivVFXyIPhrn-YwlvCjUzOfSk4uObnfrN3B41VoRk6LEGXtrE3_2oDPbtFBOOCHodEC0ofC7rLQNWK6MgCYOLkseJQf3_4qjU1snzuRYqYD5W_aL39R68ROV5Po9Drtkvc7DpRwsIKt63oS3_i6LXoFrAjV-61ZKgU7Gy8mBEXWZuH5Di1Mg8d9kZp0BRBbgKWJohv6GIxnZQyqjxfV8a8x4v"/>
+<!-- Floating Badge -->
+<div class="absolute -top-4 -right-4 bg-primary-container text-on-primary-container px-lg py-sm rounded-full shadow-lg border border-white/20 backdrop-blur-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-bold text-label-bold">Joined Community</span>
+</div>
+</div>
+<!-- Text Content -->
+<div class="space-y-md">
+<div class="flex flex-col gap-xs items-center">
+<div class="w-xl h-xl bg-primary/10 text-primary rounded-full flex items-center justify-center mb-xs">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+</div>
+<h1 class="font-display text-display text-on-surface">Welcome to Child Safety</h1>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[320px] mx-auto">Your account has been successfully created. You can now participate in the Child Safety community and receive alerts.</p>
+</div>
+<!-- Action Area -->
+<div class="w-full flex flex-col gap-lg pt-lg">
+<div class="bg-surface-container-low p-lg rounded-lg border border-outline-variant/30 text-left space-y-md">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-on-surface">Guardian Verification</h2>
+<span class="px-sm py-1 bg-error-container text-on-error-container text-label-bold font-label-bold rounded-full text-[10px] uppercase tracking-wider">Not Verified</span>
+</div>
+<p class="font-body-md text-on-surface-variant">
+To publish Missing Child reports or register children under your care, guardian verification will be required.
+</p>
+<button class="w-full h-[56px] bg-white border border-primary text-primary rounded-full font-headline-md flex items-center justify-center gap-sm hover:bg-primary/5 active:scale-[0.98] transition-all" onclick="window.location.href='./basic_information.html'">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shield_person</span>
+<span>Complete Guardian Verification</span>
+</button>
+</div>
+<button class="w-full h-[56px] bg-primary text-on-primary rounded-full font-headline-md flex items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(108,77,255,0.2)] hover:opacity-90 active:scale-[0.98] transition-all" onclick="window.location.href='./home_child_safety_v1.html'">
+<span>Go to Home</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<!-- Community Stats (Trust Indicator) -->
+<div class="pt-xl flex items-center justify-center gap-xl opacity-60">
+<div class="flex flex-col items-center">
+<span class="font-label-bold text-label-bold text-primary">12.4k+</span>
+<span class="text-label-sm font-label-sm uppercase tracking-wider">Guardians</span>
+</div>
+<div class="w-[1px] h-lg bg-outline-variant"></div>
+<div class="flex flex-col items-center">
+<span class="font-label-bold text-label-bold text-primary">Live</span>
+<span class="text-label-sm font-label-sm uppercase tracking-wider">Protection</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Success Shell suppression: No BottomNavBar or SideNav on Success/Confirmation screens -->
+<script>
+        // Micro-interaction: Light Confetti Burst
+        function createConfetti() {
+            const container = document.getElementById('confetti-anchor');
+            const colors = ['#532ce6', '#6c4dff', '#c8bfff', '#f6f0ff'];
+            
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'confetti-particle';
+                
+                // Random styles
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const startX = 50 + (Math.random() - 0.5) * 20;
+                const startY = 50 + (Math.random() - 0.5) * 20;
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 50 + Math.random() * 100;
+                const size = 4 + Math.random() * 8;
+                
+                particle.style.backgroundColor = color;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${startX}%`;
+                particle.style.top = `${startY}%`;
+                
+                container.appendChild(particle);
+                
+                // Animation logic
+                const startTime = Date.now();
+                const duration = 1500 + Math.random() * 1000;
+                
+                function animate() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = elapsed / duration;
+                    
+                    if (progress < 1) {
+                        const x = Math.cos(angle) * velocity * progress;
+                        const y = Math.sin(angle) * velocity * progress + (9.8 * progress * progress * 50); // Gravity
+                        const opacity = progress < 0.2 ? progress * 5 : 1 - progress;
+                        
+                        particle.style.transform = `translate(${x}px, ${y}px) rotate(${progress * 720}deg)`;
+                        particle.style.opacity = opacity;
+                        
+                        requestAnimationFrame(animate);
+                    } else {
+                        particle.remove();
+                    }
+                }
+                
+                requestAnimationFrame(animate);
+            }
+        }
+
+        // Trigger confetti on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(createConfetti, 300);
+        });
+
+        // Interactive Button Effects
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                ripple.className = 'absolute bg-white/30 rounded-full pointer-events-none transform -translate-x-1/2 -translate-y-1/2 animate-ping';
+                ripple.style.left = `${e.clientX - rect.left}px`;
+                ripple.style.top = `${e.clientY - rect.top}px`;
+                ripple.style.width = '100px';
+                ripple.style.height = '100px';
+                btn.classList.add('relative', 'overflow-hidden');
+                btn.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+    </script>
+</body></html>
