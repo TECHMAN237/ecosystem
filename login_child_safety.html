@@ -153,7 +153,12 @@
 <p class="text-on-surface-variant font-body-md">Log in to keep your children protected and connected.</p>
 </header>
 <!-- Form Elements -->
-<form action="./home_child_safety_v1.html" class="space-y-lg">
+<form id="loginForm" class="space-y-lg">
+<!-- Error Message Banner -->
+<div id="errorMsg" class="hidden bg-error-container text-on-error-container p-md rounded-lg text-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">error</span>
+<span id="errorText" class="font-medium"></span>
+</div>
 <!-- Email Field -->
 <div class="space-y-xs group">
 <label class="font-label-bold text-label-bold text-on-surface-variant ml-base" for="email">Email Address</label>
@@ -171,14 +176,14 @@
 <div class="relative flex items-center input-glow rounded-lg">
 <span class="material-symbols-outlined absolute left-md text-outline">lock</span>
 <input class="w-full h-12 pl-[52px] pr-[52px] bg-surface-container-lowest border-outline-variant border rounded-lg focus:border-primary focus:ring-0 transition-all outline-none text-body-md" id="password" name="password" placeholder="••••••••" type="password"/>
-<button class="absolute right-md text-outline hover:text-primary transition-colors" type="button">
+<button id="togglePasswordBtn" class="absolute right-md text-outline hover:text-primary transition-colors" type="button">
 <span class="material-symbols-outlined">visibility</span>
 </button>
 </div>
 </div>
 <!-- Sign In Button -->
-<button class="w-full h-14 bg-primary text-on-primary font-headline-md text-headline-md rounded-full shadow-[0px_4px_12px_rgba(83,44,230,0.24)] hover:shadow-[0px_8px_20px_rgba(83,44,230,0.32)] active:scale-95 transition-all duration-200" type="submit">
-                Sign In
+<button id="submitBtn" class="w-full h-14 bg-primary text-on-primary font-headline-md text-headline-md rounded-full shadow-[0px_4px_12px_rgba(83,44,230,0.24)] hover:shadow-[0px_8px_20px_rgba(83,44,230,0.32)] active:scale-95 transition-all duration-200" type="submit">
+                <span id="btnText">Sign In</span>
             </button>
 </form>
 <!-- Divider -->
@@ -188,14 +193,10 @@
 <div class="flex-grow h-[1px] bg-outline-variant"></div>
 </div>
 <!-- Social Logins -->
-<div class="grid grid-cols-2 gap-md">
-<button class="flex items-center justify-center h-12 bg-surface-container-lowest border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors active:scale-95">
+<div class="flex flex-col">
+<button class="flex items-center justify-center h-12 w-full bg-surface-container-lowest border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors active:scale-95">
 <img alt="Google Logo" class="w-5 h-5 mr-xs" data-alt="A clean, isolated Google logo icon with its signature primary colors on a white background, representing modern digital authentication and security." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvkjOOLpdvndRY9jv_Yc6UGTeCRGjDmVjaHfP0FgrzJzZYcRcqXI5FSxeyuJ8CH-paKR1EO9T3K5fAIUQwneV6QTYmy99ud72D1PAkH60o9x677_zXjnZYNaLfqQtXOKTyq5vHtvHssgr33Z4btbrqOwdMGYdaEzAFqQ9tgHG7lKlTmCA4F7A86apLWMNqU6GDzV0txMATkheKJC_sAzDd87uIaiekdqBfejaPN5RyqFCmujkHrqbtLr0k3tv-AuTl-jjqKOD_Y0cL"/>
 <span class="font-label-bold text-label-bold">Google</span>
-</button>
-<button class="flex items-center justify-center h-12 bg-surface-container-lowest border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors active:scale-95">
-<span class="material-symbols-outlined text-[20px] mr-xs" style="font-variation-settings: 'FILL' 1;">ios</span>
-<span class="font-label-bold text-label-bold">Apple</span>
 </button>
 </div>
 </div>
@@ -227,19 +228,107 @@
         });
 
         // Toggle Password Visibility
-        const passToggle = document.querySelector('button .material-symbols-outlined:contains("visibility")');
-        if (passToggle) {
-            passToggle.parentElement.addEventListener('click', () => {
+        const passToggleBtn = document.getElementById('togglePasswordBtn');
+        if (passToggleBtn) {
+            passToggleBtn.addEventListener('click', () => {
                 const input = document.getElementById('password');
-                const icon = passToggle;
+                const icon = passToggleBtn.querySelector('.material-symbols-outlined');
                 if (input.type === 'password') {
                     input.type = 'text';
                     icon.textContent = 'visibility_off';
+                    icon.setAttribute('data-icon', 'visibility_off');
                 } else {
                     input.type = 'password';
                     icon.textContent = 'visibility';
+                    icon.setAttribute('data-icon', 'visibility');
                 }
             });
         }
     </script>
+<script type="importmap">
+{
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+  }
+}
+</script>
+<script type="module">
+import { supabase } from "./src/supabaseClient.js";
+
+const form = document.getElementById('loginForm');
+const errorMsg = document.getElementById('errorMsg');
+const errorText = document.getElementById('errorText');
+const submitBtn = document.getElementById('submitBtn');
+const btnText = document.getElementById('btnText');
+
+// Check session on load
+async function checkCurrentSession() {
+    const { data } = await supabase.auth.getSession();
+    if (data && data.session) {
+        console.log("Session exists! Redirecting to Home...");
+        window.location.href = './home_child_safety_v1.html';
+    }
+}
+checkCurrentSession();
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Reset state
+    errorMsg.classList.add('hidden');
+    errorText.textContent = '';
+    
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    
+    if (!email) {
+        showError('Please enter your email address.');
+        return;
+    }
+    if (!password) {
+        showError('Please enter your password.');
+        return;
+    }
+    
+    setLoading(true);
+    
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+        
+        if (error) {
+            // Requirement error message:
+            // "This account does not exist or the password is incorrect. Please create a new account or try again."
+            showError("This account does not exist or the password is incorrect. Please create a new account or try again.");
+            setLoading(false);
+            return;
+        }
+        
+        console.log('Login successful! Redirecting to Home...');
+        window.location.href = '/';
+    } catch (err) {
+        console.error('Unexpected login error:', err);
+        showError("This account does not exist or the password is incorrect. Please create a new account or try again.");
+        setLoading(false);
+    }
+});
+
+function showError(msg) {
+    errorText.textContent = msg;
+    errorMsg.classList.remove('hidden');
+    errorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function setLoading(isLoading) {
+    if (isLoading) {
+        submitBtn.disabled = true;
+        btnText.textContent = 'Signing In...';
+    } else {
+        submitBtn.disabled = false;
+        btnText.textContent = 'Sign In';
+    }
+}
+</script>
 </body></html>

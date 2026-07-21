@@ -253,7 +253,7 @@ Access your full log of missing and found child reports. Track and manage all ca
 </div>
 <span class="material-symbols-outlined text-outline">chevron_right</span>
 </button>
-<button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./login_child_safety.html'">
+<button id="logoutBtn" class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group">
 <div class="flex items-center gap-md">
 <span class="material-symbols-outlined text-error">logout</span>
 <span class="font-body-lg text-body-lg text-error">Logout</span>
@@ -310,4 +310,29 @@ Access your full log of missing and found child reports. Track and manage all ca
       });
     });
   </script>
+<script type="importmap">
+{
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+  }
+}
+</script>
+<script type="module">
+import { supabase } from "./src/supabaseClient.js";
+
+const logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+            await supabase.auth.signOut();
+            console.log('Successfully signed out!');
+            window.location.href = './login_child_safety.html';
+        } catch (err) {
+            console.error('Logout error:', err);
+            window.location.href = './login_child_safety.html';
+        }
+    });
+}
+</script>
 </body></html>

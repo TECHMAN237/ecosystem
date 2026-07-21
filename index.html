@@ -195,11 +195,36 @@
             TekMen Revolution
         </p>
 </footer>
-<script>
-        // Simulate splash screen timeout leading to next flow
-        setTimeout(() => {
-            console.log("Redirecting to Account Type Selection...");
-            window.location.href = './login_child_safety.html';
-        }, 3000);
+<script type="importmap">
+{
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+  }
+}
+</script>
+<script type="module">
+        import { supabase } from "./src/supabaseClient.js";
+
+        async function checkSession() {
+            try {
+                const { data, error } = await supabase.auth.getSession();
+                if (data && data.session) {
+                    console.log("Session exists! Redirecting to Home...");
+                    window.location.href = './home_child_safety_v1.html';
+                } else {
+                    setTimeout(() => {
+                        console.log("Redirecting to Sign Up / Create Account...");
+                        window.location.href = './sign_up_child_safety.html';
+                    }, 2500);
+                }
+            } catch (err) {
+                console.error("Session check error:", err);
+                setTimeout(() => {
+                    window.location.href = './sign_up_child_safety.html';
+                }, 2500);
+            }
+        }
+
+        checkSession();
     </script>
 </body></html>

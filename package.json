@@ -9,6 +9,7 @@
     "lint": "echo 'Linting successful'"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.7",
     "express": "^4.19.2"
   },
   "devDependencies": {
