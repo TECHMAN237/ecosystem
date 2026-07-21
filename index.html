@@ -195,6 +195,14 @@
             TekMen Revolution
         </p>
 </footer>
+<script>
+        // Failsafe: if the module script fails to load, resolve, or execute (due to CDN block, adblockers, or unsupported importmaps)
+        // this standard script will redirect the user to the sign-up page after 5 seconds instead of hanging on the splash screen.
+        window.failsafeRedirect = setTimeout(() => {
+            console.warn("Failsafe redirect triggered: module failed to load.");
+            window.location.href = './sign_up_child_safety.html';
+        }, 5000);
+</script>
 <script type="importmap">
 {
   "imports": {
@@ -208,6 +216,9 @@
         async function checkSession() {
             try {
                 const { data, error } = await supabase.auth.getSession();
+                if (window.failsafeRedirect) {
+                    clearTimeout(window.failsafeRedirect);
+                }
                 if (data && data.session) {
                     console.log("Session exists! Redirecting to Home...");
                     window.location.href = './home_child_safety_v1.html';
@@ -215,13 +226,16 @@
                     setTimeout(() => {
                         console.log("Redirecting to Sign Up / Create Account...");
                         window.location.href = './sign_up_child_safety.html';
-                    }, 2500);
+                    }, 1500);
                 }
             } catch (err) {
                 console.error("Session check error:", err);
+                if (window.failsafeRedirect) {
+                    clearTimeout(window.failsafeRedirect);
+                }
                 setTimeout(() => {
                     window.location.href = './sign_up_child_safety.html';
-                }, 2500);
+                }, 1500);
             }
         }
 
