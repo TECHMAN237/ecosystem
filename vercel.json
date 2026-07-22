@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "builds": [
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "src/*.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "design/*.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "metadata.json",
+      "use": "@vercel/static"
+    }
+  ]
+}
