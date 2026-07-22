@@ -141,11 +141,11 @@
         
         <!-- Hero Image Section -->
         <section class="relative w-full aspect-[4/5] bg-surface-container-high shrink-0 overflow-hidden group">
-            <img alt="Photo de l'enfant trouvé" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPRhJoR99JnIq0yjWpRc5frrsMJML08i9WLb0sJUaRexO-EZ72J68ur4rWdZu3GQx3x8jpCTy5Lk8OsTZ43OD-aCenUbYDZ2ulH-lU_rOaqTvEf0IpXDYfZn9_UC8aktKYIfWeRhtP93fOlFJ529ANeK_GAwJtrbi7AXfogY1EFTk5yW0CF-cCSWQHHsLaKdIepUPSnC9XI5bG_Zfo-HeePaEZCCSnKpTFog19LD-_tr4aYbE4I1L5RMLH0HFDbHk-dpG0NixHKDj"/>
+            <img id="childPhoto" alt="Photo de l'enfant trouvé" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPRhJoR99JnIq0yjWpRc5frrsMJML08i9WLb0sJUaRexO-EZ72J68ur4rWdZu3GQx3x8jpCTy5Lk8OsTZ43OD-aCenUbYDZ2ulH-lU_rOaqTvEf0IpXDYfZn9_UC8aktKYIfWeRhtP93fOlFJ529ANeK_GAwJtrbi7AXfogY1EFTk5yW0CF-cCSWQHHsLaKdIepUPSnC9XI5bG_Zfo-HeePaEZCCSnKpTFog19LD-_tr4aYbE4I1L5RMLH0HFDbHk-dpG0NixHKDj"/>
             <!-- Gradient Overlay for text readability -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none"></div>
             <!-- Safe Badge -->
-            <div class="absolute top-4 left-4 bg-emerald-500 text-white px-3.5 py-1.5 rounded-full font-label-bold text-label-bold flex items-center gap-1.5 shadow-lg animate-safe z-10">
+            <div id="statusBadge" class="absolute top-4 left-4 bg-emerald-500 text-white px-3.5 py-1.5 rounded-full font-label-bold text-label-bold flex items-center gap-1.5 shadow-lg animate-safe z-10">
                 <span class="material-symbols-outlined fill text-[14px]">verified_user</span>
                 EN SÉCURITÉ
             </div>
@@ -157,14 +157,14 @@
             </div>
             <!-- Core Identity Overlay -->
             <div class="absolute bottom-0 left-0 w-full p-container-margin text-white z-10 flex flex-col gap-1.5">
-                <h1 class="font-display text-display text-white mb-0.5 drop-shadow-md">Garçon trouvé, env. 7 ans</h1>
+                <h1 id="childNameAge" class="font-display text-display text-white mb-0.5 drop-shadow-md">Garçon trouvé, env. 7 ans</h1>
                 <div class="flex items-center gap-2 font-label-sm text-label-sm text-white/90">
                     <span class="material-symbols-outlined text-[16px] text-emerald-400">location_on</span>
-                    <span>Yaoundé, Avenue Kennedy</span>
+                    <span id="locationText">Yaoundé, Avenue Kennedy</span>
                 </div>
                 <div class="flex items-center gap-2 font-label-sm text-label-sm text-white/90">
                     <span class="material-symbols-outlined text-[16px] text-emerald-400">schedule</span>
-                    <span>Trouvé le 14/05/2024 • 10:15</span>
+                    <span id="dateText">Trouvé le 14/05/2024 • 10:15</span>
                 </div>
             </div>
         </section>
@@ -176,15 +176,15 @@
             <div class="grid grid-cols-3 gap-3">
                 <div class="bg-surface-container-lowest border border-surface-variant rounded-lg p-3 flex flex-col items-center justify-center shadow-sm">
                     <span class="text-on-surface-variant font-label-sm text-label-sm mb-1">Sexe estimé</span>
-                    <span class="font-label-bold text-label-bold text-on-surface">Garçon</span>
+                    <span id="sexText" class="font-label-bold text-label-bold text-on-surface">Garçon</span>
                 </div>
                 <div class="bg-surface-container-lowest border border-surface-variant rounded-lg p-3 flex flex-col items-center justify-center shadow-sm">
                     <span class="text-on-surface-variant font-label-sm text-label-sm mb-1">Taille estimée</span>
-                    <span class="font-label-bold text-label-bold text-on-surface">Env. 1m15</span>
+                    <span id="heightText" class="font-label-bold text-label-bold text-on-surface">Env. 1m15</span>
                 </div>
                 <div class="bg-surface-container-lowest border border-surface-variant rounded-lg p-3 flex flex-col items-center justify-center shadow-sm">
                     <span class="text-on-surface-variant font-label-sm text-label-sm mb-1">Statut</span>
-                    <span class="font-label-bold text-label-bold text-emerald-600">Sécurisé</span>
+                    <span id="statusText" class="font-label-bold text-label-bold text-emerald-600">Sécurisé</span>
                 </div>
             </div>
 
@@ -196,7 +196,7 @@
                     <span class="material-symbols-outlined text-primary">description</span>
                     Description & Vêtements
                 </h2>
-                <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed bg-surface-container-lowest p-4 rounded-lg border border-surface-variant shadow-sm">
+                <p id="descriptionText" class="font-body-md text-body-md text-on-surface-variant leading-relaxed bg-surface-container-lowest p-4 rounded-lg border border-surface-variant shadow-sm">
                     Porte un t-shirt jaune vif avec un dessin d'animal, un short en jean bleu clair, et des baskets bleues. L'enfant a été retrouvé marchant seul près de l'Avenue Kennedy. Il est actuellement calme, bien nourri et en sécurité dans les locaux des services sociaux, en attente de l'identification de sa famille.
                 </p>
             </div>
@@ -211,7 +211,7 @@
                     <div class="p-3 border-b border-surface-variant flex items-start gap-2 bg-surface-container-low">
                         <span class="material-symbols-outlined text-emerald-600 mt-0.5 text-[18px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
                         <div>
-                            <p class="font-label-bold text-label-bold text-on-surface">Commissariat Central • Service Social</p>
+                            <p id="currentSafeLocationText" class="font-label-bold text-label-bold text-on-surface">Commissariat Central • Service Social</p>
                             <p class="font-label-sm text-label-sm text-on-surface-variant">Yaoundé, Centre-Ville</p>
                         </div>
                     </div>
@@ -234,7 +234,7 @@
                         </div>
                         <div>
                             <p class="font-label-sm text-label-sm text-emerald-800 font-medium">Service de Protection de l'Enfance</p>
-                            <p class="font-headline-md text-[18px] font-bold text-emerald-700">+237 2 22 23 45 67</p>
+                            <p id="contactPhone" class="font-headline-md text-[18px] font-bold text-emerald-700">+237 2 22 23 45 67</p>
                         </div>
                     </div>
                 </div>
@@ -256,6 +256,90 @@
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const reportDataStr = sessionStorage.getItem('current_view_report');
+    if (reportDataStr) {
+        try {
+            const report = JSON.parse(reportDataStr);
+            console.log("Rendering dynamic found report details:", report);
+
+            // 1. Photo
+            if (report.photo) {
+                document.getElementById('childPhoto').src = report.photo;
+            }
+
+            // 2. Status badge
+            const statusBadge = document.getElementById('statusBadge');
+            if (statusBadge) {
+                if (report.status === 'Published' || report.status === 'Active') {
+                    statusBadge.innerHTML = '<span class="material-symbols-outlined fill text-[14px]">verified_user</span> EN SÉCURITÉ';
+                } else {
+                    statusBadge.innerHTML = `<span class="material-symbols-outlined fill text-[14px]">verified_user</span> ${report.status.toUpperCase()}`;
+                }
+            }
+
+            // 3. Name & age estimé
+            const ageLabel = report.age ? `env. ${report.age} ans` : 'âge inconnu';
+            document.getElementById('childNameAge').textContent = `${report.name || 'Enfant trouvé'}, ${ageLabel}`;
+
+            // 4. Location Text
+            document.getElementById('locationText').textContent = report.location || "Yaoundé";
+
+            // 5. Date Text
+            const dateStr = report.date || "Inconnue";
+            const timeStr = report.time || "Non spécifiée";
+            document.getElementById('dateText').textContent = `Trouvé le ${dateStr} • ${timeStr}`;
+
+            // 6. Sex
+            const sexText = document.getElementById('sexText');
+            if (sexText) {
+                const g = (report.gender || "").toLowerCase();
+                sexText.textContent = (g === 'fille' || g === 'f') ? 'Fille' : ((g === 'garcon' || g === 'm') ? 'Garçon' : 'Inconnu');
+            }
+
+            // 7. Height
+            const heightText = document.getElementById('heightText');
+            if (heightText) {
+                heightText.textContent = report.height || "Env. 1m15";
+            }
+
+            // 8. Status Text
+            const statusText = document.getElementById('statusText');
+            if (statusText) {
+                statusText.textContent = report.currentSafeLocation ? 'Sécurisé' : 'Recherche Famille';
+            }
+
+            // 9. Description Text
+            const descriptionText = document.getElementById('descriptionText');
+            if (descriptionText) {
+                let desc = report.physicalDescription || "Aucune description physique fournie.";
+                if (report.clothingDescription) {
+                    desc += ` Vêtements: ${report.clothingDescription}`;
+                }
+                if (report.notes) {
+                    desc += ` Notes: ${report.notes}`;
+                }
+                descriptionText.textContent = desc;
+            }
+
+            // 10. Current safe location
+            if (report.currentSafeLocation) {
+                document.getElementById('currentSafeLocationText').textContent = report.currentSafeLocation;
+            }
+
+            // 11. Contact Phone
+            if (report.contactPhone) {
+                document.getElementById('contactPhone').textContent = report.contactPhone;
+            }
+
+        } catch (e) {
+            console.error("Error loading dynamic found report:", e);
+        }
+    }
+});
+</script>
 
 </body>
 </html>

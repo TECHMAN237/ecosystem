@@ -196,19 +196,19 @@
 <section class="profile-header-card p-4 flex items-center justify-between">
   <div class="flex items-center gap-4">
     <div class="relative">
-      <img src="./mbolo_brenda_avatar.png" alt="Mbolo Brenda" class="w-14 h-14 rounded-full object-cover border-2 border-primary/20 shadow-sm">
+      <img id="homeUserAvatar" src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=400" alt="Avatar" class="w-14 h-14 rounded-full object-cover border-2 border-primary/20 shadow-sm">
       <span class="absolute -bottom-1 -right-1 bg-primary text-white w-5 h-5 rounded-full flex items-center justify-center border border-white">
         <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">verified</span>
       </span>
     </div>
     <div class="flex flex-col">
-      <span class="text-xs text-on-surface-variant font-medium leading-none mb-0.5">Welcome</span>
+      <span class="text-xs text-on-surface-variant font-medium leading-none mb-0.5">Bienvenue</span>
       <h1 class="text-lg font-bold text-on-surface leading-tight flex items-center gap-1">
-        Mbolo Brenda <span class="text-base">👋</span>
+        <span id="homeUserName">Elena Rodriguez</span> <span class="text-base">👋</span>
       </h1>
       <span class="text-[11px] text-primary font-bold flex items-center gap-0.5 mt-0.5">
         <span class="material-symbols-outlined text-[13px] text-primary" style="font-variation-settings: 'FILL' 1;">verified_user</span>
-        Verified Volunteer
+        <span id="homeUserRole">Membre Élite des Gardiens</span>
       </span>
     </div>
   </div>
@@ -222,21 +222,21 @@
 <div class="bg-error-container text-on-error-container rounded-xl p-4 flex items-start gap-4 shadow-sm border border-error/20">
 <span class="material-symbols-outlined mt-1" style="font-variation-settings: 'FILL' 1;">warning</span>
 <div>
-<h3 class="font-label-bold text-label-bold uppercase tracking-wide mb-1">Active Alert in your area</h3>
-<p class="font-body-md text-body-md">A child was reported missing 2 miles away. Please review the details below and stay vigilant.</p>
+<h3 class="font-label-bold text-label-bold uppercase tracking-wide mb-1">Alerte active dans votre zone</h3>
+<p class="font-body-md text-body-md">Un enfant a été signalé disparu à 3 km. Veuillez consulter les détails ci-dessous et rester vigilant.</p>
 </div>
 </div>
 
 <!-- Recent Missing Children Carousel -->
 <section>
   <div class="flex justify-between items-center mb-4">
-    <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Recent Missing Children</h2>
+    <h2 class="font-headline-md text-headline-md text-on-surface font-bold">Enfants disparus récemment</h2>
     <button class="text-primary font-bold text-sm flex items-center gap-1 hover:underline" onclick="window.location.href='./reports_directory.html'">
-      <span>View All</span>
+      <span>Tout voir</span>
       <span class="material-symbols-outlined text-[16px]">chevron_right</span>
     </button>
   </div>
-  <div class="flex overflow-x-auto gap-4 pb-3 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-5 px-5">
+  <div id="recentMissingCarousel" class="flex overflow-x-auto gap-4 pb-3 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-5 px-5">
     <!-- Card 1 (Emmanuel T.) -->
     <div class="flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 shadow-[0_6px_24px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.02)] border border-outline-variant/20 flex gap-3.5 items-center hover:shadow-[0_12px_32px_rgba(83,44,230,0.06)] hover:-translate-y-0.5 transition-all duration-300">
       <div class="w-[96px] h-[112px] rounded-[14px] overflow-hidden flex-shrink-0 bg-surface-container-high relative shadow-inner">
@@ -247,14 +247,14 @@
           <h3 class="font-bold text-[16px] text-on-surface leading-snug mb-0.5">Emmanuel T.</h3>
           <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1.5">
             <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
-            2 miles away
+            À 3 km d'ici
           </p>
           <div class="mb-2">
             <span class="bg-error-container text-error text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Urgent</span>
           </div>
         </div>
         <button class="w-full py-2 px-3 border border-primary/20 text-primary rounded-full font-bold text-[11px] flex items-center justify-between hover:bg-primary/5 active:scale-98 transition-all" onclick="window.location.href='./report_details.html'">
-          <span>View Details</span>
+          <span>Voir les détails</span>
           <span class="material-symbols-outlined text-[14px]">chevron_right</span>
         </button>
       </div>
@@ -270,14 +270,14 @@
           <h3 class="font-bold text-[16px] text-on-surface leading-snug mb-0.5">Amina K.</h3>
           <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1.5">
             <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
-            3 miles away
+            À 5 km d'ici
           </p>
           <div class="mb-2">
             <span class="bg-error-container text-error text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Urgent</span>
           </div>
         </div>
         <button class="w-full py-2 px-3 border border-primary/20 text-primary rounded-full font-bold text-[11px] flex items-center justify-between hover:bg-primary/5 active:scale-98 transition-all" onclick="window.location.href='./report_details.html'">
-          <span>View Details</span>
+          <span>Voir les détails</span>
           <span class="material-symbols-outlined text-[14px]">chevron_right</span>
         </button>
       </div>
@@ -292,7 +292,7 @@
       <div class="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-105 transition-transform">
         <span class="material-symbols-outlined text-white text-[20px]" style="font-variation-settings: 'FILL' 1;">security</span>
       </div>
-      <span class="font-bold text-sm">Report Missing</span>
+      <span class="font-bold text-sm">Signaler un disparu</span>
     </div>
     <span class="material-symbols-outlined text-white/80 text-[16px]">chevron_right</span>
   </button>
@@ -302,7 +302,7 @@
       <div class="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-105 transition-transform">
         <span class="material-symbols-outlined text-white text-[20px]" style="font-variation-settings: 'FILL' 1;">location_on</span>
       </div>
-      <span class="font-bold text-sm">Report Found</span>
+      <span class="font-bold text-sm">Signaler un retrouvé</span>
     </div>
     <span class="material-symbols-outlined text-white/80 text-[16px]">chevron_right</span>
   </button>
@@ -313,8 +313,8 @@
   <button class="w-full bg-gradient-to-r from-[#532ce6] to-[#8b6aff] text-white rounded-[24px] p-6 shadow-[0px_8px_30px_rgba(83,44,230,0.12)] hover:opacity-95 transition-all flex flex-row items-center justify-between group overflow-hidden relative" onclick="window.location.href='./reports_directory.html'">
     <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
     <div class="flex flex-col items-start gap-1 z-10 text-left">
-      <h3 class="font-bold text-xl leading-tight">Browse Reports</h3>
-      <p class="text-sm text-white/85">View nearby active cases</p>
+      <h3 class="font-bold text-xl leading-tight">Parcourir les cas</h3>
+      <p class="text-sm text-white/85">Voir les cas actifs à proximité</p>
     </div>
     <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center z-10 group-hover:bg-white/30 transition-colors">
       <span class="material-symbols-outlined text-white text-[24px]">arrow_forward</span>
@@ -325,14 +325,14 @@
 <!-- Bottom Info Cards (Enfants trouvés récemment / Cas de disparition actifs) -->
 <section class="space-y-3">
   <!-- Card 1 -->
-  <div class="bg-white rounded-[24px] p-4 shadow-sm border border-outline-variant/30 flex items-center justify-between hover:bg-surface-container-low transition-colors cursor-pointer" onclick="window.location.href='./reports_directory.html'">
+  <div class="bg-white rounded-[24px] p-4 shadow-sm border border-outline-variant/30 flex items-center justify-between hover:bg-surface-container-low transition-colors cursor-pointer" onclick="window.location.href='./found_reports_directory.html'">
     <div class="flex items-center gap-4">
       <div class="w-12 h-12 rounded-[18px] bg-[#E8E7FD] text-[#532ce6] flex items-center justify-center">
         <span class="material-symbols-outlined text-[24px]">person</span>
       </div>
       <div class="text-left">
         <h4 class="font-bold text-base text-on-surface">Enfants trouvés récemment</h4>
-        <p class="text-xs text-on-surface-variant">No found reports yet.</p>
+        <p id="foundCountText" class="text-xs text-on-surface-variant">No found reports yet.</p>
       </div>
     </div>
     <span class="material-symbols-outlined text-on-surface-variant text-[20px]">chevron_right</span>
@@ -346,7 +346,7 @@
       </div>
       <div class="text-left">
         <h4 class="font-bold text-base text-on-surface">Cas de disparition actifs</h4>
-        <p class="text-xs text-on-surface-variant">No active missing cases.</p>
+        <p id="missingCountText" class="text-xs text-on-surface-variant">No active missing cases.</p>
       </div>
     </div>
     <span class="material-symbols-outlined text-on-surface-variant text-[20px]">chevron_right</span>
@@ -364,35 +364,230 @@
 <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-4 pb-safe bg-surface-container-lowest shadow-[0px_-12px_32px_rgba(0,0,0,0.08)] rounded-t-lg">
 <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5 transition-transform duration-150 ease-in-out scale-95" href="./home_child_safety_v1.html">
 <span class="material-symbols-outlined">home</span>
-<span class="font-label-sm text-label-sm">Home</span>
+<span class="font-label-sm text-label-sm">Accueil</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-secondary-container px-4 py-1.5 hover:bg-surface-container-high rounded-xl transition-all" href="./reports_directory.html">
 <span class="material-symbols-outlined">assignment</span>
-<span class="font-label-sm text-label-sm mt-1">Reports</span>
+<span class="font-label-sm text-label-sm mt-1">Signalements</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-secondary-container px-4 py-1.5 hover:bg-surface-container-high rounded-xl transition-all relative" href="./alert_center.html">
 <span class="material-symbols-outlined">notifications_active</span>
-<span class="font-label-sm text-label-sm mt-1">Alerts</span>
+<span class="font-label-sm text-label-sm mt-1">Alertes</span>
 <span class="absolute top-1 right-3 w-2 h-2 bg-error rounded-full"></span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-secondary-container px-4 py-1.5 hover:bg-surface-container-high rounded-xl transition-all" href="./guardian_profile_updated_my_reports.html">
 <span class="material-symbols-outlined">person</span>
-<span class="font-label-sm text-label-sm">Profile</span>
+<span class="font-label-sm text-label-sm">Profil</span>
 </a>
 </nav>
+
+<script type="importmap">
+{
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+  }
+}
+</script>
+<script type="module">
+import { supabase } from "./src/supabaseClient.js";
+import { reportService } from "./src/reportService.js";
+
+// Check session on load
+async function checkAuth() {
+    try {
+        if (localStorage.getItem('is_guest') === 'true') {
+            console.log("Guest mode active on Home.");
+            return;
+        }
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            console.log("No active session. Redirecting to login...");
+            window.location.href = './login_child_safety.html';
+        }
+    } catch (err) {
+        console.error("Error checking auth session:", err);
+    }
+}
+checkAuth();
+
+// Listen for auth state changes
+supabase.auth.onAuthStateChange((event, session) => {
+    if (localStorage.getItem('is_guest') === 'true') {
+        return;
+    }
+    if (event === 'SIGNED_OUT' || !session) {
+        console.log("Signed out or session lost. Redirecting to login...");
+        window.location.href = './login_child_safety.html';
+    }
+});
+
+async function loadAndSyncProfile() {
+    try {
+        const profile = await reportService.syncProfileWithSupabase();
+        const homeUserAvatar = document.getElementById('homeUserAvatar');
+        const homeUserName = document.getElementById('homeUserName');
+        const homeUserRole = document.getElementById('homeUserRole');
+        
+        if (profile) {
+            if (profile.photo && homeUserAvatar) {
+                homeUserAvatar.src = profile.photo;
+            }
+            if (profile.full_name && homeUserName) {
+                homeUserName.innerHTML = `${profile.full_name} <span class="text-base">👋</span>`;
+            }
+            if (profile.role && homeUserRole) {
+                homeUserRole.textContent = profile.role;
+            }
+        }
+    } catch (e) {
+        console.error("Error loading profile for home screen:", e);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Dynamically load user profile from reportService
+    loadAndSyncProfile();
+
+    // Load and render recent missing children in carousel
+    const carousel = document.getElementById('recentMissingCarousel');
+    if (carousel) {
+        const missing = reportService.getMissingReports();
+        if (missing.length > 0) {
+            carousel.innerHTML = missing.map(report => {
+                return `
+                <div class="flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 shadow-[0_6px_24px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.02)] border border-outline-variant/20 flex gap-3.5 items-center hover:shadow-[0_12px_32px_rgba(83,44,230,0.06)] hover:-translate-y-0.5 transition-all duration-300">
+                  <div class="w-[96px] h-[112px] rounded-[14px] overflow-hidden flex-shrink-0 bg-surface-container-high relative shadow-inner">
+                    <img alt="${report.name}" class="w-full h-full object-cover" src="${report.photo}" />
+                  </div>
+                  <div class="flex-1 flex flex-col h-full justify-between py-0.5">
+                    <div>
+                      <h3 class="font-bold text-[16px] text-on-surface leading-snug mb-0.5">${report.name}</h3>
+                      <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1.5">
+                        <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
+                        ${report.location}
+                      </p>
+                      <div class="mb-2">
+                        <span class="bg-error-container text-error text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">${report.urgency || 'Urgent'}</span>
+                      </div>
+                    </div>
+                    <button class="view-details-btn w-full py-2 px-3 border border-primary/20 text-primary rounded-full font-bold text-[11px] flex items-center justify-between hover:bg-primary/5 active:scale-98 transition-all" 
+                            data-id="${report.id}">
+                      <span>Voir les détails</span>
+                      <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                    </button>
+                  </div>
+                </div>
+                `;
+            }).join('');
+
+            // Bind click listeners
+            carousel.querySelectorAll('.view-details-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const report = reportService.getReportById(id);
+                    if (report) {
+                        sessionStorage.setItem('current_view_report', JSON.stringify(report));
+                        window.location.href = './report_details.html';
+                    }
+                });
+            });
+        } else {
+            carousel.innerHTML = `<p class="text-xs text-on-surface-variant px-4">Aucun cas de disparition actif.</p>`;
+        }
+    }
+
+    // Update bottom card counters
+    const foundCountText = document.getElementById('foundCountText');
+    if (foundCountText) {
+        const found = reportService.getFoundReports();
+        foundCountText.textContent = found.length > 0 ? `${found.length} enfant(s) trouvé(s) en attente.` : "Aucun signalement en attente.";
+    }
+
+    const missingCountText = document.getElementById('missingCountText');
+    if (missingCountText) {
+        const missing = reportService.getMissingReports();
+        missingCountText.textContent = missing.length > 0 ? `${missing.length} alerte(s) active(s) à proximité.` : "Aucune alerte active.";
+    }
+});
+</script>
 
 <script>
         // Hide Report Missing for Community Member / Volunteer (cannot report missing)
         (function() {
             const role = sessionStorage.getItem('childSafetyAccountType') || '';
-            const restricted = /Community Member|Volunteer Helper/i.test(role);
+            const restricted = /Community Member|Volunteer Helper|Membre de la Communauté|Bénévole Secouriste/i.test(role);
             if (restricted) {
                 document.querySelectorAll('button').forEach(btn => {
-                    if (btn.textContent.includes('Report Missing')) {
+                    if (btn.textContent.includes('Report Missing') || btn.textContent.includes('Signaler un disparu')) {
                         btn.style.display = 'none';
                     }
                 });
             }
         })();
+    </script>
+
+    <script>
+        // Guest restriction check
+        function showGuestRestrictionAlert() {
+            if (document.getElementById('guest-restriction-modal')) return;
+            
+            const modal = document.createElement('div');
+            modal.id = 'guest-restriction-modal';
+            modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-md bg-black/60 backdrop-blur-sm transition-all duration-300';
+            modal.innerHTML = `
+                <div class="bg-surface-container-lowest rounded-2xl p-lg max-w-sm w-full shadow-2xl border border-primary/10 text-center transform scale-95 transition-transform duration-300">
+                    <div class="w-16 h-16 bg-primary-container/10 text-primary rounded-full flex items-center justify-center mx-auto mb-md">
+                        <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">lock</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Accès Restreint</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant mb-lg leading-relaxed text-center">
+                        Veuillez créer un compte ou vous connecter pour continuer.
+                    </p>
+                    <div class="flex flex-col gap-sm">
+                        <a href="./sign_up_child_safety.html" class="w-full py-3 bg-primary text-on-primary rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all block text-center shadow-md">
+                            Créer un compte / Se connecter
+                        </a>
+                        <button id="closeGuestModal" class="w-full py-3 bg-surface-container-high text-on-surface rounded-full font-label-bold text-label-bold hover:bg-surface-container-highest active:scale-95 transition-all">
+                            Plus tard
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            setTimeout(() => {
+                modal.querySelector('.transform').classList.remove('scale-95');
+            }, 10);
+
+            document.getElementById('closeGuestModal').addEventListener('click', () => {
+                modal.querySelector('.transform').classList.add('scale-95');
+                modal.style.opacity = '0';
+                setTimeout(() => modal.remove(), 200);
+            });
+        }
+
+        if (localStorage.getItem('is_guest') === 'true') {
+            document.addEventListener('click', (e) => {
+                const target = e.target.closest('a, button');
+                if (!target) return;
+                
+                const href = target.getAttribute('href') || '';
+                const onclick = target.getAttribute('onclick') || '';
+                
+                const isRestrictedPath = href.includes('guardian_profile') || 
+                                         href.includes('signaler_un_disparu') || 
+                                         href.includes('signaler_un_enfant_trouv') || 
+                                         href.includes('v2_smart_device') || 
+                                         onclick.includes('guardian_profile') || 
+                                         onclick.includes('signaler_un_disparu') || 
+                                         onclick.includes('signaler_un_enfant_trouv') || 
+                                         onclick.includes('v2_smart_device');
+                
+                if (isRestrictedPath) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showGuestRestrictionAlert();
+                }
+            }, true);
+        }
     </script>
 </body></html>

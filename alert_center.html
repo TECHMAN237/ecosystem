@@ -310,4 +310,71 @@
             }
         });
     </script>
+
+    <script>
+        // Guest restriction check
+        function showGuestRestrictionAlert() {
+            if (document.getElementById('guest-restriction-modal')) return;
+            
+            const modal = document.createElement('div');
+            modal.id = 'guest-restriction-modal';
+            modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-md bg-black/60 backdrop-blur-sm transition-all duration-300';
+            modal.innerHTML = `
+                <div class="bg-surface-container-lowest rounded-2xl p-lg max-w-sm w-full shadow-2xl border border-primary/10 text-center transform scale-95 transition-transform duration-300">
+                    <div class="w-16 h-16 bg-primary-container/10 text-primary rounded-full flex items-center justify-center mx-auto mb-md">
+                        <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">lock</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Accès Restreint</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant mb-lg leading-relaxed text-center">
+                        Please create an account or sign in to continue.
+                    </p>
+                    <div class="flex flex-col gap-sm">
+                        <a href="./sign_up_child_safety.html" class="w-full py-3 bg-primary text-on-primary rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all block text-center shadow-md">
+                            Créer un compte / Se connecter
+                        </a>
+                        <button id="closeGuestModal" class="w-full py-3 bg-surface-container-high text-on-surface rounded-full font-label-bold text-label-bold hover:bg-surface-container-highest active:scale-95 transition-all">
+                            Plus tard
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            setTimeout(() => {
+                modal.querySelector('.transform').classList.remove('scale-95');
+            }, 10);
+
+            document.getElementById('closeGuestModal').addEventListener('click', () => {
+                modal.querySelector('.transform').classList.add('scale-95');
+                modal.style.opacity = '0';
+                setTimeout(() => modal.remove(), 200);
+            });
+        }
+
+        if (localStorage.getItem('is_guest') === 'true') {
+            document.addEventListener('click', (e) => {
+                const target = e.target.closest('a, button');
+                if (!target) return;
+                
+                const href = target.getAttribute('href') || '';
+                const onclick = target.getAttribute('onclick') || '';
+                
+                const isRestrictedPath = href.includes('guardian_profile') || 
+                                         href.includes('signaler_un_disparu') || 
+                                         href.includes('signaler_un_enfant_trouv') || 
+                                         href.includes('v2_smart_device') || 
+                                         href.includes('ai_smart_matching') ||
+                                         onclick.includes('guardian_profile') || 
+                                         onclick.includes('signaler_un_disparu') || 
+                                         onclick.includes('signaler_un_enfant_trouv') || 
+                                         onclick.includes('v2_smart_device') ||
+                                         onclick.includes('ai_smart_matching');
+                
+                if (isRestrictedPath) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showGuestRestrictionAlert();
+                }
+            }, true);
+        }
+    </script>
 </body></html>

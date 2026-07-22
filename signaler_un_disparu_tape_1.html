@@ -144,36 +144,35 @@
 <span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
 <p class="font-body-md text-on-surface">Seuls les parents et tuteurs légaux peuvent soumettre des signalements d'enfants disparus.</p>
 </div>
-</div>
-<!-- Form Card -->
+</div><!-- Form Card -->
 <div class="bg-surface-container-lowest rounded-xl p-lg soft-shadow border border-surface-variant">
-<form class="space-y-lg">
+<form class="space-y-lg" id="missingForm">
 <!-- Photo Upload Area -->
-<div class="flex flex-col items-center justify-center p-xl border-2 border-dashed border-outline-variant rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div id="uploadContainer" class="flex flex-col items-center justify-center p-xl border-2 border-dashed border-outline-variant rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer group relative overflow-hidden">
 <div class="w-24 h-24 rounded-lg bg-surface-container-highest flex items-center justify-center mb-md group-hover:scale-105 transition-transform">
 <span class="material-symbols-outlined text-primary text-[48px]">add_a_photo</span>
 </div>
 <span class="font-label-bold text-label-bold text-primary">Ajouter une photo récente</span>
 <span class="font-label-sm text-label-sm text-outline mt-base">Format JPG ou PNG (Max. 5MB)</span>
+<input id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
 </div>
 <!-- Personal Info Grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
 <div class="space-y-base">
 <label class="font-label-bold text-label-bold text-on-surface px-base">Nom complet de l'enfant</label>
-<input class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md" placeholder="Ex: Jean Dupont" type="text"/>
+<input id="fullName" class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md" placeholder="Ex: Jean Dupont" type="text"/>
 </div>
 <div class="grid grid-cols-2 gap-md">
 <div class="space-y-base">
 <label class="font-label-bold text-label-bold text-on-surface px-base">Âge</label>
-<input class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md" placeholder="Ans" type="number"/>
+<input id="age" class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md" placeholder="Ans" type="number"/>
 </div>
 <div class="space-y-base">
 <label class="font-label-bold text-label-bold text-on-surface px-base">Sexe</label>
-<select class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md appearance-none">
+<select id="gender" class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md appearance-none">
 <option disabled="" selected="" value="">Choisir</option>
-<option value="M">Masculin</option>
-<option value="F">Féminin</option>
-<option value="O">Autre</option>
+<option value="garcon">Masculin</option>
+<option value="fille">Féminin</option>
 </select>
 </div>
 </div>
@@ -183,7 +182,7 @@
 <label class="font-label-bold text-label-bold text-on-surface px-base">Lien de parenté (Requis)</label>
 <div class="flex flex-wrap gap-sm">
 <label class="flex-1 min-w-[100px] cursor-pointer">
-<input class="hidden peer" name="relationship" type="radio" value="mere"/>
+<input class="hidden peer" name="relationship" type="radio" value="mere" checked/>
 <div class="p-md text-center border border-outline-variant rounded-lg font-label-bold text-label-bold peer-checked:bg-primary-container peer-checked:text-on-primary-container peer-checked:border-primary transition-all">Mère</div>
 </label>
 <label class="flex-1 min-w-[100px] cursor-pointer">
@@ -202,23 +201,23 @@
 <label class="font-label-bold text-label-bold text-on-surface px-base">Lieu de disparition</label>
 <div class="relative">
 <span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">location_on</span>
-<input class="w-full pl-xl p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md" placeholder="Dernier endroit connu..." type="text"/>
+<input id="disappearanceLocation" class="w-full pl-xl p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md" placeholder="Dernier endroit connu..." type="text"/>
 </div>
 </div>
 <div class="space-y-base">
 <label class="font-label-bold text-label-bold text-on-surface px-base">Date de disparition</label>
 <div class="relative">
 <span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">calendar_month</span>
-<input class="w-full pl-xl p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md" type="date"/>
+<input id="disappearanceDate" class="w-full pl-xl p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md" type="date"/>
 </div>
 </div>
 <div class="space-y-base">
 <label class="font-label-bold text-label-bold text-on-surface px-base">Description physique</label>
-<textarea class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md resize-none" placeholder="Taille, vêtements portés, signes distinctifs..." rows="3"></textarea>
+<textarea id="physicalDescription" class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md resize-none" placeholder="Taille, vêtements portés, signes distinctifs..." rows="3"></textarea>
 </div>
 <div class="space-y-base">
 <label class="font-label-bold text-label-bold text-on-surface px-base">Notes additionnelles</label>
-<textarea class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md resize-none" placeholder="Toute information jugée utile..." rows="2"></textarea>
+<textarea id="additionalNotes" class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus-glow font-body-md resize-none" placeholder="Toute information jugée utile..." rows="2"></textarea>
 </div>
 </div>
 </form>
@@ -233,34 +232,124 @@
 <span class="font-label-bold text-label-bold">Previous</span>
 </div>
 </button>
-<button class="flex flex-col items-center justify-center bg-primary text-on-primary rounded-full px-xl py-sm hover:opacity-90 active:scale-98 transition-all duration-200 shadow-lg" onclick="window.location.href='./v_rifier_le_lien_de_parent.html'">
+<button id="btnSubmitStep1" class="flex flex-col items-center justify-center bg-primary text-on-primary rounded-full px-xl py-sm hover:opacity-90 active:scale-98 transition-all duration-200 shadow-lg">
 <div class="flex items-center gap-xs">
 <span class="font-label-bold text-label-bold">Continue</span>
 <span class="material-symbols-outlined">chevron_right</span>
 </div>
 </button>
 </nav>
-<script>
-        // Simple interactive effect for radio buttons
-        const radioGroups = document.querySelectorAll('input[type="radio"]');
-        radioGroups.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                // Add a subtle bounce when selecting
-                const parent = e.target.closest('label');
-                parent.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    parent.style.transform = 'scale(1)';
-                }, 100);
-            });
-        });
 
-        // Photo upload placeholder interaction
-        const uploadArea = document.querySelector('.border-dashed');
-        uploadArea.addEventListener('click', () => {
-            console.log('Upload triggered');
-            // Mock file picker feedback
-            uploadArea.classList.add('bg-primary-container/10');
-            setTimeout(() => uploadArea.classList.remove('bg-primary-container/10'), 300);
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.getElementById('fileInput');
+    const uploadContainer = document.getElementById('uploadContainer');
+    const fullNameInput = document.getElementById('fullName');
+    const ageInput = document.getElementById('age');
+    const genderSelect = document.getElementById('gender');
+    const locationInput = document.getElementById('disappearanceLocation');
+    const dateInput = document.getElementById('disappearanceDate');
+    const physicalInput = document.getElementById('physicalDescription');
+    const notesInput = document.getElementById('additionalNotes');
+    const btnSubmit = document.getElementById('btnSubmitStep1');
+
+    // Radio buttons
+    const radioGroups = document.querySelectorAll('input[type="radio"]');
+    radioGroups.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const parent = e.target.closest('label');
+            parent.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                parent.style.transform = 'scale(1)';
+            }, 100);
         });
-    </script>
+    });
+
+    // Handle photo select
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const base64 = evt.target.result;
+                sessionStorage.setItem('pending_report_photo', base64);
+                
+                uploadContainer.innerHTML = `
+                    <img src="${base64}" class="absolute inset-0 w-full h-full object-cover" />
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        <span class="text-white font-label-bold text-label-bold">Changer la photo</span>
+                    </div>
+                    <input id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
+                `;
+                // rebind
+                document.getElementById('fileInput').addEventListener('change', arguments.callee);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Restore existing preview if present
+    const existingPhoto = sessionStorage.getItem('pending_report_photo');
+    if (existingPhoto) {
+        uploadContainer.innerHTML = `
+            <img src="${existingPhoto}" class="absolute inset-0 w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                <span class="text-white font-label-bold text-label-bold">Changer la photo</span>
+            </div>
+            <input id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
+        `;
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const base64 = evt.target.result;
+                    sessionStorage.setItem('pending_report_photo', base64);
+                    location.reload();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Restore text inputs
+    const existingDataStr = sessionStorage.getItem('pending_report_data');
+    if (existingDataStr) {
+        try {
+            const data = JSON.parse(existingDataStr);
+            if (data.name) fullNameInput.value = data.name;
+            if (data.age) ageInput.value = data.age;
+            if (data.gender) genderSelect.value = data.gender;
+            if (data.location) locationInput.value = data.location;
+            if (data.date) dateInput.value = data.date;
+            if (data.physicalDescription) physicalInput.value = data.physicalDescription;
+            if (data.notes) notesInput.value = data.notes;
+            if (data.relationship) {
+                const radio = document.querySelector(`input[name="relationship"][value="${data.relationship}"]`);
+                if (radio) radio.checked = true;
+            }
+        } catch(e) {}
+    }
+
+    // Save and redirect
+    btnSubmit.addEventListener('click', () => {
+        const checkedRadio = document.querySelector('input[name="relationship"]:checked');
+        const relationship = checkedRadio ? checkedRadio.value : "mere";
+
+        sessionStorage.setItem('pending_report_data', JSON.stringify({
+            name: fullNameInput.value.trim() || "Anonyme",
+            age: parseInt(ageInput.value) || 8,
+            gender: genderSelect.value || "garcon",
+            location: locationInput.value.trim() || "Yaoundé",
+            date: dateInput.value || new Date().toISOString().split('T')[0],
+            physicalDescription: physicalInput.value.trim() || "Aucune description",
+            notes: notesInput.value.trim() || "",
+            relationship: relationship,
+            height: "1m20"
+        }));
+
+        window.location.href = './v_rifier_le_lien_de_parent.html';
+    });
+});
+</script>
 </body></html>

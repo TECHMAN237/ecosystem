@@ -140,29 +140,34 @@
 <!-- Progress Tracker -->
 <div class="flex items-center gap-xs mb-xl">
 <div class="h-2 step-inactive bg-primary-fixed"></div>
+<div class="h-2 step-inactive bg-primary-fixed"></div>
 <div class="h-2 step-active bg-primary transition-all duration-500"></div>
-<div class="h-2 step-inactive bg-outline-variant"></div>
-<span class="ml-sm font-label-bold text-label-bold text-outline">Step 2 of 3</span>
+<span class="ml-sm font-label-bold text-label-bold text-outline">Étape 3 sur 3</span>
 </div>
 <!-- Header Content -->
 <div class="mb-xl">
-<h2 class="font-headline-lg text-headline-lg text-on-background mb-base">Tell us about yourself</h2>
-<p class="font-body-md text-body-md text-on-surface-variant">We need a few more details to set up your secure account.</p>
+<h2 class="font-headline-lg text-headline-lg text-on-background mb-base">Parlez-nous de vous</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Nous avons besoin de quelques détails supplémentaires pour configurer votre compte sécurisé.</p>
+</div>
+<!-- Error Message Banner -->
+<div id="errorMsg" class="hidden bg-error-container text-on-error-container p-md rounded-lg text-sm flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-[20px]" data-icon="error">error</span>
+<span id="errorText" class="font-medium"></span>
 </div>
 <!-- Form Fields -->
-<form class="space-y-lg" id="basicInfoForm" action="./onboarding_community_protection_step_1.html">
+<form class="space-y-lg" id="basicInfoForm">
 <!-- Full Name -->
 <div class="space-y-xs">
-<label class="font-label-bold text-label-bold text-on-surface ml-xs">Full Name</label>
+<label class="font-label-bold text-label-bold text-on-surface ml-xs">Nom complet</label>
 <div class="relative group form-input-glow transition-all rounded-lg">
-<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="Enter your full name" type="text"/>
+<input id="fullname" class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="Saisissez votre nom complet" type="text"/>
 </div>
 </div>
 <!-- Username -->
 <div class="space-y-xs">
-<label class="font-label-bold text-label-bold text-on-surface ml-xs">Username</label>
+<label class="font-label-bold text-label-bold text-on-surface ml-xs">Nom d'utilisateur</label>
 <div class="relative group form-input-glow transition-all rounded-lg">
-<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="@username" type="text"/>
+<input id="username" class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="@nom_d_utilisateur" type="text"/>
 </div>
 </div>
 <!-- Phone Number Grid -->
@@ -170,53 +175,55 @@
 <div class="col-span-1 space-y-xs">
 <label class="font-label-bold text-label-bold text-on-surface ml-xs text-nowrap">Code</label>
 <div class="relative group form-input-glow transition-all rounded-lg">
-<select class="w-full h-[56px] px-md bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 appearance-none">
+<select id="countrycode" class="w-full h-[56px] px-md bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 appearance-none">
+<option>+237</option>
+<option>+234</option>
+<option>+221</option>
+<option>+225</option>
 <option>+1</option>
 <option>+44</option>
-<option>+91</option>
-<option>+61</option>
 </select>
 </div>
 </div>
 <div class="col-span-3 space-y-xs">
-<label class="font-label-bold text-label-bold text-on-surface ml-xs">Phone Number</label>
+<label class="font-label-bold text-label-bold text-on-surface ml-xs">Numéro de téléphone</label>
 <div class="relative group form-input-glow transition-all rounded-lg">
-<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="000 000 0000" type="tel"/>
+<input id="phonenumber" class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="677 12 34 56" type="tel"/>
 </div>
 </div>
 </div>
 <!-- Email Address (Optional) -->
 <div class="space-y-xs">
 <div class="flex justify-between items-center ml-xs">
-<label class="font-label-bold text-label-bold text-on-surface">Email Address</label>
-<span class="text-[10px] font-label-bold text-outline uppercase tracking-wider">Optional</span>
+<label class="font-label-bold text-label-bold text-on-surface">Adresse e-mail</label>
+<span class="text-[10px] font-label-bold text-outline uppercase tracking-wider">Optionnel</span>
 </div>
 <div class="relative group form-input-glow transition-all rounded-lg">
-<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="email@example.com" type="email"/>
+<input id="email" class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="email@example.com" type="email"/>
 </div>
 </div>
 <!-- City -->
 <div class="space-y-xs">
-<label class="font-label-bold text-label-bold text-on-surface ml-xs">City</label>
+<label class="font-label-bold text-label-bold text-on-surface ml-xs">Ville</label>
 <div class="relative group form-input-glow transition-all rounded-lg">
-<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="Where do you live?" type="text"/>
+<input id="city" class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="Où habitez-vous ?" type="text"/>
 </div>
 </div>
 <!-- Password Container -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
 <div class="space-y-xs">
-<label class="font-label-bold text-label-bold text-on-surface ml-xs">Password</label>
+<label class="font-label-bold text-label-bold text-on-surface ml-xs">Mot de passe</label>
 <div class="relative group form-input-glow transition-all rounded-lg">
-<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="••••••••" type="password"/>
+<input id="password" class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="••••••••" type="password"/>
 <button class="absolute right-md top-1/2 -translate-y-1/2 text-outline material-symbols-outlined hover:text-primary transition-colors" type="button">
                                 visibility
                             </button>
 </div>
 </div>
 <div class="space-y-xs">
-<label class="font-label-bold text-label-bold text-on-surface ml-xs">Confirm Password</label>
+<label class="font-label-bold text-label-bold text-on-surface ml-xs">Confirmer le mot de passe</label>
 <div class="relative group form-input-glow transition-all rounded-lg">
-<input class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="••••••••" type="password"/>
+<input id="confirm_password" class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="••••••••" type="password"/>
 </div>
 </div>
 </div>
@@ -224,7 +231,7 @@
 <div class="flex items-start gap-xs p-md bg-surface-container-low rounded-lg border border-outline-variant/30">
 <span class="material-symbols-outlined text-primary text-[18px]">info</span>
 <p class="text-[12px] leading-relaxed text-on-surface-variant font-body-md">
-                        Password must be at least 8 characters long and include a mix of uppercase letters, numbers, and symbols for maximum security.
+                        Le mot de passe doit comporter au moins 6 caractères pour une sécurité maximale.
                     </p>
 </div>
 </form>
@@ -235,22 +242,31 @@
 <button class="flex flex-col items-center justify-center text-secondary px-lg py-sm hover:opacity-90 active:scale-98 transition-all duration-200 group" onclick="history.back()">
 <div class="flex items-center gap-xs">
 <span class="material-symbols-outlined">chevron_left</span>
-<span class="font-label-bold text-label-bold">Previous</span>
+<span class="font-label-bold text-label-bold">Précédent</span>
 </div>
 </button>
-<button class="flex items-center justify-center bg-primary text-on-primary rounded-full px-xl py-md shadow-lg hover:opacity-95 active:scale-95 transition-all duration-200" onclick="window.location.href='./onboarding_community_protection_step_1.html'" type="button">
-<span class="font-label-bold text-label-bold mr-xs uppercase tracking-wide">Continue</span>
-<span class="material-symbols-outlined">chevron_right</span>
+<button id="continueBtn" class="flex items-center justify-center bg-primary text-on-primary rounded-full px-xl py-md shadow-lg hover:opacity-95 active:scale-95 transition-all duration-200" type="button">
+<span id="btnText" class="font-label-bold text-label-bold mr-xs uppercase tracking-wide">Créer un compte</span>
+<span id="btnIcon" class="material-symbols-outlined">chevron_right</span>
 </button>
 </nav>
 <!-- Atmosphere/Decorative Element (Subtle Glass Gradient) -->
 <div class="fixed top-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
 <div class="fixed bottom-[-5%] left-[-5%] w-[30%] h-[30%] bg-primary/3 rounded-full blur-[100px] pointer-events-none z-0"></div>
-<script>
+<script type="importmap">
+{
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+  }
+}
+</script>
+<script type="module">
+import { supabase } from "./src/supabaseClient.js";
+
         // Simple Interaction: Toggle Password Visibility
         const togglePass = document.querySelectorAll('.material-symbols-outlined');
         togglePass.forEach(btn => {
-            if (btn.innerText === 'visibility') {
+            if (btn.innerText === 'visibility' || btn.innerText === 'visibility_off') {
                 btn.addEventListener('click', function() {
                     const input = this.parentElement.querySelector('input');
                     if (input.type === 'password') {
@@ -264,6 +280,279 @@
             }
         });
 
-        // Micro-interaction: Input focus effects handled by Tailwind focus-within and form-input-glow
+        // Pre-populate input fields on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedName = sessionStorage.getItem('signup_fullname');
+            const storedEmail = sessionStorage.getItem('signup_email');
+            const storedPassword = sessionStorage.getItem('signup_password');
+
+            if (storedName) document.getElementById('fullname').value = storedName;
+            if (storedEmail) document.getElementById('email').value = storedEmail;
+            if (storedPassword) {
+                document.getElementById('password').value = storedPassword;
+                document.getElementById('confirm_password').value = storedPassword;
+            }
+            
+            // Pre-fill Step 3 fields if they were already typed and we came back
+            const storedUsername = sessionStorage.getItem('signup_username');
+            const storedCountryCode = sessionStorage.getItem('signup_phone_country_code');
+            const storedPhone = sessionStorage.getItem('signup_phone_number');
+            const storedCity = sessionStorage.getItem('signup_city');
+
+            if (storedUsername) document.getElementById('username').value = storedUsername;
+            if (storedCountryCode) document.getElementById('countrycode').value = storedCountryCode;
+            if (storedPhone) document.getElementById('phonenumber').value = storedPhone;
+            if (storedCity) document.getElementById('city').value = storedCity;
+        });
+
+        // Check if user is already signed in on load
+        async function checkCurrentSession() {
+            try {
+                const { data } = await supabase.auth.getSession();
+                if (data && data.session) {
+                    console.log("Already signed in, redirecting to Home...");
+                    window.location.href = './home_child_safety_v1.html';
+                }
+            } catch (err) {
+                console.error("Error checking session on load:", err);
+            }
+        }
+        checkCurrentSession();
+
+        const errorMsg = document.getElementById('errorMsg');
+        const errorText = document.getElementById('errorText');
+        const continueBtn = document.getElementById('continueBtn');
+
+        function showError(msg) {
+            errorText.textContent = msg;
+            errorMsg.classList.remove('hidden');
+            errorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function setLoading(isLoading) {
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            if (isLoading) {
+                continueBtn.disabled = true;
+                if (btnText) btnText.textContent = 'CRÉATION DU COMPTE...';
+                if (btnIcon) {
+                    btnIcon.textContent = 'pending';
+                    btnIcon.classList.add('animate-spin');
+                }
+            } else {
+                continueBtn.disabled = false;
+                if (btnText) btnText.textContent = 'CRÉER UN COMPTE';
+                if (btnIcon) {
+                    btnIcon.textContent = 'chevron_right';
+                    btnIcon.classList.remove('animate-spin');
+                }
+            }
+        }
+
+        continueBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            errorMsg.classList.add('hidden');
+            errorText.textContent = '';
+
+            const fullname = document.getElementById('fullname').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const countrycode = document.getElementById('countrycode').value;
+            const phonenumber = document.getElementById('phonenumber').value.trim();
+            const emailInput = document.getElementById('email').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const password = document.getElementById('password').value;
+            const confirm_password = document.getElementById('confirm_password').value;
+
+            // Page 3 form validations
+            if (!fullname) {
+                showError('Veuillez saisir votre nom complet.');
+                return;
+            }
+            if (!username) {
+                showError('Veuillez saisir un nom d\'utilisateur.');
+                return;
+            }
+            if (!phonenumber) {
+                showError('Veuillez saisir un numéro de téléphone.');
+                return;
+            }
+            if (!city) {
+                showError('Veuillez saisir votre ville.');
+                return;
+            }
+            if (password !== confirm_password) {
+                showError('Les mots de passe ne correspondent pas.');
+                return;
+            }
+            if (password.length < 6) {
+                showError('Le mot de passe doit contenir au moins 6 caractères.');
+                return;
+            }
+
+            // Retrieve values from Step 1 and Step 2
+            const email = emailInput || sessionStorage.getItem('signup_email') || '';
+            const terms = sessionStorage.getItem('signup_terms_accepted') === 'true';
+            const role = sessionStorage.getItem('childSafetyAccountType') || 'Tuteur / Tutrice';
+
+            // Failsafe check
+            if (!email) {
+                showError('L\'adresse e-mail de la page 1 est manquante. Veuillez recommencer le processus d\'inscription.');
+                return;
+            }
+            if (!password) {
+                showError('Le mot de passe de la page 1 est manquant. Veuillez recommencer le processus d\'inscription.');
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                // 1. Create the authentication account
+                console.log('Registering Auth account for email:', email);
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: fullname,
+                            terms_accepted: terms
+                        }
+                    }
+                });
+
+                if (error) {
+                    let msg = error.message;
+                    if (msg && msg.toLowerCase().includes('rate limit')) {
+                        msg = "Nous avons récemment envoyé un e-mail de confirmation. Veuillez attendre quelques minutes avant d'en demander un autre.";
+                    }
+                    showError(msg);
+                    setLoading(false);
+                    return;
+                }
+
+                const user = data?.user;
+                if (!user) {
+                    showError('L\'inscription a échoué. Veuillez réessayer.');
+                    setLoading(false);
+                    return;
+                }
+
+                // 2. Failsafe: check if profile already created by DB trigger
+                console.log('Checking if profile was auto-created by DB trigger...');
+                let profileCreated = false;
+                try {
+                    const { data: existingProfile, error: checkError } = await supabase
+                        .from('profiles')
+                        .select('id')
+                        .eq('id', user.id)
+                        .maybeSingle();
+
+                    if (!checkError && existingProfile) {
+                        console.log('Profile already created by database trigger.');
+                        profileCreated = true;
+                    }
+                } catch (checkErr) {
+                    console.warn('Could not query existing profile:', checkErr);
+                }
+
+                if (!profileCreated) {
+                    // 3. Insert new row in profiles table
+                    console.log('Inserting profile client-side...');
+                    const profilePayload = {
+                        id: user.id,
+                        user_id: user.id,
+                        full_name: fullname,
+                        username: username,
+                        email: email,
+                        phone_country_code: countrycode || '',
+                        phone_number: phonenumber || '',
+                        city: city || '',
+                        role: role,
+                        terms_accepted: terms
+                    };
+
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .insert([profilePayload]);
+
+                    if (profileError) {
+                        const isDuplicate = profileError.code === '23505' || (profileError.message && profileError.message.toLowerCase().includes('already exists'));
+                        if (isDuplicate) {
+                            console.log('Profile created in parallel. Proceeding with success.');
+                        } else {
+                            console.error('Profile insertion error:', profileError);
+
+                            // Rollback Auth user
+                            console.log('Profile setup failed. Rolling back created Auth user...');
+                            try {
+                                const { data: sessionData } = await supabase.auth.getSession();
+                                const token = sessionData?.session?.access_token;
+                                if (token) {
+                                    const supabaseUrl = supabase.supabaseUrl || "https://ifpbdythbhlgqymsaxtz.supabase.co";
+                                    const supabaseKey = supabase.supabaseKey || "sb_publishable_ZFWamWb5cIOB2XastpKLhg_Xpm47wPV";
+                                    const deleteRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'apikey': supabaseKey,
+                                            'Authorization': `Bearer ${token}`
+                                        }
+                                    });
+                                    if (deleteRes.ok) {
+                                        console.log('Successfully rolled back newly created auth user account.');
+                                    } else {
+                                        console.error('Failed to delete auth user during rollback:', await deleteRes.text());
+                                    }
+                                }
+                            } catch (deleteErr) {
+                                console.error('Error during auth user rollback:', deleteErr);
+                            }
+
+                            await supabase.auth.signOut();
+                            showError(`Compte créé, mais la configuration du profil a échoué : ${profileError.message}. Le compte a été annulé. Veuillez réessayer.`);
+                            setLoading(false);
+                            return;
+                        }
+                    }
+                } else {
+                    // Profile already exists, let's update it with fields
+                    console.log('Updating auto-created profile with Step 2 & 3 fields...');
+                    const { error: updateError } = await supabase
+                        .from('profiles')
+                        .update({
+                            full_name: fullname,
+                            username: username,
+                            phone_country_code: countrycode,
+                            phone_number: phonenumber,
+                            city: city,
+                            role: role,
+                            terms_accepted: terms
+                        })
+                        .eq('id', user.id);
+
+                    if (updateError) {
+                        console.warn('Could not update trigger-created profile fields:', updateError);
+                    }
+                }
+
+                // Clear sign up variables from sessionStorage on success
+                sessionStorage.removeItem('signup_fullname');
+                sessionStorage.removeItem('signup_email');
+                sessionStorage.removeItem('signup_password');
+                sessionStorage.removeItem('signup_terms_accepted');
+                sessionStorage.removeItem('signup_username');
+                sessionStorage.removeItem('signup_phone_country_code');
+                sessionStorage.removeItem('signup_phone_number');
+                sessionStorage.removeItem('signup_city');
+                sessionStorage.removeItem('childSafetyAccountType');
+
+                console.log('Successfully registered and created profile! Redirecting to Home...');
+                window.location.href = './home_child_safety_v1.html';
+
+            } catch (err) {
+                console.error('Unexpected signup submission error:', err);
+                showError(err.message || 'An unexpected error occurred during signup submission.');
+                setLoading(false);
+            }
+        });
     </script>
 </body></html>

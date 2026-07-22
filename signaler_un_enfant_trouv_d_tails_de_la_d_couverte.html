@@ -112,7 +112,7 @@
 </div>
 <!-- Photo Upload Section -->
 <div class="relative group cursor-pointer active:scale-[0.98] transition-all duration-300">
-<div class="border-2 border-dashed border-primary-container/30 bg-surface-container-lowest rounded-lg p-xl flex flex-col items-center justify-center text-center space-y-sm shadow-[0px_4px_20px_rgba(108,77,255,0.06)]">
+<div id="uploadContainer" class="border-2 border-dashed border-primary-container/30 bg-surface-container-lowest rounded-lg p-xl flex flex-col items-center justify-center text-center space-y-sm shadow-[0px_4px_20px_rgba(108,77,255,0.06)] relative overflow-hidden">
 <div class="w-16 h-16 rounded-full bg-primary-container/10 flex items-center justify-center text-primary-container">
 <span class="material-symbols-outlined text-[32px]">photo_camera</span>
 </div>
@@ -121,7 +121,7 @@
 <p class="font-label-sm text-on-surface-variant">Visage dégagé de préférence</p>
 </div>
 </div>
-<input accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" type="file"/>
+<input id="fileInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" type="file"/>
 </div>
 <!-- Form Fields -->
 <div class="space-y-md">
@@ -130,7 +130,7 @@
 <label class="font-label-sm text-on-surface-variant ml-xs">Lieu exact</label>
 <div class="relative flex items-center">
 <span class="material-symbols-outlined absolute left-md text-primary-container">location_on</span>
-<input class="w-full pl-[48px] pr-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-4 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none text-body-lg" placeholder="Ex: Marché Central, Yaoundé" type="text"/>
+<input id="location" class="w-full pl-[48px] pr-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-4 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none text-body-lg" placeholder="Ex: Marché Central, Yaoundé" type="text"/>
 </div>
 </div>
 <!-- Row: Time and Sex -->
@@ -139,18 +139,18 @@
 <label class="font-label-sm text-on-surface-variant ml-xs">Heure approx.</label>
 <div class="relative flex items-center">
 <span class="material-symbols-outlined absolute left-md text-primary-container">schedule</span>
-<input class="w-full pl-[48px] pr-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-4 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none text-body-lg" placeholder="Ex: 14:30" type="text"/>
+<input id="time" class="w-full pl-[48px] pr-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-4 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none text-body-lg" placeholder="Ex: 14:30" type="text"/>
 </div>
 </div>
 <div class="space-y-xs">
 <label class="font-label-sm text-on-surface-variant ml-xs">Sexe</label>
 <div class="relative flex items-center">
 <span class="material-symbols-outlined absolute left-md text-primary-container">wc</span>
-<select class="w-full pl-[48px] pr-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-4 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none text-body-lg appearance-none">
+<select id="gender" class="w-full pl-[48px] pr-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-4 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none text-body-lg appearance-none">
 <option value="">Sélectionner</option>
-<option value="M">Masculin</option>
-<option value="F">Féminin</option>
-<option value="U">Inconnu</option>
+<option value="fille">Féminin</option>
+<option value="garcon">Masculin</option>
+<option value="inconnu">Inconnu</option>
 </select>
 <span class="material-symbols-outlined absolute right-md pointer-events-none text-on-surface-variant">expand_more</span>
 </div>
@@ -159,11 +159,11 @@
 <!-- Clothing Description -->
 <div class="space-y-xs">
 <label class="font-label-sm text-on-surface-variant ml-xs">Tenue vestimentaire (description)</label>
-<textarea class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-4 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none text-body-lg resize-none" placeholder="Ex: T-shirt bleu, short gris" rows="3"></textarea>
+<textarea id="clothingDescription" class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-4 focus:ring-primary-container/20 focus:border-primary-container transition-all outline-none text-body-lg resize-none" placeholder="Ex: T-shirt bleu, short gris" rows="3"></textarea>
 </div>
 </div>
 <!-- Primary Button -->
-<button class="w-full bg-primary-container text-on-tertiary py-md px-lg rounded-full font-headline-md flex items-center justify-center gap-sm shadow-lg active:scale-95 transition-transform duration-200 hover:opacity-90" onclick="window.location.href='./v_rifier_le_signalement_tape_2_evidence.html'">
+<button id="btnNext" class="w-full bg-primary-container text-on-tertiary py-md px-lg rounded-full font-headline-md flex items-center justify-center gap-sm shadow-lg active:scale-95 transition-transform duration-200 hover:opacity-90">
 <span>Suivant</span>
 <span class="material-symbols-outlined">arrow_forward</span>
 </button>
@@ -177,7 +177,7 @@
 <span class="material-symbols-outlined">description</span>
 <span class="font-label-sm text-label-sm">Reports</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high transition-colors active:scale-90 duration-200" href="./v_rifier_le_signalement_tape_2_evidence.html">
+<a id="btnAlertsNav" class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high transition-colors active:scale-90 duration-200" href="./v_rifier_le_signalement_tape_2_evidence.html">
 <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
 <span class="font-label-sm text-label-sm">Alerts</span>
 </a>
@@ -187,19 +187,89 @@
 </a>
 </nav>
 <script>
-        // Simple micro-interaction for the file input
-        const dropZone = document.querySelector('.relative.group');
-        const fileInput = document.querySelector('input[type="file"]');
-        
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                const fileName = e.target.files[0].name;
-                const container = dropZone.querySelector('.border-2');
-                container.classList.remove('border-primary-container/30');
-                container.classList.add('border-primary-container', 'bg-primary-container/5');
-                container.querySelector('p').textContent = "Photo sélectionnée";
-                container.querySelector('.font-label-sm').textContent = fileName;
-            }
-        });
-    </script>
+document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.getElementById('fileInput');
+    const uploadContainer = document.getElementById('uploadContainer');
+    const locationInput = document.getElementById('location');
+    const timeInput = document.getElementById('time');
+    const genderSelect = document.getElementById('gender');
+    const clothingInput = document.getElementById('clothingDescription');
+    const btnNext = document.getElementById('btnNext');
+    const btnAlertsNav = document.getElementById('btnAlertsNav');
+
+    // Handle photo select
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const base64 = evt.target.result;
+                sessionStorage.setItem('pending_found_photo', base64);
+                
+                uploadContainer.innerHTML = `
+                    <img src="${base64}" class="absolute inset-0 w-full h-full object-cover" />
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        <span class="text-white font-label-bold text-label-bold">Changer la photo</span>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Restore preview
+    const existingPhoto = sessionStorage.getItem('pending_found_photo');
+    if (existingPhoto) {
+        uploadContainer.innerHTML = `
+            <img src="${existingPhoto}" class="absolute inset-0 w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                <span class="text-white font-label-bold text-label-bold">Changer la photo</span>
+            </div>
+        `;
+    }
+
+    // Restore text fields
+    const existingDataStr = sessionStorage.getItem('pending_found_data');
+    if (existingDataStr) {
+        try {
+            const data = JSON.parse(existingDataStr);
+            if (data.location) locationInput.value = data.location;
+            if (data.time) timeInput.value = data.time;
+            if (data.gender) genderSelect.value = data.gender;
+            if (data.clothingDescription) clothingInput.value = data.clothingDescription;
+        } catch(e) {}
+    }
+
+    function saveAndGo(targetUrl) {
+        let currentData = {};
+        const existing = sessionStorage.getItem('pending_found_data');
+        if (existing) {
+            try { currentData = JSON.parse(existing); } catch(e) {}
+        }
+
+        const merged = {
+            ...currentData,
+            location: locationInput.value.trim() || currentData.location || "Yaoundé",
+            time: timeInput.value.trim() || "12:00",
+            gender: genderSelect.value || currentData.gender || "inconnu",
+            clothingDescription: clothingInput.value.trim() || currentData.clothingDescription || "Inconnu",
+            age: currentData.age || 7,
+            physicalDescription: currentData.physicalDescription || "Teint noir",
+            date: currentData.date || new Date().toISOString().split('T')[0]
+        };
+
+        sessionStorage.setItem('pending_found_data', JSON.stringify(merged));
+        window.location.href = targetUrl;
+    }
+
+    btnNext.addEventListener('click', () => {
+        saveAndGo('./v_rifier_le_signalement_tape_2_evidence.html');
+    });
+
+    btnAlertsNav.addEventListener('click', (e) => {
+        e.preventDefault();
+        saveAndGo('./v_rifier_le_signalement_tape_2_evidence.html');
+    });
+});
+</script>
 </body></html>

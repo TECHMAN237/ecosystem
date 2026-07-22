@@ -203,11 +203,11 @@
 <main class="flex-1 flex flex-col w-full pb-safe">
 <!-- Hero Image Section -->
 <section class="relative w-full aspect-[4/5] bg-surface-container-high shrink-0 overflow-hidden group">
-<img alt="Photo of Kevin" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" data-alt="A portrait photograph of a young boy of African descent, around 8 years old, looking directly at the camera with a neutral expression. He has short dark hair and is wearing a dark blue t-shirt. The background is a soft, blurred studio grey. The lighting is soft and natural, emphasizing a calm and high-quality aesthetic suitable for a professional safety profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3fpZHXDIzZgE5MH5MNEky3ApR34mV_nr6IjJCoGx2aFXhYT1p5CdI6ejJ8GLdRaRWOd4GdiUqvTeDWPHwnRA_iFaUBWWg6iZcpZhMi2MUxNJZRBD402R-7l95PAb2kD0W8W6aeGk9pb5B7PiNrc8PxVFUXXnqbC51pUArzLbv2070oEccx6prYipqje8VZtOCGx1r9IN6yqzE5wT-o5awmX6v5OhZx3rkSWwz8XMPVR7TDR4PTawdZjUqizLhAfuIMVahbd2X9dhR"/>
+<img id="childPhoto" alt="Photo of Kevin" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" data-alt="A portrait photograph of a young boy of African descent, around 8 years old, looking directly at the camera with a neutral expression. He has short dark hair and is wearing a dark blue t-shirt. The background is a soft, blurred studio grey. The lighting is soft and natural, emphasizing a calm and high-quality aesthetic suitable for a professional safety profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3fpZHXDIzZgE5MH5MNEky3ApR34mV_nr6IjJCoGx2aFXhYT1p5CdI6ejJ8GLdRaRWOd4GdiUqvTeDWPHwnRA_iFaUBWWg6iZcpZhMi2MUxNJZRBD402R-7l95PAb2kD0W8W6aeGk9pb5B7PiNrc8PxVFUXXnqbC51pUArzLbv2070oEccx6prYipqje8VZtOCGx1r9IN6yqzE5wT-o5awmX6v5OhZx3rkSWwz8XMPVR7TDR4PTawdZjUqizLhAfuIMVahbd2X9dhR"/>
 <!-- Gradient Overlay for text readability -->
 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
 <!-- Urgent Badge -->
-<div class="absolute top-4 left-4 bg-[#FF4D4F] text-white px-3 py-1.5 rounded-full font-label-bold text-label-bold flex items-center gap-1 shadow-lg animate-urgent z-10">
+<div id="urgentBadge" class="absolute top-4 left-4 bg-[#FF4D4F] text-white px-3 py-1.5 rounded-full font-label-bold text-label-bold flex items-center gap-1 shadow-lg animate-urgent z-10">
 <span class="material-symbols-outlined fill text-[14px]">error</span>
                     URGENT
                 </div>
@@ -219,14 +219,14 @@
 </div>
 <!-- Core Identity Overlay -->
 <div class="absolute bottom-0 left-0 w-full p-container-margin text-white z-10 flex flex-col gap-2">
-<h1 class="font-display text-display text-white mb-1 drop-shadow-md">Kevin, 8 ans</h1>
+<h1 id="childNameAge" class="font-display text-display text-white mb-1 drop-shadow-md">Kevin, 8 ans</h1>
 <div class="flex items-center gap-2 font-label-sm text-label-sm text-white/90">
 <span class="material-symbols-outlined text-[16px]">location_on</span>
-<span>Yaoundé, Centre</span>
+<span id="lastLocationText">Yaoundé, Centre</span>
 </div>
 <div class="flex items-center gap-2 font-label-sm text-label-sm text-white/90">
 <span class="material-symbols-outlined text-[16px]">schedule</span>
-<span>12/05/2024 • 14:30</span>
+<span id="lastSeenDate">12/05/2024 • 14:30</span>
 </div>
 </div>
 </section>
@@ -236,15 +236,15 @@
 <div class="grid grid-cols-3 gap-3">
 <div class="bg-surface-container-lowest border border-surface-variant rounded-lg p-3 flex flex-col items-center justify-center shadow-sm">
 <span class="text-on-surface-variant font-label-sm text-label-sm mb-1">Sexe</span>
-<span class="font-label-bold text-label-bold text-on-surface">Garçon</span>
+<span id="sexText" class="font-label-bold text-label-bold text-on-surface">Garçon</span>
 </div>
 <div class="bg-surface-container-lowest border border-surface-variant rounded-lg p-3 flex flex-col items-center justify-center shadow-sm">
 <span class="text-on-surface-variant font-label-sm text-label-sm mb-1">Taille</span>
-<span class="font-label-bold text-label-bold text-on-surface">1m20</span>
+<span id="heightText" class="font-label-bold text-label-bold text-on-surface">1m20</span>
 </div>
 <div class="bg-surface-container-lowest border border-surface-variant rounded-lg p-3 flex flex-col items-center justify-center shadow-sm">
 <span class="text-on-surface-variant font-label-sm text-label-sm mb-1">Poids</span>
-<span class="font-label-bold text-label-bold text-on-surface">25kg</span>
+<span id="weightText" class="font-label-bold text-label-bold text-on-surface">25kg</span>
 </div>
 </div>
 <div class="w-full h-px bg-outline-variant/40"></div>
@@ -254,13 +254,13 @@
 <span class="material-symbols-outlined text-primary">description</span>
                         Description
                     </h2>
-<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed bg-surface-container-lowest p-4 rounded-lg border border-surface-variant shadow-sm">
+<p id="descriptionText" class="font-body-md text-body-md text-on-surface-variant leading-relaxed bg-surface-container-lowest p-4 rounded-lg border border-surface-variant shadow-sm">
                         Portait un t-shirt bleu et un pantalon noir lors de la disparition. Il a une petite cicatrice sur le sourcil gauche. Il pourrait être effrayé et ne pas répondre à son nom.
                     </p>
 </div>
 <!-- Location Block -->
 <div class="flex flex-col gap-2">
-<h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<h2 id="locationHeader" class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
 <span class="material-symbols-outlined text-primary">my_location</span>
                         Dernière localisation connue
                     </h2>
@@ -268,13 +268,13 @@
 <div class="p-3 border-b border-surface-variant flex items-start gap-2 bg-surface-container-low">
 <span class="material-symbols-outlined text-on-surface-variant mt-0.5 text-[18px]">push_pin</span>
 <div>
-<p class="font-label-bold text-label-bold text-on-surface">Avenue Kennedy, Yaoundé</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Près du marché central</p>
+<p id="mapLocationTitle" class="font-label-bold text-label-bold text-on-surface">Avenue Kennedy, Yaoundé</p>
+<p id="mapLocationSub" class="font-label-sm text-label-sm text-on-surface-variant">Près du marché central</p>
 </div>
 </div>
 <div class="h-32 bg-surface-variant w-full relative">
 <!-- Placeholder Map -->
-<img alt="Map location" class="w-full h-full object-cover opacity-80" data-alt="A stylized, light-mode digital map interface centered on an urban area. The map uses a soft color palette of light greys, whites, and subtle blues for water bodies. A distinct, pulsing purple marker pinpoints a specific location on a main avenue. The aesthetic is clean, modern, and highly legible, prioritizing clarity." data-location="Yaoundé" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLflxXD0K1PfLL7IEOnjqNC8ZowVFYFcse0HKyoighbGiEsEk7qtKO9OGebFGjRynf9ow9zmEJkcjCpU_cjlCrqWGGy7ZIFgDi3i3IHnHNcvJdMWqgL3imsAWZW7PYeCCiUVIMQ6U_kEh_4knthj7p-qHL0gk1bnSpXdpwl4gmFFq_spUSX3elbs6tYJ84uHfze-wKoXb0aiWRNOdjjA3KM3YD-2CRSTWo4apUK4APalUu8PVmcEASv76GVJOrsNFKcoHG3iBU6OuA"/>
+<img id="mapImage" alt="Map location" class="w-full h-full object-cover opacity-80" data-alt="A stylized, light-mode digital map interface centered on an urban area. The map uses a soft color palette of light greys, whites, and subtle blues for water bodies. A distinct, pulsing purple marker pinpoints a specific location on a main avenue. The aesthetic is clean, modern, and highly legible, prioritizing clarity." data-location="Yaoundé" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLflxXD0K1PfLL7IEOnjqNC8ZowVFYFcse0HKyoighbGiEsEk7qtKO9OGebFGjRynf9ow9zmEJkcjCpU_cjlCrqWGGy7ZIFgDi3i3IHnHNcvJdMWqgL3imsAWZW7PYeCCiUVIMQ6U_kEh_4knthj7p-qHL0gk1bnSpXdpwl4gmFFq_spUSX3elbs6tYJ84uHfze-wKoXb0aiWRNOdjjA3KM3YD-2CRSTWo4apUK4APalUu8PVmcEASv76GVJOrsNFKcoHG3iBU6OuA"/>
 </div>
 </div>
 </div>
@@ -290,8 +290,8 @@
 <span class="material-symbols-outlined fill">phone_in_talk</span>
 </div>
 <div>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Famille de l'enfant</p>
-<p class="font-headline-md text-[18px] font-bold text-primary">+237 6 79 12 34 56</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Famille de l'enfant / Contact de sécurité</p>
+<p id="contactPhone" class="font-headline-md text-[18px] font-bold text-primary">+237 6 79 12 34 56</p>
 </div>
 </div>
 </div>
@@ -310,4 +310,99 @@
             </button>
 </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const reportDataStr = sessionStorage.getItem('current_view_report');
+    if (reportDataStr) {
+        try {
+            const report = JSON.parse(reportDataStr);
+            console.log("Rendering dynamic report details:", report);
+
+            // 1. Photo
+            if (report.photo) {
+                document.getElementById('childPhoto').src = report.photo;
+            }
+
+            // 2. Urgent / Status badge
+            const urgentBadge = document.getElementById('urgentBadge');
+            if (urgentBadge) {
+                if (report.status === 'Published' || report.status === 'Active') {
+                    if (report.isFoundReport || report.name.includes('trouvé')) {
+                        urgentBadge.innerHTML = '<span class="material-symbols-outlined fill text-[14px]">check_circle</span> TROUVÉ';
+                        urgentBadge.className = 'absolute top-4 left-4 bg-green-600 text-white px-3 py-1.5 rounded-full font-label-bold text-label-bold flex items-center gap-1 shadow-lg z-10';
+                    } else {
+                        urgentBadge.innerHTML = '<span class="material-symbols-outlined fill text-[14px]">error</span> RECHERCHE';
+                        urgentBadge.className = 'absolute top-4 left-4 bg-primary text-white px-3 py-1.5 rounded-full font-label-bold text-label-bold flex items-center gap-1 shadow-lg z-10';
+                    }
+                } else if (report.status === 'Urgent') {
+                    urgentBadge.innerHTML = '<span class="material-symbols-outlined fill text-[14px]">error</span> URGENT';
+                    urgentBadge.className = 'absolute top-4 left-4 bg-[#FF4D4F] text-white px-3 py-1.5 rounded-full font-label-bold text-label-bold flex items-center gap-1 shadow-lg animate-urgent z-10';
+                }
+            }
+
+            // 3. Name and Age
+            const labelNameAge = report.age ? `${report.name}, ${report.age} ans` : report.name;
+            document.getElementById('childNameAge').textContent = labelNameAge;
+
+            // 4. Location text
+            document.getElementById('lastLocationText').textContent = report.location || "Yaoundé, Centre";
+
+            // 5. Date & Time
+            const dateStr = report.date || "Inconnue";
+            const timeStr = report.time || "Non spécifiée";
+            document.getElementById('lastSeenDate').textContent = `${dateStr} • ${timeStr}`;
+
+            // 6. Sex / Gender
+            const sexText = document.getElementById('sexText');
+            if (sexText) {
+                const g = (report.gender || "").toLowerCase();
+                sexText.textContent = (g === 'fille' || g === 'f') ? 'Fille' : ((g === 'garcon' || g === 'm') ? 'Garçon' : 'Inconnu');
+            }
+
+            // 7. Height
+            const heightText = document.getElementById('heightText');
+            if (heightText) {
+                heightText.textContent = report.height || "Env. 1m20";
+            }
+
+            // 8. Weight
+            const weightText = document.getElementById('weightText');
+            if (weightText) {
+                weightText.textContent = report.weight || "N/A";
+            }
+
+            // 9. Description Text
+            const descriptionText = document.getElementById('descriptionText');
+            if (descriptionText) {
+                let desc = report.physicalDescription || "Aucune description physique fournie.";
+                if (report.clothingDescription) {
+                    desc += ` Vêtements: ${report.clothingDescription}`;
+                }
+                if (report.notes) {
+                    desc += ` Notes: ${report.notes}`;
+                }
+                descriptionText.textContent = desc;
+            }
+
+            // 10. Map Title and Subtitle
+            document.getElementById('mapLocationTitle').textContent = report.location || "Yaoundé, Centre";
+            if (report.currentSafeLocation) {
+                document.getElementById('locationHeader').innerHTML = '<span class="material-symbols-outlined text-primary font-bold">home_pin</span> Lieu de garde sécurisé';
+                document.getElementById('mapLocationSub').textContent = `Actuellement gardé à: ${report.currentSafeLocation}`;
+            } else {
+                document.getElementById('mapLocationSub').textContent = "Dernière localisation connue renseignée par l'auteur du signalement.";
+            }
+
+            // 11. Custom Contact Phone
+            if (report.contactPhone) {
+                document.getElementById('contactPhone').textContent = report.contactPhone;
+            }
+
+        } catch(e) {
+            console.error("Error loading dynamic report:", e);
+        }
+    }
+});
+</script>
 </body></html>

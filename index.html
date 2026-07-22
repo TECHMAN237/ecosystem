@@ -173,7 +173,7 @@
 <!-- Tagline -->
 <div class="mb-xl fade-in-up delay-500">
 <p class="font-body-lg text-body-lg text-on-surface-variant max-w-[280px] mx-auto">
-                Community-Powered Child Protection
+                Protection des enfants par la communauté
             </p>
 </div>
 <!-- Progress/Loading Indicator (Simulated) -->
@@ -213,32 +213,79 @@
 <script type="module">
         import { supabase } from "./src/supabaseClient.js";
 
-        async function checkSession() {
-            try {
-                const { data, error } = await supabase.auth.getSession();
-                if (window.failsafeRedirect) {
-                    clearTimeout(window.failsafeRedirect);
+        let redirecting = false;
+
+        // Listen for authentication state changes and handle initial session
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            if (redirecting) return;
+            
+            if (window.failsafeRedirect) {
+                clearTimeout(window.failsafeRedirect);
+            }
+
+            if (session) {
+                redirecting = true;
+                const user = session.user;
+                console.log("Session active (event: " + event + "). Checking if profile exists for:", user.id);
+                
+                try {
+                    // Check if profile exists
+                    const { data: profile, error: profileErr } = await supabase
+                        .from('profiles')
+                        .select('id')
+                        .eq('id', user.id)
+                        .maybeSingle();
+
+                    if (profileErr) {
+                        console.error("Error checking profile:", profileErr);
+                    }
+
+                    if (!profile) {
+                        console.log("Profile not found. Automatically creating profile for user...");
+                        const fullname = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'User';
+                        const username = (user.user_metadata?.username || user.email?.split('@')[0] || 'user') + Math.floor(Math.random() * 1000);
+                        
+                        const profilePayload = {
+                            id: user.id,
+                            user_id: user.id,
+                            full_name: fullname,
+                            username: username,
+                            email: user.email || '',
+                            phone_country_code: '',
+                            phone_number: '',
+                            city: '',
+                            role: 'Guardian',
+                            terms_accepted: true
+                        };
+
+                        const { error: insertErr } = await supabase
+                            .from('profiles')
+                            .insert([profilePayload]);
+
+                        if (insertErr) {
+                            console.error("Error automatically creating profile:", insertErr);
+                        } else {
+                            console.log("Profile automatically created successfully!");
+                        }
+                    } else {
+                        console.log("Profile already exists for user.");
+                    }
+                } catch (profileCatchErr) {
+                    console.error("Exception handling profile logic:", profileCatchErr);
                 }
-                if (data && data.session) {
-                    console.log("Session exists! Redirecting to Home...");
-                    window.location.href = './home_child_safety_v1.html';
-                } else {
-                    setTimeout(() => {
+
+                console.log("Redirecting to Home...");
+                window.location.href = './home_child_safety_v1.html';
+            } else {
+                console.log("No active session (event: " + event + ").");
+                // Avoid setting multiple timeouts
+                if (!window.noSessionTimeout) {
+                    window.noSessionTimeout = setTimeout(() => {
                         console.log("Redirecting to Sign Up / Create Account...");
                         window.location.href = './sign_up_child_safety.html';
                     }, 1500);
                 }
-            } catch (err) {
-                console.error("Session check error:", err);
-                if (window.failsafeRedirect) {
-                    clearTimeout(window.failsafeRedirect);
-                }
-                setTimeout(() => {
-                    window.location.href = './sign_up_child_safety.html';
-                }, 1500);
             }
-        }
-
-        checkSession();
+        });
     </script>
 </body></html>

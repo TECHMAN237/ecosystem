@@ -145,104 +145,16 @@
 <main class="max-w-screen-md mx-auto px-container-margin py-lg">
 <!-- Toggle Segmented Control -->
 <div class="bg-surface-container-high/60 backdrop-blur p-1 rounded-full flex border border-outline-variant/15 shadow-inner mb-lg">
-<button onclick="window.location.href='./report_details.html'" class="flex-1 py-2.5 px-4 rounded-full font-bold text-sm bg-white text-on-surface shadow-[0_4px_12px_rgba(28,26,36,0.08)] transition-all">
+<button id="tabMissing" class="flex-1 py-2.5 px-4 rounded-full font-bold text-sm bg-white text-on-surface shadow-[0_4px_12px_rgba(28,26,36,0.08)] transition-all">
                 Missing Children
             </button>
-<button class="flex-1 py-2.5 px-4 rounded-full font-semibold text-sm text-on-surface-variant hover:text-on-surface transition-all">
+<button id="tabFound" class="flex-1 py-2.5 px-4 rounded-full font-semibold text-sm text-on-surface-variant hover:text-on-surface transition-all">
                 Found Children
             </button>
 </div>
 <!-- Case List -->
-<div class="space-y-md">
-<!-- Case Card 1 -->
-<div class="bg-surface-container-lowest rounded-lg p-md custom-shadow border border-outline-variant/10 active:scale-[0.98] transition-transform cursor-pointer" onclick="window.location.href='./report_details.html'">
-<div class="flex justify-between items-start mb-md">
-<div class="flex items-center gap-md">
-<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-primary-container/20">
-<img alt="Child photo" class="w-full h-full object-cover" data-alt="A close-up portrait of a young child with a hopeful and gentle expression, set against a soft, sun-drenched outdoor background. The lighting is warm and natural, reinforcing a sense of safety and care. The overall aesthetic is clean and premium, consistent with a high-end child safety application's visual language." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8SR32cyKGMuLZlYD7wdHocbE9tYtMH-LssYI4kIMFaoLoE0dkNmIjiDqKdMdXQYPKou9KFwKtKxhGtWm7yBQqEo7Mn2y0iJCUUt8FYLAzsrGQuPLsQvOmOW3up9IPgZwJGON5ioRaVLudmfMTX9AYjb_dLnkC-eSBpTmHAWFg2mSCt0R-dGMgPoSmy56spiYPb8iz0E0gQWmG4ywWVYAVXMgOo8TQ-ihpeyDbs4_L2UBxDpO5HvcDaDVwsnmzQigTZMjW-O_8ITOE"/>
-</div>
-<div>
-<h3 class="font-headline-md text-primary-container font-bold">MISSING: Kevin M. (8y)</h3>
-<p class="font-label-sm text-on-surface-variant">Yaoundé, Centre • 12/05/2024</p>
-</div>
-</div>
-<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full font-label-bold text-[10px] tracking-wider uppercase">Active</span>
-</div>
-<!-- Bottom Action Row -->
-<div class="flex justify-between items-center pt-md border-t border-outline-variant/30"><div class="flex items-center gap-xs">
-<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container hover:bg-primary-container hover:text-white transition-all text-primary" onclick="event.stopPropagation(); window.location.href='./report_details.html'">
-<span class="material-symbols-outlined text-[20px]">edit</span>
-</button>
-<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container hover:bg-error-container hover:text-white transition-all text-error relative">
-<span class="material-symbols-outlined text-[20px]">delete</span>
-<div class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-white"></div>
-</button>
-<span class="ml-2 font-label-bold text-label-sm text-primary-container uppercase">En cours</span>
-</div>
-<button class="flex items-center gap-xs px-4 py-2 rounded-full bg-surface-container hover:bg-primary-container hover:text-white transition-all text-primary font-label-bold">
-<span class="material-symbols-outlined text-[20px]">bar_chart</span>
-<span class="">Progress</span>
-</button></div>
-</div>
-<!-- Case Card 2 -->
-<div class="bg-surface-container-lowest rounded-lg p-md custom-shadow border border-outline-variant/10 active:scale-[0.98] transition-transform cursor-pointer" onclick="window.location.href='./report_details.html'">
-<div class="flex justify-between items-start mb-md">
-<div class="flex items-center gap-md">
-<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-primary-container/20">
-<img alt="Child photo" class="w-full h-full object-cover" data-alt="A portrait of a young girl with braids smiling brightly in a high-key setting. The backdrop is minimal and bright, utilizing a palette of soft whites and lavender hues. The lighting is flattering and even, creating a calm and optimistic atmosphere suitable for a premium child protection dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGdb3_iaghjIo6Jvcjq24WYH9eeW0kXajECl9adoKdr3mhx1MIrSHtlB-n6cC9HN2L-QdHxBAUB7mzu3P-y7EjKaupP3nO_E4X-9PauV6dSQDOJs-1UhJ6uqsiWZ-tK0IfZ_0E88g_L7GfXJ3H_yIGu2Iwl0slLhIUvsIX7nJ2mP_hyWzztJd_Cf7JmM-MA5-bbZarwu9jUg9guBV0DhlsFyEPM5fxhu1OGdPDgk_a8Y8ttkN_1rQpJZilwscAQv3gq4_oxFC42UI-"/>
-</div>
-<div>
-<h3 class="font-headline-md text-primary-container font-bold">MISSING: Sarah L. (6y)</h3>
-<p class="font-label-sm text-on-surface-variant">Douala, Littoral • 08/05/2024</p>
-</div>
-</div>
-<span class="bg-on-error-container text-white px-3 py-1 rounded-full font-label-bold text-[10px] tracking-wider uppercase">Urgent</span>
-</div>
-<!-- Bottom Action Row -->
-<div class="flex justify-between items-center pt-md border-t border-outline-variant/30"><div class="flex items-center gap-xs">
-<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container hover:bg-primary-container hover:text-white transition-all text-primary" onclick="event.stopPropagation(); window.location.href='./report_details.html'">
-<span class="material-symbols-outlined text-[20px]">edit</span>
-</button>
-<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container hover:bg-error-container hover:text-white transition-all text-error relative">
-<span class="material-symbols-outlined text-[20px]">delete</span>
-<div class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-white"></div>
-</button>
-<span class="ml-2 font-label-bold text-label-sm text-on-error-container uppercase">En cours</span>
-</div>
-<button class="flex items-center gap-xs px-4 py-2 rounded-full bg-surface-container hover:bg-primary-container hover:text-white transition-all text-primary font-label-bold">
-<span class="material-symbols-outlined text-[20px]">bar_chart</span>
-<span class="">Progress</span>
-</button></div>
-</div>
-<!-- Case Card 3 (Resolved Example) -->
-<div class="bg-surface-container-lowest rounded-lg p-md custom-shadow border border-outline-variant/10 opacity-75 grayscale-[0.2]">
-<div class="flex justify-between items-start mb-md">
-<div class="flex items-center gap-md">
-<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-secondary/20">
-<img alt="Child photo" class="w-full h-full object-cover" data-alt="A sharp, modern portrait of a young boy against a neutral grey studio background. The lighting is professional and soft, emphasizing clarity and trust. The overall aesthetic is clean and minimalist, using a cool color palette with subtle purple tints in the shadows to maintain platform cohesion." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbktYuzyPZj4t0wOc-vjn_Cl6tVtDbjKz6ryMhtt-WLYjRExIRM2sZwwPZp3De1wINuMxyWVeigoPlYG6hNu14gfon0I8I2qUPkiENyHR-7W__bWm8MAHa7ILMrPKJtM8yIVUvgC_x-SJfx30vs-RK4masDeP49Lz6mBEPsM76ELNdKwcDx7vUBzNOZmiBhMzDjZF3UDemUIDlGfIQa7HqYWE7QHRC7vS7OMEmifnpHWLbgKmk3xret8zkzPZG5enUamfaUTnQPKvB"/>
-</div>
-<div>
-<h3 class="font-headline-md text-secondary font-bold">FOUND: Joel B. (10y)</h3>
-<p class="font-label-sm text-on-surface-variant">Kribi, South • 20/04/2024</p>
-</div>
-</div>
-<span class="bg-success text-white bg-green-600 px-3 py-1 rounded-full font-label-bold text-[10px] tracking-wider uppercase">Resolved</span>
-</div>
-<!-- Bottom Action Row -->
-<div class="flex justify-between items-center pt-md border-t border-outline-variant/30"><div class="flex items-center gap-xs">
-<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container text-on-surface-variant cursor-not-allowed">
-<span class="material-symbols-outlined text-[20px]">edit</span>
-</button>
-<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container text-on-surface-variant cursor-not-allowed">
-<span class="material-symbols-outlined text-[20px]">delete</span>
-</button>
-<span class="ml-2 font-label-bold text-label-sm text-secondary uppercase">Archivé</span>
-</div>
-<button class="flex items-center gap-xs px-4 py-2 rounded-full bg-primary-container text-white font-label-bold">
-<span class="material-symbols-outlined text-[20px]">verified</span>
-<span class="">Archive</span>
-</button></div>
-</div>
+<div class="space-y-md" id="caseListContainer">
+    <!-- Dynamic Content -->
 </div>
 </main>
 <!-- Floating Action Button -->
@@ -263,18 +175,152 @@
                 button.classList.remove('scale-95');
             });
         });
+</script>
 
-        // Toggle Switch functionality (Simple simulation)
-        const toggleButtons = document.querySelectorAll('.bg-secondary-fixed button');
-        toggleButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                toggleButtons.forEach(b => {
-                    b.classList.remove('bg-primary-container', 'text-on-primary-container');
-                    b.classList.add('text-on-secondary-fixed-variant');
-                });
-                btn.classList.add('bg-primary-container', 'text-on-primary-container');
-                btn.classList.remove('text-on-secondary-fixed-variant');
-            });
+<script type="module">
+import { reportService } from './src/reportService.js';
+
+let currentTab = 'missing';
+
+function renderCases() {
+    const container = document.getElementById('caseListContainer');
+    if (!container) return;
+
+    let reports = [];
+    if (currentTab === 'missing') {
+        reports = reportService.getMissingReports();
+    } else {
+        reports = reportService.getFoundReports();
+    }
+
+    if (reports.length === 0) {
+        container.innerHTML = `
+            <div class="bg-surface-container-lowest rounded-lg p-lg text-center border border-outline-variant/10">
+                <span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-sm">folder_open</span>
+                <p class="text-body-lg text-on-surface-variant font-semibold">Aucun signalement actif.</p>
+                <p class="text-body-md text-on-surface-variant/70 mt-xs">Les cas signalés s'afficheront ici.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = reports.map(report => {
+        const isMissing = report.type === 'missing';
+        const urgencyLabel = report.urgency || (isMissing ? 'Active' : 'Recherche Famille');
+        const urgencyBg = isMissing ? 'bg-tertiary-fixed text-on-tertiary-fixed' : 'bg-success text-white bg-green-600';
+        const displayLabel = isMissing ? 'MISSING' : 'FOUND';
+        const displayColor = isMissing ? 'text-primary-container' : 'text-secondary';
+        
+        return `
+            <div class="bg-surface-container-lowest rounded-lg p-md custom-shadow border border-outline-variant/10 active:scale-[0.98] transition-all cursor-pointer hover:border-primary/25" data-id="${report.id}">
+                <div class="flex justify-between items-start mb-md">
+                    <div class="flex items-center gap-md">
+                        <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-primary-container/20">
+                            <img alt="${report.name}" class="w-full h-full object-cover" src="${report.photo}" />
+                        </div>
+                        <div>
+                            <h3 class="font-headline-md ${displayColor} font-bold">${displayLabel}: ${report.name} (${report.age} ans)</h3>
+                            <p class="font-label-sm text-on-surface-variant">${report.location} • ${report.date || ''}</p>
+                        </div>
+                    </div>
+                    <span class="${urgencyBg} px-3 py-1 rounded-full font-label-bold text-[10px] tracking-wider uppercase">${urgencyLabel}</span>
+                </div>
+                <!-- Bottom Action Row -->
+                <div class="flex justify-between items-center pt-md border-t border-outline-variant/30">
+                    <div class="flex items-center gap-xs">
+                        <button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container hover:bg-primary-container hover:text-white transition-all text-primary edit-btn" data-id="${report.id}">
+                            <span class="material-symbols-outlined text-[20px]">edit</span>
+                        </button>
+                        <button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container hover:bg-error-container hover:text-white transition-all text-error relative delete-btn" data-id="${report.id}">
+                            <span class="material-symbols-outlined text-[20px]">delete</span>
+                        </button>
+                        <span class="ml-2 font-label-bold text-label-sm text-primary-container uppercase">En cours</span>
+                    </div>
+                    <button class="flex items-center gap-xs px-4 py-2 rounded-full bg-surface-container hover:bg-primary-container hover:text-white transition-all text-primary font-label-bold view-progress-btn" data-id="${report.id}">
+                        <span class="material-symbols-outlined text-[20px]">bar_chart</span>
+                        <span class="">Progress</span>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Bind item click to details
+    container.querySelectorAll('[data-id]').forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('button')) return;
+            const id = card.getAttribute('data-id');
+            const report = reportService.getReportById(id);
+            if (report) {
+                sessionStorage.setItem('current_view_report', JSON.stringify(report));
+                window.location.href = './report_details.html';
+            }
         });
-    </script>
+    });
+
+    // Bind edit button
+    container.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.getAttribute('data-id');
+            const report = reportService.getReportById(id);
+            if (report) {
+                sessionStorage.setItem('current_view_report', JSON.stringify(report));
+                window.location.href = './report_details.html';
+            }
+        });
+    });
+
+    // Bind delete button
+    container.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.getAttribute('data-id');
+            if (confirm("Voulez-vous vraiment supprimer ce signalement ?")) {
+                let success = false;
+                if (currentTab === 'missing') {
+                    success = reportService.deleteMissingReport(id);
+                } else {
+                    success = reportService.deleteFoundReport(id);
+                }
+                if (success) {
+                    renderCases();
+                }
+            }
+        });
+    });
+}
+
+function updateTabButtons() {
+    const tabMissing = document.getElementById('tabMissing');
+    const tabFound = document.getElementById('tabFound');
+
+    if (currentTab === 'missing') {
+        tabMissing.className = "flex-1 py-2.5 px-4 rounded-full font-bold text-sm bg-white text-on-surface shadow-[0_4px_12px_rgba(28,26,36,0.08)] transition-all";
+        tabFound.className = "flex-1 py-2.5 px-4 rounded-full font-semibold text-sm text-on-surface-variant hover:text-on-surface transition-all";
+    } else {
+        tabFound.className = "flex-1 py-2.5 px-4 rounded-full font-bold text-sm bg-white text-on-surface shadow-[0_4px_12px_rgba(28,26,36,0.08)] transition-all";
+        tabMissing.className = "flex-1 py-2.5 px-4 rounded-full font-semibold text-sm text-on-surface-variant hover:text-on-surface transition-all";
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const tabMissing = document.getElementById('tabMissing');
+    const tabFound = document.getElementById('tabFound');
+
+    tabMissing.addEventListener('click', () => {
+        currentTab = 'missing';
+        updateTabButtons();
+        renderCases();
+    });
+
+    tabFound.addEventListener('click', () => {
+        currentTab = 'found';
+        updateTabButtons();
+        renderCases();
+    });
+
+    renderCases();
+});
+</script>
 </body></html>

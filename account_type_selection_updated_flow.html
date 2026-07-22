@@ -137,16 +137,21 @@
 <main class="flex-1 px-container-margin pt-md pb-xl">
 <!-- Progress Tracker -->
 <div class="flex items-center gap-xs mb-lg">
+<div class="progress-dot"></div>
 <div class="progress-pill"></div>
 <div class="progress-dot"></div>
-<div class="progress-dot"></div>
-<span class="text-label-sm text-outline ml-xs">Step 1 of 3</span>
+<span class="text-label-sm text-outline ml-xs">Étape 2 sur 3</span>
 </div>
 <!-- Header Section -->
 <section class="mb-xl">
-<h2 class="font-display text-display text-on-surface mb-xs">How would you like to use Child Safety?</h2>
-<p class="font-body-lg text-body-lg text-secondary">Help us personalize your experience.</p>
+<h2 class="font-display text-display text-on-surface mb-xs">Comment souhaitez-vous utiliser Child Safety ?</h2>
+<p class="font-body-lg text-body-lg text-secondary">Aidez-nous à personnaliser votre expérience.</p>
 </section>
+<!-- Error Message Banner -->
+<div id="errorMsg" class="hidden bg-error-container text-on-error-container p-md rounded-lg text-sm flex items-center gap-sm mb-md relative z-20">
+<span class="material-symbols-outlined text-[20px]" data-icon="error">error</span>
+<span id="errorText" class="font-medium"></span>
+</div>
 <!-- Bento Selection Grid -->
 <div class="grid grid-cols-2 md:grid-cols-3 gap-md mb-xl" id="selection-grid">
 <!-- Parent -->
@@ -155,40 +160,40 @@
 <div class="mb-md p-sm bg-primary-fixed rounded-full">
 <span class="material-symbols-outlined text-primary text-[32px]">woman</span>
 </div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Mother</h3>
-<p class="text-label-sm text-outline">Primary safety coordinator</p>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Mère</h3>
+<p class="text-label-sm text-outline">Coordinatrice principale de sécurité</p>
 </button>
 <!-- Father -->
 <button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
 <div class="mb-md p-sm bg-primary-fixed rounded-full">
 <span class="material-symbols-outlined text-primary text-[32px]">man</span>
 </div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Father</h3>
-<p class="text-label-sm text-outline">Reliable family protection</p>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Père</h3>
+<p class="text-label-sm text-outline">Protection familiale fiable</p>
 </button>
 <!-- Guardian -->
 <button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
 <div class="mb-md p-sm bg-primary-fixed rounded-full">
 <span class="material-symbols-outlined text-primary text-[32px]">shield_person</span>
 </div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Guardian</h3>
-<p class="text-label-sm text-outline">Legal safety supervisor</p>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Tuteur / Tutrice</h3>
+<p class="text-label-sm text-outline">Superviseur légal de sécurité</p>
 </button>
 <!-- Community Member -->
 <button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
 <div class="mb-md p-sm bg-primary-fixed rounded-full">
 <span class="material-symbols-outlined text-primary text-[32px]">groups</span>
 </div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Community Member</h3>
-<p class="text-label-sm text-outline">Local safety advocate</p>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Membre de la Communauté</h3>
+<p class="text-label-sm text-outline">Défenseur de la sécurité locale</p>
 </button>
 <!-- Volunteer Helper -->
 <button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
 <div class="mb-md p-sm bg-primary-fixed rounded-full">
 <span class="material-symbols-outlined text-primary text-[32px]">volunteer_activism</span>
 </div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Volunteer Helper</h3>
-<p class="text-label-sm text-outline">Emergency response support</p>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Bénévole Secouriste</h3>
+<p class="text-label-sm text-outline">Soutien aux interventions d'urgence</p>
 </button>
 </div>
 <!-- Illustrations Section (Asymmetric) -->
@@ -196,20 +201,20 @@
 <img alt="Community Protection" class="w-full h-full object-cover mix-blend-multiply opacity-80" data-alt="A warm and protective digital illustration showing a diverse community of caregivers and parents holding hands in a circle around a glowing safety emblem. The style is modern minimalist with soft gradients of primary purple and violet, set against a bright white background that exudes trust and calm efficiency. The lighting is soft and high-key, reinforcing a sense of collective security and proactive child safety." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEqG2XeYZhg4TvgTZHCRny59tUyebkzUOr4buS6bXJr0vhLPI1Kbmmaws1gWvaYucmlGQp-jucM_tkOHdEeu2RsyAZXlYLnhAXmagRGw_OUFUA6dMZfFXlacCNWCZAGG_rmJLQPGZV7wt5ngT53h5-kWZgEP3hQ8vp6RJ_TghEsSKZ2YHFRe6dG0ApgblD_k1ZI4jwnMI8QUWFWaU6HrMstOpkzMd7TMt5k-PzluINXFeBdWbiGcsIfrjuWQTcqV3qnFxGqv5HXEzf"/>
 <div class="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent flex items-center px-lg">
 <div class="max-w-xs">
-<h4 class="font-headline-md text-primary">Joining a Safe Network</h4>
-<p class="text-body-md text-secondary">Every choice strengthens our child safety community.</p>
+<h4 class="font-headline-md text-primary">Rejoindre un Réseau Sûr</h4>
+<p class="text-body-md text-secondary">Chaque choix renforce notre communauté pour la sécurité des enfants.</p>
 </div>
 </div>
 </div>
 </main>
 <!-- Bottom Action Bar -->
-<footer class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-lg rounded-t-lg flex flex-col gap-sm px-container-margin py-md">
-<button class="w-full py-md bg-outline text-on-primary rounded-full font-label-bold flex items-center justify-center gap-xs transition-all opacity-50 cursor-not-allowed" disabled="" id="continue-btn" onclick="window.location.href='./basic_information.html'">
-            Continue
-            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+<footer class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-lg rounded-t-lg flex flex-col gap-sm px-container-margin py-md relative z-30">
+<button class="w-full py-md bg-outline text-on-primary rounded-full font-label-bold flex items-center justify-center gap-xs transition-all opacity-50 cursor-not-allowed" disabled="" id="continue-btn">
+            <span id="btnText">Continuer</span>
+            <span class="material-symbols-outlined text-[18px]" id="btnIcon">arrow_forward</span>
 </button>
 <button class="w-full py-md text-primary font-label-bold hover:bg-surface-container-low transition-colors rounded-full flex items-center justify-center" onclick="window.location.href='./login_child_safety.html'">
-            I already have an account
+            J'ai déjà un compte
         </button>
 </footer>
 <!-- Spacer for fixed footer -->
@@ -233,4 +238,84 @@
             continueBtn.classList.add('bg-primary', 'active:scale-95', 'hover:opacity-90');
         }
     </script>
+<script type="importmap">
+{
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+  }
+}
+</script>
+<script type="module">
+import { supabase } from "./src/supabaseClient.js";
+
+// Check session and listen to auth state changes
+supabase.auth.onAuthStateChange((event, session) => {
+    if (session) {
+        console.log("Session active (event: " + event + "). Redirecting to Home...");
+        window.location.href = './home_child_safety_v1.html';
+    }
+});
+
+const continueBtn = document.getElementById('continue-btn');
+const btnText = document.getElementById('btnText');
+const btnIcon = document.getElementById('btnIcon');
+const errorMsg = document.getElementById('errorMsg');
+const errorText = document.getElementById('errorText');
+
+function showError(msg) {
+    if (errorText && errorMsg) {
+        errorText.textContent = msg;
+        errorMsg.classList.remove('hidden');
+        errorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        alert(msg);
+    }
+}
+
+function setLoading(isLoading) {
+    if (isLoading) {
+        continueBtn.disabled = true;
+        if (btnText) btnText.textContent = 'Création du compte...';
+        if (btnIcon) {
+            btnIcon.textContent = 'pending';
+            btnIcon.classList.add('animate-spin');
+        }
+    } else {
+        continueBtn.disabled = false;
+        if (btnText) btnText.textContent = 'Créer un compte';
+        if (btnIcon) {
+            btnIcon.textContent = 'arrow_forward';
+            btnIcon.classList.remove('animate-spin');
+        }
+    }
+}
+
+continueBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    if (errorMsg) errorMsg.classList.add('hidden');
+    
+    const fullname = sessionStorage.getItem('signup_fullname') || '';
+    const email = sessionStorage.getItem('signup_email') || '';
+    const password = sessionStorage.getItem('signup_password') || '';
+    const terms = sessionStorage.getItem('signup_terms_accepted') === 'true';
+    const role = sessionStorage.getItem('childSafetyAccountType') || 'Guardian';
+
+    if (!email || !password || !fullname) {
+        showError('Les détails de l\'inscription des étapes précédentes sont manquants. Veuillez revenir à l\'étape 1 et réessayer.');
+        return;
+    }
+    
+    setLoading(true);
+    
+    try {
+        console.log('Step 2 complete. Account type selected:', role);
+        window.location.href = './basic_information.html';
+    } catch (err) {
+        console.error('Unexpected routing error:', err);
+        showError('Une erreur inattendue est survenue. Veuillez réessayer.');
+        setLoading(false);
+    }
+});
+</script>
 </body></html>

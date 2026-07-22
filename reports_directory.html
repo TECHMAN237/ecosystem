@@ -190,153 +190,113 @@
     <div class="flex items-center gap-3 max-w-3xl mx-auto">
         <div class="relative flex-1">
             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary/60" style="font-variation-settings: 'FILL' 0;">search</span>
-            <input class="w-full bg-white border border-outline-variant/35 rounded-2xl py-3 pl-12 pr-4 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all text-sm placeholder-on-surface-variant/50 text-on-surface" placeholder="Rechercher un signalement..." type="text"/>
+            <input id="searchInput" class="w-full bg-white border border-outline-variant/35 rounded-2xl py-3 pl-12 pr-4 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all text-sm placeholder-on-surface-variant/50 text-on-surface" placeholder="Rechercher un signalement..." type="text"/>
         </div>
-        <button class="bg-white border border-outline-variant/35 rounded-2xl w-12 h-12 flex items-center justify-center text-on-surface hover:bg-surface-container-low/50 transition-colors shadow-sm shrink-0">
+        <button id="btnFilter" class="bg-white border border-outline-variant/35 rounded-2xl w-12 h-12 flex items-center justify-center text-on-surface hover:bg-surface-container-low/50 transition-colors shadow-sm shrink-0">
             <span class="material-symbols-outlined text-[20px] text-primary" style="font-variation-settings: 'FILL' 0;">tune</span>
         </button>
     </div>
 
     <!-- Redesigned Report Cards List -->
-    <div class="space-y-4 max-w-3xl mx-auto">
-        
-        <!-- Card 1: Urgent (Kevin) -->
-        <div class="bg-white rounded-2xl p-4 flex gap-4 items-center border border-outline-variant/30 shadow-[0_4px_20px_rgba(28,26,36,0.04)] hover:shadow-[0_12px_32px_rgba(83,44,230,0.1)] hover:border-primary/25 hover:-translate-y-0.5 transition-all duration-300 relative cursor-pointer" onclick="window.location.href='./report_details.html'">
-            <div class="w-24 h-28 rounded-xl border border-primary/20 p-1 flex-shrink-0 relative bg-surface-container shadow-inner">
-                <div class="w-full h-full rounded-lg overflow-hidden bg-surface-container-high">
-                    <img alt="Kevin, 8 ans" class="w-full h-full object-cover object-center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmFiiiTnfSMtj7u6lzjiqBQmqA2nk0VNfloOjmVkB4UB3ULfFxAubtlZmSrZj_LXfIwaXlIJuGSpbctsdnRvofC-jZGfUf6Eh3T5IExb9IquO7A0G25UpF9AQ4NIJ8mdJQo8_1lzm_XJsdaCsKByXtnY8i777qp2mLhX4Ie-RGGFFIL658DpYScxeiPjhrAChA3Ycj9tUJvTNC3lleY0Z9-nHSn2UCY4a9zWmo6w0pLrTJof3qs9wetp1RscW9Q9a1UoP1Dkm_4Eg_" />
-                </div>
-            </div>
-            <div class="flex-1 min-w-0 py-0.5 flex flex-col justify-between h-28">
-                <div>
-                    <div class="flex items-center justify-between gap-2 mb-1.5">
-                        <h3 class="font-bold text-[17px] text-on-surface leading-tight tracking-tight truncate">Kevin, 8 ans</h3>
-                        <span class="bg-error-container text-error text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">Urgent</span>
-                    </div>
-                    <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1">
-                        <span class="material-symbols-outlined text-[15px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
-                        Yaoundé, Centre
-                    </p>
-                    <p class="text-[11px] text-outline flex items-center gap-1">
-                        <span class="material-symbols-outlined text-[14px]">schedule</span>
-                        12 Mai 2024 • 14:30
-                    </p>
-                </div>
-                <div class="flex items-center gap-2 mt-auto w-full overflow-hidden flex-nowrap">
-                    <span class="text-[10.5px] text-primary font-bold bg-primary/5 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">Garçon</span>
-                    <span class="text-[10.5px] text-primary font-bold bg-primary/5 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">1m20</span>
-                    <span class="bg-surface-container text-on-surface-variant text-[10px] font-semibold px-2 py-0.5 rounded-md flex items-center gap-1 whitespace-nowrap shrink-0 ml-auto">
-                        <span class="material-symbols-outlined text-[13px] text-primary" style="font-variation-settings: 'FILL' 1;">my_location</span>
-                        2 km
-                    </span>
-                </div>
-            </div>
-            <span class="material-symbols-outlined text-outline-variant mr-1" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
-        </div>
-
-        <!-- Card 2: Nouveau (Amina) -->
-        <div class="bg-white rounded-2xl p-4 flex gap-4 items-center border border-outline-variant/30 shadow-[0_4px_20px_rgba(28,26,36,0.04)] hover:shadow-[0_12px_32px_rgba(83,44,230,0.1)] hover:border-primary/25 hover:-translate-y-0.5 transition-all duration-300 relative cursor-pointer" onclick="window.location.href='./report_details.html'">
-            <div class="w-24 h-28 rounded-xl border border-primary/20 p-1 flex-shrink-0 relative bg-surface-container shadow-inner">
-                <div class="w-full h-full rounded-lg overflow-hidden bg-surface-container-high">
-                    <img alt="Amina, 6 ans" class="w-full h-full object-cover object-center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCO-1VPeGH3pNTvLINQZZfy4SdsNFWylyC8EJx3kp7rZrbLvJ6gMmzzZoUgJiS4ECu7-gGL4A1NtdgI19bVA313dXaelvqbDFInVeIhmam_2thFH_w54Ot1piZ4ia_lAYJJjT0uGYb6g4bIZBIHBlVVc1KhU0OoxncSPquQrGvJuKo338Py4g3iZY7cpyZMtHX7CMo_L88UVAFMdnu5hU6YPypTpga_9wzCbqfGIo3LJrafgqChM2ta7N_wj8g1LOafdmjryFmqRc_" />
-                </div>
-            </div>
-            <div class="flex-1 min-w-0 py-0.5 flex flex-col justify-between h-28">
-                <div>
-                    <div class="flex items-center justify-between gap-2 mb-1.5">
-                        <h3 class="font-bold text-[17px] text-on-surface leading-tight tracking-tight truncate">Amina, 6 ans</h3>
-                        <span class="bg-primary/10 text-primary text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">Nouveau</span>
-                    </div>
-                    <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1">
-                        <span class="material-symbols-outlined text-[15px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
-                        Douala, Bonanjo
-                    </p>
-                    <p class="text-[11px] text-outline flex items-center gap-1">
-                        <span class="material-symbols-outlined text-[14px]">schedule</span>
-                        11 Mai 2024 • 09:15
-                    </p>
-                </div>
-                <div class="flex items-center gap-2 mt-auto w-full overflow-hidden flex-nowrap">
-                    <span class="text-[10.5px] text-primary font-bold bg-primary/5 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">Fille</span>
-                    <span class="text-[10.5px] text-primary font-bold bg-primary/5 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">1m10</span>
-                    <span class="bg-surface-container text-on-surface-variant text-[10px] font-semibold px-2 py-0.5 rounded-md flex items-center gap-1 whitespace-nowrap shrink-0 ml-auto">
-                        <span class="material-symbols-outlined text-[13px] text-primary" style="font-variation-settings: 'FILL' 1;">my_location</span>
-                        3 km
-                    </span>
-                </div>
-            </div>
-            <span class="material-symbols-outlined text-outline-variant mr-1" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
-        </div>
-
-        <!-- Card 3: Nouveau (Daniel) -->
-        <div class="bg-white rounded-2xl p-4 flex gap-4 items-center border border-outline-variant/30 shadow-[0_4px_20px_rgba(28,26,36,0.04)] hover:shadow-[0_12px_32px_rgba(83,44,230,0.1)] hover:border-primary/25 hover:-translate-y-0.5 transition-all duration-300 relative cursor-pointer" onclick="window.location.href='./report_details.html'">
-            <div class="w-24 h-28 rounded-xl border border-primary/20 p-1 flex-shrink-0 relative bg-surface-container shadow-inner">
-                <div class="w-full h-full rounded-lg overflow-hidden bg-surface-container-high">
-                    <img alt="Daniel, 10 ans" class="w-full h-full object-cover object-center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPRhJoR99JnIq0yjWpRc5frrsMJML08i9WLb0sJUaRexO-EZ72J68ur4rWdZu3GQx3x8jpCTy5Lk8OsTZ43OD-aCenUbYDZ2ulH-lU_rOaqTvEf0IpXDYfZn9_UC8aktKYIfWeRhtP93fOlFJ529ANeK_GAwJtrbi7AXfogY1EFTk5yW0CF-cCSWQHHsLaKdIepUPSnC9XI5bG_Zfo-HeePaEZCCSnKpTFog19LD-_tr4aYbE4I1L5RMLH0HFDbHk-dpG0NixHKDj" />
-                </div>
-            </div>
-            <div class="flex-1 min-w-0 py-0.5 flex flex-col justify-between h-28">
-                <div>
-                    <div class="flex items-center justify-between gap-2 mb-1.5">
-                        <h3 class="font-bold text-[17px] text-on-surface leading-tight tracking-tight truncate">Daniel, 10 ans</h3>
-                        <span class="bg-primary/10 text-primary text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">Nouveau</span>
-                    </div>
-                    <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1">
-                        <span class="material-symbols-outlined text-[15px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
-                        Bafoussam, Kouekong
-                    </p>
-                    <p class="text-[11px] text-outline flex items-center gap-1">
-                        <span class="material-symbols-outlined text-[14px]">schedule</span>
-                        10 Mai 2024 • 18:45
-                    </p>
-                </div>
-                <div class="flex items-center gap-2 mt-auto w-full overflow-hidden flex-nowrap">
-                    <span class="text-[10.5px] text-primary font-bold bg-primary/5 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">Garçon</span>
-                    <span class="text-[10.5px] text-primary font-bold bg-primary/5 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">1m35</span>
-                    <span class="bg-surface-container text-on-surface-variant text-[10px] font-semibold px-2 py-0.5 rounded-md flex items-center gap-1 whitespace-nowrap shrink-0 ml-auto">
-                        <span class="material-symbols-outlined text-[13px] text-primary" style="font-variation-settings: 'FILL' 1;">my_location</span>
-                        12 km
-                    </span>
-                </div>
-            </div>
-            <span class="material-symbols-outlined text-outline-variant mr-1" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
-        </div>
-
-        <!-- Card 4: Normal (Fatima) -->
-        <div class="bg-white rounded-2xl p-4 flex gap-4 items-center border border-outline-variant/30 shadow-[0_4px_20px_rgba(28,26,36,0.04)] hover:shadow-[0_12px_32px_rgba(83,44,230,0.1)] hover:border-primary/25 hover:-translate-y-0.5 transition-all duration-300 relative cursor-pointer" onclick="window.location.href='./report_details.html'">
-            <div class="w-24 h-28 rounded-xl border border-primary/20 p-1 flex-shrink-0 relative bg-surface-container shadow-inner">
-                <div class="w-full h-full rounded-lg overflow-hidden bg-surface-container-high">
-                    <img alt="Fatima, 5 ans" class="w-full h-full object-cover object-center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwFqBmOdzfhnLnldbs7YFYK3S2S9e_l9BivDpRivR3Oo2HZLQ_PIt2sx_7T50YhlgZxzwBLDoK6u7zAN20-l7neNf1XxXOBbVpV9PROXl56Hty1Fs93ZtaUL0o6rbcrN_afciUT2_aQPMMa5XGMMvko7QJw8tx0FqJebj8IgOvFdowLqKOTEQTSfioDL-r_DLNABcksnoufJmrw2Z96BUYojtuL_0EBMuC3V5TrWmcikqyMwyPMCUWV58EA9QG4si9KdUJ3_GC8XY9" />
-                </div>
-            </div>
-            <div class="flex-1 min-w-0 py-0.5 flex flex-col justify-between h-28">
-                <div>
-                    <div class="flex items-center justify-between gap-2 mb-1.5">
-                        <h3 class="font-bold text-[17px] text-on-surface leading-tight tracking-tight truncate">Fatima, 5 ans</h3>
-                        <span class="bg-secondary-container text-on-secondary-container text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">Recherche</span>
-                    </div>
-                    <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1">
-                        <span class="material-symbols-outlined text-[15px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
-                        Nkongsamba
-                    </p>
-                    <p class="text-[11px] text-outline flex items-center gap-1">
-                        <span class="material-symbols-outlined text-[14px]">schedule</span>
-                        09 Mai 2024 • 12:00
-                    </p>
-                </div>
-                <div class="flex items-center gap-2 mt-auto w-full overflow-hidden flex-nowrap">
-                    <span class="text-[10.5px] text-primary font-bold bg-primary/5 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">Fille</span>
-                    <span class="text-[10.5px] text-primary font-bold bg-primary/5 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">1m00</span>
-                    <span class="bg-surface-container text-on-surface-variant text-[10px] font-semibold px-2 py-0.5 rounded-md flex items-center gap-1 whitespace-nowrap shrink-0 ml-auto">
-                        <span class="material-symbols-outlined text-[13px] text-primary" style="font-variation-settings: 'FILL' 1;">my_location</span>
-                        8 km
-                    </span>
-                </div>
-            </div>
-            <span class="material-symbols-outlined text-outline-variant mr-1" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
-        </div>
-
+    <div id="cardsContainer" class="space-y-4 max-w-3xl mx-auto">
+        <!-- Dynamically Rendered -->
     </div>
+
+    <script type="module">
+        import { reportService } from './src/reportService.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('cardsContainer');
+            const searchInput = document.getElementById('searchInput');
+
+            function renderReports(reports) {
+                if (reports.length === 0) {
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl p-8 text-center border border-outline-variant/30 shadow-sm max-w-3xl mx-auto">
+                            <span class="material-symbols-outlined text-outline text-[48px] mb-2">search_off</span>
+                            <p class="text-on-surface-variant font-medium">Aucun signalement trouvé</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = reports.map(report => {
+                    const labelAge = report.age ? `, ${report.age} ans` : '';
+                    let badgeClass = 'bg-primary/10 text-primary';
+                    let badgeLabel = 'Recherche';
+
+                    if (report.status === 'Urgent') {
+                        badgeClass = 'bg-error-container text-error animate-pulse';
+                        badgeLabel = 'Urgent';
+                    } else if (report.status === 'Published') {
+                        badgeClass = 'bg-green-100 text-green-700';
+                        badgeLabel = 'Publié';
+                    }
+
+                    const genderLabel = (report.gender || "").toLowerCase() === 'fille' ? 'Fille' : 'Garçon';
+
+                    return `
+                        <div class="report-card bg-white rounded-2xl p-4 flex gap-4 items-center border border-outline-variant/30 shadow-[0_4px_20px_rgba(28,26,36,0.04)] hover:shadow-[0_12px_32px_rgba(83,44,230,0.1)] hover:border-primary/25 hover:-translate-y-0.5 transition-all duration-300 relative cursor-pointer" 
+                             data-id="${report.id}">
+                            <div class="w-24 h-28 rounded-xl border border-primary/20 p-1 flex-shrink-0 relative bg-surface-container shadow-inner">
+                                <div class="w-full h-full rounded-lg overflow-hidden bg-surface-container-high">
+                                    <img alt="${report.name}" class="w-full h-full object-cover object-center" src="${report.photo}" />
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0 py-0.5 flex flex-col justify-between h-28">
+                                <div>
+                                    <div class="flex items-center justify-between gap-2 mb-1.5">
+                                        <h3 class="font-bold text-[17px] text-on-surface leading-tight tracking-tight truncate">${report.name}${labelAge}</h3>
+                                        <span class="${badgeClass} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">${badgeLabel}</span>
+                                    </div>
+                                    <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1">
+                                        <span class="material-symbols-outlined text-[15px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
+                                        ${report.location}
+                                    </p>
+                                    <p class="text-[11px] text-outline flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[14px]">schedule</span>
+                                        ${report.date} • ${report.time || '12:00'}
+                                    </p>
+                                </div>
+                                <div class="flex items-center gap-2 mt-auto w-full overflow-hidden flex-nowrap">
+                                    <span class="text-[10.5px] text-primary font-bold bg-primary/5 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">${genderLabel}</span>
+                                    <span class="text-[10.5px] text-primary font-bold bg-primary/5 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">${report.height || '1m20'}</span>
+                                    <span class="bg-surface-container text-on-surface-variant text-[10px] font-semibold px-2 py-0.5 rounded-md flex items-center gap-1 whitespace-nowrap shrink-0 ml-auto">
+                                        <span class="material-symbols-outlined text-[13px] text-primary" style="font-variation-settings: 'FILL' 1;">my_location</span>
+                                        Proche
+                                    </span>
+                                </div>
+                            </div>
+                            <span class="material-symbols-outlined text-outline-variant mr-1" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
+                        </div>
+                    `;
+                }).join('');
+
+                // Bind click listeners
+                container.querySelectorAll('.report-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const id = card.getAttribute('data-id');
+                        const report = reportService.getReportById(id);
+                        if (report) {
+                            sessionStorage.setItem('current_view_report', JSON.stringify(report));
+                            window.location.href = './report_details.html';
+                        }
+                    });
+                });
+            }
+
+            // Initial fetch of missing reports
+            const missingReports = reportService.getMissingReports();
+            renderReports(missingReports);
+
+            // Real-time search handler
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value;
+                const filtered = reportService.searchReports(query, false); // isFound = false
+                renderReports(filtered);
+            });
+        });
+    </script>
 
     <!-- Floating Action Button (Mobile Only) -->
     <button class="fixed bottom-24 right-6 md:hidden w-14 h-14 bg-gradient-to-br from-primary to-primary-container rounded-full shadow-[0px_12px_32px_rgba(83,44,230,0.3)] flex items-center justify-center text-white hover:scale-105 transition-transform z-45 border border-white/10" onclick="window.location.href='./signaler_un_disparu_tape_1.html'">
@@ -364,6 +324,71 @@
         <span class="font-label-sm text-label-sm">Profile</span>
     </a>
 </nav>
+
+<script>
+    // Guest restriction check
+    function showGuestRestrictionAlert() {
+        if (document.getElementById('guest-restriction-modal')) return;
+        
+        const modal = document.createElement('div');
+        modal.id = 'guest-restriction-modal';
+        modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-md bg-black/60 backdrop-blur-sm transition-all duration-300';
+        modal.innerHTML = `
+            <div class="bg-surface-container-lowest rounded-2xl p-lg max-w-sm w-full shadow-2xl border border-primary/10 text-center transform scale-95 transition-transform duration-300">
+                <div class="w-16 h-16 bg-primary-container/10 text-primary rounded-full flex items-center justify-center mx-auto mb-md">
+                    <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">lock</span>
+                </div>
+                <h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Accès Restreint</h3>
+                <p class="font-body-md text-body-md text-on-surface-variant mb-lg leading-relaxed text-center">
+                    Please create an account or sign in to continue.
+                </p>
+                <div class="flex flex-col gap-sm">
+                    <a href="./sign_up_child_safety.html" class="w-full py-3 bg-primary text-on-primary rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all block text-center shadow-md">
+                        Créer un compte / Se connecter
+                    </a>
+                    <button id="closeGuestModal" class="w-full py-3 bg-surface-container-high text-on-surface rounded-full font-label-bold text-label-bold hover:bg-surface-container-highest active:scale-95 transition-all">
+                        Plus tard
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        setTimeout(() => {
+            modal.querySelector('.transform').classList.remove('scale-95');
+        }, 10);
+
+        document.getElementById('closeGuestModal').addEventListener('click', () => {
+            modal.querySelector('.transform').classList.add('scale-95');
+            modal.style.opacity = '0';
+            setTimeout(() => modal.remove(), 200);
+        });
+    }
+
+    if (localStorage.getItem('is_guest') === 'true') {
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest('a, button');
+            if (!target) return;
+            
+            const href = target.getAttribute('href') || '';
+            const onclick = target.getAttribute('onclick') || '';
+            
+            const isRestrictedPath = href.includes('guardian_profile') || 
+                                     href.includes('signaler_un_disparu') || 
+                                     href.includes('signaler_un_enfant_trouv') || 
+                                     href.includes('v2_smart_device') || 
+                                     onclick.includes('guardian_profile') || 
+                                     onclick.includes('signaler_un_disparu') || 
+                                     onclick.includes('signaler_un_enfant_trouv') || 
+                                     onclick.includes('v2_smart_device');
+            
+            if (isRestrictedPath) {
+                e.preventDefault();
+                e.stopPropagation();
+                showGuestRestrictionAlert();
+            }
+        }, true);
+    }
+</script>
 
 </body>
 </html>

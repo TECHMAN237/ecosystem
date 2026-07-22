@@ -138,27 +138,28 @@
 <span class="ml-xs font-label-bold text-label-bold text-outline">Étape 1 sur 3</span>
 </div>
 <h2 class="font-display text-display text-on-surface mb-lg">Signaler un enfant trouvé</h2>
-<form class="space-y-lg">
+<form class="space-y-lg" id="foundForm">
 <!-- Child Photo Upload Area -->
 <div class="relative">
 <label class="block font-label-bold text-label-bold text-outline mb-xs">Photo de l'enfant</label>
-<div class="border-2 border-dashed border-primary-container rounded-lg aspect-square w-full flex flex-col items-center justify-center bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div id="uploadContainer" class="border-2 border-dashed border-primary-container rounded-lg aspect-square w-full flex flex-col items-center justify-center bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer group relative overflow-hidden">
 <div class="w-16 h-16 bg-primary-container/10 rounded-full flex items-center justify-center mb-md group-hover:scale-110 transition-transform">
 <span class="material-symbols-outlined text-primary text-3xl">add_a_photo</span>
 </div>
 <span class="font-headline-md text-headline-md text-primary">Prendre une photo</span>
 <span class="font-body-md text-body-md text-outline mt-xs text-center px-xl">Capturez le visage de l'enfant de manière claire si possible</span>
+<input id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
 </div>
 </div>
 <!-- Two column grid for basic info -->
 <div class="grid grid-cols-2 gap-md">
 <div class="space-y-xs">
 <label class="block font-label-bold text-label-bold text-outline">Âge approx.</label>
-<input class="w-full px-md py-sm bg-surface-container-lowest border border-outline-variant rounded-full font-body-lg text-body-lg" placeholder="ex: 5" type="number"/>
+<input id="age" class="w-full px-md py-sm bg-surface-container-lowest border border-outline-variant rounded-full font-body-lg text-body-lg" placeholder="ex: 5" type="number"/>
 </div>
 <div class="space-y-xs">
 <label class="block font-label-bold text-label-bold text-outline">Sexe</label>
-<select class="w-full px-md py-sm bg-surface-container-lowest border border-outline-variant rounded-full font-body-lg text-body-lg appearance-none">
+<select id="gender" class="w-full px-md py-sm bg-surface-container-lowest border border-outline-variant rounded-full font-body-lg text-body-lg appearance-none">
 <option value="">Sélectionner</option>
 <option value="fille">Fille</option>
 <option value="garcon">Garçon</option>
@@ -169,18 +170,18 @@
 <!-- Physical Description -->
 <div class="space-y-xs">
 <label class="block font-label-bold text-label-bold text-outline">Description physique</label>
-<textarea class="w-full px-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg font-body-lg text-body-lg" placeholder="Teint, cheveux, signes distinctifs..." rows="3"></textarea>
+<textarea id="physicalDescription" class="w-full px-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg font-body-lg text-body-lg" placeholder="Teint, cheveux, signes distinctifs..." rows="3"></textarea>
 </div>
 <!-- Clothing Description -->
 <div class="space-y-xs">
 <label class="block font-label-bold text-label-bold text-outline">Description des vêtements</label>
-<textarea class="w-full px-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg font-body-lg text-body-lg" placeholder="Couleur du t-shirt, type de chaussures..." rows="3"></textarea>
+<textarea id="clothingDescription" class="w-full px-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg font-body-lg text-body-lg" placeholder="Couleur du t-shirt, type de chaussures..." rows="3"></textarea>
 </div>
 <!-- Location Found -->
 <div class="space-y-xs">
 <label class="block font-label-bold text-label-bold text-outline">Lieu de la découverte</label>
 <div class="relative">
-<input class="w-full pl-xl pr-md py-sm bg-surface-container-lowest border border-outline-variant rounded-full font-body-lg text-body-lg" placeholder="Saisir l'adresse ou le lieu" type="text"/>
+<input id="locationFound" class="w-full pl-xl pr-md py-sm bg-surface-container-lowest border border-outline-variant rounded-full font-body-lg text-body-lg" placeholder="Saisir l'adresse ou le lieu" type="text"/>
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">location_on</span>
 </div>
 </div>
@@ -188,14 +189,14 @@
 <div class="space-y-xs">
 <label class="block font-label-bold text-label-bold text-outline">Date de la découverte</label>
 <div class="relative">
-<input class="w-full pl-xl pr-md py-sm bg-surface-container-lowest border border-outline-variant rounded-full font-body-lg text-body-lg" type="date"/>
+<input id="dateFound" class="w-full pl-xl pr-md py-sm bg-surface-container-lowest border border-outline-variant rounded-full font-body-lg text-body-lg" type="date"/>
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">calendar_today</span>
 </div>
 </div>
 <!-- Additional Notes -->
 <div class="space-y-xs">
 <label class="block font-label-bold text-label-bold text-outline">Notes additionnelles</label>
-<textarea class="w-full px-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg font-body-lg text-body-lg" placeholder="Circonstances, comportement de l'enfant..." rows="2"></textarea>
+<textarea id="additionalNotes" class="w-full px-md py-md bg-surface-container-lowest border border-outline-variant rounded-lg font-body-lg text-body-lg" placeholder="Circonstances, comportement de l'enfant..." rows="2"></textarea>
 </div>
 </form>
 </main>
@@ -205,7 +206,7 @@
 <span class="material-symbols-outlined mb-1">chevron_left</span>
 <span class="font-label-bold text-label-bold">Previous</span>
 </button>
-<button class="flex flex-col items-center justify-center bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container rounded-full px-xl py-md hover:opacity-90 active:scale-98 transition-all duration-200 shadow-lg" onclick="window.location.href='./signaler_un_enfant_trouv_d_tails_de_la_d_couverte.html'">
+<button id="btnContinue" class="flex flex-col items-center justify-center bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container rounded-full px-xl py-md hover:opacity-90 active:scale-98 transition-all duration-200 shadow-lg">
 <div class="flex items-center gap-xs">
 <span class="font-label-bold text-label-bold uppercase tracking-wider">Continue</span>
 <span class="material-symbols-outlined">chevron_right</span>
@@ -215,11 +216,91 @@
 <!-- Micro-interaction for the active step indicator -->
 <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const formInputs = document.querySelectorAll('input, textarea, select');
-            formInputs.forEach(input => {
-                input.addEventListener('focus', () => {
-                    // Visual feedback for focused fields could be added here
+            const fileInput = document.getElementById('fileInput');
+            const uploadContainer = document.getElementById('uploadContainer');
+            const ageInput = document.getElementById('age');
+            const genderSelect = document.getElementById('gender');
+            const physicalInput = document.getElementById('physicalDescription');
+            const clothingInput = document.getElementById('clothingDescription');
+            const locationInput = document.getElementById('locationFound');
+            const dateInput = document.getElementById('dateFound');
+            const notesInput = document.getElementById('additionalNotes');
+            const btnContinue = document.getElementById('btnContinue');
+
+            // Handle photo upload & preview
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        const base64 = evt.target.result;
+                        sessionStorage.setItem('pending_found_photo', base64);
+                        
+                        uploadContainer.innerHTML = `
+                            <img src="${base64}" class="absolute inset-0 w-full h-full object-cover" />
+                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                                <span class="text-white font-label-bold text-label-bold">Changer la photo</span>
+                            </div>
+                            <input id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
+                        `;
+                        document.getElementById('fileInput').addEventListener('change', arguments.callee);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Restore preview if exists
+            const existingPhoto = sessionStorage.getItem('pending_found_photo');
+            if (existingPhoto) {
+                uploadContainer.innerHTML = `
+                    <img src="${existingPhoto}" class="absolute inset-0 w-full h-full object-cover" />
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        <span class="text-white font-label-bold text-label-bold">Changer la photo</span>
+                    </div>
+                    <input id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
+                `;
+                document.getElementById('fileInput').addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(evt) {
+                            const base64 = evt.target.result;
+                            sessionStorage.setItem('pending_found_photo', base64);
+                            location.reload();
+                        };
+                        reader.readAsDataURL(file);
+                    }
                 });
+            }
+
+            // Restore other field inputs
+            const existingDataStr = sessionStorage.getItem('pending_found_data');
+            if (existingDataStr) {
+                try {
+                    const data = JSON.parse(existingDataStr);
+                    if (data.age) ageInput.value = data.age;
+                    if (data.gender) genderSelect.value = data.gender;
+                    if (data.physicalDescription) physicalInput.value = data.physicalDescription;
+                    if (data.clothingDescription) clothingInput.value = data.clothingDescription;
+                    if (data.location) locationInput.value = data.location;
+                    if (data.date) dateInput.value = data.date;
+                    if (data.notes) notesInput.value = data.notes;
+                } catch(e) {}
+            }
+
+            // Click continue
+            btnContinue.addEventListener('click', () => {
+                sessionStorage.setItem('pending_found_data', JSON.stringify({
+                    age: parseInt(ageInput.value) || 7,
+                    gender: genderSelect.value || "inconnu",
+                    physicalDescription: physicalInput.value.trim() || "Teint noir",
+                    clothingDescription: clothingInput.value.trim() || "Inconnu",
+                    location: locationInput.value.trim() || "Yaoundé",
+                    date: dateInput.value || new Date().toISOString().split('T')[0],
+                    notes: notesInput.value.trim() || ""
+                }));
+
+                window.location.href = './signaler_un_enfant_trouv_d_tails_de_la_d_couverte.html';
             });
         });
     </script>

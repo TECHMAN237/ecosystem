@@ -128,7 +128,7 @@
 <header class="w-full top-0 left-0 sticky flex justify-between items-center px-container-margin py-md bg-surface dark:bg-background shadow-[0px_4px_20px_rgba(108,77,255,0.06)] z-40">
 <div class="flex items-center gap-xs">
 <span class="material-symbols-outlined text-primary font-bold text-headline-lg-mobile">security</span>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed">Guardian Flow</h1>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed">Portail Gardien</h1>
 </div>
 <button class="material-symbols-outlined text-primary dark:text-primary-fixed hover:opacity-80 transition-opacity active:scale-95 duration-200" onclick="window.location.href='./alert_center.html'">notifications</button>
 </header>
@@ -140,15 +140,19 @@
 <div class="flex flex-col items-center gap-md relative z-10">
 <div class="relative">
 <div class="w-24 h-24 rounded-full border-4 border-white/30 overflow-hidden custom-shadow">
-<img class="w-full h-full object-cover" data-alt="A professional portrait of a woman named Elena Rodriguez with a warm, confident expression. She has dark hair and is wearing a smart casual outfit. The lighting is soft and natural, emphasizing a trustworthy and reliable personality. The background is a clean, minimalist studio setting with soft purple and white tones consistent with a premium mobile application interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClC0M3fj535NrT_e6O1qyk0jz7aObxZ-bz41CTQC0qBLlCZmd807Rta2Hw7GhNhGW4x_UhiTrC5ro5C2R8EEwvhqXB3kUQhpa6D-uGNpyoJkUfa0r7zTXe_96bVZ9Yj7xeqAmTbIX3RQkVxaefGmDf0DOaoqa9Td2R5neesC4v_UnUHma8w9LTQIVneBzufAe_0nFcOsjGmT4g0GMvnPWt373nHKwXM1MaNHi4AdeLWIr3YyU2-g-y2wPOpR0YzhSjpTOoMMrDYqpH"/>
+<img id="profileAvatar" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=400"/>
 </div>
 <div class="absolute bottom-1 right-1 bg-primary text-white w-7 h-7 rounded-full flex items-center justify-center border-2 border-white">
 <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
 </div>
 </div>
-<div class="text-center">
-<h2 class="font-headline-lg text-headline-lg text-white">Elena Rodriguez</h2>
-<p class="font-label-sm text-label-sm text-white/80 tracking-wide uppercase">Community Guardian Elite</p>
+<div class="text-center flex flex-col items-center">
+<h2 id="profileName" class="font-headline-lg text-headline-lg text-white">Elena Rodriguez</h2>
+<p id="profileRole" class="font-label-sm text-label-sm text-white/80 tracking-wide uppercase">Gardien d'Élite de la Communauté</p>
+<button id="editProfileBtn" class="mt-2.5 px-4 py-1.5 border border-white/40 text-white hover:bg-white/10 rounded-full font-bold text-xs flex items-center gap-1.5 transition-all">
+  <span class="material-symbols-outlined text-sm">edit</span>
+  <span>Modifier le profil</span>
+</button>
 </div>
 </div>
 </section>
@@ -158,7 +162,7 @@
 <div class="bg-surface-container-lowest p-lg rounded-lg custom-shadow flex flex-col items-center text-center">
 <span class="material-symbols-outlined text-primary mb-xs" style="font-variation-settings: 'FILL' 1;">description</span>
 <span class="font-headline-md text-headline-md text-on-surface">14</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Reports Made</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Signalements effectués</span>
 </div>
 <div class="bg-surface-container-lowest p-lg rounded-lg custom-shadow flex flex-col items-center text-center">
 <span class="material-symbols-outlined text-tertiary mb-xs" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
@@ -166,6 +170,20 @@
 <span class="font-label-sm text-label-sm text-on-surface-variant">Karma</span>
 </div>
 </div>
+<!-- Personal Details Card -->
+<section id="profileDetailsCard" class="bg-surface-container-lowest p-lg rounded-lg custom-shadow space-y-3">
+  <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Informations Personnelles</h3>
+  <div class="grid grid-cols-2 gap-y-2.5 text-body-md border-t border-surface-container pt-3">
+    <span class="text-on-surface-variant font-medium">Nom d'utilisateur :</span>
+    <span id="detailUsername" class="text-on-surface font-semibold text-right">@elena_rod</span>
+    
+    <span class="text-on-surface-variant font-medium">Téléphone :</span>
+    <span id="detailPhone" class="text-on-surface font-semibold text-right">+237 677123456</span>
+    
+    <span class="text-on-surface-variant font-medium">Ville :</span>
+    <span id="detailCity" class="text-on-surface font-semibold text-right">Yaoundé</span>
+  </div>
+</section>
 <!-- Community Mode Section -->
 <section class="bg-surface-container-lowest p-lg rounded-lg custom-shadow">
 <div class="flex items-center justify-between mb-md">
@@ -174,8 +192,8 @@
 <span class="material-symbols-outlined text-primary" id="mode-icon">radar</span>
 </div>
 <div>
-<h3 class="font-headline-md text-headline-md text-on-surface">Active Mode</h3>
-<p class="font-label-sm text-label-sm text-primary" id="mode-status">I Can Help</p>
+<h3 class="font-headline-md text-headline-md text-on-surface">Mode Actif</h3>
+<p class="font-label-sm text-label-sm text-primary" id="mode-status">Prêt à aider</p>
 </div>
 </div>
 <!-- Modern Toggle Switch -->
@@ -185,18 +203,18 @@
 </label>
 </div>
 <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-        When Active, you'll receive emergency SOS alerts from children or parents within 500 meters of your current location. Your vigilance saves lives.
+        Lorsqu'il est actif, vous recevrez des alertes d'urgence SOS de la part d'enfants ou de parents à moins de 500 mètres de votre position actuelle. Votre vigilance sauve des vies.
       </p>
 </section>
 <!-- My Cases & Reports Card -->
 <section class="bg-surface-container-lowest p-lg rounded-lg custom-shadow">
-<h3 class="font-headline-md text-headline-md text-on-surface mb-md">My Cases &amp; Reports</h3>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-md">Mes Dossiers &amp; Signalements</h3>
 <button class="w-full bg-primary hover:bg-primary-container text-white py-md px-lg rounded-full font-headline-md flex items-center justify-center gap-sm transition-all active:scale-95 mb-md" onclick="window.location.href='./my_case_dashboard_refined_actions.html'">
 <span class="material-symbols-outlined">description</span>
-<span>View My Reports</span>
+<span>Voir mes signalements</span>
 </button>
 <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-Access your full log of missing and found child reports. Track and manage all cases you've reported.
+Accédez à l'historique complet de vos signalements d'enfants disparus et trouvés. Suivez et gérez tous vos dossiers.
 </p>
 </section>
 <!-- V2 Device Preview Card -->
@@ -209,9 +227,9 @@ Access your full log of missing and found child reports. Track and manage all ca
 </div>
 <div class="relative z-10 flex-1">
 <h3 class="font-headline-md text-headline-md text-white mb-xs">Protection V2</h3>
-<p class="font-label-sm text-label-sm text-white/60 mb-md">Smart Wearable Protection System Coming Soon.</p>
+<p class="font-label-sm text-label-sm text-white/60 mb-md">Le système de bracelet intelligent de protection arrive bientôt.</p>
 <button class="bg-primary hover:bg-primary-container text-white px-md py-xs rounded-full font-label-bold text-label-bold transition-all active:scale-95" onclick="window.location.href='./v2_smart_device_preview.html'">
-          Learn More
+          En savoir plus
         </button>
 </div>
 </section>
@@ -228,35 +246,35 @@ Access your full log of missing and found child reports. Track and manage all ca
 <button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./privacy_settings.html'">
 <div class="flex items-center gap-md">
 <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">lock</span>
-<span class="font-body-lg text-body-lg text-on-surface">Privacy</span>
+<span class="font-body-lg text-body-lg text-on-surface">Confidentialité</span>
 </div>
 <span class="material-symbols-outlined text-outline">chevron_right</span>
 </button>
 <button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./emergency_preferences.html'">
 <div class="flex items-center gap-md">
 <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">emergency</span>
-<span class="font-body-lg text-body-lg text-on-surface">Emergency Preferences</span>
+<span class="font-body-lg text-body-lg text-on-surface">Préférences d'Urgence</span>
 </div>
 <span class="material-symbols-outlined text-outline">chevron_right</span>
 </button>
 <button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./help_center.html'">
 <div class="flex items-center gap-md">
 <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">help</span>
-<span class="font-body-lg text-body-lg text-on-surface">Help Center</span>
+<span class="font-body-lg text-body-lg text-on-surface">Centre d'Aide</span>
 </div>
 <span class="material-symbols-outlined text-outline">chevron_right</span>
 </button>
 <button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./about_safeguardian.html'">
 <div class="flex items-center gap-md">
 <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">info</span>
-<span class="font-body-lg text-body-lg text-on-surface">About</span>
+<span class="font-body-lg text-body-lg text-on-surface">À propos</span>
 </div>
 <span class="material-symbols-outlined text-outline">chevron_right</span>
 </button>
 <button id="logoutBtn" class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group">
 <div class="flex items-center gap-md">
 <span class="material-symbols-outlined text-error">logout</span>
-<span class="font-body-lg text-body-lg text-error">Logout</span>
+<span class="font-body-lg text-body-lg text-error">Se déconnecter</span>
 </div>
 </button>
 </div>
@@ -266,21 +284,79 @@ Access your full log of missing and found child reports. Track and manage all ca
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter py-xs pb-safe bg-surface-container-lowest dark:bg-inverse-surface shadow-[0px_-4px_20px_rgba(108,77,255,0.06)] rounded-t-lg">
 <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-transform duration-200" href="./home_child_safety_v1.html">
 <span class="material-symbols-outlined">home</span>
-<span class="font-label-sm text-label-sm">Home</span>
+<span class="font-label-sm text-label-sm">Accueil</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-transform duration-200" href="./reports_directory.html">
 <span class="material-symbols-outlined">description</span>
-<span class="font-label-sm text-label-sm">Reports</span>
+<span class="font-label-sm text-label-sm">Signalements</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-transform duration-200" href="./alert_center.html">
 <span class="material-symbols-outlined">notifications</span>
-<span class="font-label-sm text-label-sm">Alerts</span>
+<span class="font-label-sm text-label-sm">Alertes</span>
 </a>
 <a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-2 hover:opacity-80 transition-opacity active:scale-90 transition-transform duration-200" href="./guardian_profile_updated_my_reports.html">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
-<span class="font-label-sm text-label-sm">Profile</span>
+<span class="font-label-sm text-label-sm">Profil</span>
 </a>
 </nav>
+
+<!-- Edit Profile Modal -->
+<div id="editProfileModal" class="fixed inset-0 bg-black/60 z-50 flex items-end justify-center hidden opacity-0 transition-all duration-300">
+  <div class="bg-surface-container-lowest w-full max-w-md rounded-t-lg p-lg space-y-md relative z-10 custom-shadow border-t border-outline-variant/20 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-surface-container pb-2">
+      <h3 class="font-headline-lg text-headline-lg text-on-surface">Modifier le Profil</h3>
+      <button id="closeModalBtn" class="material-symbols-outlined text-outline hover:text-on-surface p-1 rounded-full hover:bg-surface-container transition-colors">close</button>
+    </div>
+    
+    <!-- Avatar picker -->
+    <div class="flex flex-col items-center gap-xs">
+      <div class="relative w-20 h-20 rounded-full overflow-hidden border-2 border-primary/20 bg-surface-container-high group">
+        <img id="modalAvatarPreview" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=400"/>
+        <label class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+          <span class="material-symbols-outlined text-white text-[20px]">photo_camera</span>
+          <input type="file" id="modalAvatarInput" accept="image/*" class="hidden" />
+        </label>
+      </div>
+      <span class="text-xs text-on-surface-variant">Cliquez sur l'appareil photo pour modifier</span>
+    </div>
+
+    <!-- Edit Fields -->
+    <div class="space-y-sm">
+      <div>
+        <label class="block text-xs font-bold text-on-surface-variant uppercase mb-1" for="editFullName">Nom Complet</label>
+        <input type="text" id="editFullName" class="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-2.5 text-on-surface font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Elena Rodriguez"/>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-on-surface-variant uppercase mb-1" for="editUsername">Nom d'utilisateur</label>
+        <div class="relative">
+          <span class="absolute left-4 top-2.5 text-on-surface-variant font-semibold">@</span>
+          <input type="text" id="editUsername" class="w-full bg-surface-container border border-outline-variant/30 rounded-xl pl-8 pr-4 py-2.5 text-on-surface font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="elena_rod"/>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-sm">
+        <div class="col-span-1">
+          <label class="block text-xs font-bold text-on-surface-variant uppercase mb-1" for="editCountryCode">Code Pays</label>
+          <input type="text" id="editCountryCode" class="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-3 py-2.5 text-on-surface font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="+237"/>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-bold text-on-surface-variant uppercase mb-1" for="editPhoneNumber">Numéro de téléphone</label>
+          <input type="text" id="editPhoneNumber" class="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-2.5 text-on-surface font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="677123456"/>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-on-surface-variant uppercase mb-1" for="editCity">Ville</label>
+        <input type="text" id="editCity" class="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-2.5 text-on-surface font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Yaoundé"/>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-sm pt-xs">
+      <button id="cancelModalBtn" class="flex-1 py-3 border border-outline-variant/40 text-outline rounded-full font-bold text-sm hover:bg-surface-container active:scale-98 transition-all">Annuler</button>
+      <button id="saveProfileBtn" class="flex-1 py-3 bg-primary hover:bg-primary-container text-white rounded-full font-bold text-sm active:scale-98 transition-all">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <script>
     const modeToggle = document.getElementById('mode-toggle');
     const modeStatus = document.getElementById('mode-status');
@@ -288,12 +364,12 @@ Access your full log of missing and found child reports. Track and manage all ca
 
     modeToggle.addEventListener('change', (e) => {
       if(e.target.checked) {
-        modeStatus.innerText = 'I Can Help';
+        modeStatus.innerText = 'Prêt à aider';
         modeStatus.classList.remove('text-on-surface-variant');
         modeStatus.classList.add('text-primary');
         modeIcon.innerText = 'radar';
       } else {
-        modeStatus.innerText = 'Passive Mode';
+        modeStatus.innerText = 'Mode Passif';
         modeStatus.classList.remove('text-primary');
         modeStatus.classList.add('text-on-surface-variant');
         modeIcon.innerText = 'do_not_disturb_on';
@@ -309,7 +385,8 @@ Access your full log of missing and found child reports. Track and manage all ca
         btn.classList.remove('opacity-70');
       });
     });
-  </script>
+</script>
+
 <script type="importmap">
 {
   "imports": {
@@ -317,8 +394,42 @@ Access your full log of missing and found child reports. Track and manage all ca
   }
 }
 </script>
+
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
+import { reportService } from "./src/reportService.js";
+
+// Check session on load
+async function checkAuth() {
+    try {
+        if (localStorage.getItem('is_guest') === 'true') {
+            console.log("Guest mode active on Profile.");
+            return;
+        }
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            console.log("No active session. Redirecting to login...");
+            window.location.href = './login_child_safety.html';
+        } else {
+            await reportService.syncProfileWithSupabase();
+            renderProfileData();
+        }
+    } catch (err) {
+        console.error("Error checking auth session:", err);
+    }
+}
+checkAuth();
+
+// Listen for auth state changes
+supabase.auth.onAuthStateChange((event, session) => {
+    if (localStorage.getItem('is_guest') === 'true') {
+        return;
+    }
+    if (event === 'SIGNED_OUT' || !session) {
+        console.log("Signed out or session lost. Redirecting to login...");
+        window.location.href = './login_child_safety.html';
+    }
+});
 
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
@@ -334,5 +445,116 @@ if (logoutBtn) {
         }
     });
 }
+
+// Profile Editing Engine
+const profileAvatar = document.getElementById('profileAvatar');
+const profileName = document.getElementById('profileName');
+const profileRole = document.getElementById('profileRole');
+
+const detailUsername = document.getElementById('detailUsername');
+const detailPhone = document.getElementById('detailPhone');
+const detailCity = document.getElementById('detailCity');
+
+// Modal Elements
+const editProfileModal = document.getElementById('editProfileModal');
+const editProfileBtn = document.getElementById('editProfileBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const cancelModalBtn = document.getElementById('cancelModalBtn');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
+
+const modalAvatarPreview = document.getElementById('modalAvatarPreview');
+const modalAvatarInput = document.getElementById('modalAvatarInput');
+
+const editFullName = document.getElementById('editFullName');
+const editUsername = document.getElementById('editUsername');
+const editCountryCode = document.getElementById('editCountryCode');
+const editPhoneNumber = document.getElementById('editPhoneNumber');
+const editCity = document.getElementById('editCity');
+
+let currentProfilePhotoBase64 = "";
+
+function renderProfileData() {
+    const profile = reportService.getProfile();
+    
+    // Update view
+    if (profile.photo) profileAvatar.src = profile.photo;
+    if (profile.full_name) profileName.textContent = profile.full_name;
+    if (profile.role) profileRole.textContent = profile.role;
+    
+    if (profile.username) detailUsername.textContent = '@' + profile.username;
+    if (profile.phone_number) {
+        detailPhone.textContent = (profile.phone_country_code || '') + ' ' + profile.phone_number;
+    } else {
+        detailPhone.textContent = 'Non renseigné';
+    }
+    if (profile.city) detailCity.textContent = profile.city;
+    
+    // Populate Modal inputs
+    editFullName.value = profile.full_name || "";
+    editUsername.value = profile.username || "";
+    editCountryCode.value = profile.phone_country_code || "";
+    editPhoneNumber.value = profile.phone_number || "";
+    editCity.value = profile.city || "";
+    if (profile.photo) modalAvatarPreview.src = profile.photo;
+    currentProfilePhotoBase64 = profile.photo || "";
+}
+
+function openModal() {
+    renderProfileData();
+    editProfileModal.classList.remove('hidden');
+    // Force transition after microtask
+    setTimeout(() => {
+        editProfileModal.classList.remove('opacity-0');
+        editProfileModal.classList.add('opacity-100');
+    }, 10);
+}
+
+function closeModal() {
+    editProfileModal.classList.remove('opacity-100');
+    editProfileModal.classList.add('opacity-0');
+    setTimeout(() => {
+        editProfileModal.classList.add('hidden');
+    }, 300);
+}
+
+editProfileBtn.addEventListener('click', openModal);
+closeModalBtn.addEventListener('click', closeModal);
+cancelModalBtn.addEventListener('click', closeModal);
+
+// Handle file upload for profile photo
+modalAvatarInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            const base64 = evt.target.result;
+            currentProfilePhotoBase64 = base64;
+            modalAvatarPreview.src = base64;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Save Profile
+saveProfileBtn.addEventListener('click', () => {
+    const updated = {
+        full_name: editFullName.value.trim() || "Elena Rodriguez",
+        username: editUsername.value.trim().replace(/^@/, "") || "elena_rod",
+        phone_country_code: editCountryCode.value.trim() || "+237",
+        phone_number: editPhoneNumber.value.trim() || "677123456",
+        city: editCity.value.trim() || "Yaoundé",
+        photo: currentProfilePhotoBase64
+    };
+    
+    reportService.saveProfile(updated);
+    renderProfileData();
+    closeModal();
+});
+
+// Initial Render
+document.addEventListener('DOMContentLoaded', () => {
+    renderProfileData();
+});
+renderProfileData();
 </script>
 </body></html>

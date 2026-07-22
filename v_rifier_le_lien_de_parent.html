@@ -158,6 +158,12 @@
 <span class="material-symbols-outlined text-[16px]">verified</span>
                     Obligatoire
                 </h3>
+<!-- Error Banner -->
+<div id="errorBanner" class="hidden bg-error-container text-on-error-container p-md rounded-lg text-sm flex items-center gap-sm mb-md shadow-sm">
+    <span class="material-symbols-outlined text-[20px] text-error">error</span>
+    <span class="font-medium">Veuillez télécharger l'acte de naissance ou le document de tutelle avant de soumettre.</span>
+</div>
+
 <div class="space-y-md">
 <!-- Child Birth Certificate -->
 <div class="bg-surface-container-lowest p-lg rounded-lg custom-shadow border border-outline-variant/30">
@@ -168,11 +174,12 @@
 </div>
 <span class="bg-error-container text-on-error-container text-label-sm font-label-sm px-sm py-base rounded-full">Requis</span>
 </div>
-<div class="relative group border-2 border-dashed border-outline-variant rounded-lg p-xl flex flex-col items-center justify-center bg-surface-container-low/50 hover:bg-surface-container-low transition-all">
+<div id="birthCertificateContainer" class="relative group border-2 border-dashed border-outline-variant rounded-lg p-xl flex flex-col items-center justify-center bg-surface-container-low/50 hover:bg-surface-container-low transition-all">
 <span class="material-symbols-outlined text-primary text-[48px] mb-md opacity-60">upload_file</span>
-<button class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all">
+<button type="button" class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all pointer-events-none">
                                 Upload
                             </button>
+<input id="inputBirthCertificate" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
 </div>
 </div>
 <!-- School ID -->
@@ -202,11 +209,12 @@
 <p class="font-body-md text-body-md text-on-surface-variant">Décision de justice ou acte notarié</p>
 </div>
 </div>
-<div class="relative group border-2 border-dashed border-outline-variant rounded-lg p-xl flex flex-col items-center justify-center bg-surface-container-low/50 hover:bg-surface-container-low transition-all">
+<div id="guardianshipContainer" class="relative group border-2 border-dashed border-outline-variant rounded-lg p-xl flex flex-col items-center justify-center bg-surface-container-low/50 hover:bg-surface-container-low transition-all">
 <span class="material-symbols-outlined text-primary text-[48px] mb-md opacity-60">gavel</span>
-<button class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all">
+<button type="button" class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all pointer-events-none">
                                 Upload
                             </button>
+<input id="inputGuardianship" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
 </div>
 </div>
 </div>
@@ -241,7 +249,7 @@
 </div>
 <!-- Submit Button Section -->
 <div class="mt-xl mb-lg">
-<button class="w-full py-lg bg-primary text-on-primary rounded-xl font-headline-md text-headline-md shadow-lg shadow-primary/20 active:scale-[0.98] transition-all hover:opacity-90 flex items-center justify-center gap-md">
+<button id="btnSubmit" class="w-full py-lg bg-primary text-on-primary rounded-xl font-headline-md text-headline-md shadow-lg shadow-primary/20 active:scale-[0.98] transition-all hover:opacity-90 flex items-center justify-center gap-md">
                 Soumettre le signalement
                 <span class="material-symbols-outlined">send</span>
 </button>
@@ -253,38 +261,218 @@
 <span class="material-symbols-outlined">chevron_left</span>
 <span class="font-label-bold text-label-bold">Previous</span>
 </button>
-<button class="flex flex-col items-center justify-center bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container rounded-full px-lg py-sm hover:opacity-90 active:scale-98 transition-all duration-200" onclick="window.location.href='./report_under_review_missing_child.html'">
+<button id="btnContinue" class="flex flex-col items-center justify-center bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container rounded-full px-lg py-sm hover:opacity-90 active:scale-98 transition-all duration-200">
 <span class="material-symbols-outlined">chevron_right</span>
 <span class="font-label-bold text-label-bold">Continue</span>
 </button>
 </nav>
-<script>
-        // Micro-interaction for upload areas
-        document.querySelectorAll('.border-dashed').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                el.classList.add('border-primary');
-                el.classList.remove('border-outline-variant');
-            });
-            el.addEventListener('mouseleave', () => {
-                el.classList.remove('border-primary');
-                el.classList.add('border-outline-variant');
-            });
-        });
+<script type="module">
+import { reportService } from './src/reportService.js';
 
-        // Simulating form submission
-        document.querySelector('.bg-primary.py-lg').addEventListener('click', function() {
-            const btn = this;
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Traitement en cours...';
-            btn.style.opacity = "0.7";
-            
-            setTimeout(() => {
-                btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Signalement Envoyé';
-                btn.classList.replace('bg-primary', 'bg-green-600');
-                setTimeout(() => {
-                    window.location.href = './report_under_review_missing_child.html';
-                }, 1000);
-            }, 1500);
+document.addEventListener('DOMContentLoaded', () => {
+    // Micro-interaction for upload areas
+    document.querySelectorAll('.border-dashed').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            el.classList.add('border-primary');
+            el.classList.remove('border-outline-variant');
         });
-    </script>
+        el.addEventListener('mouseleave', () => {
+            el.classList.remove('border-primary');
+            el.classList.add('border-outline-variant');
+        });
+    });
+
+    const submitBtn = document.getElementById('btnSubmit');
+    const continueBtn = document.getElementById('btnContinue');
+    const errorBanner = document.getElementById('errorBanner');
+    const inputBC = document.getElementById('inputBirthCertificate');
+    const inputGuard = document.getElementById('inputGuardianship');
+    const bcContainer = document.getElementById('birthCertificateContainer');
+    const guardContainer = document.getElementById('guardianshipContainer');
+
+    let uploadedBC = null;
+    let uploadedGuard = null;
+
+    if (inputBC) {
+        inputBC.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                uploadedBC = e.target.files[0];
+                errorBanner.classList.add('hidden');
+                bcContainer.innerHTML = `
+                    <div class="flex items-center gap-md p-md w-full bg-primary/5 rounded-lg border border-primary/20">
+                        <span class="material-symbols-outlined text-primary text-[32px]">verified</span>
+                        <div class="flex-grow text-left">
+                            <p class="font-label-bold text-label-bold text-on-surface text-[14px] truncate max-w-[180px]">${uploadedBC.name}</p>
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">${(uploadedBC.size / 1024).toFixed(1)} KB • Téléchargé</p>
+                        </div>
+                        <button type="button" id="btnRemoveBC" class="text-error font-label-bold text-label-bold hover:underline text-[12px]">Retirer</button>
+                    </div>
+                `;
+                document.getElementById('btnRemoveBC').addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    uploadedBC = null;
+                    resetBCContainer();
+                });
+            }
+        });
+    }
+
+    function resetBCContainer() {
+        bcContainer.innerHTML = `
+            <span class="material-symbols-outlined text-primary text-[48px] mb-md opacity-60">upload_file</span>
+            <button type="button" class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all pointer-events-none">
+                Upload
+            </button>
+            <input id="inputBirthCertificate" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
+        `;
+        // Rebind listener
+        const newBC = document.getElementById('inputBirthCertificate');
+        newBC.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                uploadedBC = e.target.files[0];
+                errorBanner.classList.add('hidden');
+                bcContainer.innerHTML = `
+                    <div class="flex items-center gap-md p-md w-full bg-primary/5 rounded-lg border border-primary/20">
+                        <span class="material-symbols-outlined text-primary text-[32px]">verified</span>
+                        <div class="flex-grow text-left">
+                            <p class="font-label-bold text-label-bold text-on-surface text-[14px] truncate max-w-[180px]">${uploadedBC.name}</p>
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">${(uploadedBC.size / 1024).toFixed(1)} KB • Téléchargé</p>
+                        </div>
+                        <button type="button" id="btnRemoveBC" class="text-error font-label-bold text-label-bold hover:underline text-[12px]">Retirer</button>
+                    </div>
+                `;
+                document.getElementById('btnRemoveBC').addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    uploadedBC = null;
+                    resetBCContainer();
+                });
+            }
+        });
+    }
+
+    if (inputGuard) {
+        inputGuard.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                uploadedGuard = e.target.files[0];
+                errorBanner.classList.add('hidden');
+                guardContainer.innerHTML = `
+                    <div class="flex items-center gap-md p-md w-full bg-primary/5 rounded-lg border border-primary/20">
+                        <span class="material-symbols-outlined text-primary text-[32px]">gavel</span>
+                        <div class="flex-grow text-left">
+                            <p class="font-label-bold text-label-bold text-on-surface text-[14px] truncate max-w-[180px]">${uploadedGuard.name}</p>
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">${(uploadedGuard.size / 1024).toFixed(1)} KB • Téléchargé</p>
+                        </div>
+                        <button type="button" id="btnRemoveGuard" class="text-error font-label-bold text-label-bold hover:underline text-[12px]">Retirer</button>
+                    </div>
+                `;
+                document.getElementById('btnRemoveGuard').addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    uploadedGuard = null;
+                    resetGuardContainer();
+                });
+            }
+        });
+    }
+
+    function resetGuardContainer() {
+        guardContainer.innerHTML = `
+            <span class="material-symbols-outlined text-primary text-[48px] mb-md opacity-60">gavel</span>
+            <button type="button" class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all pointer-events-none">
+                Upload
+            </button>
+            <input id="inputGuardianship" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
+        `;
+        // Rebind listener
+        const newGuard = document.getElementById('inputGuardianship');
+        newGuard.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                uploadedGuard = e.target.files[0];
+                errorBanner.classList.add('hidden');
+                guardContainer.innerHTML = `
+                    <div class="flex items-center gap-md p-md w-full bg-primary/5 rounded-lg border border-primary/20">
+                        <span class="material-symbols-outlined text-primary text-[32px]">gavel</span>
+                        <div class="flex-grow text-left">
+                            <p class="font-label-bold text-label-bold text-on-surface text-[14px] truncate max-w-[180px]">${uploadedGuard.name}</p>
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">${(uploadedGuard.size / 1024).toFixed(1)} KB • Téléchargé</p>
+                        </div>
+                        <button type="button" id="btnRemoveGuard" class="text-error font-label-bold text-label-bold hover:underline text-[12px]">Retirer</button>
+                    </div>
+                `;
+                document.getElementById('btnRemoveGuard').addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    uploadedGuard = null;
+                    resetGuardContainer();
+                });
+            }
+        });
+    }
+
+    function handleSubmit(btn) {
+        if (!uploadedBC && !uploadedGuard) {
+            errorBanner.classList.remove('hidden');
+            errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Traitement en cours...';
+        btn.style.opacity = "0.7";
+
+        // Retrieve step 1 data
+        const pendingDataStr = sessionStorage.getItem('pending_report_data');
+        const pendingPhoto = sessionStorage.getItem('pending_report_photo');
+
+        let parsedData = {};
+        if (pendingDataStr) {
+            try {
+                parsedData = JSON.parse(pendingDataStr);
+            } catch(e) {}
+        }
+
+        const defaultPhoto = (parsedData.gender === 'fille' || parsedData.gender === 'f')
+            ? 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&q=80&w=500'
+            : 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&q=80&w=500';
+
+        const finalReport = {
+            name: parsedData.name || "Enfant Inconnu",
+            age: parsedData.age || 8,
+            gender: parsedData.gender || "garcon",
+            height: parsedData.height || "1m20",
+            location: parsedData.location || "Yaoundé, Centre",
+            date: parsedData.date || new Date().toISOString().split('T')[0],
+            time: parsedData.time || "12:00",
+            physicalDescription: parsedData.physicalDescription || "Teint noir, cheveux courts.",
+            clothingDescription: parsedData.clothingDescription || "Non spécifié.",
+            relationship: parsedData.relationship || "mere",
+            notes: parsedData.notes || "",
+            photo: pendingPhoto || defaultPhoto
+        };
+
+        // Call the report service to save locally (in Published status as required)
+        const savedReport = reportService.createMissingReport(finalReport);
+        console.log("Saved missing report:", savedReport);
+
+        // Clear pending session data
+        sessionStorage.removeItem('pending_report_data');
+        sessionStorage.removeItem('pending_report_photo');
+
+        setTimeout(() => {
+            btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Signalement Envoyé';
+            if (btn.classList.contains('bg-primary')) {
+                btn.classList.replace('bg-primary', 'bg-green-600');
+            }
+            setTimeout(() => {
+                window.location.href = './report_under_review_missing_child.html';
+            }, 1000);
+        }, 1500);
+    }
+
+    if (submitBtn) {
+        submitBtn.addEventListener('click', () => handleSubmit(submitBtn));
+    }
+    if (continueBtn) {
+        continueBtn.addEventListener('click', () => handleSubmit(continueBtn));
+    }
+});
+</script>
 </body></html>

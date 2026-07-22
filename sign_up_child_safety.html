@@ -133,8 +133,8 @@
 <div class="w-16 h-16 bg-primary-container rounded-lg flex items-center justify-center mb-md soft-glow">
 <span class="material-symbols-outlined text-on-primary-container text-[32px]" data-icon="security">security</span>
 </div>
-<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Create Account</h1>
-<p class="font-body-md text-on-surface-variant mt-xs">Join our secure safety network for children.</p>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Créer un compte</h1>
+<p class="font-body-md text-on-surface-variant mt-xs">Rejoignez notre réseau sécurisé pour la protection des enfants.</p>
 </div>
 <!-- Main Signup Card -->
 <div class="bg-surface-container-lowest rounded-lg p-lg md:p-xl soft-glow relative overflow-hidden">
@@ -148,7 +148,7 @@
 </div>
 <!-- Full Name -->
 <div class="space-y-xs">
-<label class="font-label-bold text-on-surface-variant px-1" for="fullname">Full Name</label>
+<label class="font-label-bold text-on-surface-variant px-1" for="fullname">Nom complet</label>
 <div class="relative">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" data-icon="person">person</span>
 <input class="w-full h-12 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-full font-body-md text-on-surface form-input transition-all duration-200" id="fullname" placeholder="TECHMAN" type="text"/>
@@ -156,15 +156,15 @@
 </div>
 <!-- Email -->
 <div class="space-y-xs">
-<label class="font-label-bold text-on-surface-variant px-1" for="email">Email Address</label>
+<label class="font-label-bold text-on-surface-variant px-1" for="email">Adresse e-mail</label>
 <div class="relative">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" data-icon="mail">mail</span>
-<input class="w-full h-12 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-full font-body-md text-on-surface form-input transition-all duration-200" id="email" placeholder="name@example.com" type="email"/>
+<input class="w-full h-12 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-full font-body-md text-on-surface form-input transition-all duration-200" id="email" placeholder="nom@example.com" type="email"/>
 </div>
 </div>
 <!-- Password -->
 <div class="space-y-xs">
-<label class="font-label-bold text-on-surface-variant px-1" for="password">Password</label>
+<label class="font-label-bold text-on-surface-variant px-1" for="password">Mot de passe</label>
 <div class="relative">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" data-icon="lock">lock</span>
 <input class="w-full h-12 pl-12 pr-12 bg-surface-container-lowest border border-outline-variant rounded-full font-body-md text-on-surface form-input transition-all duration-200" id="password" placeholder="••••••••" type="password"/>
@@ -174,26 +174,26 @@
 </div>
 </div>
 <!-- Terms & Conditions -->
-<div class="flex items-center gap-3 p-3.5 rounded-2xl bg-surface-container-low/40 border border-outline-variant/30 hover:bg-surface-container-low/60 transition-all duration-200" id="terms-container">
-<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer flex-shrink-0 accent-primary" id="terms" type="checkbox"/>
-<label class="font-body-md text-on-surface-variant leading-relaxed cursor-pointer text-[13px] select-none flex-1 text-left" for="terms">
-I agree to the <a class="text-primary font-bold hover:underline" href="./privacy_settings.html">Terms of Service</a> and <a class="text-primary font-bold hover:underline" href="./privacy_settings.html">Privacy Policy</a> regarding child safety.
+<div class="flex items-start gap-3 py-1.5 px-0.5" id="terms-container">
+<input class="w-4 h-4 mt-0.5 rounded border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer flex-shrink-0 accent-primary" id="terms" type="checkbox"/>
+<label class="font-body-md text-on-surface-variant leading-relaxed cursor-pointer text-[13.5px] select-none flex-1 text-left" for="terms">
+J'accepte les <a class="text-primary font-bold hover:underline" href="./privacy_settings.html">Conditions d'utilisation</a> et la <a class="text-primary font-bold hover:underline" href="./privacy_settings.html">Politique de confidentialité</a> relatives à la sécurité des enfants.
 </label>
 </div>
 <!-- Primary Action -->
 <button id="submitBtn" class="w-full h-14 bg-primary text-on-primary font-headline-md rounded-full shadow-lg shadow-primary/20 hover:bg-primary-container active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-xs" type="submit">
-<span id="btnText">Create Account</span>
+<span id="btnText">Créer un compte</span>
 <span class="material-symbols-outlined" data-icon="arrow_forward" id="btnIcon">arrow_forward</span>
 </button>
 <!-- Divider -->
 <div class="relative flex items-center py-sm">
 <div class="flex-grow border-t border-outline-variant"></div>
-<span class="flex-shrink mx-4 font-label-sm text-outline">OR SIGN UP WITH</span>
+<span class="flex-shrink mx-4 font-label-sm text-outline">OU S'INSCRIRE AVEC</span>
 <div class="flex-grow border-t border-outline-variant"></div>
 </div>
 <!-- Social Options -->
 <div class="flex flex-col">
-<button class="flex items-center justify-center gap-sm h-12 w-full border border-outline-variant rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-150" type="button">
+<button id="googleBtn" class="flex items-center justify-center gap-sm h-12 w-full border border-outline-variant rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-150" type="button">
 <img alt="" class="w-5 h-5" data-alt="Official Google logo icon with vibrant four-color palette of red, yellow, green, and blue, presented in a clean minimalist vector style against a transparent background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXIwjbuw9-mp5q5wkp1Am3651RSVhLo8Jdhuh5gA2RhOVMVjAPPC0KD4EK97x-e8AHO2s56_9hu2KqXzofpokpbN6PeNBwjMpGznPtKeIYozTZr0e_DZXAEj8KmkyssaquYqWOW1BJ1Nuzua1Dwfra7MTpNIzGEF6YzHoV2Yfp2U5bcZL5HPAaHCL4TnZSlf4oFv2k8spxKJBZaShiumADVD6R5UCq1mvioiEI96d1U22DeuwetLAVrZ5GKWJgGTkcCd8MxnyvRMEJ"/>
 <span class="font-label-bold">Google</span>
 </button>
@@ -201,10 +201,18 @@ I agree to the <a class="text-primary font-bold hover:underline" href="./privacy
 </form>
 </div>
 <!-- Footer Link -->
-<p class="text-center mt-lg text-sm text-on-surface-variant font-medium">
-            Already have an account? 
-            <a class="text-primary font-bold hover:underline transition-all ml-xs" href="./login_child_safety.html">Sign In</a>
-</p>
+<div class="text-center mt-lg space-y-md">
+    <p class="text-sm text-on-surface-variant font-medium">
+        Vous avez déjà un compte ? 
+        <a class="text-primary font-bold hover:underline transition-all ml-xs" href="./login_child_safety.html">Se connecter</a>
+    </p>
+    <div class="pt-2 border-t border-outline-variant/20">
+        <button id="btnGuest" type="button" class="inline-flex items-center justify-center px-lg py-2 border border-primary/30 text-primary hover:bg-primary/5 rounded-full font-label-bold text-label-bold transition-all active:scale-95 duration-150">
+            <span class="material-symbols-outlined mr-xs text-[18px]">gavel</span>
+            <span>Visiter en tant qu'invité</span>
+        </button>
+    </div>
+</div>
 <!-- Aesthetic Backdrop Elements (Purely visual) -->
 <div class="fixed top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10 animate-pulse"></div>
 <div class="fixed bottom-20 right-10 w-96 h-96 bg-tertiary-container/5 rounded-full blur-3xl -z-10"></div>
@@ -254,16 +262,47 @@ const errorText = document.getElementById('errorText');
 const submitBtn = document.getElementById('submitBtn');
 const btnText = document.getElementById('btnText');
 const btnIcon = document.getElementById('btnIcon');
+const googleBtn = document.getElementById('googleBtn');
 
-// Check if user is already signed in on load
-async function checkCurrentSession() {
-    const { data } = await supabase.auth.getSession();
-    if (data && data.session) {
-        console.log("Already signed in, redirecting to Home...");
+if (googleBtn) {
+    googleBtn.addEventListener('click', async () => {
+        errorMsg.classList.add('hidden');
+        errorText.textContent = '';
+        try {
+            console.log("Initiating Google Sign-Up via Supabase...");
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin + '/'
+                }
+            });
+            if (error) {
+                showError("Google Sign-Up failed: " + error.message);
+            }
+        } catch (err) {
+            console.error("Google sign up error:", err);
+            showError("An unexpected error occurred during Google Sign-Up.");
+        }
+    });
+}
+
+// Check session and listen to auth state changes
+supabase.auth.onAuthStateChange((event, session) => {
+    if (session) {
+        console.log("Session active (event: " + event + "). Redirecting to Home...");
+        localStorage.setItem('is_guest', 'false');
         window.location.href = './home_child_safety_v1.html';
     }
+});
+
+const btnGuest = document.getElementById('btnGuest');
+if (btnGuest) {
+    btnGuest.addEventListener('click', () => {
+        localStorage.setItem('is_guest', 'true');
+        sessionStorage.setItem('childSafetyAccountType', 'Guest');
+        window.location.href = './home_child_safety_v1.html';
+    });
 }
-checkCurrentSession();
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -279,23 +318,23 @@ form.addEventListener('submit', async (e) => {
     
     // Validation
     if (!fullname) {
-        showError('Please enter your full name.');
+        showError('Veuillez saisir votre nom complet.');
         return;
     }
     if (!email) {
-        showError('Please enter your email address.');
+        showError('Veuillez saisir votre adresse e-mail.');
         return;
     }
     if (!password) {
-        showError('Please enter a password.');
+        showError('Veuillez saisir un mot de passe.');
         return;
     }
     if (password.length < 6) {
-        showError('Password must be at least 6 characters long.');
+        showError('Le mot de passe doit contenir au moins 6 caractères.');
         return;
     }
     if (!terms) {
-        showError('You must agree to the Terms of Service and Privacy Policy.');
+        showError('Vous devez accepter les Conditions d\'utilisation et la Politique de confidentialité.');
         return;
     }
     
@@ -303,110 +342,20 @@ form.addEventListener('submit', async (e) => {
     setLoading(true);
     
     try {
-        // 2. Create the authentication account
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password
-        });
+        // Store values temporarily in sessionStorage
+        sessionStorage.setItem('signup_fullname', fullname);
+        sessionStorage.setItem('signup_email', email);
+        sessionStorage.setItem('signup_password', password);
+        sessionStorage.setItem('signup_terms_accepted', 'true');
         
-        if (error) {
-            let msg = error.message;
-            if (msg && msg.toLowerCase().includes('rate limit')) {
-                msg = "We've recently sent a confirmation email. Please wait a few minutes before requesting another one.";
-            }
-            showError(msg);
-            setLoading(false);
-            return;
-        }
-        
-        const user = data?.user;
-        if (!user) {
-            showError('Sign up failed. Please try again.');
-            setLoading(false);
-            return;
-        }
-        
-        // 3. Insert a new row into profiles
-        const profilePayload = {
-            user_id: user.id,
-            full_name: fullname,
-            username: email.split('@')[0] + Math.floor(Math.random() * 1000),
-            email,
-            phone_country_code: '',
-            phone_number: '',
-            city: '',
-            role: 'Guardian', // Valid capitalized enum value
-            terms_accepted: terms
-            // Note: community_mode column is omitted to let the database apply its default enum value safely
-        };
-
-        // Type safety validation before insertion
-        if (typeof profilePayload.user_id !== 'string' || profilePayload.user_id.length !== 36) {
-            throw new Error('Invalid user_id type or length for profile insert.');
-        }
-        if (typeof profilePayload.full_name !== 'string' || !profilePayload.full_name) {
-            throw new Error('Invalid full_name type or value for profile insert.');
-        }
-        if (typeof profilePayload.username !== 'string' || !profilePayload.username) {
-            throw new Error('Invalid username type or value for profile insert.');
-        }
-        if (typeof profilePayload.email !== 'string' || !profilePayload.email) {
-            throw new Error('Invalid email type or value for profile insert.');
-        }
-        if (profilePayload.role !== 'Guardian') {
-            throw new Error('Invalid user role enum constraint.');
-        }
-        if (typeof profilePayload.terms_accepted !== 'boolean') {
-            throw new Error('Invalid terms_accepted type for profile insert.');
-        }
-
-        const { error: profileError } = await supabase
-            .from('profiles')
-            .insert([profilePayload]);
-            
-        if (profileError) {
-            console.error('Profile insertion error:', profileError);
-            
-            // 4. Rollback Auth to prevent orphan accounts
-            console.log('Profile setup failed. Rolling back created Auth user...');
-            try {
-                const { data: sessionData } = await supabase.auth.getSession();
-                const token = sessionData?.session?.access_token;
-                if (token) {
-                    const supabaseUrl = supabase.supabaseUrl || "https://ifpbdythbhlgqymsaxtz.supabase.co";
-                    const supabaseKey = supabase.supabaseKey || "sb_publishable_ZFWamWb5cIOB2XastpKLhg_Xpm47wPV";
-                    const deleteRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
-                        method: 'DELETE',
-                        headers: {
-                            'apikey': supabaseKey,
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    if (deleteRes.ok) {
-                        console.log('Successfully rolled back newly created auth user account.');
-                    } else {
-                        console.error('Failed to delete auth user during rollback:', await deleteRes.text());
-                    }
-                }
-            } catch (deleteErr) {
-                console.error('Error during auth user rollback:', deleteErr);
-            }
-            
-            // Clear session by signing out
-            await supabase.auth.signOut();
-
-            showError(`Account created, but profile setup failed: ${profileError.message}. The account was rolled back to prevent inconsistent data. Please try again.`);
-            setLoading(false);
-            return;
-        }
-        
-        // 5. Success redirect to "/"
-        console.log('Successfully registered and created profile! Redirecting...');
-        window.location.href = '/';
+        console.log('Step 1 complete. Temporarily saved fields. Navigating to Step 2...');
+        setTimeout(() => {
+            window.location.href = './account_type_selection_updated_flow.html';
+        }, 500);
         
     } catch (err) {
-        console.error('Unexpected sign up error:', err);
-        showError(err.message || 'An unexpected error occurred during signup.');
+        console.error('Unexpected storage error:', err);
+        showError(err.message || 'An unexpected error occurred during state preservation.');
         setLoading(false);
     }
 });
@@ -420,12 +369,12 @@ function showError(msg) {
 function setLoading(isLoading) {
     if (isLoading) {
         submitBtn.disabled = true;
-        btnText.textContent = 'Creating Account...';
+        btnText.textContent = 'Création du compte...';
         btnIcon.textContent = 'pending';
         btnIcon.classList.add('animate-spin');
     } else {
         submitBtn.disabled = false;
-        btnText.textContent = 'Create Account';
+        btnText.textContent = 'Créer un compte';
         btnIcon.textContent = 'arrow_forward';
         btnIcon.classList.remove('animate-spin');
     }

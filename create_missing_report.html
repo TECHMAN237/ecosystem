@@ -276,11 +276,102 @@
 <!-- Fixed Bottom Action Area -->
 <div class="fixed bottom-0 left-0 w-full bg-surface-container-lowest border-t border-surface-container p-container-margin shadow-[0px_-4px_20px_rgba(108,77,255,0.06)] z-50">
 <div class="max-w-md mx-auto">
-<button class="w-full h-12 bg-primary text-on-primary rounded-full font-label-bold text-label-bold flex items-center justify-center hover:bg-surface-tint transition-colors active:scale-[0.98]" type="button" onclick="window.location.href='./v_rifier_le_lien_de_parent.html'">
+<button id="btnNext" class="w-full h-12 bg-primary text-on-primary rounded-full font-label-bold text-label-bold flex items-center justify-center hover:bg-surface-tint transition-colors active:scale-[0.98]" type="button">
                 Suivant
                 <span class="material-symbols-outlined ml-2" style="font-size: 20px;">arrow_forward</span>
 </button>
 </div>
 </div>
 <!-- Navigation Suppressed as per instructions for transactional/task-focused pages -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.querySelector('input[type="file"]');
+    const uploadArea = fileInput.closest('.border-dashed');
+    const fullNameInput = document.getElementById('fullName');
+    const ageInput = document.getElementById('age');
+    const genderSelect = document.getElementById('gender');
+    const heightInput = document.getElementById('height');
+    const btnNext = document.getElementById('btnNext');
+
+    // Handle photo selection & conversion to base64 for persistent preview
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const base64 = evt.target.result;
+                sessionStorage.setItem('pending_report_photo', base64);
+                
+                // Update upload area UI to show preview
+                uploadArea.innerHTML = `
+                    <div class="absolute inset-0 w-full h-full">
+                        <img src="${base64}" class="w-full h-full object-cover" />
+                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                            <span class="text-white font-label-bold text-label-bold">Changer la photo</span>
+                        </div>
+                    </div>
+                    <input accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
+                `;
+                // Re-bind change event to the newly generated file input
+                uploadArea.querySelector('input[type="file"]').addEventListener('change', arguments.callee);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Restore any existing data if back button was clicked
+    const existingPhoto = sessionStorage.getItem('pending_report_photo');
+    if (existingPhoto) {
+        uploadArea.innerHTML = `
+            <div class="absolute inset-0 w-full h-full">
+                <img src="${existingPhoto}" class="w-full h-full object-cover" />
+                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                    <span class="text-white font-label-bold text-label-bold">Changer la photo</span>
+                </div>
+            </div>
+            <input accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
+        `;
+        uploadArea.querySelector('input[type="file"]').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const base64 = evt.target.result;
+                    sessionStorage.setItem('pending_report_photo', base64);
+                    location.reload();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    const existingDataStr = sessionStorage.getItem('pending_report_data');
+    if (existingDataStr) {
+        try {
+            const existingData = JSON.parse(existingDataStr);
+            if (existingData.name) fullNameInput.value = existingData.name;
+            if (existingData.age) ageInput.value = existingData.age;
+            if (existingData.gender) genderSelect.value = existingData.gender;
+            if (existingData.height) heightInput.value = existingData.height;
+        } catch(e) {}
+    }
+
+    // Save on next click
+    btnNext.addEventListener('click', () => {
+        const name = fullNameInput.value.trim() || "Anonyme";
+        const age = parseInt(ageInput.value) || 8;
+        const gender = genderSelect.value || "garcon";
+        const height = heightInput.value.trim() || "1m20";
+
+        sessionStorage.setItem('pending_report_data', JSON.stringify({
+            name,
+            age,
+            gender,
+            height
+        }));
+
+        window.location.href = './v_rifier_le_lien_de_parent.html';
+    });
+});
+</script>
 </body></html>

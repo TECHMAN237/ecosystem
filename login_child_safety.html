@@ -149,8 +149,8 @@
 <!-- Login Container -->
 <div class="w-full max-w-[420px] glass-card rounded-xl p-xl shadow-[0px_4px_20px_rgba(108,77,255,0.06)] flex flex-col">
 <header class="mb-xl">
-<h2 class="font-display text-display mb-xs">Welcome Back</h2>
-<p class="text-on-surface-variant font-body-md">Log in to keep your children protected and connected.</p>
+<h2 class="font-display text-display mb-xs">Bon retour</h2>
+<p class="text-on-surface-variant font-body-md">Connectez-vous pour protéger vos enfants et rester connecté.</p>
 </header>
 <!-- Form Elements -->
 <form id="loginForm" class="space-y-lg">
@@ -161,17 +161,17 @@
 </div>
 <!-- Email Field -->
 <div class="space-y-xs group">
-<label class="font-label-bold text-label-bold text-on-surface-variant ml-base" for="email">Email Address</label>
+<label class="font-label-bold text-label-bold text-on-surface-variant ml-base" for="email">Adresse e-mail</label>
 <div class="relative flex items-center input-glow rounded-lg">
 <span class="material-symbols-outlined absolute left-md text-outline">mail</span>
-<input class="w-full h-12 pl-[52px] pr-md bg-surface-container-lowest border-outline-variant border rounded-lg focus:border-primary focus:ring-0 transition-all outline-none text-body-md" id="email" name="email" placeholder="name@example.com" type="email"/>
+<input class="w-full h-12 pl-[52px] pr-md bg-surface-container-lowest border-outline-variant border rounded-lg focus:border-primary focus:ring-0 transition-all outline-none text-body-md" id="email" name="email" placeholder="nom@example.com" type="email"/>
 </div>
 </div>
 <!-- Password Field -->
 <div class="space-y-xs group">
 <div class="flex justify-between items-center px-base">
-<label class="font-label-bold text-label-bold text-on-surface-variant" for="password">Password</label>
-<a class="text-primary font-label-bold text-label-bold hover:underline" href="./home_child_safety_v1.html">Forgot Password?</a>
+<label class="font-label-bold text-label-bold text-on-surface-variant" for="password">Mot de passe</label>
+<a class="text-primary font-label-bold text-label-bold hover:underline" href="./forgot_password.html">Mot de passe oublié ?</a>
 </div>
 <div class="relative flex items-center input-glow rounded-lg">
 <span class="material-symbols-outlined absolute left-md text-outline">lock</span>
@@ -183,18 +183,18 @@
 </div>
 <!-- Sign In Button -->
 <button id="submitBtn" class="w-full h-14 bg-primary text-on-primary font-headline-md text-headline-md rounded-full shadow-[0px_4px_12px_rgba(83,44,230,0.24)] hover:shadow-[0px_8px_20px_rgba(83,44,230,0.32)] active:scale-95 transition-all duration-200" type="submit">
-                <span id="btnText">Sign In</span>
+                <span id="btnText">Se connecter</span>
             </button>
 </form>
 <!-- Divider -->
 <div class="flex items-center my-xl">
 <div class="flex-grow h-[1px] bg-outline-variant"></div>
-<span class="px-md text-label-sm text-on-surface-variant font-medium">OR CONTINUE WITH</span>
+<span class="px-md text-label-sm text-on-surface-variant font-medium">OU CONTINUER AVEC</span>
 <div class="flex-grow h-[1px] bg-outline-variant"></div>
 </div>
 <!-- Social Logins -->
 <div class="flex flex-col">
-<button class="flex items-center justify-center h-12 w-full bg-surface-container-lowest border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors active:scale-95">
+<button id="googleBtn" class="flex items-center justify-center h-12 w-full bg-surface-container-lowest border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors active:scale-95" type="button">
 <img alt="Google Logo" class="w-5 h-5 mr-xs" data-alt="A clean, isolated Google logo icon with its signature primary colors on a white background, representing modern digital authentication and security." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvkjOOLpdvndRY9jv_Yc6UGTeCRGjDmVjaHfP0FgrzJzZYcRcqXI5FSxeyuJ8CH-paKR1EO9T3K5fAIUQwneV6QTYmy99ud72D1PAkH60o9x677_zXjnZYNaLfqQtXOKTyq5vHtvHssgr33Z4btbrqOwdMGYdaEzAFqQ9tgHG7lKlTmCA4F7A86apLWMNqU6GDzV0txMATkheKJC_sAzDd87uIaiekdqBfejaPN5RyqFCmujkHrqbtLr0k3tv-AuTl-jjqKOD_Y0cL"/>
 <span class="font-label-bold text-label-bold">Google</span>
 </button>
@@ -203,13 +203,13 @@
 <!-- Footer Redirect -->
 <div class="mt-md text-center">
 <p class="font-body-md text-on-surface-variant">
-            <a class="text-primary font-label-bold text-label-bold hover:underline" href="./home_child_safety_v1.html">Continue as Guest</a>
+            <a class="text-primary font-label-bold text-label-bold hover:underline" href="./home_child_safety_v1.html" onclick="localStorage.setItem('is_guest', 'true'); sessionStorage.setItem('childSafetyAccountType', 'Guest');">Continuer en tant qu'invité</a>
 </p>
 </div>
 <div class="mt-lg text-center">
 <p class="font-body-md text-on-surface-variant">
-            Don't have an account? 
-            <a class="text-primary font-label-bold text-label-bold hover:underline ml-xs" href="./sign_up_child_safety.html">Create Account</a>
+            Vous n'avez pas de compte ? 
+            <a class="text-primary font-label-bold text-label-bold hover:underline ml-xs" href="./sign_up_child_safety.html">Créer un compte</a>
 </p>
 </div>
 <!-- Illustration Background Decorative (Optional for trust) -->
@@ -260,16 +260,38 @@ const errorMsg = document.getElementById('errorMsg');
 const errorText = document.getElementById('errorText');
 const submitBtn = document.getElementById('submitBtn');
 const btnText = document.getElementById('btnText');
+const googleBtn = document.getElementById('googleBtn');
 
-// Check session on load
-async function checkCurrentSession() {
-    const { data } = await supabase.auth.getSession();
-    if (data && data.session) {
-        console.log("Session exists! Redirecting to Home...");
+if (googleBtn) {
+    googleBtn.addEventListener('click', async () => {
+        errorMsg.classList.add('hidden');
+        errorText.textContent = '';
+        try {
+            console.log("Initiating Google Sign-In via Supabase...");
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin + '/'
+                }
+            });
+            if (error) {
+                showError("Google Sign-In failed: " + error.message);
+            }
+        } catch (err) {
+            console.error("Google login error:", err);
+            showError("An unexpected error occurred during Google Sign-In.");
+        }
+    });
+}
+
+// Check session and listen to auth state changes
+supabase.auth.onAuthStateChange((event, session) => {
+    if (session) {
+        console.log("Session active (event: " + event + "). Redirecting to Home...");
+        localStorage.setItem('is_guest', 'false');
         window.location.href = './home_child_safety_v1.html';
     }
-}
-checkCurrentSession();
+});
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -282,11 +304,11 @@ form.addEventListener('submit', async (e) => {
     const password = document.getElementById('password').value;
     
     if (!email) {
-        showError('Please enter your email address.');
+        showError('Veuillez saisir votre adresse e-mail.');
         return;
     }
     if (!password) {
-        showError('Please enter your password.');
+        showError('Veuillez saisir votre mot de passe.');
         return;
     }
     
@@ -301,7 +323,7 @@ form.addEventListener('submit', async (e) => {
         if (error) {
             // Requirement error message:
             // "This account does not exist or the password is incorrect. Please create a new account or try again."
-            showError("This account does not exist or the password is incorrect. Please create a new account or try again.");
+            showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez créer un nouveau compte ou réessayer.");
             setLoading(false);
             return;
         }
@@ -310,7 +332,7 @@ form.addEventListener('submit', async (e) => {
         window.location.href = '/';
     } catch (err) {
         console.error('Unexpected login error:', err);
-        showError("This account does not exist or the password is incorrect. Please create a new account or try again.");
+        showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez créer un nouveau compte ou réessayer.");
         setLoading(false);
     }
 });
@@ -324,10 +346,10 @@ function showError(msg) {
 function setLoading(isLoading) {
     if (isLoading) {
         submitBtn.disabled = true;
-        btnText.textContent = 'Signing In...';
+        btnText.textContent = 'Connexion...';
     } else {
         submitBtn.disabled = false;
-        btnText.textContent = 'Sign In';
+        btnText.textContent = 'Se connecter';
     }
 }
 </script>
