@@ -118,32 +118,6 @@
 </head>
 <body class="bg-background text-on-background font-body-lg antialiased pb-[100px] md:pb-0">
 
-<!-- Desktop Sidebar Navigation (Hidden on mobile) -->
-<aside class="hidden md:flex flex-col fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest shadow-[4px_0_24px_rgba(108,77,255,0.06)] z-40 pt-8 border-r border-outline-variant/15">
-    <div class="flex items-center gap-3 px-8 mb-12 text-primary font-headline-lg text-headline-lg font-bold tracking-tight">
-        <span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">security</span>
-        <span>Child Safety</span>
-    </div>
-    <nav class="flex flex-col gap-2 px-4">
-        <a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors font-label-bold" href="./home_child_safety_v1.html">
-            <span class="material-symbols-outlined">home</span>
-            Home
-        </a>
-        <a class="flex items-center gap-4 px-4 py-3 bg-primary-container text-on-primary-container rounded-xl font-label-bold" href="./reports_directory.html">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment</span>
-            Reports
-        </a>
-        <a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors font-label-bold" href="./alert_center.html">
-            <span class="material-symbols-outlined">notifications_active</span>
-            Alerts
-        </a>
-        <a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors font-label-bold" href="./guardian_profile_updated_my_reports.html">
-            <span class="material-symbols-outlined">person</span>
-            Profile
-        </a>
-    </nav>
-</aside>
-
 <!-- Main Content Area -->
 <main class="pt-2 md:pt-6 md:ml-64 px-container-margin max-w-4xl mx-auto space-y-6 pb-24">
 
@@ -305,26 +279,6 @@
 
 </main>
 
-<!-- Bottom Navigation Bar (Mobile Only) -->
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-4 pb-safe bg-surface-container-lowest md:hidden shadow-[0px_-12px_32px_rgba(0,0,0,0.08)] rounded-t-lg">
-    <a class="flex flex-col items-center justify-center text-on-secondary-container px-4 py-1.5 hover:bg-surface-container-high transition-all" href="./home_child_safety_v1.html">
-        <span class="material-symbols-outlined">home</span>
-        <span class="font-label-sm text-label-sm">Home</span>
-    </a>
-    <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5 hover:bg-surface-container-high transition-all scale-90 duration-150 ease-in-out" href="./reports_directory.html">
-        <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">assignment</span>
-        <span class="font-label-sm text-label-sm font-bold">Reports</span>
-    </a>
-    <a class="flex flex-col items-center justify-center text-on-secondary-container px-4 py-1.5 hover:bg-surface-container-high transition-all" href="./alert_center.html">
-        <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">notifications_active</span>
-        <span class="font-label-sm text-label-sm">Alerts</span>
-    </a>
-    <a class="flex flex-col items-center justify-center text-on-secondary-container px-4 py-1.5 hover:bg-surface-container-high transition-all" href="./guardian_profile_updated_my_reports.html">
-        <span class="material-symbols-outlined">person</span>
-        <span class="font-label-sm text-label-sm">Profile</span>
-    </a>
-</nav>
-
 <script>
     // Guest restriction check
     function showGuestRestrictionAlert() {
@@ -340,13 +294,17 @@
                 </div>
                 <h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Accès Restreint</h3>
                 <p class="font-body-md text-body-md text-on-surface-variant mb-lg leading-relaxed text-center">
-                    Please create an account or Se connecter to continue.
+                    Veuillez créer un compte ou vous connecter pour continuer.
                 </p>
                 <div class="flex flex-col gap-sm">
-                    <a href="./sign_up_child_safety.html" class="w-full py-3 bg-primary text-on-primary rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all block text-center shadow-md">
-                        Créer un compte / Se connecter
+                    <a href="./sign_up_child_safety.html" class="w-full h-14 inline-flex items-center justify-center bg-primary text-on-primary rounded-full font-bold text-[17px] shadow-[0_8px_25px_rgba(108,77,255,0.35)] hover:shadow-[0_12px_32px_rgba(108,77,255,0.48)] hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 text-center tracking-wide">
+                        <span class="material-symbols-outlined mr-2 text-[22px]">person_add</span>
+                        <span>Créer un compte</span>
                     </a>
-                    <button id="closeGuestModal" class="w-full py-3 bg-surface-container-high text-on-surface rounded-full font-label-bold text-label-bold hover:bg-surface-container-highest active:scale-95 transition-all">
+                    <a href="./login_child_safety.html" class="w-full py-3 border-2 border-primary text-primary hover:bg-primary/10 rounded-full font-label-bold text-label-bold active:scale-95 transition-all block text-center shadow-sm">
+                        Se connecter
+                    </a>
+                    <button id="closeGuestModal" class="w-full py-2.5 text-on-surface-variant hover:bg-surface-container-high rounded-full font-label-bold text-label-bold active:scale-95 transition-all">
                         Plus tard
                     </button>
                 </div>

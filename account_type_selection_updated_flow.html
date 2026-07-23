@@ -208,14 +208,15 @@
 </div>
 </main>
 <!-- Bottom Action Bar -->
-<footer class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-lg rounded-t-lg flex flex-col gap-sm px-container-margin py-md relative z-30">
-<button class="w-full py-md bg-outline text-on-primary rounded-full font-label-bold flex items-center justify-center gap-xs transition-all opacity-50 cursor-not-allowed" disabled="" id="continue-btn">
+<footer class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-lg rounded-t-lg flex flex-col gap-sm px-container-margin py-md relative z-30 border-t border-outline-variant/30">
+<button class="w-full h-14 bg-outline text-on-primary rounded-full font-bold text-[17px] flex items-center justify-center gap-2 transition-all opacity-50 cursor-not-allowed" disabled="" id="continue-btn">
             <span id="btnText">Continuer</span>
-            <span class="material-symbols-outlined text-[18px]" id="btnIcon">arrow_forward</span>
+            <span class="material-symbols-outlined text-[20px]" id="btnIcon">arrow_forward</span>
 </button>
-<button class="w-full py-md text-primary font-label-bold hover:bg-surface-container-low transition-colors rounded-full flex items-center justify-center" onclick="window.location.href='./login_child_safety.html'">
-            J'ai déjà un compte
-        </button>
+<a class="w-full h-12 border-2 border-primary text-primary hover:bg-primary/10 active:scale-95 transition-all rounded-full flex items-center justify-center font-headline-md text-base font-bold shadow-sm" href="./login_child_safety.html">
+            <span class="material-symbols-outlined mr-xs text-[20px]">login</span>
+            <span>Vous avez déjà un compte ? Se connecter</span>
+</a>
 </footer>
 <!-- Spacer for fixed footer -->
 <div class="h-32"></div>
@@ -235,7 +236,7 @@
             const continueBtn = document.getElementById('continue-btn');
             continueBtn.disabled = false;
             continueBtn.classList.remove('bg-outline', 'opacity-50', 'cursor-not-allowed');
-            continueBtn.classList.add('bg-primary', 'active:scale-95', 'hover:opacity-90');
+            continueBtn.classList.add('bg-primary', 'shadow-[0_8px_25px_rgba(108,77,255,0.35)]', 'hover:shadow-[0_12px_32px_rgba(108,77,255,0.48)]', 'hover:scale-[1.01]', 'active:scale-[0.98]');
         }
     </script>
 <script type="importmap">

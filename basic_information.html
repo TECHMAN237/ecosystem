@@ -262,6 +262,7 @@
 </script>
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
+import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
 
         // Simple Interaction: Toggle Password Visibility
         const togglePass = document.querySelectorAll('.material-symbols-outlined');
@@ -533,6 +534,17 @@ import { supabase } from "./src/supabaseClient.js";
                         console.warn('Could not update trigger-created profile fields:', updateError);
                     }
                 }
+
+                // Save locally so home page and sidebar display immediately
+                reportService.saveProfile({
+                    full_name: fullname,
+                    username: username,
+                    phone_country_code: countrycode,
+                    phone_number: phonenumber,
+                    city: city,
+                    role: role,
+                    photo: DEFAULT_AVATAR
+                });
 
                 // Clear sign up variables from sessionStorage on success
                 sessionStorage.removeItem('signup_fullname');

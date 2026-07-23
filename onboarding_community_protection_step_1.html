@@ -125,11 +125,15 @@
   </style>
   </head>
 <body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col overflow-x-hidden">
-<!-- Top Navigation / Skip -->
-<header class="flex justify-end px-container-margin py-md sticky top-0 z-10">
-<button class="font-label-bold text-label-bold text-primary px-md py-xs rounded-full hover:bg-primary-fixed transition-colors" onclick="window.location.href='./home_child_safety_v1.html'">
-            Skip
-        </button>
+<!-- Top Navigation / Login & Skip -->
+<header class="flex items-center justify-between px-container-margin py-md sticky top-0 z-10 bg-background/80 backdrop-blur-md">
+<a class="inline-flex items-center gap-1.5 px-md py-2 bg-surface-container-lowest border border-primary/40 text-primary rounded-full font-label-bold text-sm hover:bg-primary-fixed/30 active:scale-95 transition-all shadow-sm" href="./login_child_safety.html">
+    <span class="material-symbols-outlined text-[18px]">login</span>
+    <span>Se connecter</span>
+</a>
+<button class="font-label-bold text-label-bold text-on-surface-variant px-md py-xs rounded-full hover:bg-surface-container transition-colors" onclick="window.location.href='./home_child_safety_v1.html'">
+            Passer
+</button>
 </header>
 <main class="flex-1 flex flex-col px-container-margin">
 <!-- Step Indicator Header -->

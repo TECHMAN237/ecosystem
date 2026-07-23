@@ -143,7 +143,7 @@ const DEMO_FOUND_REPORTS = [
 
 function initLocalStorage() {
   if (typeof window === "undefined") return;
-  const dbVersion = "v5_african_portraits_only_perfect";
+  const dbVersion = "v6_african_portraits_verified_clean";
   const currentVer = localStorage.getItem("reports_db_version");
   if (currentVer !== dbVersion || !localStorage.getItem("missing_reports") || !localStorage.getItem("found_reports")) {
     localStorage.setItem("missing_reports", JSON.stringify(DEMO_MISSING_REPORTS));
@@ -163,9 +163,17 @@ export const reportService = {
     }
   },
 
-  createMissingReport(reportData) {
+  async createMissingReport(reportData) {
     initLocalStorage();
     try {
+      let photoUrl = reportData.photo;
+      if (photoUrl && photoUrl.startsWith("data:")) {
+        const uploadedUrl = await this.uploadFileToSupabaseStorage(photoUrl, "reports");
+        if (uploadedUrl) {
+          photoUrl = uploadedUrl;
+        }
+      }
+
       const reports = this.getMissingReports();
       const newReport = {
         id: "m-" + Date.now(),
@@ -173,10 +181,41 @@ export const reportService = {
         urgency: "Nouveau",
         createdAt: new Date().toISOString(),
         type: "missing",
-        ...reportData
+        ...reportData,
+        photo: photoUrl
       };
       reports.unshift(newReport);
       localStorage.setItem("missing_reports", JSON.stringify(reports));
+
+      // Sync with Supabase DB
+      try {
+        if (localStorage.getItem('is_guest') !== 'true') {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session && session.user) {
+            await supabase.from('missing_reports').insert([{
+              id: newReport.id,
+              user_id: session.user.id,
+              name: newReport.name,
+              age: newReport.age,
+              gender: newReport.gender,
+              height: newReport.height,
+              location: newReport.location,
+              date: newReport.date,
+              time: newReport.time,
+              physical_description: newReport.physicalDescription,
+              clothing_description: newReport.clothingDescription,
+              relationship: newReport.relationship,
+              notes: newReport.notes,
+              status: newReport.status,
+              urgency: newReport.urgency,
+              photo_url: newReport.photo
+            }]).catch(err => console.warn("Supabase table insert notice:", err));
+          }
+        }
+      } catch (dbErr) {
+        console.warn("Supabase DB save notice:", dbErr);
+      }
+
       return newReport;
     } catch (e) {
       console.error("Error saving missing report to localStorage:", e);
@@ -194,9 +233,17 @@ export const reportService = {
     }
   },
 
-  createFoundReport(reportData) {
+  async createFoundReport(reportData) {
     initLocalStorage();
     try {
+      let photoUrl = reportData.photo;
+      if (photoUrl && photoUrl.startsWith("data:")) {
+        const uploadedUrl = await this.uploadFileToSupabaseStorage(photoUrl, "reports");
+        if (uploadedUrl) {
+          photoUrl = uploadedUrl;
+        }
+      }
+
       const reports = this.getFoundReports();
       const newReport = {
         id: "f-" + Date.now(),
@@ -204,10 +251,41 @@ export const reportService = {
         urgency: "Recherche Famille",
         createdAt: new Date().toISOString(),
         type: "found",
-        ...reportData
+        ...reportData,
+        photo: photoUrl
       };
       reports.unshift(newReport);
       localStorage.setItem("found_reports", JSON.stringify(reports));
+
+      // Sync with Supabase DB
+      try {
+        if (localStorage.getItem('is_guest') !== 'true') {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session && session.user) {
+            await supabase.from('found_reports').insert([{
+              id: newReport.id,
+              user_id: session.user.id,
+              name: newReport.name,
+              age: newReport.age,
+              gender: newReport.gender,
+              height: newReport.height,
+              location: newReport.location,
+              date: newReport.date,
+              time: newReport.time,
+              physical_description: newReport.physicalDescription,
+              clothing_description: newReport.clothingDescription,
+              current_safe_location: newReport.currentSafeLocation,
+              gps: newReport.gps,
+              status: newReport.status,
+              urgency: newReport.urgency,
+              photo_url: newReport.photo
+            }]).catch(err => console.warn("Supabase table insert notice:", err));
+          }
+        }
+      } catch (dbErr) {
+        console.warn("Supabase DB save notice:", dbErr);
+      }
+
       return newReport;
     } catch (e) {
       console.error("Error saving found report to localStorage:", e);
@@ -269,102 +347,270 @@ export const reportService = {
       console.error("Error deleting found report:", e);
       return false;
     }
-  },
+  }
+};
 
-  getProfile() {
-    if (typeof window === "undefined") return {};
-    try {
-      const defaultProfile = {
-        full_name: "Elena Rodriguez",
-        role: "Membre Élite des Gardiens",
-        username: "elena_rod",
-        phone_country_code: "+237",
-        phone_number: "677123456",
-        city: "Yaoundé",
-        photo: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=400"
-      };
-      const stored = localStorage.getItem("user_profile");
-      if (!stored) {
-        localStorage.setItem("user_profile", JSON.stringify(defaultProfile));
-        return defaultProfile;
+export const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='60' fill='%23ECE8FF'/%3E%3Cpath d='M60 28c11.045 0 20 8.955 20 20s-8.955 20-20 20-20-8.955-20-20 8.955-20 20-20zm0 48c18.336 0 34 9.168 34 22v4H26v-4c0-12.832 15.664-22 34-22z' fill='%23532CE6'/%3E%3C/svg%3E";
+
+reportService.DEFAULT_AVATAR = DEFAULT_AVATAR;
+
+reportService.uploadFileToSupabaseStorage = async function(fileOrBase64, bucketName = "reports") {
+  try {
+    let blob;
+    let fileExt = "jpg";
+
+    if (typeof fileOrBase64 === "string" && fileOrBase64.startsWith("data:")) {
+      const mimeMatch = fileOrBase64.match(/data:(.*?);base64,/);
+      if (mimeMatch && mimeMatch[1]) {
+        const mime = mimeMatch[1];
+        if (mime.includes("png")) fileExt = "png";
+        else if (mime.includes("pdf")) fileExt = "pdf";
+        else if (mime.includes("jpeg") || mime.includes("jpg")) fileExt = "jpg";
       }
-      return { ...defaultProfile, ...JSON.parse(stored) };
-    } catch (e) {
-      console.error("Error getting user profile:", e);
-      return {};
+      const res = await fetch(fileOrBase64);
+      blob = await res.blob();
+    } else if (fileOrBase64 instanceof File || fileOrBase64 instanceof Blob) {
+      blob = fileOrBase64;
+      if (fileOrBase64.name) {
+        const parts = fileOrBase64.name.split(".");
+        if (parts.length > 1) fileExt = parts.pop();
+      }
     }
-  },
 
-  saveProfile(profileData) {
-    if (typeof window === "undefined") return null;
-    try {
-      const current = this.getProfile();
-      const updated = { ...current, ...profileData };
-      localStorage.setItem("user_profile", JSON.stringify(updated));
+    if (blob) {
+      const filePath = `report_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+      const { data, error } = await supabase.storage
+        .from(bucketName)
+        .upload(filePath, blob, { upsert: true });
 
-      // Asynchronously update profile in Supabase if not in guest mode
-      if (localStorage.getItem('is_guest') !== 'true') {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-          if (session && session.user) {
-            const payload = {
-              full_name: updated.full_name,
-              username: updated.username,
-              phone_country_code: updated.phone_country_code || "",
-              phone_number: updated.phone_number || "",
-              city: updated.city || "",
-              role: updated.role || "Membre Élite des Gardiens",
-              photo: updated.photo || ""
-            };
-            supabase
-              .from('profiles')
-              .update(payload)
-              .eq('id', session.user.id)
-              .then(({ error }) => {
-                if (error) {
-                  console.error("Error updating profile in Supabase:", error);
-                } else {
-                  console.log("Profile synchronized with Supabase successfully!");
-                }
-              });
+      if (!error) {
+        const { data: publicData } = supabase.storage
+          .from(bucketName)
+          .getPublicUrl(filePath);
+        if (publicData && publicData.publicUrl) {
+          return publicData.publicUrl;
+        }
+      } else {
+        // Fallback if bucket doesn't exist, try avatars bucket
+        const { data: altData, error: altErr } = await supabase.storage
+          .from("avatars")
+          .upload(`reports/${filePath}`, blob, { upsert: true });
+        if (!altErr) {
+          const { data: publicData } = supabase.storage
+            .from("avatars")
+            .getPublicUrl(`reports/${filePath}`);
+          if (publicData && publicData.publicUrl) {
+            return publicData.publicUrl;
           }
-        }).catch(err => {
-          console.error("Error retrieving session for database profile update:", err);
-        });
-      }
-
-      return updated;
-    } catch (e) {
-      console.error("Error saving user profile:", e);
-      return null;
-    }
-  },
-
-  async syncProfileWithSupabase() {
-    if (typeof window === "undefined") return null;
-    if (localStorage.getItem('is_guest') === 'true') {
-      return this.getProfile();
-    }
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session && session.user) {
-        const { data: profileData, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .maybeSingle();
-
-        if (profileData && !error) {
-          const current = this.getProfile();
-          const updated = { ...current, ...profileData };
-          localStorage.setItem("user_profile", JSON.stringify(updated));
-          return updated;
         }
       }
-    } catch (e) {
-      console.error("Error syncing profile with Supabase:", e);
     }
-    return this.getProfile();
+  } catch (err) {
+    console.warn("Supabase storage upload error:", err);
   }
+  return null;
+};
+
+reportService.updateDOMProfile = function(profile) {
+  if (typeof document === "undefined" || !profile) return;
+  const avatarUrl = profile.photo || DEFAULT_AVATAR;
+  const fullName = profile.full_name || "Gardien de la Sécurité";
+  const role = profile.role || "Membre Élite des Gardiens";
+
+  const avatarElements = document.querySelectorAll('#homeUserAvatar, #profileAvatar, #modalAvatarPreview, [data-user-avatar], .user-avatar-img');
+  avatarElements.forEach(el => {
+    if (el && el.tagName === 'IMG') {
+      el.src = avatarUrl;
+    }
+  });
+
+  const nameElements = document.querySelectorAll('#homeUserName, #profileName, [data-user-name], .user-name-text');
+  nameElements.forEach(el => {
+    if (el) {
+      el.textContent = fullName;
+    }
+  });
+
+  const roleElements = document.querySelectorAll('#homeUserRole, #profileRole, [data-user-role]');
+  roleElements.forEach(el => {
+    if (el) {
+      el.textContent = role;
+    }
+  });
+};
+
+reportService.getProfile = function() {
+  if (typeof window === "undefined") return {};
+  try {
+    const defaultProfile = {
+      full_name: "Gardien de la Sécurité",
+      role: "Membre Élite des Gardiens",
+      username: "gardien_securite",
+      phone_country_code: "+237",
+      phone_number: "677123456",
+      city: "Yaoundé",
+      photo: DEFAULT_AVATAR
+    };
+    const stored = localStorage.getItem("user_profile");
+    if (!stored) {
+      localStorage.setItem("user_profile", JSON.stringify(defaultProfile));
+      return defaultProfile;
+    }
+    const parsed = JSON.parse(stored);
+    if (!parsed.photo || parsed.photo.includes('unsplash.com')) {
+      parsed.photo = DEFAULT_AVATAR;
+    }
+    return { ...defaultProfile, ...parsed };
+  } catch (e) {
+    console.error("Error getting user profile:", e);
+    return {};
+  }
+};
+
+reportService.uploadAvatarToSupabaseStorage = async function(fileOrBase64) {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session || !session.user) return null;
+
+    let blob;
+    if (typeof fileOrBase64 === "string" && fileOrBase64.startsWith("data:")) {
+      const res = await fetch(fileOrBase64);
+      blob = await res.blob();
+    } else if (fileOrBase64 instanceof File || fileOrBase64 instanceof Blob) {
+      blob = fileOrBase64;
+    }
+
+    if (blob) {
+      const fileExt = blob.type === "image/png" ? "png" : "jpg";
+      const filePath = `avatars/user_${session.user.id}_${Date.now()}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, blob, { upsert: true });
+
+      if (!error) {
+        const { data: publicData } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(filePath);
+        if (publicData && publicData.publicUrl) {
+          return publicData.publicUrl;
+        }
+      } else {
+        console.warn("Supabase storage upload notice:", error.message);
+      }
+    }
+  } catch (err) {
+    console.warn("Supabase storage upload fallback:", err);
+  }
+  return null;
+};
+
+reportService.saveProfile = async function(profileData) {
+  if (typeof window === "undefined") return null;
+  try {
+    const current = this.getProfile();
+    let photoUrl = profileData.photo || current.photo || DEFAULT_AVATAR;
+
+    // Upload to Supabase Storage if data URI provided
+    if (profileData.photo && profileData.photo.startsWith("data:")) {
+      const storageUrl = await this.uploadAvatarToSupabaseStorage(profileData.photo);
+      if (storageUrl) {
+        photoUrl = storageUrl;
+      }
+    }
+
+    const updated = {
+      ...current,
+      ...profileData,
+      photo: photoUrl
+    };
+
+    localStorage.setItem("user_profile", JSON.stringify(updated));
+
+    // Update Supabase profiles table
+    if (localStorage.getItem('is_guest') !== 'true') {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session && session.user) {
+        const payload = {
+          full_name: updated.full_name,
+          username: updated.username,
+          phone_country_code: updated.phone_country_code || "",
+          phone_number: updated.phone_number || "",
+          city: updated.city || "",
+          role: updated.role || "Membre Élite des Gardiens",
+          photo: updated.photo || DEFAULT_AVATAR
+        };
+
+        const { error } = await supabase
+          .from('profiles')
+          .update(payload)
+          .eq('id', session.user.id);
+
+        if (error) {
+          console.error("Error updating profile in Supabase:", error);
+        } else {
+          console.log("Profile synchronized with Supabase successfully!");
+        }
+      }
+    }
+
+    this.updateDOMProfile(updated);
+    return updated;
+  } catch (e) {
+    console.error("Error saving user profile:", e);
+    return null;
+  }
+};
+
+reportService.syncProfileWithSupabase = async function() {
+  if (typeof window === "undefined") return this.getProfile();
+  if (localStorage.getItem('is_guest') === 'true') {
+    const profile = this.getProfile();
+    this.updateDOMProfile(profile);
+    return profile;
+  }
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session && session.user) {
+      const { data: profileData, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      const current = this.getProfile();
+      let updated = { ...current };
+
+      if (profileData && !error && Object.keys(profileData).length > 0) {
+        updated = { ...updated, ...profileData };
+      }
+
+      if (!updated.full_name || updated.full_name === "Elena Rodriguez") {
+        if (session.user.user_metadata?.full_name) {
+          updated.full_name = session.user.user_metadata.full_name;
+        } else if (session.user.email) {
+          updated.full_name = session.user.email.split('@')[0];
+        } else {
+          updated.full_name = "Gardien de la Sécurité";
+        }
+      }
+
+      if (!updated.photo || updated.photo.includes('unsplash.com')) {
+        updated.photo = DEFAULT_AVATAR;
+      }
+
+      localStorage.setItem("user_profile", JSON.stringify(updated));
+      this.updateDOMProfile(updated);
+      return updated;
+    }
+  } catch (e) {
+    console.error("Error syncing profile with Supabase:", e);
+  }
+
+  const fallback = this.getProfile();
+  this.updateDOMProfile(fallback);
+  return fallback;
 };
 
 // Expose globally for pages loaded in iframe context

@@ -129,8 +129,8 @@
   </style>
   </head>
 <body class="bg-background text-on-background min-h-screen flex flex-col">
-<!-- Top App Bar -->
-<header class="flex justify-between items-center px-container-margin py-md w-full sticky top-0 z-50 bg-background shadow-sm">
+<!-- Top App Bar (Mobile Only) -->
+<header class="flex md:hidden justify-between items-center px-container-margin py-md w-full sticky top-0 z-50 bg-background shadow-sm">
 <div class="flex items-center gap-xs">
 <span class="material-symbols-outlined text-primary font-bold" style="font-variation-settings: 'FILL' 1;">shield</span>
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">SafeGuardian</h1>
@@ -139,7 +139,7 @@
 <span class="material-symbols-outlined text-on-surface-variant">notifications_active</span>
 </button>
 </header>
-<main class="flex-grow pb-32 pt-1">
+<main class="flex-grow pb-32 pt-1 md:ml-64 md:max-w-4xl md:mx-auto">
 <!-- Screen Header -->
 <section class="px-container-margin pt-lg pb-md">
 <h2 class="font-display text-display text-on-surface">Alerts</h2>
@@ -252,24 +252,6 @@
 </div>
 </div>
 </main>
-<!-- Bottom Navigation Bar -->
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface shadow-[0px_-4px_20px_rgba(108,77,255,0.06)] rounded-t-lg">
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-xs py-base hover:bg-surface-container-high rounded-full transition-all" href="./home_child_safety_v1.html"> <span class="material-symbols-outlined">home</span>
-<span class="font-label-sm text-label-sm">Home</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-xs py-base hover:bg-surface-container-high rounded-full transition-all" href="./reports_directory.html">
-<span class="material-symbols-outlined">description</span>
-<span class="font-label-sm text-label-sm">Reports</span>
-</a>
-<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-xs py-base min-w-[64px] transition-all" href="./alert_center.html">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
-<span class="font-label-sm text-label-sm">Alerts</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant px-xs py-base hover:bg-surface-container-high rounded-full transition-all" href="./guardian_profile_updated_my_reports.html">
-<span class="material-symbols-outlined">person</span>
-<span class="font-label-sm text-label-sm">Profile</span>
-</a>
-</nav>
 <!-- Floating Action Button (FAB) - Optional context-sensitive -->
 <button class="fixed right-container-margin bottom-28 w-14 h-14 bg-gradient-to-tr from-primary to-primary-container text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-all duration-200 z-40 border-4 border-white/20" onclick="window.location.href='./signaler_un_enfant_trouv_tape_1.html'">
 <span class="material-symbols-outlined text-3xl">add_alert</span>
@@ -326,13 +308,17 @@
                     </div>
                     <h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Accès Restreint</h3>
                     <p class="font-body-md text-body-md text-on-surface-variant mb-lg leading-relaxed text-center">
-                        Please create an account or Se connecter to continue.
+                        Veuillez créer un compte ou vous connecter pour continuer.
                     </p>
                     <div class="flex flex-col gap-sm">
-                        <a href="./sign_up_child_safety.html" class="w-full py-3 bg-primary text-on-primary rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all block text-center shadow-md">
-                            Créer un compte / Se connecter
+                        <a href="./sign_up_child_safety.html" class="w-full h-14 inline-flex items-center justify-center bg-primary text-on-primary rounded-full font-bold text-[17px] shadow-[0_8px_25px_rgba(108,77,255,0.35)] hover:shadow-[0_12px_32px_rgba(108,77,255,0.48)] hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 text-center tracking-wide">
+                            <span class="material-symbols-outlined mr-2 text-[22px]">person_add</span>
+                            <span>Créer un compte</span>
                         </a>
-                        <button id="closeGuestModal" class="w-full py-3 bg-surface-container-high text-on-surface rounded-full font-label-bold text-label-bold hover:bg-surface-container-highest active:scale-95 transition-all">
+                        <a href="./login_child_safety.html" class="w-full py-3 border-2 border-primary text-primary hover:bg-primary/10 rounded-full font-label-bold text-label-bold active:scale-95 transition-all block text-center shadow-sm">
+                            Se connecter
+                        </a>
+                        <button id="closeGuestModal" class="w-full py-2.5 text-on-surface-variant hover:bg-surface-container-high rounded-full font-label-bold text-label-bold active:scale-95 transition-all">
                             Plus tard
                         </button>
                     </div>

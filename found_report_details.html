@@ -118,13 +118,13 @@
         }
     </style>
 </head>
-<body class="bg-surface-bright text-on-surface antialiased font-body-lg min-h-screen flex justify-center selection:bg-primary-container selection:text-on-primary-container">
+<body class="bg-surface-bright text-on-surface antialiased font-body-lg min-h-screen flex justify-center md:block selection:bg-primary-container selection:text-on-primary-container">
 
-<!-- Mobile Container Wrapper -->
-<div class="w-full max-w-[480px] bg-surface relative min-h-screen shadow-2xl flex flex-col overflow-hidden pb-24 border-x border-outline-variant/15">
+<!-- Mobile / Responsive Container Wrapper -->
+<div class="w-full max-w-[480px] md:max-w-none bg-surface relative min-h-screen shadow-2xl md:shadow-none flex flex-col overflow-x-hidden pb-24 md:pb-28 border-x border-outline-variant/15 md:border-x-0">
     
     <!-- Top App Bar (Task-Focused / Sub-page Style) -->
-    <header class="flex items-center justify-between px-container-margin h-16 w-full z-40 bg-surface/80 backdrop-blur-md sticky top-0 transition-all duration-300 border-b border-outline-variant/30">
+    <header class="flex items-center justify-between px-container-margin md:px-8 h-16 w-full z-40 bg-surface/80 backdrop-blur-md sticky top-0 transition-all duration-300 border-b border-outline-variant/30">
         <button aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface hover:bg-surface-container-high transition-colors shadow-sm" onclick="history.back()">
             <span class="material-symbols-outlined">arrow_back</span>
         </button>
@@ -137,11 +137,11 @@
         </button>
     </header>
 
-    <main class="flex-1 flex flex-col w-full pb-safe">
+    <main class="flex-1 flex flex-col md:grid md:grid-cols-12 md:gap-8 md:max-w-6xl md:mx-auto md:p-8 w-full pb-safe">
         
         <!-- Hero Image Section -->
-        <section class="relative w-full aspect-[4/5] bg-surface-container-high shrink-0 overflow-hidden group">
-            <img id="childPhoto" alt="Photo de l'enfant trouvé" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPRhJoR99JnIq0yjWpRc5frrsMJML08i9WLb0sJUaRexO-EZ72J68ur4rWdZu3GQx3x8jpCTy5Lk8OsTZ43OD-aCenUbYDZ2ulH-lU_rOaqTvEf0IpXDYfZn9_UC8aktKYIfWeRhtP93fOlFJ529ANeK_GAwJtrbi7AXfogY1EFTk5yW0CF-cCSWQHHsLaKdIepUPSnC9XI5bG_Zfo-HeePaEZCCSnKpTFog19LD-_tr4aYbE4I1L5RMLH0HFDbHk-dpG0NixHKDj"/>
+        <section class="relative w-full aspect-[4/5] bg-surface-container-high shrink-0 overflow-hidden group md:col-span-5 md:rounded-2xl md:shadow-md md:sticky md:top-20">
+            <img id="childPhoto" alt="Photo de l'enfant trouvé" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" src="https://images.unsplash.com/photo-1540331547168-8b63109225b7?auto=format&fit=crop&q=80&w=500"/>
             <!-- Gradient Overlay for text readability -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none"></div>
             <!-- Safe Badge -->
@@ -170,7 +170,7 @@
         </section>
 
         <!-- Detailed Info Canvas -->
-        <section class="flex-1 bg-surface-bright -mt-6 rounded-t-xl z-20 relative px-container-margin pt-8 pb-12 flex flex-col gap-lg shadow-[0px_-8px_24px_rgba(0,0,0,0.06)]">
+        <section class="flex-1 bg-surface-bright md:bg-surface-container-lowest -mt-6 md:mt-0 rounded-t-xl md:rounded-2xl z-20 relative px-container-margin md:px-8 pt-8 md:pt-6 pb-12 flex flex-col gap-lg shadow-[0px_-8px_24px_rgba(0,0,0,0.06)] md:shadow-sm md:border md:border-outline-variant/20 md:col-span-7">
             
             <!-- Physical Attributes Bento Grid -->
             <div class="grid grid-cols-3 gap-3">
@@ -244,7 +244,7 @@
     </main>
 
     <!-- Fixed Bottom Action Bar -->
-    <div class="fixed bottom-0 left-0 w-full max-w-[480px] left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md border-t border-outline-variant/30 px-container-margin py-4 flex items-center gap-3 shadow-[0px_-12px_32px_rgba(0,0,0,0.08)] z-50 pb-safe">
+    <div class="fixed bottom-0 left-0 w-full max-w-[480px] left-1/2 -translate-x-1/2 md:left-64 md:translate-x-0 md:w-[calc(100%-16rem)] md:max-w-none bg-white/95 backdrop-blur-md border-t border-outline-variant/30 px-container-margin md:px-12 py-4 flex items-center gap-3 shadow-[0px_-12px_32px_rgba(0,0,0,0.08)] z-50 pb-safe">
         <button class="flex-1 bg-surface-container border border-outline-variant text-on-surface font-label-bold text-label-bold h-[48px] rounded-full flex items-center justify-center gap-2 hover:bg-surface-container-high transition-colors">
             <span class="material-symbols-outlined text-[20px]">share</span>
             Partager

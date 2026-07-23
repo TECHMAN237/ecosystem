@@ -140,15 +140,15 @@
 <div class="flex flex-col items-center gap-md relative z-10">
 <div class="relative">
 <div class="w-24 h-24 rounded-full border-4 border-white/30 overflow-hidden custom-shadow">
-<img id="profileAvatar" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=400"/>
+<img id="profileAvatar" data-user-avatar class="w-full h-full object-cover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='60' fill='%23ECE8FF'/%3E%3Cpath d='M60 28c11.045 0 20 8.955 20 20s-8.955 20-20 20-20-8.955-20-20 8.955-20 20-20zm0 48c18.336 0 34 9.168 34 22v4H26v-4c0-12.832 15.664-22 34-22z' fill='%23532CE6'/%3E%3C/svg%3E"/>
 </div>
 <div class="absolute bottom-1 right-1 bg-primary text-white w-7 h-7 rounded-full flex items-center justify-center border-2 border-white">
 <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
 </div>
 </div>
 <div class="text-center flex flex-col items-center">
-<h2 id="profileName" class="font-headline-lg text-headline-lg text-white">Elena Rodriguez</h2>
-<p id="profileRole" class="font-label-sm text-label-sm text-white/80 tracking-wide uppercase">Gardien d'Élite de la Communauté</p>
+<h2 id="profileName" data-user-name class="font-headline-lg text-headline-lg text-white">Gardien de la Sécurité</h2>
+<p id="profileRole" data-user-role class="font-label-sm text-label-sm text-white/80 tracking-wide uppercase">Gardien d'Élite de la Communauté</p>
 <button id="editProfileBtn" class="mt-2.5 px-4 py-1.5 border border-white/40 text-white hover:bg-white/10 rounded-full font-bold text-xs flex items-center gap-1.5 transition-all">
   <span class="material-symbols-outlined text-sm">edit</span>
   <span>Modifier le profil</span>
@@ -280,25 +280,6 @@ Accédez à l'historique complet de vos signalements d'enfants disparus et trouv
 </div>
 </div>
 </main>
-<!-- Bottom Navigation Shell -->
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter py-xs pb-safe bg-surface-container-lowest dark:bg-inverse-surface shadow-[0px_-4px_20px_rgba(108,77,255,0.06)] rounded-t-lg">
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-transform duration-200" href="./home_child_safety_v1.html">
-<span class="material-symbols-outlined">home</span>
-<span class="font-label-sm text-label-sm">Accueil</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-transform duration-200" href="./reports_directory.html">
-<span class="material-symbols-outlined">description</span>
-<span class="font-label-sm text-label-sm">Signalements</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim px-4 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-90 transition-transform duration-200" href="./alert_center.html">
-<span class="material-symbols-outlined">notifications</span>
-<span class="font-label-sm text-label-sm">Alertes</span>
-</a>
-<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-2 hover:opacity-80 transition-opacity active:scale-90 transition-transform duration-200" href="./guardian_profile_updated_my_reports.html">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
-<span class="font-label-sm text-label-sm">Profil</span>
-</a>
-</nav>
 
 <!-- Edit Profile Modal -->
 <div id="editProfileModal" class="fixed inset-0 bg-black/60 z-50 flex items-end justify-center hidden opacity-0 transition-all duration-300">
@@ -311,7 +292,7 @@ Accédez à l'historique complet de vos signalements d'enfants disparus et trouv
     <!-- Avatar picker -->
     <div class="flex flex-col items-center gap-xs">
       <div class="relative w-20 h-20 rounded-full overflow-hidden border-2 border-primary/20 bg-surface-container-high group">
-        <img id="modalAvatarPreview" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=400"/>
+        <img id="modalAvatarPreview" class="w-full h-full object-cover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='60' fill='%23ECE8FF'/%3E%3Cpath d='M60 28c11.045 0 20 8.955 20 20s-8.955 20-20 20-20-8.955-20-20 8.955-20 20-20zm0 48c18.336 0 34 9.168 34 22v4H26v-4c0-12.832 15.664-22 34-22z' fill='%23532CE6'/%3E%3C/svg%3E"/>
         <label class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
           <span class="material-symbols-outlined text-white text-[20px]">photo_camera</span>
           <input type="file" id="modalAvatarInput" accept="image/*" class="hidden" />
@@ -324,13 +305,13 @@ Accédez à l'historique complet de vos signalements d'enfants disparus et trouv
     <div class="space-y-sm">
       <div>
         <label class="block text-xs font-bold text-on-surface-variant uppercase mb-1" for="editFullName">Nom Complet</label>
-        <input type="text" id="editFullName" class="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-2.5 text-on-surface font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Elena Rodriguez"/>
+        <input type="text" id="editFullName" class="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-2.5 text-on-surface font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Nom complet"/>
       </div>
       <div>
         <label class="block text-xs font-bold text-on-surface-variant uppercase mb-1" for="editUsername">Nom d'utilisateur</label>
         <div class="relative">
           <span class="absolute left-4 top-2.5 text-on-surface-variant font-semibold">@</span>
-          <input type="text" id="editUsername" class="w-full bg-surface-container border border-outline-variant/30 rounded-xl pl-8 pr-4 py-2.5 text-on-surface font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="elena_rod"/>
+          <input type="text" id="editUsername" class="w-full bg-surface-container border border-outline-variant/30 rounded-xl pl-8 pr-4 py-2.5 text-on-surface font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="nom_utilisateur"/>
         </div>
       </div>
       <div class="grid grid-cols-3 gap-sm">
@@ -473,8 +454,9 @@ const editCity = document.getElementById('editCity');
 
 let currentProfilePhotoBase64 = "";
 
-function renderProfileData() {
-    const profile = reportService.getProfile();
+async function renderProfileData() {
+    const profile = await reportService.syncProfileWithSupabase();
+    if (!profile) return;
     
     // Update view
     if (profile.photo) profileAvatar.src = profile.photo;
@@ -536,18 +518,25 @@ modalAvatarInput.addEventListener('change', (e) => {
 });
 
 // Save Profile
-saveProfileBtn.addEventListener('click', () => {
+saveProfileBtn.addEventListener('click', async () => {
+    saveProfileBtn.disabled = true;
+    const origText = saveProfileBtn.textContent;
+    saveProfileBtn.textContent = 'Enregistrement...';
+
+    const current = reportService.getProfile();
     const updated = {
-        full_name: editFullName.value.trim() || "Elena Rodriguez",
-        username: editUsername.value.trim().replace(/^@/, "") || "elena_rod",
-        phone_country_code: editCountryCode.value.trim() || "+237",
-        phone_number: editPhoneNumber.value.trim() || "677123456",
-        city: editCity.value.trim() || "Yaoundé",
-        photo: currentProfilePhotoBase64
+        full_name: editFullName.value.trim() || current.full_name || "Gardien de la Sécurité",
+        username: editUsername.value.trim().replace(/^@/, "") || current.username || "gardien",
+        phone_country_code: editCountryCode.value.trim() || current.phone_country_code || "+237",
+        phone_number: editPhoneNumber.value.trim() || current.phone_number || "",
+        city: editCity.value.trim() || current.city || "Yaoundé",
+        photo: currentProfilePhotoBase64 || current.photo
     };
     
-    reportService.saveProfile(updated);
-    renderProfileData();
+    await reportService.saveProfile(updated);
+    await renderProfileData();
+    saveProfileBtn.disabled = false;
+    saveProfileBtn.textContent = origText;
     closeModal();
 });
 
