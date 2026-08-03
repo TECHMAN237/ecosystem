@@ -282,8 +282,8 @@ Accédez à l'historique complet de vos signalements d'enfants disparus et trouv
 </main>
 
 <!-- Edit Profile Modal -->
-<div id="editProfileModal" class="fixed inset-0 bg-black/60 z-50 flex items-end justify-center hidden opacity-0 transition-all duration-300">
-  <div class="bg-surface-container-lowest w-full max-w-md rounded-t-lg p-lg space-y-md relative z-10 custom-shadow border-t border-outline-variant/20 max-h-[90vh] overflow-y-auto">
+<div id="editProfileModal" class="fixed inset-0 bg-black/60 z-50 flex items-center sm:items-end justify-center hidden opacity-0 transition-all duration-300 p-4">
+  <div class="bg-surface-container-lowest w-full max-w-md rounded-2xl sm:rounded-t-lg p-lg space-y-md relative z-10 custom-shadow border-t border-outline-variant/20 max-h-[85vh] overflow-y-auto pb-12">
     <div class="flex items-center justify-between border-b border-surface-container pb-2">
       <h3 class="font-headline-lg text-headline-lg text-on-surface">Modifier le Profil</h3>
       <button id="closeModalBtn" class="material-symbols-outlined text-outline hover:text-on-surface p-1 rounded-full hover:bg-surface-container transition-colors">close</button>
@@ -331,9 +331,9 @@ Accédez à l'historique complet de vos signalements d'enfants disparus et trouv
     </div>
 
     <!-- Actions -->
-    <div class="flex gap-sm pt-xs">
+    <div class="flex gap-sm pt-md pb-6">
       <button id="cancelModalBtn" class="flex-1 py-3 border border-outline-variant/40 text-outline rounded-full font-bold text-sm hover:bg-surface-container active:scale-98 transition-all">Annuler</button>
-      <button id="saveProfileBtn" class="flex-1 py-3 bg-primary hover:bg-primary-container text-white rounded-full font-bold text-sm active:scale-98 transition-all">Enregistrer</button>
+      <button id="saveProfileBtn" class="flex-1 py-3 bg-primary hover:bg-primary-container text-white rounded-full font-bold text-sm active:scale-98 transition-all shadow-lg">Enregistrer</button>
     </div>
   </div>
 </div>

@@ -204,14 +204,24 @@
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             renderShell();
-            if (window.reportService && typeof window.reportService.syncProfileWithSupabase === 'function') {
-                window.reportService.syncProfileWithSupabase();
+            if (window.reportService) {
+                if (typeof window.reportService.syncProfileWithSupabase === 'function') {
+                    window.reportService.syncProfileWithSupabase();
+                }
+                if (typeof window.reportService.syncReportsFromSupabase === 'function') {
+                    window.reportService.syncReportsFromSupabase();
+                }
             }
         });
     } else {
         renderShell();
-        if (window.reportService && typeof window.reportService.syncProfileWithSupabase === 'function') {
-            window.reportService.syncProfileWithSupabase();
+        if (window.reportService) {
+            if (typeof window.reportService.syncProfileWithSupabase === 'function') {
+                window.reportService.syncProfileWithSupabase();
+            }
+            if (typeof window.reportService.syncReportsFromSupabase === 'function') {
+                window.reportService.syncReportsFromSupabase();
+            }
         }
     }
 

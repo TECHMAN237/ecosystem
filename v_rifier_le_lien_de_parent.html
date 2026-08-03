@@ -425,6 +425,14 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleSubmit(btn) {
         const currentDraft = formDraftState.getMissingDraft();
 
+        if (!currentDraft.birthCertificate && !currentDraft.guardianshipDoc) {
+            if (errorBanner) errorBanner.classList.remove('hidden');
+            btn.innerHTML = '<span>Soumettre le signalement</span><span class="material-symbols-outlined">send</span>';
+            btn.style.opacity = "1";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
         btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Envoi au serveur...';
         btn.style.opacity = "0.7";
 
@@ -445,11 +453,11 @@ document.addEventListener('DOMContentLoaded', () => {
             relationship: currentDraft.relationship || "mere",
             notes: currentDraft.notes || "",
             photo: currentDraft.photo || defaultPhoto,
-            birthCertificate: currentDraft.birthCertificate ? (typeof currentDraft.birthCertificate === 'object' ? currentDraft.birthCertificate.name : 'Document vérifié') : null,
-            guardianshipDoc: currentDraft.guardianshipDoc ? (typeof currentDraft.guardianshipDoc === 'object' ? currentDraft.guardianshipDoc.name : 'Document vérifié') : null,
-            schoolDoc: currentDraft.schoolDoc ? (typeof currentDraft.schoolDoc === 'object' ? currentDraft.schoolDoc.name : 'Document vérifié') : null,
-            familyPhoto: currentDraft.familyPhoto ? (typeof currentDraft.familyPhoto === 'object' ? currentDraft.familyPhoto.name : 'Document vérifié') : null,
-            hospitalRecord: currentDraft.hospitalRecord ? (typeof currentDraft.hospitalRecord === 'object' ? currentDraft.hospitalRecord.name : 'Document vérifié') : null
+            birthCertificate: currentDraft.birthCertificate || null,
+            guardianshipDoc: currentDraft.guardianshipDoc || null,
+            schoolDoc: currentDraft.schoolDoc || null,
+            familyPhoto: currentDraft.familyPhoto || null,
+            hospitalRecord: currentDraft.hospitalRecord || null
         };
 
         // Create the missing report (with Supabase Storage upload + DB insert)

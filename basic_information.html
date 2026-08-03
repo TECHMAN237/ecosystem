@@ -283,15 +283,24 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
 
         // Pre-populate input fields on load
         document.addEventListener('DOMContentLoaded', () => {
-            const storedName = sessionStorage.getItem('signup_fullname');
-            const storedEmail = sessionStorage.getItem('signup_email');
-            const storedPassword = sessionStorage.getItem('signup_password');
+            if (sessionStorage.getItem('is_google_pending') === 'true') {
+                const gName = sessionStorage.getItem('google_signup_fullname');
+                const gEmail = sessionStorage.getItem('google_signup_email');
+                if (gName) document.getElementById('fullname').value = gName;
+                if (gEmail) document.getElementById('email').value = gEmail;
+                const passContainer = document.getElementById('password')?.closest('.grid');
+                if (passContainer) passContainer.style.display = 'none';
+            } else {
+                const storedName = sessionStorage.getItem('signup_fullname');
+                const storedEmail = sessionStorage.getItem('signup_email');
+                const storedPassword = sessionStorage.getItem('signup_password');
 
-            if (storedName) document.getElementById('fullname').value = storedName;
-            if (storedEmail) document.getElementById('email').value = storedEmail;
-            if (storedPassword) {
-                document.getElementById('password').value = storedPassword;
-                document.getElementById('confirm_password').value = storedPassword;
+                if (storedName) document.getElementById('fullname').value = storedName;
+                if (storedEmail) document.getElementById('email').value = storedEmail;
+                if (storedPassword) {
+                    document.getElementById('password').value = storedPassword;
+                    document.getElementById('confirm_password').value = storedPassword;
+                }
             }
             
             // Pre-fill Step 3 fields if they were already typed and we came back
@@ -309,6 +318,10 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
         // Check if user is already signed in on load
         async function checkCurrentSession() {
             try {
+                if (sessionStorage.getItem('is_google_pending') === 'true') {
+                    console.log("Google pending user onboarding in progress.");
+                    return;
+                }
                 const { data } = await supabase.auth.getSession();
                 if (data && data.session) {
                     console.log("Already signed in, redirecting to Home...");
@@ -361,6 +374,89 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
             const phonenumber = document.getElementById('phonenumber').value.trim();
             const emailInput = document.getElementById('email').value.trim();
             const city = document.getElementById('city').value.trim();
+            const role = sessionStorage.getItem('childSafetyAccountType') || 'Tuteur / Tutrice';
+
+            if (sessionStorage.getItem('is_google_pending') === 'true') {
+                if (!fullname) {
+                    showError('Veuillez saisir votre nom complet.');
+                    return;
+                }
+                if (!username) {
+                    showError('Veuillez saisir un nom d\'utilisateur.');
+                    return;
+                }
+                if (!phonenumber) {
+                    showError('Veuillez saisir un numéro de téléphone.');
+                    return;
+                }
+                if (!city) {
+                    showError('Veuillez saisir votre ville.');
+                    return;
+                }
+
+                setLoading(true);
+                try {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) {
+                        showError('Session Google introuvable. Veuillez vous reconnecter.');
+                        setLoading(false);
+                        return;
+                    }
+                    const metadata = user.user_metadata || {};
+
+                    const profilePayload = {
+                        id: user.id,
+                        user_id: user.id,
+                        full_name: fullname,
+                        username: username,
+                        email: user.email || metadata.email || sessionStorage.getItem('google_signup_email') || '',
+                        profile_photo_url: metadata.avatar_url || metadata.picture || sessionStorage.getItem('google_signup_avatar') || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+                        phone_country_code: countrycode,
+                        phone_number: phonenumber,
+                        city: city,
+                        role: role,
+                        terms_accepted: true,
+                        is_verified: true,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    };
+
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .upsert([profilePayload]);
+
+                    if (profileError) {
+                        showError('Erreur lors de la création du profil : ' + profileError.message);
+                        setLoading(false);
+                        return;
+                    }
+
+                    reportService.saveProfile({
+                        full_name: fullname,
+                        username: username,
+                        phone_country_code: countrycode,
+                        phone_number: phonenumber,
+                        city: city,
+                        role: role,
+                        photo: metadata.avatar_url || metadata.picture || sessionStorage.getItem('google_signup_avatar') || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
+                    });
+
+                    sessionStorage.removeItem('is_google_pending');
+                    sessionStorage.removeItem('google_signup_email');
+                    sessionStorage.removeItem('google_signup_fullname');
+                    sessionStorage.removeItem('google_signup_avatar');
+                    sessionStorage.removeItem('childSafetyAccountType');
+
+                    console.log('Google first-time profile created! Redirecting to Home...');
+                    window.location.href = './home_child_safety_v1.html';
+                } catch (err) {
+                    console.error('Google profile creation error:', err);
+                    showError(err.message || 'Une erreur inattendue est survenue.');
+                    setLoading(false);
+                }
+                return;
+            }
+
             const password = document.getElementById('password').value;
             const confirm_password = document.getElementById('confirm_password').value;
 
@@ -393,7 +489,6 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
             // Retrieve values from Step 1 and Step 2
             const email = emailInput || sessionStorage.getItem('signup_email') || '';
             const terms = sessionStorage.getItem('signup_terms_accepted') === 'true';
-            const role = sessionStorage.getItem('childSafetyAccountType') || 'Tuteur / Tutrice';
 
             // Failsafe check
             if (!email) {

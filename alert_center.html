@@ -142,115 +142,423 @@
 <main class="flex-grow pb-32 pt-1 md:ml-64 md:max-w-4xl md:mx-auto">
 <!-- Screen Header -->
 <section class="px-container-margin pt-lg pb-md">
+<div class="flex items-center justify-between">
+<div>
 <h2 class="font-display text-display text-on-surface">Alerts</h2>
 <p class="font-body-md text-body-md text-on-surface-variant mt-base">Stay informed about reports, matches, community activity, and safety updates.</p>
+</div>
+<div class="flex items-center gap-xs">
+<button id="markAllReadBtn" class="px-md py-2 text-xs font-label-bold text-primary bg-primary/10 hover:bg-primary/20 rounded-full transition-colors">Tout marquer comme lu</button>
+</div>
+</div>
 </section>
 <!-- Filter Chips -->
-<section class="-mx-container-margin px-container-margin mb-lg overflow-x-auto hide-scrollbar flex gap-sm items-center pb-1">
-<button class="px-lg py-sm rounded-full bg-primary text-on-primary font-label-bold text-label-bold shadow-md whitespace-nowrap">All</button>
-<button class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap">Emergency</button>
-<button class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap">Reports</button>
-<button class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap">Community</button>
-<button class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap">Matches</button>
-<button class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap" onclick="window.location.href='./smart_alerts_guardian_flow.html'">V2</button>
-</section>
-<!-- Feed Content -->
-<div class="px-container-margin space-y-lg">
-<!-- 1. High Urgency Alert -->
-<div class="relative bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] overflow-hidden border-l-4 border-error">
-<div class="p-lg">
-<div class="flex justify-between items-start mb-md">
-<div class="flex items-center gap-sm">
-<span class="flex h-3 w-3 rounded-full bg-error animate-pulse"></span>
-<span class="font-label-bold text-label-bold text-error uppercase tracking-wider">Urgent Alert</span>
-</div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">2m ago</span>
-</div>
-<div class="flex gap-lg">
-<img alt="Liam" class="w-20 h-20 rounded-lg object-cover shadow-sm" data-alt="A portrait of a young boy with light brown hair and a bright yellow hoodie, smiling gently against a soft-focus park background. The lighting is warm and natural, creating a nostalgic and safe atmosphere. The overall style is high-definition photography with a shallow depth of field, emphasizing the child's face and the high-contrast yellow color of his clothes." src="https://lh3.googleusercontent.com/aida-public/AB6AXuALSmf5_N5T3I5bUbJsEcUGpn-DRuSkphH2uJa_oMoR8Pk3kToesG0mKRqFv_0eBWgmakZ7mnAfKK2pTJlmQ8ZMY3kOtq6pa7Inz8y5er-zQEKHKybA723pNAg2dyebCBCMl6B6gzOuazXulv_q8cpzgStpnZNt3HemTFgHOVq85_EeLP-dEnm5Ay4bcwYhkAPmfJGDIRGyzyqDXWnUbCRga8X54dZxNyn8gs5VZtKHmpO9hKX9ld-oGSQxCwKQS8m85ni-0XwNZHts"/>
-<div class="flex-1">
-<h3 class="font-headline-md text-headline-md text-on-surface">Liam is Missing</h3>
-<p class="font-label-bold text-label-bold text-primary mt-base">Central Park, North Sector</p>
-<p class="font-body-md text-body-md text-on-surface-variant mt-sm">"Last seen near the water fountain wearing a yellow hoodie."</p>
-</div>
-</div>
-<button class="w-full mt-lg py-md bg-error text-on-error rounded-full font-label-bold text-label-bold active:scale-95 transition-transform" onclick="window.location.href='./report_details.html'">View Details</button>
-</div>
-</div>
-<!-- 5. V2 Device Alert (SOS) - Higher priority moved up -->
-<div class="bg-inverse-surface rounded-lg p-lg shadow-lg relative overflow-hidden">
-<div class="absolute top-0 right-0 p-lg">
-<span class="material-symbols-outlined text-primary-fixed text-3xl opacity-20">watch</span>
-</div>
-<div class="flex items-center gap-sm mb-md">
-<span class="material-symbols-outlined text-primary-fixed" style="font-variation-settings: 'FILL' 1;">emergency_home</span>
-<span class="font-label-bold text-label-bold text-primary-fixed">V2 DEVICE ALERT</span>
-<span class="w-2 h-2 rounded-full bg-primary-fixed"></span>
-<span class="font-label-sm text-label-sm text-outline-variant">5m ago</span>
-</div>
-<h3 class="font-headline-md text-headline-md text-on-primary-container">SOS Triggered - Sarah's Watch</h3>
-<p class="font-body-md text-body-md text-outline-variant mt-sm">Emergency button pressed at Home (Geo-fence verified).</p>
-<div class="flex gap-md mt-lg">
-<button class="flex-1 py-md bg-primary-container text-on-primary-container rounded-full font-label-bold text-label-bold active:scale-95 transition-transform">Call Sarah</button>
-<button class="flex-1 py-md bg-surface-container-highest text-on-surface rounded-full font-label-bold text-label-bold active:scale-95 transition-transform">Live GPS</button>
-</div>
-</div>
-<!-- 3. Matching Alert -->
-<div class="bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] border border-primary/10">
-<div class="p-lg">
-<div class="flex justify-between items-center mb-md">
-<div class="bg-primary/10 text-primary px-sm py-base rounded-full flex items-center gap-xs">
-<span class="material-symbols-outlined text-sm">verified_user</span>
-<span class="font-label-bold text-label-bold">POTENTIAL MATCH FOUND</span>
-</div>
-<span class="font-label-bold text-label-bold text-tertiary">98% Confidence</span>
-</div>
-<div class="flex items-center justify-between gap-md mb-lg">
-<div class="flex-1 text-center">
-<img alt="Database" class="w-full aspect-square rounded-lg object-cover grayscale opacity-60" data-alt="A clinical identification photo of a child, lit with neutral studio lighting against a plain grey background. The style is formal and archival, maintaining a professional database look. The focus is sharp on the facial features, conveying a sense of identification and security record-keeping." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjXc6s0M-RxE8WkKzyveFh2YbG8g9FUnAke3hX-BrYNaBTM-fAQaeKNq3ICh-U6-qs8zejz3BtIiU4Rezcqr7_RoDn2VvYH3AKB83swuFtpa03WG5lVkVSRErfMzAR1X0cR8dYDdSpg4PVI8qn-OdlNh6Yl0TpAG1D49XUKVkwhh4a7F0gzYO2kc3xPoKlJ0OJPkAC9xITgB-zGBi0Y2RTpwihn2zFlArU28y5aI8_otDg2xp1HPlXRG-coY4Dv4mg5NrS90EofYHg"/>
-<span class="font-label-sm text-label-sm text-outline mt-xs block">Database</span>
-</div>
-<span class="material-symbols-outlined text-primary text-3xl">compare_arrows</span>
-<div class="flex-1 text-center">
-<img alt="Found" class="w-full aspect-square rounded-lg object-cover" data-alt="A candid, high-resolution smartphone photo of a child in a busy public square. The lighting is bright afternoon sunlight, casting realistic shadows. The image has a slight motion blur typical of a quick snapshot, making it look authentic and immediate. The child is wearing similar clothing to the database photo but in a real-world environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNJNWHYOcNSq1Dg-JHAXU_nZ_POOj2pUAf0SY6RiJRJZoh3rrZ_vWQXZx8GmzlmvZK4iPh1aCLJ_BPMgQrfkc2StNQ4yqX3BtgbdvnnNHJGmwXDm-xgDVfTNauRqv-mvEwR-dcMhN9t9Bd9gjRVKspsFEWutmf5Hwc4D2n-QnZv9xqjpUPbORmeFKFb7CXKiLzuosUj4vYSrelf8wlpHfYXRx09mj-EApWR3fentirr8XZQDTwHt1CB6RrTUTmEYHKx3fCzMP2r6ZZ"/>
-<span class="font-label-sm text-label-sm text-primary font-bold mt-xs block">Found Now</span>
-</div>
-</div>
-<div class="flex gap-md">
-<button class="flex-1 py-md border border-outline-variant text-on-surface-variant rounded-full font-label-bold text-label-bold active:scale-95 transition-transform">Dismiss</button>
-<button class="flex-1 py-md bg-primary text-on-primary rounded-full font-label-bold text-label-bold shadow-md active:scale-95 transition-transform" onclick="window.location.href='./ai_smart_matching.html'">Review Match</button>
-</div>
-</div>
-</div>
-<!-- 2. Report Status Alert -->
-<div class="bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] p-lg flex gap-md items-start">
-<div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center flex-shrink-0">
-<span class="material-symbols-outlined text-on-surface-variant">description</span>
-</div>
-<div class="flex-1">
-<div class="flex justify-between">
-<h3 class="font-headline-md text-headline-md text-on-surface">Report Under Review</h3>
-<span class="font-label-sm text-label-sm text-on-surface-variant">15m ago</span>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant mt-base">Your report for Amadou is being verified by the local community leads.</p>
-<button class="mt-md text-primary font-label-bold text-label-bold flex items-center gap-xs" onclick="window.location.href='./report_details.html'">
-                        View Report <span class="material-symbols-outlined text-sm">arrow_forward</span>
+<section class="-mx-container-margin px-container-margin mb-lg overflow-x-auto hide-scrollbar flex gap-sm items-center pb-1" id="filterChipsContainer">
+<button data-category="all" class="px-lg py-sm rounded-full bg-primary text-on-primary font-label-bold text-label-bold shadow-md whitespace-nowrap flex items-center gap-1.5 transition-all">
+    All <span id="count-all" class="px-1.5 py-0.2 bg-white/20 text-white text-[10px] rounded-full">0</span>
 </button>
+<button data-category="EMERGENCY" class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Emergency <span id="count-EMERGENCY" class="px-1.5 py-0.2 bg-primary/10 text-primary text-[10px] rounded-full">0</span>
+</button>
+<button data-category="REPORT" class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Reports <span id="count-REPORT" class="px-1.5 py-0.2 bg-primary/10 text-primary text-[10px] rounded-full">0</span>
+</button>
+<button data-category="COMMUNITY" class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Community <span id="count-COMMUNITY" class="px-1.5 py-0.2 bg-primary/10 text-primary text-[10px] rounded-full">0</span>
+</button>
+<button data-category="MATCH" class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Matches <span id="count-MATCH" class="px-1.5 py-0.2 bg-primary/10 text-primary text-[10px] rounded-full">0</span>
+</button>
+<button data-category="WEARABLE" class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap flex items-center gap-1.5 transition-all">
+    V2 <span id="count-WEARABLE" class="px-1.5 py-0.2 bg-primary/10 text-primary text-[10px] rounded-full">0</span>
+</button>
+</section>
+
+<!-- Pull to Refresh Indicator -->
+<div id="pullRefreshIndicator" class="text-center py-2 text-xs text-on-surface-variant hidden">
+    <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Actualisation...</span>
 </div>
+
+<!-- Feed Content -->
+<div class="px-container-margin space-y-lg" id="alertsFeedContainer">
+    <!-- Dynamically rendered alert cards with Supabase readiness & pagination -->
 </div>
-<!-- 4. Community Alert -->
-<div class="bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] overflow-hidden border-t border-primary/5">
-<div class="bg-primary/5 p-lg border-l-4 border-primary">
-<div class="flex items-center gap-sm mb-sm">
-<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">groups</span>
-<span class="font-label-bold text-label-bold text-primary">COMMUNITY BEACON ACTIVE</span>
+
+<!-- Pagination / Load More -->
+<div class="px-container-margin py-xl text-center" id="loadMoreContainer">
+    <button id="loadMoreBtn" class="px-8 py-3 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-full font-label-bold text-label-bold transition-all shadow-sm">
+        Charger plus d'alertes (Pagination active)
+    </button>
 </div>
-<h3 class="font-headline-md text-headline-md text-on-surface">Nearby Missing Child</h3>
-<p class="font-body-md text-body-md text-on-surface-variant mt-base">A beacon was activated 1.2 miles away from your current location.</p>
-<button class="w-full mt-lg py-md bg-white border border-primary text-primary rounded-full font-label-bold text-label-bold shadow-sm hover:bg-primary/5 active:scale-95 transition-all" onclick="window.location.href='./report_details.html'">Help Nearby</button>
-</div>
-</div>
-</div>
+
+<script>
+    // Comprehensive alert dataset covering all 6 categories with Supabase readiness structure
+    const allAlertsData = [
+        {
+            id: 'alt-1',
+            category: 'EMERGENCY',
+            title: 'Liam is Missing',
+            subtitle: 'Central Park, North Sector',
+            description: '"Last seen near the water fountain wearing a yellow hoodie."',
+            timestamp: '2m ago',
+            read: false,
+            priority: 'high',
+            type: 'missing_child',
+            photo: 'https://lh3.googleusercontent.com/aida-public/AB6AXuALSmf5_N5T3I5bUbJsEcUGpn-DRuSkphH2uJa_oMoR8Pk3kToesG0mKRqFv_0eBWgmakZ7mnAfKK2pTJlmQ8ZMY3kOtq6pa7Inz8y5er-zQEKHKybA723pNAg2dyebCBCMl6B6gzOuazXulv_q8cpzgStpnZNt3HemTFgHOVq85_EeLP-dEnm5Ay4bcwYhkAPmfJGDIRGyzyqDXWnUbCRga8X54dZxNyn8gs5VZtKHmpO9hKX9ld-oGSQxCwKQS8m85ni-0XwNZHts',
+            actionText: 'View Details',
+            actionUrl: './report_details.html'
+        },
+        {
+            id: 'alt-2',
+            category: 'WEARABLE',
+            title: "SOS Triggered - Sarah's Watch",
+            description: "Emergency button pressed at Home (Geo-fence verified).",
+            timestamp: '5m ago',
+            read: false,
+            priority: 'high',
+            type: 'sos',
+            actionTextPrimary: 'Call Sarah',
+            actionTextSecondary: 'Live GPS'
+        },
+        {
+            id: 'alt-3',
+            category: 'MATCH',
+            title: 'POTENTIAL MATCH FOUND',
+            confidence: '98% Confidence',
+            description: "Visual identification systems have flagged a high-confidence match at Subway Station A12.",
+            timestamp: '10m ago',
+            read: false,
+            priority: 'normal',
+            type: 'match',
+            databasePhoto: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAjXc6s0M-RxE8WkKzyveFh2YbG8g9FUnAke3hX-BrYNaBTM-fAQaeKNq3ICh-U6-qs8zejz3BtIiU4Rezcqr7_RoDn2VvYH3AKB83swuFtpa03WG5lVkVSRErfMzAR1X0cR8dYDdSpg4PVI8qn-OdlNh6Yl0TpAG1D49XUKVkwhh4a7F0gzYO2kc3xPoKlJ0OJPkAC9xITgB-zGBi0Y2RTpwihn2zFlArU28y5aI8_otDg2xp1HPlXRG-coY4Dv4mg5NrS90EofYHg',
+            foundPhoto: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBNJNWHYOcNSq1Dg-JHAXU_nZ_POOj2pUAf0SY6RiJRJZoh3rrZ_vWQXZx8GmzlmvZK4iPh1aCLJ_BPMgQrfkc2StNQ4yqX3BtgbdvnnNHJGmwXDm-xgDVfTNauRqv-mvEwR-dcMhN9t9Bd9gjRVKspsFEWutmf5Hwc4D2n-QnZv9xqjpUPbORmeFKFb7CXKiLzuosUj4vYSrelf8wlpHfYXRx09mj-EApWR3fentirr8XZQDTwHt1CB6RrTUTmEYHKx3fCzMP2r6ZZ',
+            actionText: 'Review Match',
+            actionUrl: './ai_smart_matching.html'
+        },
+        {
+            id: 'alt-4',
+            category: 'REPORT',
+            title: 'Report Under Review',
+            description: "Your report for Amadou is being verified by the local community leads.",
+            timestamp: '15m ago',
+            read: true,
+            priority: 'normal',
+            type: 'report',
+            actionText: 'View Report',
+            actionUrl: './report_details.html'
+        },
+        {
+            id: 'alt-5',
+            category: 'COMMUNITY',
+            title: 'Nearby Missing Child',
+            description: "A beacon was activated 1.2 miles away from your current location.",
+            timestamp: '25m ago',
+            read: false,
+            priority: 'normal',
+            type: 'community',
+            actionText: 'Help Nearby',
+            actionUrl: './report_details.html'
+        },
+        {
+            id: 'alt-6',
+            category: 'EMERGENCY',
+            title: 'Battery Critical - Tracker Alpha',
+            subtitle: 'School Zone Perimeter',
+            description: "Device battery has dropped below 5%. Immediate recharge required.",
+            timestamp: '1h ago',
+            read: true,
+            priority: 'high',
+            type: 'emergency_broadcast',
+            actionText: 'Device Status',
+            actionUrl: './emergency_preferences.html'
+        },
+        {
+            id: 'alt-7',
+            category: 'REPORT',
+            title: 'Missing Report Submitted',
+            description: "Case #MS-2026-881 successfully registered in the secure database.",
+            timestamp: '2h ago',
+            read: true,
+            priority: 'normal',
+            type: 'report',
+            actionText: 'View Report',
+            actionUrl: './reports_directory.html'
+        },
+        {
+            id: 'alt-8',
+            category: 'COMMUNITY',
+            title: 'New Helper Joined',
+            description: "15 new certified volunteers joined your local neighborhood safety grid.",
+            timestamp: '3h ago',
+            read: true,
+            priority: 'normal',
+            type: 'community',
+            actionText: 'View Community',
+            actionUrl: './home_child_safety_v1.html'
+        },
+        {
+            id: 'alt-9',
+            category: 'MATCH',
+            title: 'Strong Match Found',
+            confidence: '95% Confidence',
+            description: "High facial similarity score reported by biometric verification engine.",
+            timestamp: '4h ago',
+            read: true,
+            priority: 'normal',
+            type: 'match',
+            databasePhoto: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAjXc6s0M-RxE8WkKzyveFh2YbG8g9FUnAke3hX-BrYNaBTM-fAQaeKNq3ICh-U6-qs8zejz3BtIiU4Rezcqr7_RoDn2VvYH3AKB83swuFtpa03WG5lVkVSRErfMzAR1X0cR8dYDdSpg4PVI8qn-OdlNh6Yl0TpAG1D49XUKVkwhh4a7F0gzYO2kc3xPoKlJ0OJPkAC9xITgB-zGBi0Y2RTpwihn2zFlArU28y5aI8_otDg2xp1HPlXRG-coY4Dv4mg5NrS90EofYHg',
+            foundPhoto: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBNJNWHYOcNSq1Dg-JHAXU_nZ_POOj2pUAf0SY6RiJRJZoh3rrZ_vWQXZx8GmzlmvZK4iPh1aCLJ_BPMgQrfkc2StNQ4yqX3BtgbdvnnNHJGmwXDm-xgDVfTNauRqv-mvEwR-dcMhN9t9Bd9gjRVKspsFEWutmf5Hwc4D2n-QnZv9xqjpUPbORmeFKFb7CXKiLzuosUj4vYSrelf8wlpHfYXRx09mj-EApWR3fentirr8XZQDTwHt1CB6RrTUTmEYHKx3fCzMP2r6ZZ',
+            actionText: 'Review Match',
+            actionUrl: './ai_smart_matching.html'
+        },
+        {
+            id: 'alt-10',
+            category: 'WEARABLE',
+            title: 'Device Offline - Bracelet Beta',
+            description: "Tracker heartbeat lost for over 15 minutes. Checking GSM signal.",
+            timestamp: '5h ago',
+            read: true,
+            priority: 'normal',
+            type: 'wearable',
+            actionText: 'Troubleshoot',
+            actionUrl: './emergency_preferences.html'
+        },
+        {
+            id: 'alt-11',
+            category: 'WEARABLE',
+            title: 'GPS Restored - Sarahs Watch',
+            description: "Satellite fix successfully acquired in outdoor urban sector.",
+            timestamp: '6h ago',
+            read: true,
+            priority: 'normal',
+            type: 'wearable'
+        }
+    ];
+
+    let currentCategory = 'all';
+
+    function renderAlerts() {
+        const container = document.getElementById('alertsFeedContainer');
+        if (!container) return;
+
+        const filtered = currentCategory === 'all' 
+            ? allAlertsData 
+            : allAlertsData.filter(a => a.category === currentCategory);
+
+        // Update counts
+        document.getElementById('count-all').textContent = allAlertsData.length;
+        document.getElementById('count-EMERGENCY').textContent = allAlertsData.filter(a => a.category === 'EMERGENCY').length;
+        document.getElementById('count-REPORT').textContent = allAlertsData.filter(a => a.category === 'REPORT').length;
+        document.getElementById('count-COMMUNITY').textContent = allAlertsData.filter(a => a.category === 'COMMUNITY').length;
+        document.getElementById('count-MATCH').textContent = allAlertsData.filter(a => a.category === 'MATCH').length;
+        document.getElementById('count-WEARABLE').textContent = allAlertsData.filter(a => a.category === 'WEARABLE').length;
+
+        if (filtered.length === 0) {
+            container.innerHTML = `
+                <div class="bg-surface rounded-xl p-xl text-center shadow-sm border border-outline-variant/20">
+                    <span class="material-symbols-outlined text-4xl text-outline mb-2">notifications_off</span>
+                    <h3 class="font-headline-md text-headline-md text-on-surface">Aucune alerte dans cette catégorie</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant mt-xs">Vous êtes à jour. Aucune nouvelle notification pour le moment.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        filtered.forEach(alt => {
+            const unreadIndicator = !alt.read ? '<span class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-white"></span>' : '';
+
+            if (alt.category === 'EMERGENCY') {
+                html += `
+                <div class="relative bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] overflow-hidden border-l-4 border-error">
+                    ${unreadIndicator}
+                    <div class="p-lg">
+                        <div class="flex justify-between items-start mb-md">
+                            <div class="flex items-center gap-sm">
+                                <span class="flex h-3 w-3 rounded-full bg-error animate-pulse"></span>
+                                <span class="font-label-bold text-label-bold text-error uppercase tracking-wider">${alt.title.includes('Battery') ? 'System Warning' : 'Urgent Alert'}</span>
+                            </div>
+                            <span class="font-label-sm text-label-sm text-on-surface-variant">${alt.timestamp}</span>
+                        </div>
+                        <div class="flex gap-lg">
+                            ${alt.photo ? `<img alt="Alert Photo" class="w-20 h-20 rounded-lg object-cover shadow-sm" src="${alt.photo}"/>` : `<div class="w-20 h-20 rounded-lg bg-error/10 text-error flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-3xl">warning</span></div>`}
+                            <div class="flex-1">
+                                <h3 class="font-headline-md text-headline-md text-on-surface">${alt.title}</h3>
+                                ${alt.subtitle ? `<p class="font-label-bold text-label-bold text-primary mt-base">${alt.subtitle}</p>` : ''}
+                                <p class="font-body-md text-body-md text-on-surface-variant mt-sm">${alt.description}</p>
+                            </div>
+                        </div>
+                        <button class="w-full mt-lg py-md bg-error text-on-error rounded-full font-label-bold text-label-bold active:scale-95 transition-transform" onclick="window.location.href='${alt.actionUrl || './report_details.html'}'; markAsRead('${alt.id}')">${alt.actionText || 'View Details'}</button>
+                    </div>
+                </div>`;
+            } else if (alt.category === 'WEARABLE') {
+                html += `
+                <div class="bg-inverse-surface rounded-lg p-lg shadow-lg relative overflow-hidden">
+                    ${unreadIndicator}
+                    <div class="absolute top-0 right-0 p-lg">
+                        <span class="material-symbols-outlined text-primary-fixed text-3xl opacity-20">watch</span>
+                    </div>
+                    <div class="flex items-center gap-sm mb-md">
+                        <span class="material-symbols-outlined text-primary-fixed" style="font-variation-settings: 'FILL' 1;">emergency_home</span>
+                        <span class="font-label-bold text-label-bold text-primary-fixed">V2 DEVICE ALERT</span>
+                        <span class="w-2 h-2 rounded-full bg-primary-fixed"></span>
+                        <span class="font-label-sm text-label-sm text-outline-variant">${alt.timestamp}</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-on-primary-container">${alt.title}</h3>
+                    <p class="font-body-md text-body-md text-outline-variant mt-sm">${alt.description}</p>
+                    ${alt.actionTextPrimary ? `
+                    <div class="flex gap-md mt-lg">
+                        <button class="flex-1 py-md bg-primary-container text-on-primary-container rounded-full font-label-bold text-label-bold active:scale-95 transition-transform" onclick="markAsRead('${alt.id}')">${alt.actionTextPrimary}</button>
+                        <button class="flex-1 py-md bg-surface-container-highest text-on-surface rounded-full font-label-bold text-label-bold active:scale-95 transition-transform" onclick="markAsRead('${alt.id}')">${alt.actionTextSecondary}</button>
+                    </div>` : `
+                    <button class="w-full mt-lg py-md bg-surface-container-highest text-on-surface rounded-full font-label-bold text-label-bold active:scale-95 transition-transform" onclick="markAsRead('${alt.id}')">Détails de l'appareil</button>`}
+                </div>`;
+            } else if (alt.category === 'MATCH') {
+                html += `
+                <div class="bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] border border-primary/10 relative">
+                    ${unreadIndicator}
+                    <div class="p-lg">
+                        <div class="flex justify-between items-center mb-md">
+                            <div class="bg-primary/10 text-primary px-sm py-base rounded-full flex items-center gap-xs">
+                                <span class="material-symbols-outlined text-sm">verified_user</span>
+                                <span class="font-label-bold text-label-bold">${alt.title}</span>
+                            </div>
+                            <span class="font-label-bold text-label-bold text-tertiary">${alt.confidence}</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-md mb-lg">
+                            <div class="flex-1 text-center">
+                                <img alt="Database" class="w-full aspect-square rounded-lg object-cover grayscale opacity-60" src="${alt.databasePhoto}"/>
+                                <span class="font-label-sm text-label-sm text-outline mt-xs block">Database</span>
+                            </div>
+                            <span class="material-symbols-outlined text-primary text-3xl">compare_arrows</span>
+                            <div class="flex-1 text-center">
+                                <img alt="Found" class="w-full aspect-square rounded-lg object-cover" src="${alt.foundPhoto}"/>
+                                <span class="font-label-sm text-label-sm text-primary font-bold mt-xs block">Found Now</span>
+                            </div>
+                        </div>
+                        <p class="font-body-md text-body-md text-on-surface-variant mb-lg">${alt.description}</p>
+                        <div class="flex gap-md">
+                            <button class="flex-1 py-md border border-outline-variant text-on-surface-variant rounded-full font-label-bold text-label-bold active:scale-95 transition-transform" onclick="markAsRead('${alt.id}')">Dismiss</button>
+                            <button class="flex-1 py-md bg-primary text-on-primary rounded-full font-label-bold text-label-bold shadow-md active:scale-95 transition-transform" onclick="window.location.href='${alt.actionUrl}'; markAsRead('${alt.id}')">${alt.actionText}</button>
+                        </div>
+                    </div>
+                </div>`;
+            } else if (alt.category === 'REPORT') {
+                html += `
+                <div class="bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] p-lg flex gap-md items-start relative">
+                    ${unreadIndicator}
+                    <div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-on-surface-variant">description</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex justify-between">
+                            <h3 class="font-headline-md text-headline-md text-on-surface">${alt.title}</h3>
+                            <span class="font-label-sm text-label-sm text-on-surface-variant">${alt.timestamp}</span>
+                        </div>
+                        <p class="font-body-md text-body-md text-on-surface-variant mt-base">${alt.description}</p>
+                        <button class="mt-md text-primary font-label-bold text-label-bold flex items-center gap-xs" onclick="window.location.href='${alt.actionUrl || './report_details.html'}'; markAsRead('${alt.id}')">
+                            ${alt.actionText || 'View Report'} <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>`;
+            } else if (alt.category === 'COMMUNITY') {
+                html += `
+                <div class="bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] overflow-hidden border-t border-primary/5 relative">
+                    ${unreadIndicator}
+                    <div class="bg-primary/5 p-lg border-l-4 border-primary">
+                        <div class="flex items-center gap-sm mb-sm">
+                            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">groups</span>
+                            <span class="font-label-bold text-label-bold text-primary">COMMUNITY BEACON ACTIVE</span>
+                        </div>
+                        <h3 class="font-headline-md text-headline-md text-on-surface">${alt.title}</h3>
+                        <p class="font-body-md text-body-md text-on-surface-variant mt-base">${alt.description}</p>
+                        <button class="w-full mt-lg py-md bg-white border border-primary text-primary rounded-full font-label-bold text-label-bold shadow-sm hover:bg-primary/5 active:scale-95 transition-all" onclick="window.location.href='${alt.actionUrl || './report_details.html'}'; markAsRead('${alt.id}')">${alt.actionText || 'Help Nearby'}</button>
+                    </div>
+                </div>`;
+            }
+        });
+
+        container.innerHTML = html;
+    }
+
+    function markAsRead(id) {
+        const alt = allAlertsData.find(a => a.id === id);
+        if (alt) {
+            alt.read = true;
+            renderAlerts();
+        }
+    }
+
+    document.getElementById('markAllReadBtn').addEventListener('click', () => {
+        allAlertsData.forEach(a => a.read = true);
+        renderAlerts();
+    });
+
+    // Setup chip filtering
+    document.querySelectorAll('#filterChipsContainer button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const cat = this.getAttribute('data-category');
+            currentCategory = cat;
+
+            // Update chip styles
+            document.querySelectorAll('#filterChipsContainer button').forEach(b => {
+                b.classList.remove('bg-primary', 'text-on-primary', 'shadow-md', 'font-label-bold');
+                b.classList.add('bg-surface-container', 'text-on-surface-variant', 'font-label-sm');
+            });
+            this.classList.remove('bg-surface-container', 'text-on-surface-variant', 'font-label-sm');
+            this.classList.add('bg-primary', 'text-on-primary', 'shadow-md', 'font-label-bold');
+
+            renderAlerts();
+        });
+    });
+
+    // Pull-to-refresh simulation
+    let touchStartY = 0;
+    const indicator = document.getElementById('pullRefreshIndicator');
+
+    window.addEventListener('touchstart', e => {
+        touchStartY = e.touches[0].clientY;
+    });
+
+    window.addEventListener('touchend', e => {
+        const touchEndY = e.changedTouches[0].clientY;
+        if (touchEndY - touchStartY > 120 && window.scrollY <= 10) {
+            indicator.classList.remove('hidden');
+            setTimeout(() => {
+                indicator.classList.add('hidden');
+                renderAlerts();
+            }, 1000);
+        }
+    });
+
+    // Pagination / Infinite scroll simulation
+    document.getElementById('loadMoreBtn').addEventListener('click', () => {
+        const btn = document.getElementById('loadMoreBtn');
+        btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Chargement des alertes antérieures...';
+        setTimeout(() => {
+            // Append some past archive alerts
+            allAlertsData.push({
+                id: 'alt-' + (allAlertsData.length + 1),
+                category: 'COMMUNITY',
+                title: 'Community Safety Broadcast (Archive)',
+                description: "Weekly safety check-in completed across 14 zones.",
+                timestamp: '2d ago',
+                read: true,
+                priority: 'normal',
+                type: 'community',
+                actionText: 'View Report',
+                actionUrl: './reports_directory.html'
+            });
+            btn.innerHTML = "Charger plus d'alertes (Pagination active)";
+            renderAlerts();
+        }, 800);
+    });
+
+    // Initial render
+    document.addEventListener('DOMContentLoaded', () => {
+        renderAlerts();
+    });
+</script>
 </main>
 <!-- Floating Action Button (FAB) - Optional context-sensitive -->
 <button class="fixed right-container-margin bottom-28 w-14 h-14 bg-gradient-to-tr from-primary to-primary-container text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-all duration-200 z-40 border-4 border-white/20" onclick="window.location.href='./signaler_un_enfant_trouv_tape_1.html'">

@@ -285,11 +285,30 @@ if (googleBtn) {
 }
 
 // Check session and listen to auth state changes
-supabase.auth.onAuthStateChange((event, session) => {
+supabase.auth.onAuthStateChange(async (event, session) => {
     if (session) {
-        console.log("Session active (event: " + event + "). Redirecting to Home...");
+        console.log("Session active (event: " + event + "). Checking profile...");
         localStorage.setItem('is_guest', 'false');
-        window.location.href = './home_child_safety_v1.html';
+        try {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+            if (profile) {
+                window.location.href = './home_child_safety_v1.html';
+            } else {
+                const metadata = session.user.user_metadata || {};
+                sessionStorage.setItem('google_signup_email', session.user.email || metadata.email || '');
+                sessionStorage.setItem('google_signup_fullname', metadata.full_name || metadata.name || '');
+                sessionStorage.setItem('google_signup_avatar', metadata.avatar_url || metadata.picture || '');
+                sessionStorage.setItem('is_google_pending', 'true');
+                window.location.href = './basic_information.html';
+            }
+        } catch (err) {
+            window.location.href = './home_child_safety_v1.html';
+        }
     }
 });
 
