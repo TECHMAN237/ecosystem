@@ -241,22 +241,41 @@
                     }
 
                     if (!profile) {
-                        console.log("Profile not found. First-time user login. Redirecting to onboarding (basic_information.html)...");
-                        const metadata = user.user_metadata || {};
-                        sessionStorage.setItem('google_signup_email', user.email || metadata.email || '');
-                        sessionStorage.setItem('google_signup_fullname', metadata.full_name || metadata.name || '');
-                        sessionStorage.setItem('google_signup_avatar', metadata.avatar_url || metadata.picture || '');
-                        sessionStorage.setItem('is_google_pending', 'true');
-                        window.location.href = './basic_information.html';
-                        return;
+                        console.log("Profile not found. Automatically creating profile for user...");
+                        const fullname = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'User';
+                        const username = (user.user_metadata?.username || user.email?.split('@')[0] || 'user') + Math.floor(Math.random() * 1000);
+                        
+                        const profilePayload = {
+                            id: user.id,
+                            user_id: user.id,
+                            full_name: fullname,
+                            username: username,
+                            email: user.email || '',
+                            phone_country_code: '',
+                            phone_number: '',
+                            city: '',
+                            role: 'Guardian',
+                            terms_accepted: true
+                        };
+
+                        const { error: insertErr } = await supabase
+                            .from('profiles')
+                            .insert([profilePayload]);
+
+                        if (insertErr) {
+                            console.error("Error automatically creating profile:", insertErr);
+                        } else {
+                            console.log("Profile automatically created successfully!");
+                        }
                     } else {
-                        console.log("Profile already exists for user. Redirecting to Home...");
-                        window.location.href = './home_child_safety_v1.html';
+                        console.log("Profile already exists for user.");
                     }
                 } catch (profileCatchErr) {
                     console.error("Exception handling profile logic:", profileCatchErr);
-                    window.location.href = './home_child_safety_v1.html';
                 }
+
+                console.log("Redirecting to Home...");
+                window.location.href = './home_child_safety_v1.html';
             } else {
                 console.log("No active session (event: " + event + ").");
                 // Avoid setting multiple timeouts
