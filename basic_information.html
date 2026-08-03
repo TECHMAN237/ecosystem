@@ -337,6 +337,15 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
         const errorText = document.getElementById('errorText');
         const continueBtn = document.getElementById('continueBtn');
 
+        function getDbRole(rawRole) {
+            if (!rawRole) return 'Guardian';
+            const lower = rawRole.toLowerCase();
+            if (lower.includes('parent') || lower.includes('famille')) return 'Parent';
+            if (lower.includes('bénévole') || lower.includes('volunteer') || lower.includes('communauté') || lower.includes('helper')) return 'Volunteer';
+            if (lower.includes('partenaire') || lower.includes('partner') || lower.includes('admin')) return 'Admin';
+            return 'Guardian';
+        }
+
         function showError(msg) {
             errorText.textContent = msg;
             errorMsg.classList.remove('hidden');
@@ -414,7 +423,7 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                         phone_country_code: countrycode,
                         phone_number: phonenumber,
                         city: city,
-                        role: role,
+                        role: getDbRole(role),
                         terms_accepted: true,
                         is_verified: true,
                         created_at: new Date().toISOString(),
@@ -563,7 +572,7 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                         phone_country_code: countrycode || '',
                         phone_number: phonenumber || '',
                         city: city || '',
-                        role: role,
+                        role: getDbRole(role),
                         terms_accepted: terms
                     };
 
@@ -620,7 +629,7 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                             phone_country_code: countrycode,
                             phone_number: phonenumber,
                             city: city,
-                            role: role,
+                            role: getDbRole(role),
                             terms_accepted: terms
                         })
                         .eq('id', user.id);
