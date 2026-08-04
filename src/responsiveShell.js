@@ -100,7 +100,7 @@
         let activeTab = 'accueil';
         if (path.includes('home_child_safety_v1')) {
             activeTab = 'accueil';
-        } else if (path.includes('reports_directory') || path.includes('found_reports_directory') || path.includes('signaler_un_disparu') || path.includes('signaler_un_enfant_trouv') || path.includes('report_details') || path.includes('found_report_details') || path.includes('report_under_review') || path.includes('my_case_dashboard')) {
+        } else if (path.includes('reports_directory') || path.includes('found_reports_directory') || path.includes('signaler_un_disparu') || path.includes('signaler_un_enfant_trouv') || path.includes('create_missing_report') || path.includes('report_details') || path.includes('found_report_details') || path.includes('report_under_review') || path.includes('my_case_dashboard') || path.includes('v_rifier_le_lien_de_parent') || path.includes('v_rifier_le_signalement_tape_2_evidence')) {
             activeTab = 'signalements';
         } else if (path.includes('alert_center') || path.includes('smart_alerts') || path.includes('ai_smart_matching')) {
             activeTab = 'alerts';

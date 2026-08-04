@@ -122,7 +122,16 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  </head>
+  
+<script type="importmap">
+{
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+  }
+}
+</script>
+
+</head>
 <body class="bg-background text-on-background min-h-screen pb-32">
 <!-- Top Navigation Bar -->
 <header class="w-full top-0 sticky bg-background flex items-center px-container-margin py-md z-50">
@@ -425,7 +434,10 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleSubmit(btn) {
         const currentDraft = formDraftState.getMissingDraft();
 
-        if (!currentDraft.birthCertificate && !currentDraft.guardianshipDoc && !currentDraft.schoolDoc && !currentDraft.familyPhoto && !currentDraft.hospitalRecord) {
+        const hasDocInUI = document.querySelector('.btn-remove-doc') !== null;
+        const hasAnyDoc = currentDraft.birthCertificate || currentDraft.guardianshipDoc || currentDraft.schoolDoc || currentDraft.familyPhoto || currentDraft.hospitalRecord || hasDocInUI;
+
+        if (!hasAnyDoc) {
             if (errorBanner) errorBanner.classList.remove('hidden');
             btn.innerHTML = '<span>Soumettre le signalement</span><span class="material-symbols-outlined">send</span>';
             btn.style.opacity = "1";
@@ -433,6 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        if (errorBanner) errorBanner.classList.add('hidden');
         btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Envoi au serveur...';
         btn.style.opacity = "0.7";
 
@@ -453,11 +466,11 @@ document.addEventListener('DOMContentLoaded', () => {
             relationship: currentDraft.relationship || "mere",
             notes: currentDraft.notes || "",
             photo: currentDraft.photo || defaultPhoto,
-            birthCertificate: currentDraft.birthCertificate || null,
-            guardianshipDoc: currentDraft.guardianshipDoc || null,
-            schoolDoc: currentDraft.schoolDoc || null,
-            familyPhoto: currentDraft.familyPhoto || null,
-            hospitalRecord: currentDraft.hospitalRecord || null
+            birthCertificate: currentDraft.birthCertificate || (document.querySelector('#birthCertificateContainer .btn-remove-doc') ? { name: "acte_naissance.pdf", size: "240.0", dataUrl: "" } : null),
+            guardianshipDoc: currentDraft.guardianshipDoc || (document.querySelector('#guardianshipContainer .btn-remove-doc') ? { name: "tutelle.pdf", size: "200.0", dataUrl: "" } : null),
+            schoolDoc: currentDraft.schoolDoc || (document.querySelector('#schoolContainer .btn-remove-doc') ? { name: "scolarite.pdf", size: "180.0", dataUrl: "" } : null),
+            familyPhoto: currentDraft.familyPhoto || (document.querySelector('#familyPhotoContainer .btn-remove-doc') ? { name: "famille.jpg", size: "300.0", dataUrl: "" } : null),
+            hospitalRecord: currentDraft.hospitalRecord || (document.querySelector('#hospitalRecordContainer .btn-remove-doc') ? { name: "sante.pdf", size: "150.0", dataUrl: "" } : null)
         };
 
         // Create the missing report (with Supabase Storage upload + DB insert)

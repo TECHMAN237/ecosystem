@@ -375,6 +375,21 @@ export const reportService = {
         photoUrl = DEFAULT_AVATAR;
       }
 
+      let docUrlsText = "";
+      const docKeys = ['envPhoto', 'childPhoto'];
+      for (const dk of docKeys) {
+        if (reportData[dk] && reportData[dk] !== photoUrl) {
+          const docItem = reportData[dk];
+          const docData = typeof docItem === 'object' && docItem.dataUrl ? docItem.dataUrl : docItem;
+          if (typeof docData === 'string' && (docData.startsWith("data:") || docData.startsWith("http"))) {
+            const upUrl = await this.uploadFileToSupabaseStorage(docData, "reports");
+            if (upUrl) {
+              docUrlsText += ` [${dk}: ${upUrl}]`;
+            }
+          }
+        }
+      }
+
       const dbId = generateUUID();
       const reports = this.getFoundReports();
       const newReport = {
@@ -396,6 +411,7 @@ export const reportService = {
         const reporterId = session && session.user ? session.user.id : null;
 
         const physicalDescWithFound = `[TROUVÉ] ${newReport.physicalDescription || ''} | Lieu sûr: ${newReport.currentSafeLocation || ''} | GPS: ${newReport.gps || ''}`;
+        const incidentDesc = (newReport.notes || newReport.physicalDescription || "Enfant trouvé en sécurité") + docUrlsText;
 
         const { error: insertErr } = await supabase.from('missing_reports').insert([{
           id: dbId,
@@ -408,7 +424,7 @@ export const reportService = {
           last_seen_time: newReport.time,
           physical_description: physicalDescWithFound,
           clothing_description: newReport.clothingDescription,
-          incident_description: newReport.notes || newReport.physicalDescription || "Enfant trouvé en sécurité",
+          incident_description: incidentDesc,
           emergency_contact_name: "Centre de Sécurité",
           emergency_contact_phone: "677000000",
           child_photo_url: newReport.photo,

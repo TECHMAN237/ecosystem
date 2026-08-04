@@ -35,20 +35,34 @@ export const formDraftState = {
       const current = this.getMissingDraft();
       const updated = { ...current, ...fields };
       
-      localStorage.setItem('draft_missing_report', JSON.stringify(updated));
-      sessionStorage.setItem('pending_report_data', JSON.stringify(updated));
+      try {
+        localStorage.setItem('draft_missing_report', JSON.stringify(updated));
+      } catch (err) {
+        console.warn('LocalStorage quota exceeded for missing report draft');
+      }
+      try {
+        sessionStorage.setItem('pending_report_data', JSON.stringify(updated));
+      } catch (err) {}
 
       if (fields.photo) {
-        localStorage.setItem('draft_missing_photo', fields.photo);
-        sessionStorage.setItem('pending_report_photo', fields.photo);
+        try { localStorage.setItem('draft_missing_photo', fields.photo); } catch(e){}
+        try { sessionStorage.setItem('pending_report_photo', fields.photo); } catch(e){}
       }
-      if (fields.birthCertificate) {
-        const bcVal = typeof fields.birthCertificate === 'object' ? JSON.stringify(fields.birthCertificate) : fields.birthCertificate;
-        localStorage.setItem('draft_missing_bc', bcVal);
+      if (fields.birthCertificate !== undefined) {
+        if (fields.birthCertificate) {
+          const bcVal = typeof fields.birthCertificate === 'object' ? JSON.stringify(fields.birthCertificate) : fields.birthCertificate;
+          try { localStorage.setItem('draft_missing_bc', bcVal); } catch(e){}
+        } else {
+          localStorage.removeItem('draft_missing_bc');
+        }
       }
-      if (fields.guardianshipDoc) {
-        const guardVal = typeof fields.guardianshipDoc === 'object' ? JSON.stringify(fields.guardianshipDoc) : fields.guardianshipDoc;
-        localStorage.setItem('draft_missing_guard', guardVal);
+      if (fields.guardianshipDoc !== undefined) {
+        if (fields.guardianshipDoc) {
+          const guardVal = typeof fields.guardianshipDoc === 'object' ? JSON.stringify(fields.guardianshipDoc) : fields.guardianshipDoc;
+          try { localStorage.setItem('draft_missing_guard', guardVal); } catch(e){}
+        } else {
+          localStorage.removeItem('draft_missing_guard');
+        }
       }
 
       return updated;
@@ -94,15 +108,25 @@ export const formDraftState = {
       const current = this.getFoundDraft();
       const updated = { ...current, ...fields };
 
-      localStorage.setItem('draft_found_report', JSON.stringify(updated));
-      sessionStorage.setItem('pending_found_data', JSON.stringify(updated));
+      try {
+        localStorage.setItem('draft_found_report', JSON.stringify(updated));
+      } catch (err) {
+        console.warn('LocalStorage quota exceeded for found report draft');
+      }
+      try {
+        sessionStorage.setItem('pending_found_data', JSON.stringify(updated));
+      } catch (err) {}
 
       if (fields.photo) {
-        localStorage.setItem('draft_found_photo', fields.photo);
-        sessionStorage.setItem('pending_found_photo', fields.photo);
+        try { localStorage.setItem('draft_found_photo', fields.photo); } catch(e){}
+        try { sessionStorage.setItem('pending_found_photo', fields.photo); } catch(e){}
       }
-      if (fields.evidencePhotos) {
-        localStorage.setItem('draft_found_evidence', JSON.stringify(fields.evidencePhotos));
+      if (fields.evidencePhotos !== undefined) {
+        if (fields.evidencePhotos) {
+          try { localStorage.setItem('draft_found_evidence', JSON.stringify(fields.evidencePhotos)); } catch(e){}
+        } else {
+          localStorage.removeItem('draft_found_evidence');
+        }
       }
 
       return updated;
