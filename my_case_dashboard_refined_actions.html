@@ -191,15 +191,15 @@ import { reportService } from './src/reportService.js';
 
 let currentTab = 'missing';
 
-function renderCases() {
+async function renderCases() {
     const container = document.getElementById('caseListContainer');
     if (!container) return;
 
     let reports = [];
     if (currentTab === 'missing') {
-        reports = reportService.getMissingReports();
+        reports = await reportService.getMyMissingReports();
     } else {
-        reports = reportService.getFoundReports();
+        reports = await reportService.getMyFoundReports();
     }
 
     if (reports.length === 0) {

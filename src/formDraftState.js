@@ -86,9 +86,17 @@ export const formDraftState = {
       const raw = localStorage.getItem('draft_found_report') || sessionStorage.getItem('pending_found_data');
       let data = raw ? JSON.parse(raw) : {};
 
-      const photo = localStorage.getItem('draft_found_photo') || sessionStorage.getItem('pending_found_photo');
+      const photo = localStorage.getItem('draft_found_photo') || sessionStorage.getItem('pending_found_photo') || sessionStorage.getItem('pending_found_child_photo');
       if (photo && !data.photo) {
         data.photo = photo;
+      }
+      const childPhoto = sessionStorage.getItem('pending_found_child_photo') || localStorage.getItem('draft_found_child_photo');
+      if (childPhoto && !data.childPhoto) {
+        data.childPhoto = childPhoto;
+      }
+      const envPhoto = sessionStorage.getItem('pending_found_env_photo') || localStorage.getItem('draft_found_env_photo');
+      if (envPhoto && !data.envPhoto) {
+        data.envPhoto = envPhoto;
       }
 
       const evidence = localStorage.getItem('draft_found_evidence');
@@ -111,7 +119,13 @@ export const formDraftState = {
       try {
         localStorage.setItem('draft_found_report', JSON.stringify(updated));
       } catch (err) {
-        console.warn('LocalStorage quota exceeded for found report draft');
+        try {
+          const lightUpdated = { ...updated };
+          if (lightUpdated.photo && lightUpdated.photo.length > 500000) delete lightUpdated.photo;
+          if (lightUpdated.childPhoto && lightUpdated.childPhoto.length > 500000) delete lightUpdated.childPhoto;
+          if (lightUpdated.envPhoto && lightUpdated.envPhoto.length > 500000) delete lightUpdated.envPhoto;
+          localStorage.setItem('draft_found_report', JSON.stringify(lightUpdated));
+        } catch (e2) {}
       }
       try {
         sessionStorage.setItem('pending_found_data', JSON.stringify(updated));
@@ -120,6 +134,14 @@ export const formDraftState = {
       if (fields.photo) {
         try { localStorage.setItem('draft_found_photo', fields.photo); } catch(e){}
         try { sessionStorage.setItem('pending_found_photo', fields.photo); } catch(e){}
+      }
+      if (fields.childPhoto) {
+        try { localStorage.setItem('draft_found_child_photo', fields.childPhoto); } catch(e){}
+        try { sessionStorage.setItem('pending_found_child_photo', fields.childPhoto); } catch(e){}
+      }
+      if (fields.envPhoto) {
+        try { localStorage.setItem('draft_found_env_photo', fields.envPhoto); } catch(e){}
+        try { sessionStorage.setItem('pending_found_env_photo', fields.envPhoto); } catch(e){}
       }
       if (fields.evidencePhotos !== undefined) {
         if (fields.evidencePhotos) {
@@ -138,9 +160,13 @@ export const formDraftState = {
   clearFoundDraft() {
     localStorage.removeItem('draft_found_report');
     localStorage.removeItem('draft_found_photo');
+    localStorage.removeItem('draft_found_child_photo');
+    localStorage.removeItem('draft_found_env_photo');
     localStorage.removeItem('draft_found_evidence');
     sessionStorage.removeItem('pending_found_data');
     sessionStorage.removeItem('pending_found_photo');
+    sessionStorage.removeItem('pending_found_child_photo');
+    sessionStorage.removeItem('pending_found_env_photo');
   }
 };
 

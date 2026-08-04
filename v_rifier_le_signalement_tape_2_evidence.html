@@ -383,7 +383,10 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSubmit?.addEventListener('click', async () => {
         const currentDraft = formDraftState.getFoundDraft();
 
-        if (!currentDraft.childPhoto && !currentDraft.envPhoto && !currentDraft.photo) {
+        const hasChildPhoto = currentDraft.childPhoto || currentDraft.photo || (document.querySelector('#cardPhotoChild img') !== null);
+        const hasEnvPhoto = currentDraft.envPhoto || (document.querySelector('#cardPhotoEnv img') !== null);
+
+        if (!hasChildPhoto && !hasEnvPhoto) {
             if (errorBanner) errorBanner.classList.remove('hidden');
             btnSubmit.innerHTML = '<span>Soumettre le signalement</span><span class="material-symbols-outlined">send</span>';
             btnSubmit.style.opacity = '1';
@@ -400,6 +403,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ? 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&q=80&w=500'
             : 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&q=80&w=500';
 
+        const childPhotoVal = currentDraft.childPhoto || currentDraft.photo || (document.querySelector('#cardPhotoChild img') ? document.querySelector('#cardPhotoChild img').src : null) || defaultPhoto;
+        const envPhotoVal = currentDraft.envPhoto || (document.querySelector('#cardPhotoEnv img') ? document.querySelector('#cardPhotoEnv img').src : null) || null;
+
         const finalReport = {
             name: `Enfant trouvé (${genderLabel})`,
             age: currentDraft.age || 7,
@@ -412,7 +418,8 @@ document.addEventListener('DOMContentLoaded', () => {
             clothingDescription: currentDraft.clothingDescription || 'T-shirt bleu, pantalon noir.',
             currentSafeLocation: safeLocationSelect ? safeLocationSelect.value : 'Poste de Police',
             gps: '4.0500° N, 9.7000° E',
-            photo: currentDraft.childPhoto || currentDraft.photo || defaultPhoto
+            photo: childPhotoVal,
+            envPhoto: envPhotoVal
         };
 
         const savedReport = await reportService.createFoundReport(finalReport);

@@ -264,6 +264,35 @@ export const reportService = {
     }
   },
 
+  async getCurrentUserId() {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session && session.user) {
+        return session.user.id;
+      }
+    } catch (e) {}
+    let guestId = localStorage.getItem('guardians_local_user_id');
+    if (!guestId) {
+      guestId = 'user_' + Math.random().toString(36).substring(2, 9);
+      localStorage.setItem('guardians_local_user_id', guestId);
+    }
+    return guestId;
+  },
+
+  async getMyMissingReports() {
+    initLocalStorage();
+    const all = this.getMissingReports();
+    const currentId = await this.getCurrentUserId();
+    return all.filter(r => r.reporterId === currentId);
+  },
+
+  async getMyFoundReports() {
+    initLocalStorage();
+    const all = this.getFoundReports();
+    const currentId = await this.getCurrentUserId();
+    return all.filter(r => r.reporterId === currentId);
+  },
+
   async createMissingReport(reportData) {
     initLocalStorage();
     try {
@@ -295,10 +324,12 @@ export const reportService = {
       }
 
       const dbId = generateUUID();
+      const currentId = await this.getCurrentUserId();
       const reports = this.getMissingReports();
       const newReport = {
         id: dbId,
-        status: "Published",
+        reporterId: currentId,
+        status: "Under Review",
         urgency: "Nouveau",
         createdAt: new Date().toISOString(),
         type: "missing",
@@ -311,14 +342,11 @@ export const reportService = {
       // Insert started
       console.log("Insert started");
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const reporterId = session && session.user ? session.user.id : null;
-
         const incidentDesc = (reportData.notes || reportData.physicalDescription || "Signalement de disparition de l'enfant") + docUrlsText;
 
         const { error: insertErr } = await supabase.from('missing_reports').insert([{
           id: dbId,
-          reporter_id: reporterId,
+          reporter_id: currentId,
           child_full_name: newReport.name,
           child_age: newReport.age ? Number(newReport.age) : null,
           child_gender: newReport.gender,
@@ -331,7 +359,7 @@ export const reportService = {
           emergency_contact_name: newReport.relationship || "Parent / Gardien",
           emergency_contact_phone: "677000000",
           child_photo_url: newReport.photo,
-          status: newReport.status,
+          status: "Under Review",
           is_public: true
         }]);
 
@@ -391,10 +419,12 @@ export const reportService = {
       }
 
       const dbId = generateUUID();
+      const currentId = await this.getCurrentUserId();
       const reports = this.getFoundReports();
       const newReport = {
         id: dbId,
-        status: "Trouvé",
+        reporterId: currentId,
+        status: "Under Review",
         urgency: "Recherche Famille",
         createdAt: new Date().toISOString(),
         type: "found",
@@ -407,15 +437,12 @@ export const reportService = {
       // Insert started
       console.log("Insert started");
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const reporterId = session && session.user ? session.user.id : null;
-
         const physicalDescWithFound = `[TROUVÉ] ${newReport.physicalDescription || ''} | Lieu sûr: ${newReport.currentSafeLocation || ''} | GPS: ${newReport.gps || ''}`;
         const incidentDesc = (newReport.notes || newReport.physicalDescription || "Enfant trouvé en sécurité") + docUrlsText;
 
         const { error: insertErr } = await supabase.from('missing_reports').insert([{
           id: dbId,
-          reporter_id: reporterId,
+          reporter_id: currentId,
           child_full_name: newReport.name,
           child_age: newReport.age ? Number(newReport.age) : null,
           child_gender: newReport.gender,
@@ -428,7 +455,7 @@ export const reportService = {
           emergency_contact_name: "Centre de Sécurité",
           emergency_contact_phone: "677000000",
           child_photo_url: newReport.photo,
-          status: "Trouvé",
+          status: "Under Review",
           is_public: true
         }]);
 
