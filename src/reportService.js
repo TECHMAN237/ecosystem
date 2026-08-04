@@ -627,15 +627,21 @@ reportService.uploadAvatarToSupabaseStorage = async function(fileOrBase64) {
 
     if (blob) {
       const fileExt = blob.type === "image/png" ? "png" : "jpg";
-      const filePath = `avatars/user_${session.user.id}_${Date.now()}.${fileExt}`;
+      const filePath = `user_${session.user.id}_${Date.now()}.${fileExt}`;
       
-      const { data, error } = await supabase.storage
-        .from("avatars")
+      const uploadPromise = supabase.storage
+        .from("reports")
         .upload(filePath, blob, { upsert: true });
+
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Storage upload timeout')), 5000)
+      );
+
+      const { data, error } = await Promise.race([uploadPromise, timeoutPromise]);
 
       if (!error) {
         const { data: publicData } = supabase.storage
-          .from("avatars")
+          .from("reports")
           .getPublicUrl(filePath);
         if (publicData && publicData.publicUrl) {
           return publicData.publicUrl;
@@ -683,7 +689,7 @@ reportService.saveProfile = async function(profileData) {
           phone_number: updated.phone_number || "",
           city: updated.city || "",
           role: updated.role || "Membre Élite des Gardiens",
-          photo: updated.photo || DEFAULT_AVATAR
+          profile_photo_url: updated.photo || updated.profile_photo_url || DEFAULT_AVATAR
         };
 
         const { error } = await supabase

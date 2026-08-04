@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleSubmit(btn) {
         const currentDraft = formDraftState.getMissingDraft();
 
-        if (!currentDraft.birthCertificate && !currentDraft.guardianshipDoc) {
+        if (!currentDraft.birthCertificate && !currentDraft.guardianshipDoc && !currentDraft.schoolDoc && !currentDraft.familyPhoto && !currentDraft.hospitalRecord) {
             if (errorBanner) errorBanner.classList.remove('hidden');
             btn.innerHTML = '<span>Soumettre le signalement</span><span class="material-symbols-outlined">send</span>';
             btn.style.opacity = "1";

@@ -523,21 +523,26 @@ saveProfileBtn.addEventListener('click', async () => {
     const origText = saveProfileBtn.textContent;
     saveProfileBtn.textContent = 'Enregistrement...';
 
-    const current = reportService.getProfile();
-    const updated = {
-        full_name: editFullName.value.trim() || current.full_name || "Gardien de la Sécurité",
-        username: editUsername.value.trim().replace(/^@/, "") || current.username || "gardien",
-        phone_country_code: editCountryCode.value.trim() || current.phone_country_code || "+237",
-        phone_number: editPhoneNumber.value.trim() || current.phone_number || "",
-        city: editCity.value.trim() || current.city || "Yaoundé",
-        photo: currentProfilePhotoBase64 || current.photo
-    };
-    
-    await reportService.saveProfile(updated);
-    await renderProfileData();
-    saveProfileBtn.disabled = false;
-    saveProfileBtn.textContent = origText;
-    closeModal();
+    try {
+        const current = reportService.getProfile();
+        const updated = {
+            full_name: editFullName.value.trim() || current.full_name || "Gardien de la Sécurité",
+            username: editUsername.value.trim().replace(/^@/, "") || current.username || "gardien",
+            phone_country_code: editCountryCode.value.trim() || current.phone_country_code || "+237",
+            phone_number: editPhoneNumber.value.trim() || current.phone_number || "",
+            city: editCity.value.trim() || current.city || "Yaoundé",
+            photo: currentProfilePhotoBase64 || current.photo
+        };
+        
+        await reportService.saveProfile(updated);
+        await renderProfileData();
+        closeModal();
+    } catch (err) {
+        console.error("Error saving profile in UI:", err);
+    } finally {
+        saveProfileBtn.disabled = false;
+        saveProfileBtn.textContent = origText;
+    }
 });
 
 // Initial Render

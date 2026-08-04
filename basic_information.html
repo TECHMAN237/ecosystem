@@ -460,6 +460,7 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                 if (!profileCreated) {
                     // 3. Insert new row in profiles table
                     console.log('Inserting profile client-side...');
+                    const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
                     const profilePayload = {
                         id: user.id,
                         user_id: user.id,
@@ -470,7 +471,8 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                         phone_number: phonenumber || '',
                         city: city || '',
                         role: getDbRole(role),
-                        terms_accepted: terms
+                        terms_accepted: terms,
+                        profile_photo_url: avatarUrl
                     };
 
                     const { error: profileError } = await supabase
@@ -527,7 +529,8 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                             phone_number: phonenumber,
                             city: city,
                             role: getDbRole(role),
-                            terms_accepted: terms
+                            terms_accepted: terms,
+                            profile_photo_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || ''
                         })
                         .eq('id', user.id);
 
