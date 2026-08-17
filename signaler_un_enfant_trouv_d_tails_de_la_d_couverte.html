@@ -129,11 +129,9 @@
 </div>
 <!-- Photo Upload Section -->
 <div class="space-y-xs">
-<label class="block font-label-bold text-label-bold text-outline">Photos du signalement</label>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+<label class="block font-label-bold text-label-bold text-outline">Photo de l'enfant</label>
 <!-- Child Photo Card -->
 <div class="space-y-xs">
-<span class="block font-label-sm text-on-surface-variant ml-xs">Photo de l'enfant</span>
 <div id="uploadChildContainer" class="bg-surface rounded-xl p-6 border-2 border-dashed border-outline-variant flex flex-col items-center justify-center text-center cursor-pointer hover:bg-surface-container-low hover:border-primary transition-all group shadow-[0px_4px_20px_rgba(108,77,255,0.06)] relative overflow-hidden aspect-square">
 <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 group-hover:scale-110 transition-transform text-primary">
 <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 0;">add_a_photo</span>
@@ -141,19 +139,6 @@
 <p class="font-label-bold text-label-bold text-on-surface mb-1">Ajouter une photo</p>
 <p class="font-body-md text-body-md text-on-surface-variant text-xs">Visage dégagé de préférence</p>
 <input id="fileInputChild" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
-</div>
-</div>
-<!-- Environment Photo Card -->
-<div class="space-y-xs">
-<span class="block font-label-sm text-on-surface-variant ml-xs">Photo de l'environnement (optionnel)</span>
-<div id="uploadEnvContainer" class="bg-surface rounded-xl p-6 border-2 border-dashed border-outline-variant flex flex-col items-center justify-center text-center cursor-pointer hover:bg-surface-container-low hover:border-primary transition-all group shadow-[0px_4px_20px_rgba(108,77,255,0.06)] relative overflow-hidden aspect-square">
-<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 group-hover:scale-110 transition-transform text-primary">
-<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 0;">location_city</span>
-</div>
-<p class="font-label-bold text-label-bold text-on-surface mb-1">Ajouter l'environnement</p>
-<p class="font-body-md text-body-md text-on-surface-variant text-xs">Poste de police, lieu de découverte</p>
-<input id="fileInputEnv" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
-</div>
 </div>
 </div>
 </div>
@@ -217,9 +202,7 @@ import { formDraftState } from './src/formDraftState.js';
 document.addEventListener('DOMContentLoaded', () => {
     const childNameInput = document.getElementById('childName');
     const uploadChildContainer = document.getElementById('uploadChildContainer');
-    const uploadEnvContainer = document.getElementById('uploadEnvContainer');
     const fileInputChild = document.getElementById('fileInputChild');
-    const fileInputEnv = document.getElementById('fileInputEnv');
     const locationInput = document.getElementById('location');
     const timeInput = document.getElementById('time');
     const genderSelect = document.getElementById('gender');
@@ -229,8 +212,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderPhotoPreview(base64, container, fileInputId, photoType) {
         if (!container) return;
         container.innerHTML = `
-            <div class="absolute inset-0 w-full h-full">
-                <img src="${base64}" class="w-full h-full object-cover" />
+            <div class="absolute inset-0 w-full h-full flex items-center justify-center bg-surface-container-low">
+                <img src="${base64}" class="w-full h-full object-contain" />
                 <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                     <span class="text-white font-label-bold text-label-bold">Changer la photo</span>
                 </div>
@@ -246,11 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const reader = new FileReader();
             reader.onload = function(evt) {
                 const base64 = evt.target.result;
-                if (photoType === 'child') {
-                    formDraftState.updateFoundDraft({ photo: base64, childPhoto: base64 });
-                } else {
-                    formDraftState.updateFoundDraft({ envPhoto: base64 });
-                }
+                formDraftState.updateFoundDraft({ photo: base64, childPhoto: base64 });
                 renderPhotoPreview(base64, container, fileInputId, photoType);
             };
             reader.readAsDataURL(file);
@@ -259,9 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (fileInputChild) {
         fileInputChild.addEventListener('change', (e) => handleFileChange(e, 'child', uploadChildContainer, 'fileInputChild'));
-    }
-    if (fileInputEnv) {
-        fileInputEnv.addEventListener('change', (e) => handleFileChange(e, 'env', uploadEnvContainer, 'fileInputEnv'));
     }
 
     // Restore existing draft
@@ -272,9 +248,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const childPhoto = draft.childPhoto || draft.photo;
     if (childPhoto) {
         renderPhotoPreview(childPhoto, uploadChildContainer, 'fileInputChild', 'child');
-    }
-    if (draft.envPhoto) {
-        renderPhotoPreview(draft.envPhoto, uploadEnvContainer, 'fileInputEnv', 'env');
     }
     if (draft.location) locationInput.value = draft.location;
     if (draft.time) timeInput.value = draft.time;

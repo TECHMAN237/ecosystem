@@ -162,24 +162,24 @@
 </div>
 </section>
 <!-- Filter Chips -->
-<section class="-mx-container-margin px-container-margin mb-lg overflow-x-auto hide-scrollbar flex gap-sm items-center pb-1" id="filterChipsContainer">
+<section class="px-container-margin mb-lg overflow-x-auto hide-scrollbar flex gap-sm items-center pb-1" id="filterChipsContainer">
 <button data-category="all" class="px-lg py-sm rounded-full bg-primary text-on-primary font-label-bold text-label-bold shadow-md whitespace-nowrap flex items-center gap-1.5 transition-all">
-    All <span id="count-all" class="px-1.5 py-0.2 bg-white/20 text-white text-[10px] rounded-full">0</span>
+    All <span id="count-all" class="px-1.5 py-0.2 bg-white/20 text-white font-bold text-[10px] rounded-full">0</span>
 </button>
-<button data-category="EMERGENCY" class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap flex items-center gap-1.5 transition-all">
-    Emergency <span id="count-EMERGENCY" class="px-1.5 py-0.2 bg-primary/10 text-primary text-[10px] rounded-full">0</span>
+<button data-category="EMERGENCY" class="px-lg py-sm rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm hover:bg-surface-container-high hover:text-primary whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Emergency <span id="count-EMERGENCY" class="px-1.5 py-0.2 bg-primary/15 text-primary font-bold text-[10px] rounded-full">0</span>
 </button>
-<button data-category="REPORT" class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap flex items-center gap-1.5 transition-all">
-    Reports <span id="count-REPORT" class="px-1.5 py-0.2 bg-primary/10 text-primary text-[10px] rounded-full">0</span>
+<button data-category="REPORT" class="px-lg py-sm rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm hover:bg-surface-container-high hover:text-primary whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Reports <span id="count-REPORT" class="px-1.5 py-0.2 bg-primary/15 text-primary font-bold text-[10px] rounded-full">0</span>
 </button>
-<button data-category="COMMUNITY" class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap flex items-center gap-1.5 transition-all">
-    Community <span id="count-COMMUNITY" class="px-1.5 py-0.2 bg-primary/10 text-primary text-[10px] rounded-full">0</span>
+<button data-category="COMMUNITY" class="px-lg py-sm rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm hover:bg-surface-container-high hover:text-primary whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Community <span id="count-COMMUNITY" class="px-1.5 py-0.2 bg-primary/15 text-primary font-bold text-[10px] rounded-full">0</span>
 </button>
-<button data-category="MATCH" class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap flex items-center gap-1.5 transition-all">
-    Matches <span id="count-MATCH" class="px-1.5 py-0.2 bg-primary/10 text-primary text-[10px] rounded-full">0</span>
+<button data-category="MATCH" class="px-lg py-sm rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm hover:bg-surface-container-high hover:text-primary whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Matches <span id="count-MATCH" class="px-1.5 py-0.2 bg-primary/15 text-primary font-bold text-[10px] rounded-full">0</span>
 </button>
-<button data-category="WEARABLE" class="px-lg py-sm rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap flex items-center gap-1.5 transition-all">
-    V2 <span id="count-WEARABLE" class="px-1.5 py-0.2 bg-primary/10 text-primary text-[10px] rounded-full">0</span>
+<button data-category="WEARABLE" class="px-lg py-sm rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm hover:bg-surface-container-high hover:text-primary whitespace-nowrap flex items-center gap-1.5 transition-all">
+    V2 <span id="count-WEARABLE" class="px-1.5 py-0.2 bg-primary/15 text-primary font-bold text-[10px] rounded-full">0</span>
 </button>
 </section>
 
@@ -512,9 +512,9 @@
             // Update chip styles
             document.querySelectorAll('#filterChipsContainer button').forEach(b => {
                 b.classList.remove('bg-primary', 'text-on-primary', 'shadow-md', 'font-label-bold');
-                b.classList.add('bg-surface-container', 'text-on-surface-variant', 'font-label-sm');
+                b.classList.add('bg-surface-container', 'text-on-surface', 'font-label-sm');
             });
-            this.classList.remove('bg-surface-container', 'text-on-surface-variant', 'font-label-sm');
+            this.classList.remove('bg-surface-container', 'text-on-surface', 'font-label-sm');
             this.classList.add('bg-primary', 'text-on-primary', 'shadow-md', 'font-label-bold');
 
             renderAlerts();
@@ -583,12 +583,12 @@
                     chips.forEach(c => {
                         if(c.parentElement.classList.contains('overflow-x-auto')) {
                             c.classList.remove('bg-primary', 'text-on-primary', 'shadow-md');
-                            c.classList.add('bg-surface-container', 'text-on-surface-variant');
+                            c.classList.add('bg-surface-container', 'text-on-surface');
                             c.classList.remove('font-label-bold');
                             c.classList.add('font-label-sm');
                         }
                     });
-                    this.classList.remove('bg-surface-container', 'text-on-surface-variant');
+                    this.classList.remove('bg-surface-container', 'text-on-surface');
                     this.classList.add('bg-primary', 'text-on-primary', 'shadow-md', 'font-label-bold');
                     this.classList.remove('font-label-sm');
                 }

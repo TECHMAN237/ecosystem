@@ -30,7 +30,7 @@
             /* Mobile Layout Padding */
             @media (max-width: 767px) {
                 body {
-                    padding-bottom: 80px !important;
+                    padding-bottom: 0 !important;
                 }
             }
             

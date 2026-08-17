@@ -274,9 +274,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderPhotoPreview(base64) {
         uploadContainer.innerHTML = `
-            <img src="${base64}" class="absolute inset-0 w-full h-full object-cover" />
-            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                <span class="text-white font-label-bold text-label-bold">Changer la photo</span>
+            <div class="absolute inset-0 w-full h-full flex items-center justify-center bg-surface-container-low">
+                <img src="${base64}" class="w-full h-full object-contain" />
+                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                    <span class="text-white font-label-bold text-label-bold">Changer la photo</span>
+                </div>
             </div>
             <input id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
         `;
