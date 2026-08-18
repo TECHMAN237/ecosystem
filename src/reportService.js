@@ -788,7 +788,10 @@ reportService.saveProfile = async function(profileData) {
           .eq('id', session.user.id);
 
         if (error) {
-          console.error("Error updating profile in Supabase:", error);
+          if (error.code === 'PGRST303' || error.message?.includes('JWT')) {
+            supabase.auth.signOut().catch(() => {});
+          }
+          console.warn("Notice updating profile in Supabase (saved locally):", error.message || error);
         } else {
           console.log("Profile synchronized with Supabase successfully!");
         }
@@ -798,7 +801,7 @@ reportService.saveProfile = async function(profileData) {
     this.updateDOMProfile(updated);
     return updated;
   } catch (e) {
-    console.error("Error saving user profile:", e);
+    console.warn("Notice saving user profile locally:", e?.message || e);
     return null;
   }
 };
@@ -819,6 +822,10 @@ reportService.syncProfileWithSupabase = async function() {
         .select('*')
         .eq('id', session.user.id)
         .maybeSingle();
+
+      if (error && (error.code === 'PGRST303' || error.message?.includes('JWT'))) {
+        supabase.auth.signOut().catch(() => {});
+      }
 
       const current = this.getProfile();
       let updated = { ...current };
@@ -846,7 +853,7 @@ reportService.syncProfileWithSupabase = async function() {
       return updated;
     }
   } catch (e) {
-    console.error("Error syncing profile with Supabase:", e);
+    console.warn("Notice syncing profile with Supabase (using local profile):", e?.message || e);
   }
 
   const fallback = this.getProfile();
