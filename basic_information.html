@@ -410,8 +410,12 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
 
         initPage();
 
+        let isSubmitting = false;
+
         continueBtn.addEventListener('click', async (e) => {
             e.preventDefault();
+            if (isSubmitting) return;
+
             errorMsg.classList.add('hidden');
             errorText.textContent = '';
 
@@ -441,32 +445,39 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                 return;
             }
 
+            isSubmitting = true;
             setLoading(true);
 
             try {
-                let targetUser = activeUser;
-                if (!targetUser) {
-                    const { data: { session } } = await supabase.auth.getSession();
-                    targetUser = session?.user;
-                }
-                if (!targetUser) {
-                    const { data: { user } } = await supabase.auth.getUser();
-                    targetUser = user;
+                // Authoritative identity check: retrieve current active Supabase user directly
+                let targetUser = null;
+                const { data: userData, error: userErr } = await supabase.auth.getUser();
+                if (!userErr && userData && userData.user && userData.user.id) {
+                    targetUser = userData.user;
                 }
 
-                // If user was not already authenticated (e.g. email draft flow), sign up or sign in now
+                if (!targetUser) {
+                    const { data: sessionData } = await supabase.auth.getSession();
+                    if (sessionData && sessionData.session && sessionData.session.user && sessionData.session.user.id) {
+                        targetUser = sessionData.session.user;
+                    }
+                }
+
+                // If user was not already authenticated (e.g. draft registration), sign up or sign in
                 if (!targetUser) {
                     const password = document.getElementById('password')?.value || sessionStorage.getItem('signup_password') || '';
                     const email = emailInput || sessionStorage.getItem('signup_email') || '';
                     const terms = sessionStorage.getItem('signup_terms_accepted') === 'true';
 
                     if (!email) {
-                        showError('Adresse e-mail requise. Veuillez vérifier vos informations.');
+                        showError('Adresse e-mail requise. Veuillez vérifier vos informations ou vous reconnecter.');
+                        isSubmitting = false;
                         setLoading(false);
                         return;
                     }
                     if (!password || password.length < 6) {
                         showError('Le mot de passe doit comporter au moins 6 caractères.');
+                        isSubmitting = false;
                         setLoading(false);
                         return;
                     }
@@ -486,27 +497,29 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                     if (authErr) {
                         let msg = authErr.message;
                         if (msg && msg.toLowerCase().includes('already registered')) {
-                            // Try signing in
                             const { data: signData, error: signErr } = await supabase.auth.signInWithPassword({ email, password });
                             if (signErr) {
                                 showError("Cette adresse e-mail est déjà utilisée. Veuillez vous connecter.");
+                                isSubmitting = false;
                                 setLoading(false);
                                 return;
                             }
                             if (!signData || !signData.session) {
                                 showError("Check your email and confirm your account before logging in.");
+                                isSubmitting = false;
                                 setLoading(false);
                                 return;
                             }
                             targetUser = signData.user;
                         } else {
                             showError(msg);
+                            isSubmitting = false;
                             setLoading(false);
                             return;
                         }
                     } else if (!authData || !authData.session) {
-                        // If data.session is null, email confirmation required
                         showError("Check your email and confirm your account before logging in.");
+                        isSubmitting = false;
                         setLoading(false);
                         return;
                     } else {
@@ -515,13 +528,15 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                 }
 
                 if (!targetUser || !targetUser.id) {
-                    throw new Error("Impossible de vérifier votre session d'authentification. Veuillez réessayer.");
+                    throw new Error("Impossible de vérifier votre session d'authentification Supabase. Veuillez vous reconnecter.");
                 }
 
-                console.log("Writing RAYDAR profile for verified user_id:", targetUser.id);
+                console.log("[Profile Submission Diagnostic] Target Supabase User ID:", targetUser.id);
+                console.log("[Profile Submission Diagnostic] Target User Email:", targetUser.email || emailInput);
                 const photo = targetUser.user_metadata?.avatar_url || targetUser.user_metadata?.picture || '';
 
-                await createRaydarProfile({
+                // Execute profile creation/update with verified Supabase Auth user ID
+                const createdProfile = await createRaydarProfile({
                     userId: targetUser.id,
                     email: targetUser.email || emailInput,
                     fullName: fullname,
@@ -532,6 +547,10 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                     role: role,
                     photo: photo
                 });
+
+                if (!createdProfile) {
+                    throw new Error("Erreur de confirmation de l'enregistrement du profil.");
+                }
 
                 // Clear temporary registration cache
                 sessionStorage.removeItem('signup_fullname');
@@ -547,7 +566,8 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
 
             } catch (err) {
                 console.error('Registration/Profile completion error:', err);
-                showError(err.message || "Une erreur inattendue est survenue lors de l'enregistrement. Veuillez réessayer.");
+                showError(err.message || "Une erreur inattendue est survenue lors de l'enregistrement. Veuillez vérifier vos informations et réessayer.");
+                isSubmitting = false;
                 setLoading(false);
             }
         });

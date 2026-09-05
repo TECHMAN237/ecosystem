@@ -93,8 +93,23 @@ export function mapAccountTypeToDbRole(selectedRole) {
  */
 export async function getAuthAndProfileState() {
   try {
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !session || !session.user) {
+    let sessionUser = null;
+    let currentSession = null;
+
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    if (!sessionError && sessionData && sessionData.session) {
+      currentSession = sessionData.session;
+      sessionUser = sessionData.session.user;
+    }
+
+    if (!sessionUser) {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (!userError && userData && userData.user) {
+        sessionUser = userData.user;
+      }
+    }
+
+    if (!sessionUser) {
       return {
         state: AuthState.UNAUTHENTICATED,
         session: null,
@@ -103,13 +118,13 @@ export async function getAuthAndProfileState() {
       };
     }
 
-    const user = session.user;
+    const user = sessionUser;
 
-    // Fetch RAYDAR profile for this authenticated user
+    // Fetch RAYDAR profile for this authenticated user by user_id (foreign key to auth.users.id)
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', user.id)
+      .eq('user_id', user.id)
       .maybeSingle();
 
     if (profileError) {
@@ -132,7 +147,7 @@ export async function getAuthAndProfileState() {
     if (!hasProfile) {
       return {
         state: AuthState.AUTHENTICATED_NO_PROFILE,
-        session,
+        session: currentSession,
         user,
         profile: null,
       };
@@ -147,7 +162,7 @@ export async function getAuthAndProfileState() {
     if (isAdmin) {
       return {
         state: AuthState.AUTHENTICATED_ADMIN,
-        session,
+        session: currentSession,
         user,
         profile,
       };
@@ -158,7 +173,7 @@ export async function getAuthAndProfileState() {
     if (!onboardingDone) {
       return {
         state: AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED,
-        session,
+        session: currentSession,
         user,
         profile,
       };
@@ -166,7 +181,7 @@ export async function getAuthAndProfileState() {
 
     return {
       state: AuthState.AUTHENTICATED_USER,
-      session,
+      session: currentSession,
       user,
       profile,
     };
@@ -241,29 +256,45 @@ export async function createRaydarProfile({
   role = 'Guardian',
   photo = ''
 }) {
-  // Ensure we have a valid, active Supabase Auth session
-  let verifiedUserId = userId;
+  // Retrieve the authoritative current authenticated Supabase user
   let sessionUser = null;
+  let verifiedUserId = null;
 
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session && session.user && session.user.id) {
-      sessionUser = session.user;
-      verifiedUserId = session.user.id;
-    } else {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user && user.id) {
-        sessionUser = user;
-        verifiedUserId = user.id;
-      }
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (!userError && userData && userData.user && userData.user.id) {
+      sessionUser = userData.user;
+      verifiedUserId = userData.user.id;
     }
   } catch (e) {
-    console.warn("Session verification check in createRaydarProfile:", e);
+    console.warn("Notice checking getUser in createRaydarProfile:", e);
   }
 
   if (!verifiedUserId) {
-    throw new Error("Impossible de créer le profil RAYDAR : utilisateur non authentifié dans Supabase Auth.");
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (sessionData && sessionData.session && sessionData.session.user && sessionData.session.user.id) {
+        sessionUser = sessionData.session.user;
+        verifiedUserId = sessionData.session.user.id;
+      }
+    } catch (e) {
+      console.warn("Notice checking getSession in createRaydarProfile:", e);
+    }
   }
+
+  // If userId was explicitly passed, verify it matches the active session or can be used
+  if (!verifiedUserId && userId) {
+    verifiedUserId = userId;
+  }
+
+  if (!verifiedUserId) {
+    console.error("[RAYDAR Auth Error] Cannot create profile: No authenticated Supabase user found.");
+    throw new Error("Impossible de créer le profil RAYDAR : utilisateur non authentifié dans Supabase Auth. Veuillez vous reconnecter.");
+  }
+
+  console.log(`[Auth Diagnostic] AUTH USER ID: ${verifiedUserId}`);
+  console.log(`[Auth Diagnostic] PROFILE USER ID: ${verifiedUserId}`);
+  console.log(`[Auth Diagnostic] FOREIGN KEY: profiles_user_id_fkey -> auth.users.id`);
 
   const validRole = mapAccountTypeToDbRole(role);
   const formattedUsername = username 
@@ -291,16 +322,58 @@ export async function createRaydarProfile({
 
   console.log("Writing verified profile to Supabase profiles table for user_id:", verifiedUserId);
 
-  const { data, error } = await supabase
+  // Check if profile already exists for this user_id
+  const { data: existingProfile, error: checkError } = await supabase
     .from('profiles')
-    .upsert(payload, { onConflict: 'id' })
-    .select()
+    .select('id, user_id')
+    .eq('user_id', verifiedUserId)
     .maybeSingle();
 
+  if (checkError) {
+    console.warn("Notice checking existing profile:", checkError.message || checkError);
+  }
+
+  let data = null;
+  let error = null;
+
+  if (existingProfile) {
+    console.log("Existing profile found for user_id. Updating profile...");
+    const updateResult = await supabase
+      .from('profiles')
+      .update({
+        full_name: resolvedFullName,
+        username: formattedUsername,
+        phone_country_code: phoneCountryCode || '+237',
+        phone_number: phoneNumber || '',
+        city: city || '',
+        role: validRole,
+        terms_accepted: true,
+        profile_photo_url: resolvedPhoto
+      })
+      .eq('user_id', verifiedUserId)
+      .select()
+      .maybeSingle();
+    
+    data = updateResult.data;
+    error = updateResult.error;
+  } else {
+    console.log("No existing profile found. Inserting new profile with onConflict user_id...");
+    const upsertResult = await supabase
+      .from('profiles')
+      .upsert(payload, { onConflict: 'user_id' })
+      .select()
+      .maybeSingle();
+    
+    data = upsertResult.data;
+    error = upsertResult.error;
+  }
+
   if (error) {
-    console.error("Error creating RAYDAR profile in Supabase:", error);
+    console.error("Error creating/updating RAYDAR profile in Supabase:", error);
     throw error;
   }
+
+  console.log("Profile successfully persisted in Supabase:", data);
 
   // Update local reportService cache so profile displays across all pages
   if (typeof window !== 'undefined' && window.reportService && window.reportService.saveProfile) {

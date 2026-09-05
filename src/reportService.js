@@ -785,7 +785,7 @@ reportService.saveProfile = async function(profileData) {
         const { error } = await supabase
           .from('profiles')
           .update(payload)
-          .eq('id', session.user.id);
+          .eq('user_id', session.user.id);
 
         if (error) {
           if (error.code === 'PGRST303' || error.message?.includes('JWT')) {
@@ -820,7 +820,7 @@ reportService.syncProfileWithSupabase = async function() {
       const { data: profileData, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', session.user.id)
+        .eq('user_id', session.user.id)
         .maybeSingle();
 
       if (error && (error.code === 'PGRST303' || error.message?.includes('JWT'))) {
