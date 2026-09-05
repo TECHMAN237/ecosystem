@@ -490,7 +490,11 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 
     <script type="module">
+        import { protectRoute } from "./src/authService.js";
         import { reportService } from "./src/reportService.js";
+
+        // Route guard for home page
+        await protectRoute('user');
 
         async function updateHomeUserProfile() {
             try {

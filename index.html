@@ -237,14 +237,17 @@
                 } else if (state === AuthState.AUTHENTICATED_USER) {
                     console.log("Existing Normal User detected. Redirecting to Home...");
                     window.location.replace('./home_child_safety_v1.html');
+                } else if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
+                    console.log("User needs first-login onboarding. Redirecting to Onboarding Step 1...");
+                    window.location.replace('./onboarding_community_protection_step_1.html');
                 } else if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-                    console.log("Authenticated user without RAYDAR profile detected. Redirecting to Profile Completion...");
-                    window.location.replace('./basic_information.html');
+                    console.log("Authenticated user without RAYDAR profile detected. Redirecting to Role Selection (Step 2)...");
+                    window.location.replace('./account_type_selection_updated_flow.html');
                 } else {
                     console.log("Unauthenticated user. Redirecting to Sign Up...");
                     setTimeout(() => {
                         window.location.replace('./sign_up_child_safety.html');
-                    }, 800);
+                    }, 600);
                 }
             } catch (err) {
                 console.error("Index router error:", err);

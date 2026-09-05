@@ -6,6 +6,7 @@ export const AuthState = {
   LOADING: 'LOADING',
   UNAUTHENTICATED: 'UNAUTHENTICATED',
   AUTHENTICATED_NO_PROFILE: 'AUTHENTICATED_NO_PROFILE',
+  AUTHENTICATED_USER_ONBOARDING_REQUIRED: 'AUTHENTICATED_USER_ONBOARDING_REQUIRED',
   AUTHENTICATED_USER: 'AUTHENTICATED_USER',
   AUTHENTICATED_ADMIN: 'AUTHENTICATED_ADMIN',
 };
@@ -18,6 +19,58 @@ export const DB_ROLES = {
   COMMUNITY_MEMBER: "Community Member",
   VOLUNTEER_HELPER: "Volunteer Helper",
 };
+
+/**
+ * Checks if a user has completed the first-login onboarding sequence.
+ * Checks both localStorage and Supabase Auth user_metadata.
+ */
+export function isOnboardingCompleted(user) {
+  if (!user || !user.id) return false;
+  
+  // 1. LocalStorage check (synchronous & instant)
+  const localVal = localStorage.getItem(`raydar_onboarding_completed_${user.id}`);
+  if (localVal === 'true') return true;
+
+  // 2. Supabase Auth user_metadata check
+  if (user.user_metadata && user.user_metadata.onboarding_completed === true) {
+    try {
+      localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
+    } catch (e) {}
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Marks onboarding as completed for a user.
+ * Persists to both localStorage and Supabase Auth user_metadata.
+ */
+export async function setOnboardingCompleted(user) {
+  if (!user || !user.id) {
+    // If no user object passed, attempt to get active user
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session && session.user) {
+        user = session.user;
+      }
+    } catch (e) {}
+  }
+  if (!user || !user.id) return;
+
+  try {
+    localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
+  } catch (e) {}
+
+  try {
+    await supabase.auth.updateUser({
+      data: { onboarding_completed: true }
+    });
+    console.log("[Auth] Onboarding completed flag saved to Supabase user metadata.");
+  } catch (err) {
+    console.warn("[Auth] Notice updating onboarding status in Supabase:", err);
+  }
+}
 
 /**
  * Maps French or UI selected role strings to database enum values.
@@ -94,6 +147,17 @@ export async function getAuthAndProfileState() {
     if (isAdmin) {
       return {
         state: AuthState.AUTHENTICATED_ADMIN,
+        session,
+        user,
+        profile,
+      };
+    }
+
+    // Normal User: Check if first-login onboarding has been completed
+    const onboardingDone = isOnboardingCompleted(user);
+    if (!onboardingDone) {
+      return {
+        state: AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED,
         session,
         user,
         profile,
@@ -236,7 +300,7 @@ export async function createRaydarProfile({
  * Guard utility for pages.
  * Handles page protection and routing without flickering or race conditions.
  * 
- * @param {'public' | 'registration_step' | 'profile_completion' | 'user' | 'admin'} routeType 
+ * @param {'public' | 'registration_step' | 'profile_completion' | 'onboarding' | 'user' | 'admin'} routeType 
  */
 export async function protectRoute(routeType) {
   // Check guest mode bypass for normal user pages
@@ -260,10 +324,31 @@ export async function protectRoute(routeType) {
         window.location.replace('./home_child_safety_v1.html');
         return authInfo;
       }
-      if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        window.location.replace('./basic_information.html');
+      if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
+        window.location.replace('./onboarding_community_protection_step_1.html');
         return authInfo;
       }
+      if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
+        // Authenticated with Google or Supabase Auth but no profile yet -> Go to Step 2: Role Selection!
+        window.location.replace('./account_type_selection_updated_flow.html');
+        return authInfo;
+      }
+      break;
+
+    case 'registration_step': // account_type_selection_updated_flow.html
+      if (state === AuthState.AUTHENTICATED_ADMIN) {
+        window.location.replace('./admin_dashboard.html');
+        return authInfo;
+      }
+      if (state === AuthState.AUTHENTICATED_USER) {
+        window.location.replace('./home_child_safety_v1.html');
+        return authInfo;
+      }
+      if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
+        window.location.replace('./onboarding_community_protection_step_1.html');
+        return authInfo;
+      }
+      // If AUTHENTICATED_NO_PROFILE or UNAUTHENTICATED: stay in registration flow
       break;
 
     case 'profile_completion': // basic_information.html
@@ -275,19 +360,32 @@ export async function protectRoute(routeType) {
         window.location.replace('./home_child_safety_v1.html');
         return authInfo;
       }
+      if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
+        window.location.replace('./onboarding_community_protection_step_1.html');
+        return authInfo;
+      }
       // If AUTHENTICATED_NO_PROFILE or UNAUTHENTICATED: stay on basic_information to complete profile!
       break;
 
-    case 'registration_step': // account_type_selection
+    case 'onboarding': // onboarding_community_protection_step_1, onboarding_reporter, onboarding_alerte
+      if (state === AuthState.UNAUTHENTICATED) {
+        window.location.replace('./login_child_safety.html');
+        return authInfo;
+      }
+      if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
+        window.location.replace('./account_type_selection_updated_flow.html');
+        return authInfo;
+      }
       if (state === AuthState.AUTHENTICATED_ADMIN) {
         window.location.replace('./admin_dashboard.html');
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_USER) {
+        // User already completed onboarding previously! Direct them straight to the app.
         window.location.replace('./home_child_safety_v1.html');
         return authInfo;
       }
-      // If AUTHENTICATED_NO_PROFILE or UNAUTHENTICATED: stay in registration flow
+      // If AUTHENTICATED_USER_ONBOARDING_REQUIRED: allow access to complete onboarding!
       break;
 
     case 'user': // home_child_safety_v1, reports, alerts, etc.
@@ -296,7 +394,11 @@ export async function protectRoute(routeType) {
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        window.location.replace('./basic_information.html');
+        window.location.replace('./account_type_selection_updated_flow.html');
+        return authInfo;
+      }
+      if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
+        window.location.replace('./onboarding_community_protection_step_1.html');
         return authInfo;
       }
       // If AUTHENTICATED_USER or AUTHENTICATED_ADMIN: allow access
@@ -308,10 +410,10 @@ export async function protectRoute(routeType) {
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        window.location.replace('./basic_information.html');
+        window.location.replace('./account_type_selection_updated_flow.html');
         return authInfo;
       }
-      if (state === AuthState.AUTHENTICATED_USER) {
+      if (state === AuthState.AUTHENTICATED_USER || state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
         // Access Denied! Normal user attempted direct access to Admin
         console.warn("Security Alert: Normal user attempted access to admin route. Redirecting to normal app.");
         sessionStorage.setItem('access_denied_message', 'Accès réservé aux administrateurs.');
@@ -331,6 +433,8 @@ if (typeof window !== 'undefined') {
     AuthState,
     DB_ROLES,
     mapAccountTypeToDbRole,
+    isOnboardingCompleted,
+    setOnboardingCompleted,
     getAuthAndProfileState,
     signInWithGoogle,
     signOut,

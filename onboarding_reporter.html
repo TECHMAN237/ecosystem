@@ -148,7 +148,7 @@
     <span class="material-symbols-outlined text-[18px]">login</span>
     <span>Se connecter</span>
 </a>
-<button class="text-on-surface-variant font-label-bold text-label-bold px-md py-xs rounded-full hover:bg-surface-container transition-colors active:scale-95" onclick="window.location.href='./home_child_safety_v1.html'">
+<button class="text-on-surface-variant font-label-bold text-label-bold px-md py-xs rounded-full hover:bg-surface-container transition-colors active:scale-95" onclick="handleSkipOnboarding()">
             Passer
 </button>
 </div>
@@ -232,4 +232,20 @@
             });
         });
     </script>
+<script type="module">
+import { protectRoute, setOnboardingCompleted } from "./src/authService.js";
+
+let currentUser = null;
+try {
+    const authInfo = await protectRoute('onboarding');
+    currentUser = authInfo?.user;
+} catch (e) {
+    console.warn("Route protect notice:", e);
+}
+
+window.handleSkipOnboarding = async function() {
+    await setOnboardingCompleted(currentUser);
+    window.location.replace('./home_child_safety_v1.html');
+};
+</script>
 </body></html>

@@ -174,8 +174,8 @@ To publish Missing Child reports or register children under your care, guardian 
 <span>Complete Guardian Verification</span>
 </button>
 </div>
-<button class="w-full h-[56px] bg-primary text-on-primary rounded-full font-headline-md flex items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(108,77,255,0.2)] hover:opacity-90 active:scale-[0.98] transition-all" onclick="window.location.href='./home_child_safety_v1.html'">
-<span>Go to Home</span>
+<button id="goHomeBtn" class="w-full h-[56px] bg-primary text-on-primary rounded-full font-headline-md flex items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(108,77,255,0.2)] hover:opacity-90 active:scale-[0.98] transition-all" onclick="handleCompleteAndGoHome()">
+<span>Accéder à l'accueil</span>
 <span class="material-symbols-outlined">arrow_forward</span>
 </button>
 </div>
@@ -267,4 +267,25 @@ To publish Missing Child reports or register children under your care, guardian 
             });
         });
     </script>
+<script type="module">
+import { setOnboardingCompleted, protectRoute } from "./src/authService.js";
+
+let currentUser = null;
+try {
+    const authInfo = await protectRoute('onboarding');
+    currentUser = authInfo?.user;
+} catch (e) {
+    console.warn("Route protect notice:", e);
+}
+
+window.handleCompleteAndGoHome = async function() {
+    const btn = document.getElementById('goHomeBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.classList.add('opacity-80', 'cursor-wait');
+    }
+    await setOnboardingCompleted(currentUser);
+    window.location.replace('./home_child_safety_v1.html');
+};
+</script>
 </body></html>

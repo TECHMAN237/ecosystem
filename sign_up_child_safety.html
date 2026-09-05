@@ -134,7 +134,14 @@
 <span class="material-symbols-outlined text-on-primary-container text-[32px]" data-icon="security">security</span>
 </div>
 <h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Créer un compte</h1>
-<p class="font-body-md text-on-surface-variant mt-xs">Rejoignez notre réseau sécurisé pour la protection des enfants.</p>
+<p class="font-body-md text-on-surface-variant mt-xs mb-md">Rejoignez notre réseau sécurisé pour la protection des enfants.</p>
+<!-- Progress Tracker: Step 1 of 3 -->
+<div class="flex items-center justify-center gap-xs">
+    <div class="w-6 h-2 rounded-full bg-primary"></div>
+    <div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+    <div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+    <span class="text-label-sm text-outline ml-xs">Étape 1 sur 3</span>
+</div>
 </div>
 <!-- Main Signup Card -->
 <div class="bg-surface-container-lowest rounded-lg p-lg md:p-xl soft-glow relative overflow-hidden">
@@ -276,6 +283,16 @@ const googleBtn = document.getElementById('googleBtn');
 
 // Route guard: if user is already authenticated with profile, redirect appropriately
 protectRoute('public');
+
+// Restore any draft Step 1 values if returning from Step 2
+try {
+    const draftName = sessionStorage.getItem('signup_fullname');
+    const draftEmail = sessionStorage.getItem('signup_email');
+    const draftPass = sessionStorage.getItem('signup_password');
+    if (draftName && document.getElementById('fullname')) document.getElementById('fullname').value = draftName;
+    if (draftEmail && document.getElementById('email')) document.getElementById('email').value = draftEmail;
+    if (draftPass && document.getElementById('password')) document.getElementById('password').value = draftPass;
+} catch (e) {}
 
 if (googleBtn) {
     googleBtn.addEventListener('click', async () => {

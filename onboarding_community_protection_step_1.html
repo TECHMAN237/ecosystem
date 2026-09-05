@@ -140,7 +140,7 @@
     <span class="material-symbols-outlined text-[18px]">login</span>
     <span>Se connecter</span>
 </a>
-<button class="font-label-bold text-label-bold text-on-surface-variant px-md py-xs rounded-full hover:bg-surface-container transition-colors" onclick="window.location.href='./home_child_safety_v1.html'">
+<button class="font-label-bold text-label-bold text-on-surface-variant px-md py-xs rounded-full hover:bg-surface-container transition-colors" onclick="handleSkipOnboarding()">
             Passer
 </button>
 </header>
@@ -199,4 +199,20 @@
 <div class="fixed inset-0 -z-10 bg-gradient-to-br from-[#F5F4F2] via-[#F5F4F2] to-[#e5deff] opacity-50"></div>
 <div class="fixed -bottom-20 -left-20 w-64 h-64 bg-primary opacity-[0.03] rounded-full blur-3xl"></div>
 <div class="fixed -top-20 -right-20 w-80 h-80 bg-surface-tint opacity-[0.05] rounded-full blur-3xl"></div>
+<script type="module">
+import { protectRoute, setOnboardingCompleted } from "./src/authService.js";
+
+let currentUser = null;
+try {
+    const authInfo = await protectRoute('onboarding');
+    currentUser = authInfo?.user;
+} catch (e) {
+    console.warn("Route protect notice:", e);
+}
+
+window.handleSkipOnboarding = async function() {
+    await setOnboardingCompleted(currentUser);
+    window.location.replace('./home_child_safety_v1.html');
+};
+</script>
 </body></html>

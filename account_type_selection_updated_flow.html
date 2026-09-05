@@ -130,22 +130,22 @@
 <!-- TopAppBar -->
 <header class="w-full top-0 sticky z-40 bg-background flex items-center px-container-margin py-md">
 <div class="flex items-center gap-md">
-<button class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors p-xs rounded-full active:scale-95 transition-transform" onclick="history.back()">arrow_back</button>
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors p-xs rounded-full active:scale-95 transition-transform" onclick="handleStepBack()">arrow_back</button>
 <h1 class="font-headline-lg text-headline-lg text-primary">Guardian Flow</h1>
 </div>
 </header>
 <main class="flex-1 px-container-margin pt-md pb-xl">
 <!-- Progress Tracker -->
 <div class="flex items-center gap-xs mb-lg">
-<div class="progress-dot"></div>
-<div class="progress-pill"></div>
-<div class="progress-dot"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<div class="w-6 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
 <span class="text-label-sm text-outline ml-xs">Étape 2 sur 3</span>
 </div>
 <!-- Header Section -->
 <section class="mb-xl">
 <h2 class="font-display text-display text-on-surface mb-xs">Comment souhaitez-vous utiliser Child Safety ?</h2>
-<p class="font-body-lg text-body-lg text-secondary">Aidez-nous à personnaliser votre expérience.</p>
+<p class="font-body-lg text-body-lg text-secondary" id="subtitleText">Aidez-nous à personnaliser votre expérience.</p>
 </section>
 <!-- Error Message Banner -->
 <div id="errorMsg" class="hidden bg-error-container text-on-error-container p-md rounded-lg text-sm flex items-center gap-sm mb-md relative z-20">
@@ -238,6 +238,15 @@
             continueBtn.classList.remove('bg-outline', 'opacity-50', 'cursor-not-allowed');
             continueBtn.classList.add('bg-primary', 'shadow-[0_8px_25px_rgba(108,77,255,0.35)]', 'hover:shadow-[0_12px_32px_rgba(108,77,255,0.48)]', 'hover:scale-[1.01]', 'active:scale-[0.98]');
         }
+
+        window.handleStepBack = function() {
+            const isGoogle = sessionStorage.getItem('signup_is_google') === 'true';
+            if (isGoogle) {
+                window.location.href = './login_child_safety.html';
+            } else {
+                window.location.href = './sign_up_child_safety.html';
+            }
+        };
     </script>
 <script type="importmap">
 {
@@ -251,13 +260,48 @@ import { supabase } from "./src/supabaseClient.js";
 import { protectRoute } from "./src/authService.js";
 
 // Check route: only redirect if user already has an active session with completed profile
-protectRoute('registration_step');
+await protectRoute('registration_step');
 
 const continueBtn = document.getElementById('continue-btn');
 const btnText = document.getElementById('btnText');
 const btnIcon = document.getElementById('btnIcon');
 const errorMsg = document.getElementById('errorMsg');
 const errorText = document.getElementById('errorText');
+const subtitleText = document.getElementById('subtitleText');
+
+let isOAuthUser = false;
+
+// Check if user is authenticated with Google
+try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session && session.user) {
+        isOAuthUser = true;
+        sessionStorage.setItem('signup_is_google', 'true');
+        const googleName = session.user.user_metadata?.full_name || session.user.user_metadata?.name || '';
+        if (googleName && !sessionStorage.getItem('signup_fullname')) {
+            sessionStorage.setItem('signup_fullname', googleName);
+        }
+        if (session.user.email && !sessionStorage.getItem('signup_email')) {
+            sessionStorage.setItem('signup_email', session.user.email);
+        }
+        if (subtitleText && googleName) {
+            subtitleText.textContent = `Bienvenue, ${googleName} ! Veuillez choisir votre rôle au sein de la communauté.`;
+        }
+    }
+} catch (e) {
+    console.warn("Session check notice on Step 2:", e);
+}
+
+// Restore previously selected role if user navigated back from Step 3
+const savedRole = sessionStorage.getItem('childSafetyAccountType');
+if (savedRole) {
+    document.querySelectorAll('.account-card').forEach(card => {
+        const cardRole = card.querySelector('h3')?.innerText?.trim() || '';
+        if (cardRole.toLowerCase() === savedRole.toLowerCase() || savedRole.toLowerCase().includes(cardRole.toLowerCase())) {
+            selectAccount(card);
+        }
+    });
+}
 
 function showError(msg) {
     if (errorText && errorMsg) {
@@ -272,14 +316,14 @@ function showError(msg) {
 function setLoading(isLoading) {
     if (isLoading) {
         continueBtn.disabled = true;
-        if (btnText) btnText.textContent = 'Création du compte...';
+        if (btnText) btnText.textContent = 'Chargement...';
         if (btnIcon) {
             btnIcon.textContent = 'pending';
             btnIcon.classList.add('animate-spin');
         }
     } else {
         continueBtn.disabled = false;
-        if (btnText) btnText.textContent = 'Créer un compte';
+        if (btnText) btnText.textContent = 'Continuer';
         if (btnIcon) {
             btnIcon.textContent = 'arrow_forward';
             btnIcon.classList.remove('animate-spin');
@@ -292,15 +336,20 @@ continueBtn.addEventListener('click', (e) => {
     
     if (errorMsg) errorMsg.classList.add('hidden');
     
-    const fullname = sessionStorage.getItem('signup_fullname') || '';
-    const email = sessionStorage.getItem('signup_email') || '';
-    const password = sessionStorage.getItem('signup_password') || '';
-    const terms = sessionStorage.getItem('signup_terms_accepted') === 'true';
-    const role = sessionStorage.getItem('childSafetyAccountType') || 'Guardian';
-
-    if (!email || !password || !fullname) {
-        showError('Les détails de l\'inscription des étapes précédentes sont manquants. Veuillez revenir à l\'étape 1 et réessayer.');
+    const role = sessionStorage.getItem('childSafetyAccountType');
+    if (!role) {
+        showError('Veuillez sélectionner votre rôle pour continuer.');
         return;
+    }
+
+    if (!isOAuthUser) {
+        const fullname = sessionStorage.getItem('signup_fullname') || '';
+        const email = sessionStorage.getItem('signup_email') || '';
+        const password = sessionStorage.getItem('signup_password') || '';
+        if (!email || !password || !fullname) {
+            showError('Les informations de l\'étape 1 sont manquantes. Veuillez revenir à l\'étape 1.');
+            return;
+        }
     }
     
     setLoading(true);
