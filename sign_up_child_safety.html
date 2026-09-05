@@ -153,6 +153,20 @@
 <span class="material-symbols-outlined text-[20px]" data-icon="error">error</span>
 <span id="errorText" class="font-medium"></span>
 </div>
+<!-- Confirmation Message Banner -->
+<div id="confirmMsg" class="hidden bg-primary/10 border-2 border-primary/40 text-on-surface p-md rounded-xl text-sm flex items-start gap-sm">
+<span class="material-symbols-outlined text-[24px] text-primary shrink-0" data-icon="mark_email_unread">mark_email_unread</span>
+<div class="flex-1">
+<p id="confirmText" class="font-bold text-[15px] text-primary">Check your email and confirm your account before logging in.</p>
+<p class="text-xs text-on-surface-variant mt-1 leading-relaxed">A confirmation email has been sent. Please confirm your email address before logging in to access your account.</p>
+<div class="mt-3">
+<a href="/login" class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-white text-xs font-bold rounded-full hover:opacity-90 active:scale-95 transition-all shadow-sm">
+<span>Go to Login</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
 <!-- Full Name -->
 <div class="space-y-xs">
 <label class="font-label-bold text-on-surface-variant px-1" for="fullname">Nom complet</label>
@@ -382,6 +396,8 @@ form.addEventListener('submit', async (e) => {
     // Reset state
     errorMsg.classList.add('hidden');
     errorText.textContent = '';
+    const confirmBox = document.getElementById('confirmMsg');
+    if (confirmBox) confirmBox.classList.add('hidden');
     
     const fullname = document.getElementById('fullname').value.trim();
     const email = document.getElementById('email').value.trim();
@@ -454,8 +470,18 @@ form.addEventListener('submit', async (e) => {
             return;
         }
 
+        // Check if a session was returned
+        // If data.session is null, email confirmation is required: do NOT redirect to dashboard!
+        if (!authData || !authData.session) {
+            console.log('signUp succeeded but session is null (email confirmation required). Not redirecting.');
+            showConfirmation("Check your email and confirm your account before logging in.");
+            setLoading(false);
+            return;
+        }
+
+        // Only redirect when a real session exists:
         sessionStorage.setItem('signup_password', password);
-        console.log('Step 1 complete. Supabase Auth session active. Navigating to Step 2...');
+        console.log('Step 1 complete. Real Supabase Auth session active. Navigating to Step 2...');
         window.location.href = './account_type_selection_updated_flow.html';
         
     } catch (err) {
@@ -465,7 +491,22 @@ form.addEventListener('submit', async (e) => {
     }
 });
 
+function showConfirmation(msg) {
+    if (errorMsg) errorMsg.classList.add('hidden');
+    const confirmBox = document.getElementById('confirmMsg');
+    const confirmText = document.getElementById('confirmText');
+    if (confirmBox && confirmText) {
+        confirmText.textContent = msg;
+        confirmBox.classList.remove('hidden');
+        confirmBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        showError(msg);
+    }
+}
+
 function showError(msg) {
+    const confirmBox = document.getElementById('confirmMsg');
+    if (confirmBox) confirmBox.classList.add('hidden');
     errorMsg.className = "bg-error-container text-on-error-container p-md rounded-lg text-sm flex items-center gap-sm";
     const icon = errorMsg.querySelector('.material-symbols-outlined');
     if (icon) icon.textContent = 'error';

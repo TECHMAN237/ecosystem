@@ -17,6 +17,20 @@ app.use((req, res, next) => {
 // Serve static files from root directory
 app.use(express.static(__dirname));
 
+// Route aliases for clean navigation
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "login_child_safety.html"));
+});
+app.get("/login.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "login_child_safety.html"));
+});
+app.get("/signup", (req, res) => {
+  res.sendFile(path.join(__dirname, "sign_up_child_safety.html"));
+});
+app.get("/dashboard", (req, res) => {
+  res.sendFile(path.join(__dirname, "home_child_safety_v1.html"));
+});
+
 // Serve index.html for root path
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));

@@ -222,7 +222,7 @@ export async function signOut() {
   localStorage.removeItem('user_profile');
   localStorage.removeItem('guardians_local_user_id');
   sessionStorage.clear();
-  window.location.href = './login_child_safety.html';
+  window.location.replace('/login');
 }
 
 /**
@@ -326,6 +326,7 @@ export async function createRaydarProfile({
 /**
  * Guard utility for pages.
  * Handles page protection and routing without flickering or race conditions.
+ * Protects private pages with supabase.auth.getSession() - if no session, redirect to /login.
  * 
  * @param {'public' | 'login' | 'signup_step_1' | 'registration_step' | 'profile_completion' | 'onboarding' | 'user' | 'admin'} routeType 
  */
@@ -336,6 +337,23 @@ export async function protectRoute(routeType) {
     return { state: AuthState.UNAUTHENTICATED, isGuest: true };
   }
 
+  // 1. Directly verify session using supabase.auth.getSession()
+  const { data: { session }, error: sessionErr } = await supabase.auth.getSession();
+  const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1';
+
+  // Protect private pages with supabase.auth.getSession()
+  // if no session, redirect to /login
+  if (!session && !isPublic) {
+    console.log(`[RAYDAR Route Guard] No active session on private route '${routeType}'. Redirecting to /login...`);
+    window.location.replace('/login');
+    return {
+      state: AuthState.UNAUTHENTICATED,
+      session: null,
+      user: null,
+      profile: null
+    };
+  }
+
   const authInfo = await getAuthAndProfileState();
   const { state, profile } = authInfo;
 
@@ -344,42 +362,50 @@ export async function protectRoute(routeType) {
   switch (routeType) {
     case 'public':
     case 'login': // login_child_safety.html
-      if (state === AuthState.AUTHENTICATED_ADMIN) {
-        window.location.replace('./admin_dashboard.html');
-        return authInfo;
-      }
-      if (state === AuthState.AUTHENTICATED_USER) {
-        window.location.replace('./home_child_safety_v1.html');
-        return authInfo;
-      }
-      if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
-        window.location.replace('./onboarding_community_protection_step_1.html');
-        return authInfo;
-      }
-      if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        // Authenticated with Google or Supabase Auth but no RAYDAR profile yet -> Go to Registration Step 1
-        window.location.replace('./sign_up_child_safety.html');
-        return authInfo;
+      // Only redirect when a real session exists after login
+      if (session) {
+        if (state === AuthState.AUTHENTICATED_ADMIN) {
+          window.location.replace('./admin_dashboard.html');
+          return authInfo;
+        }
+        if (state === AuthState.AUTHENTICATED_USER) {
+          window.location.replace('./home_child_safety_v1.html');
+          return authInfo;
+        }
+        if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
+          window.location.replace('./onboarding_community_protection_step_1.html');
+          return authInfo;
+        }
+        if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
+          window.location.replace('./account_type_selection_updated_flow.html');
+          return authInfo;
+        }
       }
       break;
 
     case 'signup_step_1': // sign_up_child_safety.html
-      if (state === AuthState.AUTHENTICATED_ADMIN) {
-        window.location.replace('./admin_dashboard.html');
-        return authInfo;
-      }
-      if (state === AuthState.AUTHENTICATED_USER) {
-        window.location.replace('./home_child_safety_v1.html');
-        return authInfo;
-      }
-      if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
-        window.location.replace('./onboarding_community_protection_step_1.html');
-        return authInfo;
+      if (session) {
+        if (state === AuthState.AUTHENTICATED_ADMIN) {
+          window.location.replace('./admin_dashboard.html');
+          return authInfo;
+        }
+        if (state === AuthState.AUTHENTICATED_USER) {
+          window.location.replace('./home_child_safety_v1.html');
+          return authInfo;
+        }
+        if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
+          window.location.replace('./onboarding_community_protection_step_1.html');
+          return authInfo;
+        }
       }
       // If AUTHENTICATED_NO_PROFILE or UNAUTHENTICATED: stay on Step 1 to complete or review info
       break;
 
     case 'registration_step': // account_type_selection_updated_flow.html
+      if (!session) {
+        window.location.replace('/login');
+        return authInfo;
+      }
       if (state === AuthState.AUTHENTICATED_ADMIN) {
         window.location.replace('./admin_dashboard.html');
         return authInfo;
@@ -392,10 +418,14 @@ export async function protectRoute(routeType) {
         window.location.replace('./onboarding_community_protection_step_1.html');
         return authInfo;
       }
-      // If AUTHENTICATED_NO_PROFILE or UNAUTHENTICATED: stay in registration flow
+      // If AUTHENTICATED_NO_PROFILE: stay in registration flow
       break;
 
     case 'profile_completion': // basic_information.html
+      if (!session) {
+        window.location.replace('/login');
+        return authInfo;
+      }
       if (state === AuthState.AUTHENTICATED_ADMIN) {
         window.location.replace('./admin_dashboard.html');
         return authInfo;
@@ -408,16 +438,16 @@ export async function protectRoute(routeType) {
         window.location.replace('./onboarding_community_protection_step_1.html');
         return authInfo;
       }
-      // If AUTHENTICATED_NO_PROFILE or UNAUTHENTICATED: stay on basic_information to complete profile!
+      // If AUTHENTICATED_NO_PROFILE: stay on basic_information to complete profile!
       break;
 
     case 'onboarding': // onboarding_community_protection_step_1, onboarding_reporter, onboarding_alerte
-      if (state === AuthState.UNAUTHENTICATED) {
-        window.location.replace('./login_child_safety.html');
+      if (!session || state === AuthState.UNAUTHENTICATED) {
+        window.location.replace('/login');
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        window.location.replace('./sign_up_child_safety.html');
+        window.location.replace('./account_type_selection_updated_flow.html');
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_ADMIN) {
@@ -425,7 +455,6 @@ export async function protectRoute(routeType) {
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_USER) {
-        // User already completed onboarding previously! Direct them straight to the app.
         window.location.replace('./home_child_safety_v1.html');
         return authInfo;
       }
@@ -433,12 +462,12 @@ export async function protectRoute(routeType) {
       break;
 
     case 'user': // home_child_safety_v1, reports, alerts, etc.
-      if (state === AuthState.UNAUTHENTICATED) {
-        window.location.replace('./login_child_safety.html');
+      if (!session || state === AuthState.UNAUTHENTICATED) {
+        window.location.replace('/login');
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        window.location.replace('./sign_up_child_safety.html');
+        window.location.replace('./account_type_selection_updated_flow.html');
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
@@ -449,16 +478,15 @@ export async function protectRoute(routeType) {
       break;
 
     case 'admin': // admin_dashboard.html
-      if (state === AuthState.UNAUTHENTICATED) {
-        window.location.replace('./login_child_safety.html');
+      if (!session || state === AuthState.UNAUTHENTICATED) {
+        window.location.replace('/login');
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        window.location.replace('./sign_up_child_safety.html');
+        window.location.replace('./account_type_selection_updated_flow.html');
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_USER || state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
-        // Access Denied! Normal user attempted direct access to Admin
         console.warn("Security Alert: Normal user attempted access to admin route. Redirecting to normal app.");
         sessionStorage.setItem('access_denied_message', 'Accès réservé aux administrateurs.');
         window.location.replace('./home_child_safety_v1.html');
@@ -469,6 +497,24 @@ export async function protectRoute(routeType) {
   }
 
   return authInfo;
+}
+
+/**
+ * Direct guard for private pages.
+ * Protect private pages with supabase.auth.getSession()
+ * if no session, redirect to /login.
+ */
+export async function protectPrivatePage() {
+  if (localStorage.getItem('is_guest') === 'true') {
+    return { isGuest: true };
+  }
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error || !session) {
+    console.log("[Auth Guard] No active session. Redirecting to /login...");
+    window.location.replace('/login');
+    return null;
+  }
+  return session;
 }
 
 // Expose on window for vanilla script compatibility
@@ -483,7 +529,9 @@ if (typeof window !== 'undefined') {
     signInWithGoogle,
     signOut,
     createRaydarProfile,
-    protectRoute
+    protectRoute,
+    protectPrivatePage
   };
   window.handleLogout = signOut;
+  window.protectPrivatePage = protectPrivatePage;
 }

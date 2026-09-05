@@ -389,8 +389,8 @@ async function checkAuth() {
         }
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
-            console.log("No active session. Redirecting to login...");
-            window.location.href = './login_child_safety.html';
+            console.log("No active session. Redirecting to /login...");
+            window.location.replace('/login');
         } else {
             await reportService.syncProfileWithSupabase();
             renderProfileData();
@@ -407,8 +407,8 @@ supabase.auth.onAuthStateChange((event, session) => {
         return;
     }
     if (event === 'SIGNED_OUT' || !session) {
-        console.log("Signed out or session lost. Redirecting to login...");
-        window.location.href = './login_child_safety.html';
+        console.log("Signed out or session lost. Redirecting to /login...");
+        window.location.replace('/login');
     }
 });
 

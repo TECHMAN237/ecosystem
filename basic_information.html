@@ -493,12 +493,22 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                                 setLoading(false);
                                 return;
                             }
+                            if (!signData || !signData.session) {
+                                showError("Check your email and confirm your account before logging in.");
+                                setLoading(false);
+                                return;
+                            }
                             targetUser = signData.user;
                         } else {
                             showError(msg);
                             setLoading(false);
                             return;
                         }
+                    } else if (!authData || !authData.session) {
+                        // If data.session is null, email confirmation required
+                        showError("Check your email and confirm your account before logging in.");
+                        setLoading(false);
+                        return;
                     } else {
                         targetUser = authData?.user;
                     }

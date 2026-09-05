@@ -308,33 +308,14 @@ form.addEventListener('submit', async (e) => {
         });
         
         if (error) {
-            let msg = error.message || '';
-            if (msg.toLowerCase().includes('email not confirmed')) {
-                showError("Check your email and confirm your account before logging in.");
-            } else {
-                showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");
-            }
-            setLoading(false);
-            return;
-        }
-
-        // Only redirect when a real session exists after login
-        let session = data?.session;
-        if (!session) {
-            const { data: sessionData } = await supabase.auth.getSession();
-            session = sessionData?.session;
-        }
-
-        if (!session) {
-            console.warn("No active session found after login. Not redirecting.");
-            showError("Check your email and confirm your account before logging in.");
+            showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");
             setLoading(false);
             return;
         }
         
-        console.log('Login successful! Real session confirmed for user:', session.user.id);
+        console.log('Login successful! Resolving profile and role-based route...');
         localStorage.setItem('is_guest', 'false');
-        await protectRoute('login');
+        await protectRoute('public');
     } catch (err) {
         console.error('Unexpected login error:', err);
         showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");
