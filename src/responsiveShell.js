@@ -70,7 +70,7 @@
         }
 
         const path = window.location.pathname;
-        const publicPages = ['login', 'sign_up', 'forgot_password', 'reset_password', 'index'];
+        const publicPages = ['login', 'sign_up', 'forgot_password', 'reset_password', 'index', 'about_safeguardian', 'help_center', 'privacy_settings'];
         const isPublic = publicPages.some(p => path.includes(p)) || path === '/' || path === '';
         if (isPublic) return;
 

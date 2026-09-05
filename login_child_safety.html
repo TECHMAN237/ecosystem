@@ -360,7 +360,7 @@
                 if (error) {
                     let msg = error.message || '';
                     if (msg.toLowerCase().includes('email not confirmed')) {
-                        showError("Veuillez confirmer votre compte via l'e-mail reçu avant de vous connecter.");
+                        showError("Check your email and confirm your account before logging in.");
                     } else if (msg.toLowerCase().includes('invalid login credentials')) {
                         showError("Adresse e-mail ou mot de passe incorrect. Veuillez vérifier vos identifiants.");
                     } else {
@@ -379,7 +379,7 @@
 
                 if (!session) {
                     console.warn("No active session found after login. Not redirecting.");
-                    showError("Veuillez confirmer votre compte via l'e-mail reçu avant de vous connecter.");
+                    showError("Check your email and confirm your account before logging in.");
                     setLoading(false);
                     return;
                 }
