@@ -215,53 +215,39 @@
 </script>
 <script type="module">
         import { supabase } from "./src/supabaseClient.js";
-        import { getAuthAndProfileState, AuthState } from "./src/authService.js";
+        import { protectRoute } from "./src/authService.js";
 
-        let resolved = false;
+        // Check if returning from a Google OAuth callback redirect (has access_token or code in URL)
+        const isOAuthCallback = window.location.hash.includes('access_token') || window.location.search.includes('code=');
 
-        async function resolveDestination() {
-            if (resolved) return;
-            resolved = true;
-
-            if (window.failsafeRedirect) {
-                clearTimeout(window.failsafeRedirect);
-            }
-
-            try {
-                const { state, profile, user } = await getAuthAndProfileState();
-                console.log("[Index Router] Auth state resolved:", state);
-
-                if (state === AuthState.AUTHENTICATED_ADMIN) {
-                    console.log("Existing Admin detected. Redirecting to Admin Dashboard...");
-                    window.location.replace('./admin_dashboard.html');
-                } else if (state === AuthState.AUTHENTICATED_USER) {
-                    console.log("Existing Normal User detected. Redirecting to Home...");
-                    window.location.replace('./home_child_safety_v1.html');
-                } else if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
-                    console.log("User needs first-login onboarding. Redirecting to Onboarding Step 1...");
-                    window.location.replace('./onboarding_community_protection_step_1.html');
-                } else if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-                    console.log("Authenticated user without RAYDAR profile detected. Redirecting to Registration Step 1...");
-                    window.location.replace('./sign_up_child_safety.html');
-                } else {
-                    console.log("Unauthenticated user. Redirecting to Authentication Page...");
-                    setTimeout(() => {
-                        window.location.replace('./login_child_safety.html');
-                    }, 600);
-                }
-            } catch (err) {
-                console.error("Index router error:", err);
-                window.location.replace('./login_child_safety.html');
-            }
+        if (window.failsafeRedirect) {
+            clearTimeout(window.failsafeRedirect);
         }
 
-        // Process immediately once auth state initializes
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            console.log(`[Index Auth Event]: ${event}`);
-            await resolveDestination();
-        });
-
-        // Backup immediate check in case session is already cached
-        resolveDestination();
+        if (isOAuthCallback) {
+            console.log("[Index Router] Returning from Google OAuth callback...");
+            // Let Supabase process the OAuth session and route to the appropriate screen
+            supabase.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'SIGNED_IN' || session) {
+                    await protectRoute('login');
+                }
+            });
+            // Backup check in case session is already initialized
+            setTimeout(async () => {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    await protectRoute('login');
+                } else {
+                    window.location.replace('./login_child_safety.html');
+                }
+            }, 800);
+        } else {
+            // Normal public entry: ALWAYS display the Splash animation and transition to the Authentication page
+            // DO NOT automatically redirect to dashboard even if an existing Supabase session exists
+            console.log("[Index Router] Public entry: showing splash and transitioning to Auth page...");
+            setTimeout(() => {
+                window.location.replace('./login_child_safety.html');
+            }, 1200);
+        }
     </script>
 </body></html>

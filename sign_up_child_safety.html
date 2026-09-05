@@ -470,19 +470,25 @@ form.addEventListener('submit', async (e) => {
             return;
         }
 
-        // Check if a session was returned
-        // If data.session is null, email confirmation is required: do NOT redirect to dashboard!
-        if (!authData || !authData.session) {
-            console.log('signUp succeeded but session is null (email confirmation required). Not redirecting.');
-            showConfirmation("Check your email and confirm your account before logging in.");
-            setLoading(false);
-            return;
+        // Do NOT auto-login: sign out any session created by Supabase during signUp
+        try {
+            if (authData?.session) {
+                await supabase.auth.signOut();
+            }
+        } catch (e) {
+            console.warn("SignOut after signup notice:", e);
         }
 
-        // Only redirect when a real session exists:
-        sessionStorage.setItem('signup_password', password);
-        console.log('Step 1 complete. Real Supabase Auth session active. Navigating to Step 2...');
-        window.location.href = './account_type_selection_updated_flow.html';
+        // Clean up any sensitive draft passwords
+        sessionStorage.removeItem('signup_password');
+
+        // Store prefill information for sign in page
+        sessionStorage.setItem('signup_success_email', email);
+        sessionStorage.setItem('signup_success_message', 'Compte créé avec succès ! Connectez-vous avec vos identifiants.');
+
+        console.log('Sign Up successful. Redirecting to Sign In page with prefilled email...');
+        window.location.replace(`./login_child_safety.html?registered=true&email=${encodeURIComponent(email)}`);
+        return;
         
     } catch (err) {
         console.error('Unexpected signup error:', err);

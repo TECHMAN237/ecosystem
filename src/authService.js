@@ -361,8 +361,10 @@ export async function protectRoute(routeType) {
 
   switch (routeType) {
     case 'public':
-    case 'login': // login_child_safety.html
-      // Only redirect when a real session exists after login
+      // Public entry routes (Splash, Auth entry) never auto-redirect to protected pages on load
+      return authInfo;
+
+    case 'login': // Triggered only when the user explicitly completes login or OAuth callback
       if (session) {
         if (state === AuthState.AUTHENTICATED_ADMIN) {
           window.location.replace('./admin_dashboard.html');

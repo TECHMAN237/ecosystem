@@ -1,361 +1,433 @@
 <!DOCTYPE html>
-
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link rel="stylesheet" href="./ui-polish.css"/>
-<title>Login | Child Safety</title>
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
-<!-- Material Symbols -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script id="tailwind-config">
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <link rel="stylesheet" href="./ui-polish.css"/>
+    <title>RAYDAR — Child Safety Authentication</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
         theme: {
           extend: {
-            "colors": {
-                    "on-error": "#ffffff",
-                    "tertiary-fixed-dim": "#ffb68e",
-                    "on-primary-container": "#f6f0ff",
-                    "secondary-fixed": "#e4e2e4",
-                    "primary-container": "#6c4dff",
-                    "on-secondary-container": "#636264",
-                    "on-primary-fixed": "#190064",
-                    "on-tertiary-fixed": "#331200",
-                    "surface-container-highest": "#e5e0ef",
-                    "surface-container-high": "#ebe6f4",
-                    "on-tertiary-fixed-variant": "#773300",
-                    "on-error-container": "#93000a",
-                    "surface-container-low": "#F5F4F2",
-                    "on-primary": "#ffffff",
-                    "outline": "#787588",
-                    "surface-dim": "#ddd8e6",
-                    "on-tertiary": "#ffffff",
-                    "on-secondary-fixed": "#1b1b1d",
-                    "surface-tint": "#5b38ee",
-                    "secondary-fixed-dim": "#c8c6c8",
-                    "on-secondary-fixed-variant": "#474649",
-                    "surface-container": "#f1ebfa",
-                    "primary-fixed": "#e5deff",
-                    "on-surface": "#1c1a24",
-                    "error": "#ba1a1a",
-                    "tertiary-container": "#b55100",
-                    "surface": "#F5F4F2",
-                    "secondary-container": "#e2dfe1",
-                    "background": "#F5F4F2",
-                    "secondary": "#5f5e60",
-                    "tertiary-fixed": "#ffdbca",
-                    "on-tertiary-container": "#ffefe9",
-                    "outline-variant": "#c9c4d9",
-                    "primary-fixed-dim": "#c8bfff",
-                    "on-secondary": "#ffffff",
-                    "error-container": "#ffdad6",
-                    "surface-bright": "#F5F4F2",
-                    "inverse-primary": "#c8bfff",
-                    "on-background": "#1c1a24",
-                    "surface-container-lowest": "#ffffff",
-                    "on-primary-fixed-variant": "#4206d7",
-                    "inverse-on-surface": "#f4eefd",
-                    "surface-variant": "#e5e0ef",
-                    "primary": "#532ce6",
-                    "tertiary": "#8f3e00",
-                    "on-surface-variant": "#474556",
-                    "inverse-surface": "#312f3a"
+            colors: {
+              primary: "#532ce6",
+              "primary-hover": "#4320d0",
+              "primary-container": "#6c4dff",
+              "on-primary": "#ffffff",
+              surface: "#F4F6FB",
+              "surface-card": "#ffffff",
+              "on-surface": "#1A1C28",
+              "on-surface-variant": "#64748B",
+              outline: "#E2E8F0",
+              "outline-focus": "#532CE6",
+              "error-container": "#FEE2E2",
+              "on-error-container": "#991B1B",
             },
-            "borderRadius": {
-                    "DEFAULT": "1rem",
-                    "lg": "2rem",
-                    "xl": "3rem",
-                    "full": "9999px"
-            },
-            "spacing": {
-                    "sm": "12px",
-                    "gutter": "16px",
-                    "base": "4px",
-                    "xs": "8px",
-                    "md": "16px",
-                    "container-margin": "20px",
-                    "xl": "32px",
-                    "lg": "24px"
-            },
-            "fontFamily": {
-                    "display": ["Plus Jakarta Sans"],
-                    "body-md": ["Inter"],
-                    "label-bold": ["Inter"],
-                    "label-sm": ["Inter"],
-                    "body-lg": ["Inter"],
-                    "headline-md": ["Plus Jakarta Sans"],
-                    "headline-lg": ["Plus Jakarta Sans"]
-            },
-            "fontSize": {
-                    "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
-                    "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
-                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
-                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
-                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
-                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+            fontFamily: {
+              display: ["Plus Jakarta Sans", "sans-serif"],
+              body: ["Inter", "sans-serif"],
             }
-          },
-        },
+          }
+        }
       }
     </script>
-<style>
+    <style>
         body {
-            background-color: #F5F4F2; /* Soft lavender-tinted surface */
-            background-image: radial-gradient(circle at 0% 0%, rgba(108, 77, 255, 0.03) 0%, transparent 50%),
-                              radial-gradient(circle at 100% 100%, rgba(108, 77, 255, 0.05) 0%, transparent 50%);
+            background-color: #F4F6FB;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(83, 44, 230, 0.06) 0px, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+        .auth-card {
+            background: #ffffff;
+            box-shadow: 0 16px 40px -8px rgba(26, 28, 40, 0.07), 0 2px 8px -2px rgba(26, 28, 40, 0.03);
+            border: 1px solid #EAEFF6;
         }
-        .input-glow:focus-within {
-            box-shadow: 0 0 0 4px rgba(83, 44, 230, 0.1);
+        .app-icon-squircle {
+            background: linear-gradient(145deg, #6C4DFF 0%, #4B24D9 100%);
+            box-shadow: 0 10px 24px -4px rgba(83, 44, 230, 0.35);
         }
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+        .input-field {
+            background-color: #FAFCFE;
+            border: 1px solid #E2E8F0;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .float-animation {
-            animation: float 6s ease-in-out infinite;
+        .input-field:focus-within {
+            background-color: #ffffff;
+            border-color: #532CE6;
+            box-shadow: 0 0 0 3px rgba(83, 44, 230, 0.12);
         }
     </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
-  </head>
-<body class="font-body-md text-on-surface min-h-screen flex flex-col items-center justify-center p-container-margin">
-<!-- App Identity -->
-<div class="mb-lg flex flex-col items-center">
-<div class="w-16 h-16 bg-primary rounded-lg flex items-center justify-center shadow-[0px_8px_24px_rgba(83,44,230,0.2)] mb-md float-animation">
-<span class="material-symbols-outlined text-on-primary text-[32px]" style="font-variation-settings: 'FILL' 1;">security</span>
-</div>
-<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight font-extrabold">Child Safety</h1>
-</div>
-<!-- Login Container -->
-<div class="w-full max-w-[420px] glass-card rounded-xl p-xl shadow-[0px_4px_20px_rgba(108,77,255,0.06)] flex flex-col">
-<header class="mb-xl">
-<h2 class="font-display text-display mb-xs">Bon retour</h2>
-<p class="text-on-surface-variant font-body-md">Connectez-vous pour protéger vos enfants et rester connecté.</p>
-</header>
-<!-- Form Elements -->
-<form id="loginForm" class="space-y-lg">
-<!-- Error Message Banner -->
-<div id="errorMsg" class="hidden bg-error-container text-on-error-container p-md rounded-lg text-sm flex items-center gap-sm">
-<span class="material-symbols-outlined text-[20px]">error</span>
-<span id="errorText" class="font-medium"></span>
-</div>
-<!-- Email Field -->
-<div class="space-y-xs group">
-<label class="font-label-bold text-label-bold text-on-surface-variant ml-base" for="email">Adresse e-mail</label>
-<div class="relative flex items-center input-glow rounded-lg">
-<span class="material-symbols-outlined absolute left-md text-outline">mail</span>
-<input class="w-full h-12 pl-[52px] pr-md bg-surface-container-lowest border-outline-variant border rounded-lg focus:border-primary focus:ring-0 transition-all outline-none text-body-md" id="email" name="email" placeholder="nom@example.com" type="email"/>
-</div>
-</div>
-<!-- Password Field -->
-<div class="space-y-xs group">
-<div class="flex justify-between items-center px-base">
-<label class="font-label-bold text-label-bold text-on-surface-variant" for="password">Mot de passe</label>
-<a class="text-primary font-label-bold text-label-bold hover:underline" href="./forgot_password.html">Mot de passe oublié ?</a>
-</div>
-<div class="relative flex items-center input-glow rounded-lg">
-<span class="material-symbols-outlined absolute left-md text-outline">lock</span>
-<input class="w-full h-12 pl-[52px] pr-[52px] bg-surface-container-lowest border-outline-variant border rounded-lg focus:border-primary focus:ring-0 transition-all outline-none text-body-md" id="password" name="password" placeholder="••••••••" type="password"/>
-<button id="togglePasswordBtn" class="absolute right-md text-outline hover:text-primary transition-colors" type="button">
-<span class="material-symbols-outlined">visibility</span>
-</button>
-</div>
-</div>
-<!-- Se connecter Button -->
-<button id="submitBtn" class="w-full h-14 bg-primary text-on-primary font-headline-md text-headline-md rounded-full shadow-[0px_4px_12px_rgba(83,44,230,0.24)] hover:shadow-[0px_8px_20px_rgba(83,44,230,0.32)] active:scale-95 transition-all duration-200" type="submit">
-                <span id="btnText">Se connecter</span>
+</head>
+<body class="font-body text-[#1A1C28] antialiased min-h-screen flex items-center justify-center p-4 sm:p-6">
+
+    <!-- Centered Authentication Card (Visual language faithfully aligned with reference) -->
+    <main class="w-full max-w-[390px] auth-card rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 flex flex-col my-auto transition-all">
+        
+        <!-- Header & App Logo Icon -->
+        <header class="flex flex-col items-center text-center mb-6">
+            <!-- App Logo Squircle Icon with subtle depth -->
+            <div class="w-14 h-14 sm:w-16 sm:h-16 app-icon-squircle rounded-[20px] sm:rounded-[22px] flex items-center justify-center mb-4 transition-transform hover:scale-105" aria-hidden="true">
+                <!-- RAYDAR Radar/Shield Child-Safety Icon -->
+                <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <circle cx="12" cy="11" r="3"/>
+                    <path d="M12 8a3 3 0 0 1 3 3"/>
+                </svg>
+            </div>
+
+            <!-- Heading & Subtitle -->
+            <h1 class="font-display font-extrabold text-[24px] sm:text-[26px] text-[#1A1C28] tracking-tight leading-snug">
+                Welcome Back
+            </h1>
+            <p class="text-[13px] sm:text-[14px] text-[#64748B] mt-1.5 leading-normal max-w-[280px]">
+                Enter your credentials to access your RAYDAR child safety account.
+            </p>
+        </header>
+
+        <!-- Form Elements -->
+        <form id="loginForm" class="space-y-4" novalidate>
+            
+            <!-- Success Message Banner -->
+            <div id="successMsg" class="hidden bg-emerald-50 border border-emerald-200 text-emerald-800 px-3.5 py-2.5 rounded-xl text-[13px] flex items-center gap-2.5 animate-in fade-in">
+                <span class="material-symbols-outlined text-[18px] text-emerald-600 shrink-0" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                <span id="successText" class="font-medium leading-snug">Compte créé avec succès ! Connectez-vous avec vos identifiants.</span>
+            </div>
+
+            <!-- Error Message Banner -->
+            <div id="errorMsg" class="hidden bg-error-container border border-red-200 text-on-error-container px-3.5 py-2.5 rounded-xl text-[13px] flex items-center gap-2.5 animate-in fade-in">
+                <span class="material-symbols-outlined text-[18px] text-red-600 shrink-0">error</span>
+                <span id="errorText" class="font-medium leading-snug"></span>
+            </div>
+
+            <!-- Email Field -->
+            <div class="space-y-1.5">
+                <div class="relative flex items-center input-field rounded-2xl h-[48px] sm:h-[50px] px-3.5">
+                    <span class="material-symbols-outlined text-[#94A3B8] text-[20px] mr-2.5 select-none pointer-events-none" aria-hidden="true">mail</span>
+                    <input 
+                        class="w-full bg-transparent border-0 p-0 text-[14px] sm:text-[15px] text-[#1A1C28] placeholder-[#94A3B8] focus:ring-0 focus:outline-none" 
+                        id="email" 
+                        name="email" 
+                        placeholder="name@example.com" 
+                        type="email" 
+                        required 
+                        autocomplete="email"
+                        aria-label="Email address"
+                    />
+                </div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="space-y-1.5">
+                <div class="relative flex items-center input-field rounded-2xl h-[48px] sm:h-[50px] px-3.5">
+                    <span class="material-symbols-outlined text-[#94A3B8] text-[20px] mr-2.5 select-none pointer-events-none" aria-hidden="true">lock</span>
+                    <input 
+                        class="w-full bg-transparent border-0 p-0 pr-8 text-[14px] sm:text-[15px] text-[#1A1C28] placeholder-[#94A3B8] focus:ring-0 focus:outline-none" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Enter your password" 
+                        type="password" 
+                        required 
+                        autocomplete="current-password"
+                        aria-label="Password"
+                    />
+                    <button id="togglePasswordBtn" class="absolute right-3 text-[#94A3B8] hover:text-[#532CE6] transition-colors p-1" type="button" aria-label="Toggle password visibility">
+                        <span class="material-symbols-outlined text-[20px]">visibility</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Remember me & Forgot password Row -->
+            <div class="flex items-center justify-between pt-0.5 pb-1 text-[13px]">
+                <label class="flex items-center cursor-pointer select-none text-[#64748B] hover:text-[#1A1C28] transition-colors">
+                    <input id="rememberMe" type="checkbox" class="w-4 h-4 rounded text-[#532CE6] border-[#CBD5E1] focus:ring-[#532CE6]/20 cursor-pointer"/>
+                    <span class="ml-2 text-[#64748B]">Remember me</span>
+                </label>
+                <a class="text-[#532CE6] font-medium hover:underline text-[13px]" href="./forgot_password.html">
+                    Forgot password?
+                </a>
+            </div>
+
+            <!-- Primary Sign In Button -->
+            <button 
+                id="submitBtn" 
+                class="w-full h-[48px] sm:h-[50px] bg-[#532CE6] hover:bg-[#4320D0] active:scale-[0.98] text-white font-semibold text-[15px] rounded-full sm:rounded-2xl shadow-[0_4px_16px_rgba(83,44,230,0.25)] hover:shadow-[0_6px_20px_rgba(83,44,230,0.35)] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer" 
+                type="submit"
+            >
+                <span id="btnText">Sign In</span>
+                <span id="btnIcon" class="hidden material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
-</form>
-<!-- Divider -->
-<div class="flex items-center my-xl">
-<div class="flex-grow h-[1px] bg-outline-variant"></div>
-<span class="px-md text-label-sm text-on-surface-variant font-medium">OU CONTINUER AVEC</span>
-<div class="flex-grow h-[1px] bg-outline-variant"></div>
-</div>
-<!-- Social Logins -->
-<div class="flex flex-col">
-<button id="googleBtn" class="flex items-center justify-center h-12 w-full bg-surface-container-lowest border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors active:scale-95" type="button">
-<img alt="Google Logo" class="w-5 h-5 mr-xs" data-alt="A clean, isolated Google logo icon with its signature primary colors on a white background, representing modern digital authentication and security." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvkjOOLpdvndRY9jv_Yc6UGTeCRGjDmVjaHfP0FgrzJzZYcRcqXI5FSxeyuJ8CH-paKR1EO9T3K5fAIUQwneV6QTYmy99ud72D1PAkH60o9x677_zXjnZYNaLfqQtXOKTyq5vHtvHssgr33Z4btbrqOwdMGYdaEzAFqQ9tgHG7lKlTmCA4F7A86apLWMNqU6GDzV0txMATkheKJC_sAzDd87uIaiekdqBfejaPN5RyqFCmujkHrqbtLr0k3tv-AuTl-jjqKOD_Y0cL"/>
-<span class="font-label-bold text-label-bold">Google</span>
-</button>
-</div>
-</div>
-<!-- Footer Redirect -->
-<div class="mt-md text-center">
-<p class="font-body-md text-on-surface-variant">
-            <a class="text-primary font-label-bold text-label-bold hover:underline" href="./home_child_safety_v1.html" onclick="localStorage.setItem('is_guest', 'true'); sessionStorage.setItem('childSafetyAccountType', 'Guest');">Continuer en tant qu'invité</a>
-</p>
-</div>
-<div class="mt-lg text-center">
-<p class="font-body-md text-on-surface-variant">
-            Vous n'avez pas de compte ? 
-            <a class="text-primary font-label-bold text-label-bold hover:underline ml-xs" href="./sign_up_child_safety.html">Créer un compte</a>
-</p>
-</div>
-<!-- Illustration Background Decorative (Optional for trust) -->
-<div class="fixed top-1/2 -translate-y-1/2 left-[-100px] opacity-[0.03] pointer-events-none select-none hidden lg:block">
-<span class="material-symbols-outlined text-[400px]">family_restroom</span>
-</div>
-<div class="fixed top-1/2 -translate-y-1/2 right-[-100px] opacity-[0.03] pointer-events-none select-none hidden lg:block">
-<span class="material-symbols-outlined text-[400px]">verified_user</span>
-</div>
-<script>
-        // Simple Interaction logic
-        document.querySelectorAll('button').forEach(btn => {
-            btn.addEventListener('mousedown', () => btn.classList.add('scale-95'));
-            btn.addEventListener('mouseup', () => btn.classList.remove('scale-95'));
-            btn.addEventListener('mouseleave', () => btn.classList.remove('scale-95'));
-        });
+        </form>
+
+        <!-- OR Divider with pill badge -->
+        <div class="relative flex items-center justify-center my-5">
+            <div class="w-full border-t border-[#E8ECF4]"></div>
+            <span class="absolute bg-white px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold text-[#94A3B8] uppercase tracking-wider border border-[#F1F4F9]">
+                OR
+            </span>
+        </div>
+
+        <!-- Continue with Google Button -->
+        <div class="flex flex-col">
+            <button 
+                id="googleBtn" 
+                class="flex items-center justify-center h-[48px] sm:h-[50px] w-full bg-white border border-[#E2E8F0] rounded-full sm:rounded-2xl text-[#1A1C28] text-[14px] sm:text-[15px] font-medium hover:bg-[#F8FAFC] hover:border-[#CBD5E1] active:scale-[0.98] transition-all duration-200 shadow-[0_1px_3px_rgba(0,0,0,0.02)] cursor-pointer gap-3" 
+                type="button"
+            >
+                <!-- Official Google Colored G Icon -->
+                <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+                </svg>
+                <span>Continue with Google</span>
+            </button>
+        </div>
+
+        <!-- Footer Links: Sign Up & Guest -->
+        <footer class="mt-6 text-center space-y-2">
+            <p class="text-[13px] text-[#64748B]">
+                Don't have an account? 
+                <a class="text-[#532CE6] font-semibold hover:underline ml-1 inline-block" href="./sign_up_child_safety.html">
+                    Sign up
+                </a>
+            </p>
+            <p class="text-[12px] text-[#94A3B8]">
+                <a class="hover:text-[#532CE6] transition-colors hover:underline" href="./home_child_safety_v1.html" onclick="localStorage.setItem('is_guest', 'true'); sessionStorage.setItem('childSafetyAccountType', 'Guest');">
+                    Continue as guest
+                </a>
+            </p>
+        </footer>
+    </main>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+      }
+    }
+    </script>
+    <script type="module">
+        import { supabase } from "./src/supabaseClient.js";
+        import { signInWithGoogle, protectRoute } from "./src/authService.js";
+
+        const form = document.getElementById('loginForm');
+        const errorMsg = document.getElementById('errorMsg');
+        const errorText = document.getElementById('errorText');
+        const successMsg = document.getElementById('successMsg');
+        const successText = document.getElementById('successText');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const rememberMeInput = document.getElementById('rememberMe');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnIcon = document.getElementById('btnIcon');
+        const googleBtn = document.getElementById('googleBtn');
+        const passToggleBtn = document.getElementById('togglePasswordBtn');
 
         // Toggle Password Visibility
-        const passToggleBtn = document.getElementById('togglePasswordBtn');
-        if (passToggleBtn) {
+        if (passToggleBtn && passwordInput) {
             passToggleBtn.addEventListener('click', () => {
-                const input = document.getElementById('password');
                 const icon = passToggleBtn.querySelector('.material-symbols-outlined');
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.textContent = 'visibility_off';
-                    icon.setAttribute('data-icon', 'visibility_off');
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    if (icon) icon.textContent = 'visibility_off';
                 } else {
-                    input.type = 'password';
-                    icon.textContent = 'visibility';
-                    icon.setAttribute('data-icon', 'visibility');
+                    passwordInput.type = 'password';
+                    if (icon) icon.textContent = 'visibility';
                 }
             });
         }
-    </script>
-<script type="importmap">
-{
-  "imports": {
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
-  }
-}
-</script>
-<script type="module">
-import { supabase } from "./src/supabaseClient.js";
-import { signInWithGoogle, protectRoute, AuthState } from "./src/authService.js";
 
-const form = document.getElementById('loginForm');
-const errorMsg = document.getElementById('errorMsg');
-const errorText = document.getElementById('errorText');
-const submitBtn = document.getElementById('submitBtn');
-const btnText = document.getElementById('btnText');
-const googleBtn = document.getElementById('googleBtn');
-
-// Route guard: if user is already authenticated, route them according to their role/profile
-protectRoute('public');
-
-if (googleBtn) {
-    googleBtn.addEventListener('click', async () => {
-        errorMsg.classList.add('hidden');
-        errorText.textContent = '';
+        // Restore saved email if remember me was active
         try {
-            console.log("Initiating Google Sign-In with select_account prompt...");
-            await signInWithGoogle();
-        } catch (err) {
-            console.error("Google login error:", err);
-            showError("Erreur lors de la connexion Google: " + (err.message || "Veuillez réessayer."));
-        }
-    });
-}
-
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    // Reset state
-    errorMsg.classList.add('hidden');
-    errorText.textContent = '';
-    
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    
-    if (!email) {
-        showError('Veuillez saisir votre adresse e-mail.');
-        return;
-    }
-    if (!password) {
-        showError('Veuillez saisir votre mot de passe.');
-        return;
-    }
-    
-    setLoading(true);
-    
-    try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-        });
-        
-        if (error) {
-            let msg = error.message || '';
-            if (msg.toLowerCase().includes('email not confirmed')) {
-                showError("Check your email and confirm your account before logging in.");
-            } else {
-                showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");
+            const savedRememberEmail = localStorage.getItem('raydar_remember_email');
+            if (savedRememberEmail && emailInput && !emailInput.value) {
+                emailInput.value = savedRememberEmail;
+                if (rememberMeInput) rememberMeInput.checked = true;
             }
-            setLoading(false);
-            return;
+        } catch (e) {}
+
+        // Check for signup redirect or prefilled email
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isRegistered = urlParams.get('registered') === 'true';
+            const emailParam = urlParams.get('email') || sessionStorage.getItem('signup_success_email');
+            const customSuccessMsg = sessionStorage.getItem('signup_success_message');
+
+            if (emailParam && emailInput) {
+                emailInput.value = decodeURIComponent(emailParam);
+            }
+
+            if (isRegistered || emailParam || customSuccessMsg) {
+                const msg = customSuccessMsg || "Compte créé avec succès ! Connectez-vous avec vos identifiants.";
+                showSuccess(msg);
+
+                // Auto-focus password input if email is prefilled
+                if (emailInput && emailInput.value && passwordInput) {
+                    setTimeout(() => {
+                        passwordInput.focus();
+                    }, 200);
+                }
+
+                // Clean up sessionStorage and URL parameters without reloading
+                sessionStorage.removeItem('signup_success_email');
+                sessionStorage.removeItem('signup_success_message');
+                if (window.history && window.history.replaceState) {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+        } catch (e) {
+            console.warn("Notice checking registration redirect:", e);
         }
 
-        // Only redirect when a real session exists after login
-        let session = data?.session;
-        if (!session) {
-            const { data: sessionData } = await supabase.auth.getSession();
-            session = sessionData?.session;
+        if (googleBtn) {
+            googleBtn.addEventListener('click', async () => {
+                if (errorMsg) errorMsg.classList.add('hidden');
+                if (errorText) errorText.textContent = '';
+                if (successMsg) successMsg.classList.add('hidden');
+                
+                try {
+                    googleBtn.disabled = true;
+                    googleBtn.classList.add('opacity-75', 'cursor-wait');
+                    console.log("Initiating Google Sign-In with select_account prompt...");
+                    await signInWithGoogle();
+                } catch (err) {
+                    console.error("Google login error:", err);
+                    googleBtn.disabled = false;
+                    googleBtn.classList.remove('opacity-75', 'cursor-wait');
+                    showError("Erreur lors de la connexion Google: " + (err.message || "Veuillez réessayer."));
+                }
+            });
         }
 
-        if (!session) {
-            console.warn("No active session found after login. Not redirecting.");
-            showError("Check your email and confirm your account before logging in.");
-            setLoading(false);
-            return;
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Reset state
+            if (errorMsg) errorMsg.classList.add('hidden');
+            if (errorText) errorText.textContent = '';
+            if (successMsg) successMsg.classList.add('hidden');
+            
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (!email) {
+                showError('Veuillez saisir votre adresse e-mail.');
+                emailInput.focus();
+                return;
+            }
+            if (!password) {
+                showError('Veuillez saisir votre mot de passe.');
+                passwordInput.focus();
+                return;
+            }
+
+            // Save or clear remember me email
+            try {
+                if (rememberMeInput && rememberMeInput.checked) {
+                    localStorage.setItem('raydar_remember_email', email);
+                } else {
+                    localStorage.removeItem('raydar_remember_email');
+                }
+            } catch (e) {}
+            
+            setLoading(true);
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                
+                if (error) {
+                    let msg = error.message || '';
+                    if (msg.toLowerCase().includes('email not confirmed')) {
+                        showError("Veuillez confirmer votre compte via l'e-mail reçu avant de vous connecter.");
+                    } else if (msg.toLowerCase().includes('invalid login credentials')) {
+                        showError("Adresse e-mail ou mot de passe incorrect. Veuillez vérifier vos identifiants.");
+                    } else {
+                        showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");
+                    }
+                    setLoading(false);
+                    return;
+                }
+
+                // Only redirect when a real session exists after login
+                let session = data?.session;
+                if (!session) {
+                    const { data: sessionData } = await supabase.auth.getSession();
+                    session = sessionData?.session;
+                }
+
+                if (!session) {
+                    console.warn("No active session found after login. Not redirecting.");
+                    showError("Veuillez confirmer votre compte via l'e-mail reçu avant de vous connecter.");
+                    setLoading(false);
+                    return;
+                }
+                
+                console.log('Login successful! Real session confirmed for user:', session.user.id);
+                localStorage.setItem('is_guest', 'false');
+                await protectRoute('login');
+            } catch (err) {
+                console.error('Unexpected login error:', err);
+                showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");
+                setLoading(false);
+            }
+        });
+
+        function showSuccess(msg) {
+            if (errorMsg) errorMsg.classList.add('hidden');
+            if (successText) successText.textContent = msg;
+            if (successMsg) {
+                successMsg.classList.remove('hidden');
+                successMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         }
-        
-        console.log('Login successful! Real session confirmed for user:', session.user.id);
-        localStorage.setItem('is_guest', 'false');
-        await protectRoute('login');
-    } catch (err) {
-        console.error('Unexpected login error:', err);
-        showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");
-        setLoading(false);
-    }
-});
 
-function showError(msg) {
-    errorText.textContent = msg;
-    errorMsg.classList.remove('hidden');
-    errorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
+        function showError(msg) {
+            if (successMsg) successMsg.classList.add('hidden');
+            errorText.textContent = msg;
+            errorMsg.classList.remove('hidden');
+            errorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
 
-function setLoading(isLoading) {
-    if (isLoading) {
-        submitBtn.disabled = true;
-        btnText.textContent = 'Connexion...';
-    } else {
-        submitBtn.disabled = false;
-        btnText.textContent = 'Se connecter';
-    }
-}
-</script>
-</body></html>
+        function setLoading(isLoading) {
+            if (isLoading) {
+                submitBtn.disabled = true;
+                btnText.textContent = 'Connexion...';
+                if (btnIcon) {
+                    btnIcon.textContent = 'pending';
+                    btnIcon.classList.remove('hidden');
+                    btnIcon.classList.add('animate-spin');
+                }
+            } else {
+                submitBtn.disabled = false;
+                btnText.textContent = 'Sign In';
+                if (btnIcon) {
+                    btnIcon.classList.add('hidden');
+                    btnIcon.classList.remove('animate-spin');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
