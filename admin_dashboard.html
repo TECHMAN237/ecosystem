@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr" class="light">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>RAYDAR - Tableau de bord Administrateur</title>
+    <link rel="stylesheet" href="./ui-polish.css"/>
+    <link rel="stylesheet" href="./design/design-system.css"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script type="importmap">
+    {
+      "imports": {
+        "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+      }
+    }
+    </script>
+</head>
+<body class="bg-[#F5F4F2] text-on-surface font-body min-h-screen">
+    <div id="adminApp" class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-outline-variant/30 gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-error-container text-on-error-container">
+                        Privilège Administrateur
+                    </span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-bold font-headline mt-2 text-on-surface">Tableau de bord RAYDAR Admin</h1>
+                <p class="text-sm text-on-surface-variant mt-1" id="adminUserEmail">Chargement de la session...</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="./home_child_safety_v1.html" class="px-4 py-2 text-sm font-semibold rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors">
+                    Vue Utilisateur
+                </a>
+                <button id="adminLogoutBtn" class="px-4 py-2 text-sm font-semibold rounded-lg bg-error/10 text-error hover:bg-error/20 transition-colors flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-sm">logout</span>
+                    Déconnexion
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="mt-8 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-6 bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-on-surface-variant">Rôle Authentifié</span>
+                        <span class="material-symbols-outlined text-primary">admin_panel_settings</span>
+                    </div>
+                    <p class="text-2xl font-bold mt-2 text-on-surface" id="adminRoleBadge">Admin</p>
+                    <p class="text-xs text-on-surface-variant mt-1">Accès système complet vérifié</p>
+                </div>
+                <div class="p-6 bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-on-surface-variant">Signalements en attente</span>
+                        <span class="material-symbols-outlined text-amber-500">pending_actions</span>
+                    </div>
+                    <p class="text-2xl font-bold mt-2 text-on-surface">Actifs</p>
+                    <p class="text-xs text-on-surface-variant mt-1">Supervision communautaire</p>
+                </div>
+                <div class="p-6 bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-on-surface-variant">Statut Réseau</span>
+                        <span class="material-symbols-outlined text-emerald-500">check_circle</span>
+                    </div>
+                    <p class="text-2xl font-bold mt-2 text-on-surface">Opérationnel</p>
+                    <p class="text-xs text-on-surface-variant mt-1">RAYDAR Supabase v1</p>
+                </div>
+            </div>
+
+            <div class="p-6 bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm">
+                <h2 class="text-lg font-bold text-on-surface mb-3">Sécurité & Contrôle d'Accès (RBAC)</h2>
+                <p class="text-sm text-on-surface-variant leading-relaxed">
+                    Ce tableau de bord est strictement isolé. Les comptes utilisateurs ordinaires (créés via Google OAuth ou e-mail/mot de passe) ne peuvent jamais accéder à cet écran et sont automatiquement redirigés vers l'application principale.
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { protectRoute, signOut } from "./src/authService.js";
+
+        async function initAdmin() {
+            // Strict guard: only users with explicit admin role in profiles can stay here
+            const authInfo = await protectRoute('admin');
+            if (authInfo && authInfo.user) {
+                const emailEl = document.getElementById('adminUserEmail');
+                const roleEl = document.getElementById('adminRoleBadge');
+                if (emailEl) emailEl.textContent = `Connecté en tant que: ${authInfo.user.email}`;
+                if (roleEl && authInfo.profile) roleEl.textContent = authInfo.profile.role || 'Admin';
+            }
+        }
+
+        initAdmin();
+
+        const logoutBtn = document.getElementById('adminLogoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                await signOut();
+            });
+        }
+    </script>
+</body>
+</html>

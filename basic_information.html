@@ -210,6 +210,7 @@
 </div>
 </div>
 <!-- Password Container -->
+<div id="passwordSection" class="space-y-lg">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
 <div class="space-y-xs">
 <label class="font-label-bold text-label-bold text-on-surface ml-xs">Mot de passe</label>
@@ -233,6 +234,12 @@
 <p class="text-[12px] leading-relaxed text-on-surface-variant font-body-md">
                         Le mot de passe doit comporter au moins 6 caractères pour une sécurité maximale.
                     </p>
+</div>
+</div>
+<!-- Google User Banner (Shown only when authenticated via Google OAuth) -->
+<div id="googleAuthNotice" class="hidden p-md bg-primary-fixed/30 border border-primary/20 rounded-lg flex items-center gap-sm text-primary">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-body-md text-sm">Connecté avec Google. Veuillez renseigner ces dernières informations pour activer votre compte.</span>
 </div>
 </form>
 </div>
@@ -262,14 +269,19 @@
 </script>
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
+import { protectRoute, createRaydarProfile, AuthState, getAuthAndProfileState, mapAccountTypeToDbRole } from "./src/authService.js";
 import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
 
-        // Simple Interaction: Toggle Password Visibility
+        let activeUser = null;
+        let isOAuthUser = false;
+
+        // Toggle Password Visibility
         const togglePass = document.querySelectorAll('.material-symbols-outlined');
         togglePass.forEach(btn => {
             if (btn.innerText === 'visibility' || btn.innerText === 'visibility_off') {
                 btn.addEventListener('click', function() {
                     const input = this.parentElement.querySelector('input');
+                    if (!input) return;
                     if (input.type === 'password') {
                         input.type = 'text';
                         this.innerText = 'visibility_off';
@@ -281,48 +293,12 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
             }
         });
 
-        // Pre-populate input fields on load
-        document.addEventListener('DOMContentLoaded', () => {
-            const storedName = sessionStorage.getItem('signup_fullname');
-            const storedEmail = sessionStorage.getItem('signup_email');
-            const storedPassword = sessionStorage.getItem('signup_password');
-
-            if (storedName) document.getElementById('fullname').value = storedName;
-            if (storedEmail) document.getElementById('email').value = storedEmail;
-            if (storedPassword) {
-                document.getElementById('password').value = storedPassword;
-                document.getElementById('confirm_password').value = storedPassword;
-            }
-            
-            // Pre-fill Step 3 fields if they were already typed and we came back
-            const storedUsername = sessionStorage.getItem('signup_username');
-            const storedCountryCode = sessionStorage.getItem('signup_phone_country_code');
-            const storedPhone = sessionStorage.getItem('signup_phone_number');
-            const storedCity = sessionStorage.getItem('signup_city');
-
-            if (storedUsername) document.getElementById('username').value = storedUsername;
-            if (storedCountryCode) document.getElementById('countrycode').value = storedCountryCode;
-            if (storedPhone) document.getElementById('phonenumber').value = storedPhone;
-            if (storedCity) document.getElementById('city').value = storedCity;
-        });
-
-        // Check if user is already signed in on load
-        async function checkCurrentSession() {
-            try {
-                const { data } = await supabase.auth.getSession();
-                if (data && data.session) {
-                    console.log("Already signed in, redirecting to Home...");
-                    window.location.href = './home_child_safety_v1.html';
-                }
-            } catch (err) {
-                console.error("Error checking session on load:", err);
-            }
-        }
-        checkCurrentSession();
-
         const errorMsg = document.getElementById('errorMsg');
         const errorText = document.getElementById('errorText');
         const continueBtn = document.getElementById('continueBtn');
+        const passwordSection = document.getElementById('passwordSection');
+        const googleAuthNotice = document.getElementById('googleAuthNotice');
+        const btnText = document.getElementById('btnText');
 
         function showError(msg) {
             errorText.textContent = msg;
@@ -331,7 +307,6 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
         }
 
         function setLoading(isLoading) {
-            const btnText = document.getElementById('btnText');
             const btnIcon = document.getElementById('btnIcon');
             if (isLoading) {
                 continueBtn.disabled = true;
@@ -342,13 +317,79 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                 }
             } else {
                 continueBtn.disabled = false;
-                if (btnText) btnText.textContent = 'CRÉER UN COMPTE';
+                if (btnText) {
+                    btnText.textContent = isOAuthUser ? 'FINALISER MON PROFIL' : 'CRÉER UN COMPTE';
+                }
                 if (btnIcon) {
                     btnIcon.textContent = 'chevron_right';
                     btnIcon.classList.remove('animate-spin');
                 }
             }
         }
+
+        // Initialize and check current auth state
+        async function initPage() {
+            try {
+                // Route guard: only redirect if user already has a complete profile
+                const authInfo = await protectRoute('profile_completion');
+                
+                if (authInfo && authInfo.user) {
+                    activeUser = authInfo.user;
+                    isOAuthUser = true;
+
+                    // User is authenticated (e.g. via Google OAuth) but has no RAYDAR profile yet
+                    console.log("Authenticated OAuth user needing profile completion:", activeUser.email);
+                    
+                    if (passwordSection) passwordSection.classList.add('hidden');
+                    if (googleAuthNotice) googleAuthNotice.classList.remove('hidden');
+                    if (btnText) btnText.textContent = 'FINALISER MON PROFIL';
+
+                    const emailInput = document.getElementById('email');
+                    if (emailInput) {
+                        emailInput.value = activeUser.email || '';
+                        emailInput.readOnly = true;
+                        emailInput.classList.add('bg-surface-container-low', 'opacity-80', 'cursor-not-allowed');
+                    }
+
+                    const fullnameInput = document.getElementById('fullname');
+                    if (fullnameInput && !fullnameInput.value) {
+                        const googleName = activeUser.user_metadata?.full_name || 
+                                           activeUser.user_metadata?.name || 
+                                           (activeUser.email ? activeUser.email.split('@')[0] : '');
+                        fullnameInput.value = googleName;
+                    }
+                } else {
+                    // Standard Email/Password registration flow from Step 1
+                    isOAuthUser = false;
+                    const storedName = sessionStorage.getItem('signup_fullname');
+                    const storedEmail = sessionStorage.getItem('signup_email');
+                    const storedPassword = sessionStorage.getItem('signup_password');
+
+                    if (storedName) document.getElementById('fullname').value = storedName;
+                    if (storedEmail) document.getElementById('email').value = storedEmail;
+                    if (storedPassword) {
+                        document.getElementById('password').value = storedPassword;
+                        document.getElementById('confirm_password').value = storedPassword;
+                    }
+                }
+
+                // Restore any draft Step 3 fields
+                const storedUsername = sessionStorage.getItem('signup_username');
+                const storedCountryCode = sessionStorage.getItem('signup_phone_country_code');
+                const storedPhone = sessionStorage.getItem('signup_phone_number');
+                const storedCity = sessionStorage.getItem('signup_city');
+
+                if (storedUsername && document.getElementById('username')) document.getElementById('username').value = storedUsername;
+                if (storedCountryCode && document.getElementById('countrycode')) document.getElementById('countrycode').value = storedCountryCode;
+                if (storedPhone && document.getElementById('phonenumber')) document.getElementById('phonenumber').value = storedPhone;
+                if (storedCity && document.getElementById('city')) document.getElementById('city').value = storedCity;
+
+            } catch (err) {
+                console.error("Error during basic_information init:", err);
+            }
+        }
+
+        initPage();
 
         continueBtn.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -361,12 +402,9 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
             const phonenumber = document.getElementById('phonenumber').value.trim();
             const emailInput = document.getElementById('email').value.trim();
             const city = document.getElementById('city').value.trim();
-            const role = sessionStorage.getItem('childSafetyAccountType') || 'Tuteur / Tutrice';
+            const role = sessionStorage.getItem('childSafetyAccountType') || 'Guardian';
 
-            const password = document.getElementById('password').value;
-            const confirm_password = document.getElementById('confirm_password').value;
-
-            // Page 3 form validations
+            // Common validations
             if (!fullname) {
                 showError('Veuillez saisir votre nom complet.');
                 return;
@@ -383,192 +421,111 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                 showError('Veuillez saisir votre ville.');
                 return;
             }
-            if (password !== confirm_password) {
-                showError('Les mots de passe ne correspondent pas.');
-                return;
-            }
-            if (password.length < 6) {
-                showError('Le mot de passe doit contenir au moins 6 caractères.');
-                return;
-            }
-
-            // Retrieve values from Step 1 and Step 2
-            const email = emailInput || sessionStorage.getItem('signup_email') || '';
-            const terms = sessionStorage.getItem('signup_terms_accepted') === 'true';
-
-            // Failsafe check
-            if (!email) {
-                showError('L\'adresse e-mail de la page 1 est manquante. Veuillez recommencer le processus d\'inscription.');
-                return;
-            }
-            if (!password) {
-                showError('Le mot de passe de la page 1 est manquant. Veuillez recommencer le processus d\'inscription.');
-                return;
-            }
 
             setLoading(true);
 
             try {
-                // 1. Create the authentication account
-                console.log('Registering Auth account for email:', email);
-                const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            full_name: fullname,
-                            terms_accepted: terms
-                        }
-                    }
-                });
-
-                if (error) {
-                    let msg = error.message;
-                    if (msg && msg.toLowerCase().includes('rate limit')) {
-                        msg = "Nous avons récemment envoyé un e-mail de confirmation. Veuillez attendre quelques minutes avant d'en demander un autre.";
-                    }
-                    showError(msg);
-                    setLoading(false);
-                    return;
-                }
-
-                const user = data?.user;
-                if (!user) {
-                    showError('L\'inscription a échoué. Veuillez réessayer.');
-                    setLoading(false);
-                    return;
-                }
-
-                // 2. Failsafe: check if profile already created by DB trigger
-                console.log('Checking if profile was auto-created by DB trigger...');
-                let profileCreated = false;
-                try {
-                    const { data: existingProfile, error: checkError } = await supabase
-                        .from('profiles')
-                        .select('id')
-                        .eq('id', user.id)
-                        .maybeSingle();
-
-                    if (!checkError && existingProfile) {
-                        console.log('Profile already created by database trigger.');
-                        profileCreated = true;
-                    }
-                } catch (checkErr) {
-                    console.warn('Could not query existing profile:', checkErr);
-                }
-
-                if (!profileCreated) {
-                    // 3. Insert new row in profiles table
-                    console.log('Inserting profile client-side...');
-                    const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
-                    const profilePayload = {
-                        id: user.id,
-                        user_id: user.id,
-                        full_name: fullname,
+                if (isOAuthUser && activeUser) {
+                    // FLOW A: Google OAuth authenticated user completing RAYDAR profile
+                    console.log("Creating RAYDAR profile for Google OAuth user:", activeUser.id);
+                    const photo = activeUser.user_metadata?.avatar_url || activeUser.user_metadata?.picture || '';
+                    
+                    await createRaydarProfile({
+                        userId: activeUser.id,
+                        email: activeUser.email || emailInput,
+                        fullName: fullname,
                         username: username,
-                        email: email,
-                        phone_country_code: countrycode || '',
-                        phone_number: phonenumber || '',
-                        city: city || '',
-                        role: getDbRole(role),
-                        terms_accepted: terms,
-                        profile_photo_url: avatarUrl
-                    };
+                        phoneCountryCode: countrycode,
+                        phoneNumber: phonenumber,
+                        city: city,
+                        role: role,
+                        photo: photo
+                    });
 
-                    const { error: profileError } = await supabase
-                        .from('profiles')
-                        .insert([profilePayload]);
+                    // Clear session storage
+                    sessionStorage.clear();
+                    console.log("Profile created successfully for Google user! Redirecting to normal app Home...");
+                    window.location.replace('./home_child_safety_v1.html');
 
-                    if (profileError) {
-                        const isDuplicate = profileError.code === '23505' || (profileError.message && profileError.message.toLowerCase().includes('already exists'));
-                        if (isDuplicate) {
-                            console.log('Profile created in parallel. Proceeding with success.');
-                        } else {
-                            console.error('Profile insertion error:', profileError);
-
-                            // Rollback Auth user
-                            console.log('Profile setup failed. Rolling back created Auth user...');
-                            try {
-                                const { data: sessionData } = await supabase.auth.getSession();
-                                const token = sessionData?.session?.access_token;
-                                if (token) {
-                                    const supabaseUrl = supabase.supabaseUrl || "https://ifpbdythbhlgqymsaxtz.supabase.co";
-                                    const supabaseKey = supabase.supabaseKey || "sb_publishable_ZFWamWb5cIOB2XastpKLhg_Xpm47wPV";
-                                    const deleteRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
-                                        method: 'DELETE',
-                                        headers: {
-                                            'apikey': supabaseKey,
-                                            'Authorization': `Bearer ${token}`
-                                        }
-                                    });
-                                    if (deleteRes.ok) {
-                                        console.log('Successfully rolled back newly created auth user account.');
-                                    } else {
-                                        console.error('Failed to delete auth user during rollback:', await deleteRes.text());
-                                    }
-                                }
-                            } catch (deleteErr) {
-                                console.error('Error during auth user rollback:', deleteErr);
-                            }
-
-                            await supabase.auth.signOut();
-                            showError(`Compte créé, mais la configuration du profil a échoué : ${profileError.message}. Le compte a été annulé. Veuillez réessayer.`);
-                            setLoading(false);
-                            return;
-                        }
-                    }
                 } else {
-                    // Profile already exists, let's update it with fields
-                    console.log('Updating auto-created profile with Step 2 & 3 fields...');
-                    const { error: updateError } = await supabase
-                        .from('profiles')
-                        .update({
-                            full_name: fullname,
-                            username: username,
-                            phone_country_code: countrycode,
-                            phone_number: phonenumber,
-                            city: city,
-                            role: getDbRole(role),
-                            terms_accepted: terms,
-                            profile_photo_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || ''
-                        })
-                        .eq('id', user.id);
+                    // FLOW B: Standard Email & Password registration
+                    const password = document.getElementById('password').value;
+                    const confirm_password = document.getElementById('confirm_password').value;
+                    const email = emailInput || sessionStorage.getItem('signup_email') || '';
+                    const terms = sessionStorage.getItem('signup_terms_accepted') === 'true';
 
-                    if (updateError) {
-                        console.warn('Could not update trigger-created profile fields:', updateError);
+                    if (!email) {
+                        showError('Adresse e-mail requise. Veuillez vérifier vos informations.');
+                        setLoading(false);
+                        return;
                     }
+                    if (!password || password.length < 6) {
+                        showError('Le mot de passe doit comporter au moins 6 caractères.');
+                        setLoading(false);
+                        return;
+                    }
+                    if (password !== confirm_password) {
+                        showError('Les mots de passe ne correspondent pas.');
+                        setLoading(false);
+                        return;
+                    }
+
+                    console.log('Registering Supabase Auth account for email:', email);
+                    const { data: authData, error: authErr } = await supabase.auth.signUp({
+                        email,
+                        password,
+                        options: {
+                            data: {
+                                full_name: fullname,
+                                terms_accepted: terms
+                            }
+                        }
+                    });
+
+                    if (authErr) {
+                        let msg = authErr.message;
+                        if (msg && msg.toLowerCase().includes('already registered')) {
+                            msg = "Cette adresse e-mail est déjà utilisée. Veuillez vous connecter.";
+                        } else if (msg && msg.toLowerCase().includes('rate limit')) {
+                            msg = "Trop de tentatives récentes. Veuillez patienter quelques instants.";
+                        }
+                        showError(msg);
+                        setLoading(false);
+                        return;
+                    }
+
+                    const newUser = authData?.user;
+                    if (!newUser) {
+                        showError('L\'inscription a échoué. Veuillez réessayer.');
+                        setLoading(false);
+                        return;
+                    }
+
+                    console.log('Auth user created. Creating RAYDAR profile in Supabase profiles table...');
+                    await createRaydarProfile({
+                        userId: newUser.id,
+                        email: email,
+                        fullName: fullname,
+                        username: username,
+                        phoneCountryCode: countrycode,
+                        phoneNumber: phonenumber,
+                        city: city,
+                        role: role,
+                        photo: ''
+                    });
+
+                    // Clear temporary signup cache
+                    sessionStorage.clear();
+                    console.log("Registration complete! Redirecting to normal app Home...");
+                    window.location.replace('./home_child_safety_v1.html');
                 }
-
-                // Save locally so home page and sidebar display immediately
-                reportService.saveProfile({
-                    full_name: fullname,
-                    username: username,
-                    phone_country_code: countrycode,
-                    phone_number: phonenumber,
-                    city: city,
-                    role: role,
-                    photo: DEFAULT_AVATAR
-                });
-
-                // Clear sign up variables from sessionStorage on success
-                sessionStorage.removeItem('signup_fullname');
-                sessionStorage.removeItem('signup_email');
-                sessionStorage.removeItem('signup_password');
-                sessionStorage.removeItem('signup_terms_accepted');
-                sessionStorage.removeItem('signup_username');
-                sessionStorage.removeItem('signup_phone_country_code');
-                sessionStorage.removeItem('signup_phone_number');
-                sessionStorage.removeItem('signup_city');
-                sessionStorage.removeItem('childSafetyAccountType');
-
-                console.log('Successfully registered and created profile! Redirecting to Home...');
-                window.location.href = './home_child_safety_v1.html';
 
             } catch (err) {
-                console.error('Unexpected signup submission error:', err);
-                showError(err.message || 'An unexpected error occurred during signup submission.');
+                console.error('Registration/Profile completion error:', err);
+                showError(err.message || "Une erreur inattendue est survenue lors de l'enregistrement. Veuillez réessayer.");
                 setLoading(false);
             }
         });
+    </script>
     </script>
 </body></html>

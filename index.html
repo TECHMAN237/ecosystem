@@ -3,8 +3,11 @@
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Child Safety</title>
+<meta name="description" content="Community-Powered Child Protection application to report and track missing children and find safety information."/>
+<meta property="og:title" content="Child Safety"/>
+<meta property="og:description" content="Community-Powered Child Protection application to report and track missing children and find safety information."/>
 <link rel="stylesheet" href="./ui-polish.css"/>
-<title>Child Safety - Community-Powered Child Protection</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -212,79 +215,50 @@
 </script>
 <script type="module">
         import { supabase } from "./src/supabaseClient.js";
+        import { getAuthAndProfileState, AuthState } from "./src/authService.js";
 
-        let redirecting = false;
+        let resolved = false;
 
-        // Listen for authentication state changes and handle initial session
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            if (redirecting) return;
-            
+        async function resolveDestination() {
+            if (resolved) return;
+            resolved = true;
+
             if (window.failsafeRedirect) {
                 clearTimeout(window.failsafeRedirect);
             }
 
-            if (session) {
-                redirecting = true;
-                const user = session.user;
-                console.log("Session active (event: " + event + "). Checking if profile exists for:", user.id);
-                
-                try {
-                    // Check if profile exists
-                    const { data: profile, error: profileErr } = await supabase
-                        .from('profiles')
-                        .select('id')
-                        .eq('id', user.id)
-                        .maybeSingle();
+            try {
+                const { state, profile, user } = await getAuthAndProfileState();
+                console.log("[Index Router] Auth state resolved:", state);
 
-                    if (profileErr) {
-                        console.error("Error checking profile:", profileErr);
-                    }
-
-                    if (!profile) {
-                        console.log("Profile not found. Automatically creating profile for user...");
-                        const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
-                        const profilePayload = {
-                            id: user.id,
-                            user_id: user.id,
-                            full_name: fullname,
-                            username: username,
-                            email: user.email || '',
-                            phone_country_code: '',
-                            phone_number: '',
-                            city: '',
-                            role: 'Guardian',
-                            terms_accepted: true,
-                            profile_photo_url: avatarUrl
-                        };
-
-                        const { error: insertErr } = await supabase
-                            .from('profiles')
-                            .insert([profilePayload]);
-
-                        if (insertErr) {
-                            console.error("Error automatically creating profile:", insertErr);
-                        } else {
-                            console.log("Profile automatically created successfully!");
-                        }
-                    } else {
-                        console.log("Profile already exists for user.");
-                    }
-                } catch (profileCatchErr) {
-                    console.error("Exception handling profile logic:", profileCatchErr);
+                if (state === AuthState.AUTHENTICATED_ADMIN) {
+                    console.log("Existing Admin detected. Redirecting to Admin Dashboard...");
+                    window.location.replace('./admin_dashboard.html');
+                } else if (state === AuthState.AUTHENTICATED_USER) {
+                    console.log("Existing Normal User detected. Redirecting to Home...");
+                    window.location.replace('./home_child_safety_v1.html');
+                } else if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
+                    console.log("Authenticated user without RAYDAR profile detected. Redirecting to Profile Completion...");
+                    window.location.replace('./basic_information.html');
+                } else {
+                    console.log("Unauthenticated user. Redirecting to Sign Up...");
+                    setTimeout(() => {
+                        window.location.replace('./sign_up_child_safety.html');
+                    }, 800);
                 }
-
-                console.log("Redirecting to Home...");
-                window.location.href = './home_child_safety_v1.html';
-            } else {
-                console.log("No active session (event: " + event + ").");
-                // Avoid setting multiple timeouts
-                if (!window.noSessionTimeout) {
-                    window.noSessionTimeout = setTimeout(() => {
-                        console.log("Redirecting to Sign Up / Créer un compte...");
-                        window.location.href = './sign_up_child_safety.html';
-                    }, 1500);
-                }
+            } catch (err) {
+                console.error("Index router error:", err);
+                window.location.replace('./sign_up_child_safety.html');
             }
+        }
+
+        // Process immediately once auth state initializes
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            console.log(`[Index Auth Event]: ${event}`);
+            await resolveDestination();
         });
+
+        // Backup immediate check in case session is already cached
+        resolveDestination();
     </script>
 </body></html>

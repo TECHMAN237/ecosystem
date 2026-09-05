@@ -248,14 +248,10 @@
 </script>
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
+import { protectRoute } from "./src/authService.js";
 
-// Check session and listen to auth state changes
-supabase.auth.onAuthStateChange((event, session) => {
-    if (session) {
-        console.log("Session active (event: " + event + "). Redirecting to Home...");
-        window.location.href = './home_child_safety_v1.html';
-    }
-});
+// Check route: only redirect if user already has an active session with completed profile
+protectRoute('registration_step');
 
 const continueBtn = document.getElementById('continue-btn');
 const btnText = document.getElementById('btnText');

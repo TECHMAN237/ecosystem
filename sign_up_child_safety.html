@@ -264,6 +264,7 @@ J'accepte les <a class="text-primary font-bold hover:underline" href="./privacy_
 </script>
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
+import { signInWithGoogle, protectRoute, AuthState } from "./src/authService.js";
 
 const form = document.getElementById('signupForm');
 const errorMsg = document.getElementById('errorMsg');
@@ -273,36 +274,22 @@ const btnText = document.getElementById('btnText');
 const btnIcon = document.getElementById('btnIcon');
 const googleBtn = document.getElementById('googleBtn');
 
+// Route guard: if user is already authenticated with profile, redirect appropriately
+protectRoute('public');
+
 if (googleBtn) {
     googleBtn.addEventListener('click', async () => {
         errorMsg.classList.add('hidden');
         errorText.textContent = '';
         try {
-            console.log("Initiating Google Sign-Up via Supabase...");
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: window.location.origin + '/'
-                }
-            });
-            if (error) {
-                showError("Google Sign-Up failed: " + error.message);
-            }
+            console.log("Initiating Google Sign-Up with select_account prompt...");
+            await signInWithGoogle();
         } catch (err) {
             console.error("Google sign up error:", err);
-            showError("An unexpected error occurred during Google Sign-Up.");
+            showError("Erreur lors de l'inscription Google: " + (err.message || "Veuillez réessayer."));
         }
     });
 }
-
-// Check session and listen to auth state changes
-supabase.auth.onAuthStateChange((event, session) => {
-    if (session) {
-        console.log("Session active (event: " + event + "). Redirecting to Home...");
-        localStorage.setItem('is_guest', 'false');
-        window.location.href = './home_child_safety_v1.html';
-    }
-});
 
 const btnGuest = document.getElementById('btnGuest');
 if (btnGuest) {

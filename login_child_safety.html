@@ -254,6 +254,7 @@
 </script>
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
+import { signInWithGoogle, protectRoute, AuthState } from "./src/authService.js";
 
 const form = document.getElementById('loginForm');
 const errorMsg = document.getElementById('errorMsg');
@@ -262,36 +263,22 @@ const submitBtn = document.getElementById('submitBtn');
 const btnText = document.getElementById('btnText');
 const googleBtn = document.getElementById('googleBtn');
 
+// Route guard: if user is already authenticated, route them according to their role/profile
+protectRoute('public');
+
 if (googleBtn) {
     googleBtn.addEventListener('click', async () => {
         errorMsg.classList.add('hidden');
         errorText.textContent = '';
         try {
-            console.log("Initiating Google Sign-In via Supabase...");
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: window.location.origin + '/'
-                }
-            });
-            if (error) {
-                showError("Google Sign-In failed: " + error.message);
-            }
+            console.log("Initiating Google Sign-In with select_account prompt...");
+            await signInWithGoogle();
         } catch (err) {
             console.error("Google login error:", err);
-            showError("An unexpected error occurred during Google Sign-In.");
+            showError("Erreur lors de la connexion Google: " + (err.message || "Veuillez réessayer."));
         }
     });
 }
-
-// Check session and listen to auth state changes
-supabase.auth.onAuthStateChange((event, session) => {
-    if (session) {
-        console.log("Session active (event: " + event + "). Redirecting to Home...");
-        localStorage.setItem('is_guest', 'false');
-        window.location.href = './home_child_safety_v1.html';
-    }
-});
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -321,18 +308,17 @@ form.addEventListener('submit', async (e) => {
         });
         
         if (error) {
-            // Requirement error message:
-            // "This account does not exist or the password is incorrect. Please create a new account or try again."
-            showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez créer un nouveau compte ou réessayer.");
+            showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");
             setLoading(false);
             return;
         }
         
-        console.log('Login successful! Redirecting to Home...');
-        window.location.href = '/';
+        console.log('Login successful! Resolving profile and role-based route...');
+        localStorage.setItem('is_guest', 'false');
+        await protectRoute('public');
     } catch (err) {
         console.error('Unexpected login error:', err);
-        showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez créer un nouveau compte ou réessayer.");
+        showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");
         setLoading(false);
     }
 });
