@@ -199,11 +199,11 @@
         </p>
 </footer>
 <script>
-        // Failsafe: if the module script fails to load, resolve, or execute (due to CDN block, adblockers, or unsupported importmaps)
-        // this standard script will redirect the user to the sign-up page after 5 seconds instead of hanging on the splash screen.
+        // Failsafe: if the module script fails to load, resolve, or execute
+        // this standard script will redirect the user to the authentication page after 5 seconds instead of hanging on the splash screen.
         window.failsafeRedirect = setTimeout(() => {
             console.warn("Failsafe redirect triggered: module failed to load.");
-            window.location.href = './sign_up_child_safety.html';
+            window.location.href = './login_child_safety.html';
         }, 5000);
 </script>
 <script type="importmap">
@@ -241,17 +241,17 @@
                     console.log("User needs first-login onboarding. Redirecting to Onboarding Step 1...");
                     window.location.replace('./onboarding_community_protection_step_1.html');
                 } else if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-                    console.log("Authenticated user without RAYDAR profile detected. Redirecting to Role Selection (Step 2)...");
-                    window.location.replace('./account_type_selection_updated_flow.html');
+                    console.log("Authenticated user without RAYDAR profile detected. Redirecting to Registration Step 1...");
+                    window.location.replace('./sign_up_child_safety.html');
                 } else {
-                    console.log("Unauthenticated user. Redirecting to Sign Up...");
+                    console.log("Unauthenticated user. Redirecting to Authentication Page...");
                     setTimeout(() => {
-                        window.location.replace('./sign_up_child_safety.html');
+                        window.location.replace('./login_child_safety.html');
                     }, 600);
                 }
             } catch (err) {
                 console.error("Index router error:", err);
-                window.location.replace('./sign_up_child_safety.html');
+                window.location.replace('./login_child_safety.html');
             }
         }
 

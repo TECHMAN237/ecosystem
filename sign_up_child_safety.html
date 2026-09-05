@@ -280,19 +280,78 @@ const submitBtn = document.getElementById('submitBtn');
 const btnText = document.getElementById('btnText');
 const btnIcon = document.getElementById('btnIcon');
 const googleBtn = document.getElementById('googleBtn');
+const passwordFieldGroup = document.getElementById('password')?.closest('.space-y-xs');
+const dividerSection = document.querySelector('.relative.flex.items-center.py-sm');
+const googleSection = document.getElementById('googleBtn')?.closest('.flex.flex-col');
 
-// Route guard: if user is already authenticated with profile, redirect appropriately
-protectRoute('public');
+let authenticatedUser = null;
 
-// Restore any draft Step 1 values if returning from Step 2
-try {
-    const draftName = sessionStorage.getItem('signup_fullname');
-    const draftEmail = sessionStorage.getItem('signup_email');
-    const draftPass = sessionStorage.getItem('signup_password');
-    if (draftName && document.getElementById('fullname')) document.getElementById('fullname').value = draftName;
-    if (draftEmail && document.getElementById('email')) document.getElementById('email').value = draftEmail;
-    if (draftPass && document.getElementById('password')) document.getElementById('password').value = draftPass;
-} catch (e) {}
+// Route guard: if user already has complete profile, redirect appropriately
+async function initStep1() {
+    try {
+        const authInfo = await protectRoute('signup_step_1');
+        if (authInfo && authInfo.user) {
+            authenticatedUser = authInfo.user;
+            console.log("[Step 1] Authenticated session detected:", authenticatedUser.id);
+            
+            // User is already authenticated (e.g., via Google OAuth)
+            const googleName = authenticatedUser.user_metadata?.full_name || authenticatedUser.user_metadata?.name || '';
+            const userEmail = authenticatedUser.email || '';
+            
+            if (googleName && document.getElementById('fullname')) {
+                document.getElementById('fullname').value = googleName;
+            }
+            if (userEmail && document.getElementById('email')) {
+                document.getElementById('email').value = userEmail;
+                document.getElementById('email').readOnly = true;
+                document.getElementById('email').classList.add('bg-surface-container-high', 'cursor-not-allowed');
+            }
+
+            // Hide password section for OAuth user
+            if (passwordFieldGroup) {
+                passwordFieldGroup.classList.add('hidden');
+            }
+            if (dividerSection) {
+                dividerSection.classList.add('hidden');
+            }
+            if (googleSection) {
+                googleSection.classList.add('hidden');
+            }
+
+            // Update button label
+            if (btnText) btnText.textContent = 'Continuer (Étape 2/3)';
+
+            // Display info banner
+            if (errorMsg && errorText) {
+                errorMsg.classList.remove('hidden', 'bg-error-container', 'text-on-error-container');
+                errorMsg.classList.add('bg-primary-container/40', 'text-primary', 'border', 'border-primary/20');
+                const icon = errorMsg.querySelector('.material-symbols-outlined');
+                if (icon) icon.textContent = 'verified_user';
+                errorText.innerHTML = `Compte connecté : <strong>${userEmail}</strong>. Veuillez valider vos informations ci-dessous.`;
+            }
+        }
+    } catch (e) {
+        console.warn("[Step 1] Route guard check notice:", e);
+    }
+
+    // Restore any draft Step 1 values if returning from Step 2
+    try {
+        const draftName = sessionStorage.getItem('signup_fullname');
+        const draftEmail = sessionStorage.getItem('signup_email');
+        const draftPass = sessionStorage.getItem('signup_password');
+        if (draftName && document.getElementById('fullname') && !document.getElementById('fullname').value) {
+            document.getElementById('fullname').value = draftName;
+        }
+        if (draftEmail && document.getElementById('email') && !document.getElementById('email').value) {
+            document.getElementById('email').value = draftEmail;
+        }
+        if (draftPass && document.getElementById('password') && !authenticatedUser) {
+            document.getElementById('password').value = draftPass;
+        }
+    } catch (e) {}
+}
+
+initStep1();
 
 if (googleBtn) {
     googleBtn.addEventListener('click', async () => {
@@ -326,7 +385,7 @@ form.addEventListener('submit', async (e) => {
     
     const fullname = document.getElementById('fullname').value.trim();
     const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+    const password = document.getElementById('password') ? document.getElementById('password').value : '';
     const terms = document.getElementById('terms').checked;
     
     // Validation
@@ -338,42 +397,78 @@ form.addEventListener('submit', async (e) => {
         showError('Veuillez saisir votre adresse e-mail.');
         return;
     }
-    if (!password) {
-        showError('Veuillez saisir un mot de passe.');
-        return;
-    }
-    if (password.length < 6) {
-        showError('Le mot de passe doit contenir au moins 6 caractères.');
-        return;
-    }
     if (!terms) {
         showError('Vous devez accepter les Conditions d\'utilisation et la Politique de confidentialité.');
         return;
+    }
+
+    // If not authenticated via OAuth, validate password
+    if (!authenticatedUser) {
+        if (!password) {
+            showError('Veuillez saisir un mot de passe.');
+            return;
+        }
+        if (password.length < 6) {
+            showError('Le mot de passe doit contenir au moins 6 caractères.');
+            return;
+        }
     }
     
     // Show loading
     setLoading(true);
     
     try {
-        // Store values temporarily in sessionStorage
         sessionStorage.setItem('signup_fullname', fullname);
         sessionStorage.setItem('signup_email', email);
-        sessionStorage.setItem('signup_password', password);
         sessionStorage.setItem('signup_terms_accepted', 'true');
-        
-        console.log('Step 1 complete. Temporarily saved fields. Navigating to Step 2...');
-        setTimeout(() => {
+
+        if (authenticatedUser) {
+            // User already has an authenticated session (Google OAuth)
+            console.log('Step 1 verified for authenticated user. Navigating to Step 2...');
             window.location.href = './account_type_selection_updated_flow.html';
-        }, 500);
+            return;
+        }
+
+        // Email & Password registration: create Supabase Auth user NOW
+        console.log('Creating Supabase Auth user for email:', email);
+        const { data: authData, error: authErr } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: fullname,
+                    terms_accepted: terms
+                }
+            }
+        });
+
+        if (authErr) {
+            let msg = authErr.message;
+            if (msg && msg.toLowerCase().includes('already registered')) {
+                msg = "Cette adresse e-mail est déjà associée à un compte. Veuillez vous connecter.";
+            } else if (msg && msg.toLowerCase().includes('rate limit')) {
+                msg = "Trop de tentatives récentes. Veuillez patienter quelques instants.";
+            }
+            showError(msg);
+            setLoading(false);
+            return;
+        }
+
+        sessionStorage.setItem('signup_password', password);
+        console.log('Step 1 complete. Supabase Auth session active. Navigating to Step 2...');
+        window.location.href = './account_type_selection_updated_flow.html';
         
     } catch (err) {
-        console.error('Unexpected storage error:', err);
-        showError(err.message || 'An unexpected error occurred during state preservation.');
+        console.error('Unexpected signup error:', err);
+        showError(err.message || 'Une erreur inattendue est survenue lors de l\'inscription.');
         setLoading(false);
     }
 });
 
 function showError(msg) {
+    errorMsg.className = "bg-error-container text-on-error-container p-md rounded-lg text-sm flex items-center gap-sm";
+    const icon = errorMsg.querySelector('.material-symbols-outlined');
+    if (icon) icon.textContent = 'error';
     errorText.textContent = msg;
     errorMsg.classList.remove('hidden');
     errorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -382,12 +477,12 @@ function showError(msg) {
 function setLoading(isLoading) {
     if (isLoading) {
         submitBtn.disabled = true;
-        btnText.textContent = 'Création du compte...';
+        btnText.textContent = 'Traitement en cours...';
         btnIcon.textContent = 'pending';
         btnIcon.classList.add('animate-spin');
     } else {
         submitBtn.disabled = false;
-        btnText.textContent = 'Créer un compte';
+        btnText.textContent = authenticatedUser ? 'Continuer (Étape 2/3)' : 'Créer un compte';
         btnIcon.textContent = 'arrow_forward';
         btnIcon.classList.remove('animate-spin');
     }

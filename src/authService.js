@@ -228,6 +228,7 @@ export async function signOut() {
 /**
  * Creates or completes a RAYDAR profile for a user.
  * Guarantees that newly created users ALWAYS receive a normal user role and is_admin: false.
+ * Strictly binds profiles.id and profiles.user_id to the verified Supabase Auth session auth.uid().
  */
 export async function createRaydarProfile({
   userId,
@@ -240,8 +241,28 @@ export async function createRaydarProfile({
   role = 'Guardian',
   photo = ''
 }) {
-  if (!userId) {
-    throw new Error("User ID is required to create a RAYDAR profile.");
+  // Ensure we have a valid, active Supabase Auth session
+  let verifiedUserId = userId;
+  let sessionUser = null;
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session && session.user && session.user.id) {
+      sessionUser = session.user;
+      verifiedUserId = session.user.id;
+    } else {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user && user.id) {
+        sessionUser = user;
+        verifiedUserId = user.id;
+      }
+    }
+  } catch (e) {
+    console.warn("Session verification check in createRaydarProfile:", e);
+  }
+
+  if (!verifiedUserId) {
+    throw new Error("Impossible de créer le profil RAYDAR : utilisateur non authentifié dans Supabase Auth.");
   }
 
   const validRole = mapAccountTypeToDbRole(role);
@@ -249,11 +270,15 @@ export async function createRaydarProfile({
     ? (username.startsWith('@') ? username : `@${username}`) 
     : `@user_${Date.now()}`;
 
+  const resolvedEmail = email || sessionUser?.email || '';
+  const resolvedFullName = fullName || sessionUser?.user_metadata?.full_name || sessionUser?.user_metadata?.name || '';
+  const resolvedPhoto = photo || sessionUser?.user_metadata?.avatar_url || sessionUser?.user_metadata?.picture || '';
+
   const payload = {
-    id: userId,
-    user_id: userId,
-    email: email || '',
-    full_name: fullName || '',
+    id: verifiedUserId,
+    user_id: verifiedUserId,
+    email: resolvedEmail,
+    full_name: resolvedFullName,
     username: formattedUsername,
     phone_country_code: phoneCountryCode || '+237',
     phone_number: phoneNumber || '',
@@ -261,8 +286,10 @@ export async function createRaydarProfile({
     role: validRole,
     is_admin: false, // Critical: Never assign admin to new registrations!
     terms_accepted: true,
-    profile_photo_url: photo || ''
+    profile_photo_url: resolvedPhoto
   };
+
+  console.log("Writing verified profile to Supabase profiles table for user_id:", verifiedUserId);
 
   const { data, error } = await supabase
     .from('profiles')
@@ -279,13 +306,13 @@ export async function createRaydarProfile({
   if (typeof window !== 'undefined' && window.reportService && window.reportService.saveProfile) {
     try {
       await window.reportService.saveProfile({
-        full_name: fullName,
+        full_name: resolvedFullName,
         username: formattedUsername,
-        phone_country_code: phoneCountryCode,
-        phone_number: phoneNumber,
-        city: city,
+        phone_country_code: phoneCountryCode || '+237',
+        phone_number: phoneNumber || '',
+        city: city || '',
         role: validRole,
-        photo: photo || undefined,
+        photo: resolvedPhoto || undefined,
         is_admin: false
       });
     } catch (e) {
@@ -300,7 +327,7 @@ export async function createRaydarProfile({
  * Guard utility for pages.
  * Handles page protection and routing without flickering or race conditions.
  * 
- * @param {'public' | 'registration_step' | 'profile_completion' | 'onboarding' | 'user' | 'admin'} routeType 
+ * @param {'public' | 'login' | 'signup_step_1' | 'registration_step' | 'profile_completion' | 'onboarding' | 'user' | 'admin'} routeType 
  */
 export async function protectRoute(routeType) {
   // Check guest mode bypass for normal user pages
@@ -315,7 +342,8 @@ export async function protectRoute(routeType) {
   console.log(`[RAYDAR Route Guard] Route Type: ${routeType}, State: ${state}`);
 
   switch (routeType) {
-    case 'public': // login_child_safety, sign_up_child_safety
+    case 'public':
+    case 'login': // login_child_safety.html
       if (state === AuthState.AUTHENTICATED_ADMIN) {
         window.location.replace('./admin_dashboard.html');
         return authInfo;
@@ -329,10 +357,26 @@ export async function protectRoute(routeType) {
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        // Authenticated with Google or Supabase Auth but no profile yet -> Go to Step 2: Role Selection!
-        window.location.replace('./account_type_selection_updated_flow.html');
+        // Authenticated with Google or Supabase Auth but no RAYDAR profile yet -> Go to Registration Step 1
+        window.location.replace('./sign_up_child_safety.html');
         return authInfo;
       }
+      break;
+
+    case 'signup_step_1': // sign_up_child_safety.html
+      if (state === AuthState.AUTHENTICATED_ADMIN) {
+        window.location.replace('./admin_dashboard.html');
+        return authInfo;
+      }
+      if (state === AuthState.AUTHENTICATED_USER) {
+        window.location.replace('./home_child_safety_v1.html');
+        return authInfo;
+      }
+      if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
+        window.location.replace('./onboarding_community_protection_step_1.html');
+        return authInfo;
+      }
+      // If AUTHENTICATED_NO_PROFILE or UNAUTHENTICATED: stay on Step 1 to complete or review info
       break;
 
     case 'registration_step': // account_type_selection_updated_flow.html
@@ -373,7 +417,7 @@ export async function protectRoute(routeType) {
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        window.location.replace('./account_type_selection_updated_flow.html');
+        window.location.replace('./sign_up_child_safety.html');
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_ADMIN) {
@@ -394,7 +438,7 @@ export async function protectRoute(routeType) {
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        window.location.replace('./account_type_selection_updated_flow.html');
+        window.location.replace('./sign_up_child_safety.html');
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
@@ -410,7 +454,7 @@ export async function protectRoute(routeType) {
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        window.location.replace('./account_type_selection_updated_flow.html');
+        window.location.replace('./sign_up_child_safety.html');
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_USER || state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {

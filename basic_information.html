@@ -255,7 +255,7 @@
 </main>
 <!-- Bottom Navigation Bar (Action Area) -->
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-container-margin py-md bg-surface-container-lowest shadow-[0px_-4px_20px_rgba(108,77,255,0.06)] rounded-t-lg">
-<button class="flex flex-col items-center justify-center text-secondary px-lg py-sm hover:opacity-90 active:scale-98 transition-all duration-200 group" onclick="history.back()">
+<button class="flex flex-col items-center justify-center text-secondary px-lg py-sm hover:opacity-90 active:scale-98 transition-all duration-200 group" onclick="window.location.href='./account_type_selection_updated_flow.html'">
 <div class="flex items-center gap-xs">
 <span class="material-symbols-outlined">chevron_left</span>
 <span class="font-label-bold text-label-bold">Précédent</span>
@@ -444,32 +444,19 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
             setLoading(true);
 
             try {
-                if (isOAuthUser && activeUser) {
-                    // FLOW A: Google OAuth authenticated user completing RAYDAR profile
-                    console.log("Creating RAYDAR profile for Google OAuth user:", activeUser.id);
-                    const photo = activeUser.user_metadata?.avatar_url || activeUser.user_metadata?.picture || '';
-                    
-                    await createRaydarProfile({
-                        userId: activeUser.id,
-                        email: activeUser.email || emailInput,
-                        fullName: fullname,
-                        username: username,
-                        phoneCountryCode: countrycode,
-                        phoneNumber: phonenumber,
-                        city: city,
-                        role: role,
-                        photo: photo
-                    });
+                let targetUser = activeUser;
+                if (!targetUser) {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    targetUser = session?.user;
+                }
+                if (!targetUser) {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    targetUser = user;
+                }
 
-                    // Clear session storage
-                    sessionStorage.clear();
-                    console.log("Profile created successfully for Google user! Transitioning to onboarding flow...");
-                    window.location.replace('./onboarding_community_protection_step_1.html');
-
-                } else {
-                    // FLOW B: Standard Email & Password registration
-                    const password = document.getElementById('password').value;
-                    const confirm_password = document.getElementById('confirm_password').value;
+                // If user was not already authenticated (e.g. email draft flow), sign up or sign in now
+                if (!targetUser) {
+                    const password = document.getElementById('password')?.value || sessionStorage.getItem('signup_password') || '';
                     const email = emailInput || sessionStorage.getItem('signup_email') || '';
                     const terms = sessionStorage.getItem('signup_terms_accepted') === 'true';
 
@@ -480,11 +467,6 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                     }
                     if (!password || password.length < 6) {
                         showError('Le mot de passe doit comporter au moins 6 caractères.');
-                        setLoading(false);
-                        return;
-                    }
-                    if (password !== confirm_password) {
-                        showError('Les mots de passe ne correspondent pas.');
                         setLoading(false);
                         return;
                     }
@@ -504,40 +486,54 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                     if (authErr) {
                         let msg = authErr.message;
                         if (msg && msg.toLowerCase().includes('already registered')) {
-                            msg = "Cette adresse e-mail est déjà utilisée. Veuillez vous connecter.";
-                        } else if (msg && msg.toLowerCase().includes('rate limit')) {
-                            msg = "Trop de tentatives récentes. Veuillez patienter quelques instants.";
+                            // Try signing in
+                            const { data: signData, error: signErr } = await supabase.auth.signInWithPassword({ email, password });
+                            if (signErr) {
+                                showError("Cette adresse e-mail est déjà utilisée. Veuillez vous connecter.");
+                                setLoading(false);
+                                return;
+                            }
+                            targetUser = signData.user;
+                        } else {
+                            showError(msg);
+                            setLoading(false);
+                            return;
                         }
-                        showError(msg);
-                        setLoading(false);
-                        return;
+                    } else {
+                        targetUser = authData?.user;
                     }
-
-                    const newUser = authData?.user;
-                    if (!newUser) {
-                        showError('L\'inscription a échoué. Veuillez réessayer.');
-                        setLoading(false);
-                        return;
-                    }
-
-                    console.log('Auth user created. Creating RAYDAR profile in Supabase profiles table...');
-                    await createRaydarProfile({
-                        userId: newUser.id,
-                        email: email,
-                        fullName: fullname,
-                        username: username,
-                        phoneCountryCode: countrycode,
-                        phoneNumber: phonenumber,
-                        city: city,
-                        role: role,
-                        photo: ''
-                    });
-
-                    // Clear temporary signup cache
-                    sessionStorage.clear();
-                    console.log("Registration complete! Transitioning to onboarding flow...");
-                    window.location.replace('./onboarding_community_protection_step_1.html');
                 }
+
+                if (!targetUser || !targetUser.id) {
+                    throw new Error("Impossible de vérifier votre session d'authentification. Veuillez réessayer.");
+                }
+
+                console.log("Writing RAYDAR profile for verified user_id:", targetUser.id);
+                const photo = targetUser.user_metadata?.avatar_url || targetUser.user_metadata?.picture || '';
+
+                await createRaydarProfile({
+                    userId: targetUser.id,
+                    email: targetUser.email || emailInput,
+                    fullName: fullname,
+                    username: username,
+                    phoneCountryCode: countrycode,
+                    phoneNumber: phonenumber,
+                    city: city,
+                    role: role,
+                    photo: photo
+                });
+
+                // Clear temporary registration cache
+                sessionStorage.removeItem('signup_fullname');
+                sessionStorage.removeItem('signup_email');
+                sessionStorage.removeItem('signup_password');
+                sessionStorage.removeItem('signup_username');
+                sessionStorage.removeItem('signup_city');
+                sessionStorage.removeItem('signup_phone_number');
+                sessionStorage.removeItem('childSafetyAccountType');
+
+                console.log("Profile created successfully! Navigating to onboarding sequence (Page 1/3)...");
+                window.location.replace('./onboarding_community_protection_step_1.html');
 
             } catch (err) {
                 console.error('Registration/Profile completion error:', err);
@@ -545,6 +541,5 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                 setLoading(false);
             }
         });
-    </script>
     </script>
 </body></html>

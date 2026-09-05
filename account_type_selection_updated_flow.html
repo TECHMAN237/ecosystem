@@ -240,12 +240,7 @@
         }
 
         window.handleStepBack = function() {
-            const isGoogle = sessionStorage.getItem('signup_is_google') === 'true';
-            if (isGoogle) {
-                window.location.href = './login_child_safety.html';
-            } else {
-                window.location.href = './sign_up_child_safety.html';
-            }
+            window.location.href = './sign_up_child_safety.html';
         };
     </script>
 <script type="importmap">

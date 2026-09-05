@@ -182,7 +182,7 @@
 <div class="w-6 h-2 rounded-full bg-primary-container"></div>
 </div>
 <!-- Action Button -->
-<button class="w-full max-w-[320px] h-14 bg-primary-container text-on-primary-container rounded-full font-headline-md text-headline-md shadow-xl flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all" onclick="window.location.href='./success_account_created.html'">
+<button id="getStartedBtn" class="w-full max-w-[320px] h-14 bg-primary-container text-on-primary-container rounded-full font-headline-md text-headline-md shadow-xl flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all" onclick="handleFinishOnboarding()">
             Get Started
             <span class="material-symbols-outlined">arrow_forward</span>
 </button>
@@ -191,10 +191,6 @@
         // Simple micro-interaction for the button
         document.querySelectorAll('footer button').forEach(btn => {
             btn.addEventListener('click', function(e) {
-                if (this.textContent.includes('Get Started')) {
-                    window.location.href = './success_account_created.html';
-                    return;
-                }
                 this.classList.add('scale-95');
                 setTimeout(() => this.classList.remove('scale-95'), 150);
             });
@@ -210,6 +206,16 @@ try {
 } catch (e) {
     console.warn("Route protect notice:", e);
 }
+
+window.handleFinishOnboarding = async function() {
+    const btn = document.getElementById('getStartedBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.classList.add('opacity-80', 'cursor-wait');
+    }
+    await setOnboardingCompleted(currentUser);
+    window.location.replace('./success_account_created.html');
+};
 
 window.handleSkipOnboarding = async function() {
     await setOnboardingCompleted(currentUser);
