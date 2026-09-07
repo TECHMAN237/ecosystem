@@ -360,18 +360,19 @@ function renderReportCards(reportsList) {
     if (!carousel) return;
 
     if (reportsList && reportsList.length > 0) {
-        carousel.innerHTML = reportsList.map(report => {
+        carousel.innerHTML = reportsList.map((report, index) => {
             const isFound = report.type === 'found' || report.status === 'Trouvé';
             const badgeText = isFound ? 'Trouvé' : (report.urgency || 'Urgent');
             const badgeClass = isFound ? 'bg-green-100 text-green-700' : 'bg-error-container text-error';
-            const photoSrc = report.photo || reportService.NEUTRAL_CHILD_PHOTO_PLACEHOLDER;
+            const fallbackPhoto = reportService.getDefaultChildPortrait(report.gender || '', index, isFound);
+            const photoSrc = report.photo || fallbackPhoto;
             const childDisplayName = (report.name || report.child_full_name || report.childName || '').trim() || (isFound ? 'Enfant trouvé' : 'Enfant disparu');
             const locText = report.location || report.last_seen_location || report.found_location || 'Localisation inconnue';
 
             return `
             <div class="flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 shadow-[0_6px_24px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.02)] border border-outline-variant/20 flex gap-3.5 items-center hover:shadow-[0_12px_32px_rgba(83,44,230,0.06)] hover:-translate-y-0.5 transition-all duration-300">
               <div class="w-[96px] h-[112px] rounded-[14px] overflow-hidden flex-shrink-0 bg-surface-container-high relative shadow-inner">
-                <img alt="${childDisplayName}" class="w-full h-full object-cover" src="${photoSrc}" onerror="this.onerror=null; this.src='${reportService.NEUTRAL_CHILD_PHOTO_PLACEHOLDER}';" />
+                <img alt="${childDisplayName}" class="w-full h-full object-cover" src="${photoSrc}" onerror="this.onerror=null; this.src='${fallbackPhoto}';" />
               </div>
               <div class="flex-1 flex flex-col h-full justify-between py-0.5 min-w-0">
                 <div>

@@ -96,7 +96,12 @@ export const AFRICAN_CHILD_PORTRAITS = {
 export const NEUTRAL_CHILD_PHOTO_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Crect width='200' height='240' fill='%23F1F5F9'/%3E%3Cg fill='%2394A3B8'%3E%3Ccircle cx='100' cy='85' r='36' fill='%23CBD5E1'/%3E%3Cpath d='M40 210c0-33.137 26.863-60 60-60s60 26.863 60 60z' fill='%23CBD5E1'/%3E%3Ctext x='100' y='225' font-family='system-ui, -apple-system, sans-serif' font-size='12' font-weight='600' text-anchor='middle' fill='%2364748B'%3EPhoto non fournie%3C/text%3E%3C/g%3E%3C/svg%3E";
 
 export function getDefaultChildPortrait(gender = "", index = 0, isFound = false) {
-  return NEUTRAL_CHILD_PHOTO_PLACEHOLDER;
+  if (isFound) {
+    const list = AFRICAN_CHILD_PORTRAITS.found;
+    return list[Math.abs(index) % list.length];
+  }
+  const list = AFRICAN_CHILD_PORTRAITS.missing;
+  return list[Math.abs(index) % list.length];
 }
 
 const DEMO_MISSING_REPORTS = [
