@@ -327,8 +327,8 @@ supabase.auth.onAuthStateChange((event) => {
         return;
     }
     if (event === 'SIGNED_OUT') {
-        console.log("Signed out. Redirecting to /login...");
-        window.location.replace('/login');
+        console.log("Signed out. Redirecting to ./login_child_safety.html...");
+        window.location.replace('./login_child_safety.html');
     }
 });
 

@@ -646,6 +646,20 @@ if (saveProfileBtn) {
     });
 }
 
+// Logout button handler
+const logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+        if (window.handleLogout) {
+            await window.handleLogout();
+        } else {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.replace('./login_child_safety.html');
+        }
+    });
+}
+
 // Initial Render
 renderProfileData();
 </script>

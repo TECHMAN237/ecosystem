@@ -95,7 +95,7 @@
         }
         localStorage.clear();
         sessionStorage.clear();
-        window.location.replace('/login');
+        window.location.replace('./login_child_safety.html');
     };
 
     // 2b. Shell rendering is decoupled from routing guards (handled authoritatively by authService.js)
