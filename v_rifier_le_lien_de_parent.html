@@ -152,6 +152,27 @@
                 Pour prévenir les faux signalements et protéger les enfants, des documents justificatifs doivent être fournis avant l'examen du signalement.
             </p>
 </section>
+
+<!-- Child Summary Card (Step 1 Recap with User Photo) -->
+<div id="childSummaryCard" class="bg-surface-container-lowest p-md rounded-2xl border border-outline-variant/30 mb-xl flex items-center gap-md shadow-sm">
+    <div class="w-16 h-16 rounded-xl overflow-hidden bg-surface-container-high shrink-0 border border-outline-variant/40 flex items-center justify-center relative">
+        <img id="summaryChildPhoto" src="" class="w-full h-full object-cover hidden" alt="Photo enfant" />
+        <span id="summaryPhotoPlaceholder" class="material-symbols-outlined text-outline text-[28px]">person</span>
+    </div>
+    <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+            <h3 id="summaryChildName" class="font-headline-md text-headline-md text-on-surface truncate">Enfant</h3>
+            <span id="summaryChildAge" class="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">8 ans</span>
+        </div>
+        <p id="summaryChildLocation" class="text-sm text-on-surface-variant flex items-center gap-1 mt-0.5 truncate">
+            <span class="material-symbols-outlined text-[16px] text-primary">location_on</span>
+            <span id="summaryLocationText">Yaoundé</span>
+        </p>
+    </div>
+    <a href="./signaler_un_disparu_tape_1.html" class="p-2 text-primary hover:bg-primary/5 rounded-full flex items-center justify-center" title="Modifier l'étape 1">
+        <span class="material-symbols-outlined text-[20px]">edit</span>
+    </a>
+</div>
 <!-- Information Card -->
 <div class="bg-primary-container/10 border-l-4 border-primary p-lg rounded-r-lg mb-xl custom-shadow flex gap-md items-start">
 <span class="material-symbols-outlined text-primary">info</span>
@@ -388,52 +409,75 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('inputFamilyPhoto')?.addEventListener('change', (e) => handleFileUpload(e, 'familyPhoto', familyContainer, 'family_history', resetFamily));
     document.getElementById('inputHospitalRecord')?.addEventListener('change', (e) => handleFileUpload(e, 'hospitalRecord', hospitalContainer, 'medical_services', resetHospital));
 
-    // Restore existing draft
-    const draft = formDraftState.getMissingDraft();
-    if (draft.birthCertificate) {
-        const name = typeof draft.birthCertificate === 'object' ? draft.birthCertificate.name : 'acte_naissance.pdf';
-        const size = typeof draft.birthCertificate === 'object' ? draft.birthCertificate.size : '240.0';
-        renderDocUploaded(bcContainer, 'verified', name, size, () => {
-            formDraftState.updateMissingDraft({ birthCertificate: null });
-            resetBC();
-        });
+    // Restore existing draft and populate summary card
+    async function restoreStep2Draft() {
+        const draft = await formDraftState.getMissingDraftAsync();
+        
+        // Populate Child Summary Card
+        const summaryName = document.getElementById('summaryChildName');
+        const summaryAge = document.getElementById('summaryChildAge');
+        const summaryLoc = document.getElementById('summaryLocationText');
+        const summaryPhoto = document.getElementById('summaryChildPhoto');
+        const summaryPlaceholder = document.getElementById('summaryPhotoPlaceholder');
+        
+        if (summaryName) summaryName.textContent = draft.name || 'Enfant';
+        if (summaryAge) summaryAge.textContent = `${draft.age || 8} ans`;
+        if (summaryLoc) summaryLoc.textContent = draft.location || 'Localisation non spécifiée';
+        if (draft.photo && summaryPhoto && summaryPlaceholder) {
+            summaryPhoto.src = draft.photo;
+            summaryPhoto.classList.remove('hidden');
+            summaryPlaceholder.classList.add('hidden');
+            console.log('[REPORT TRACE] Successfully displayed child photo in Step 2 summary card');
+        }
+
+        if (draft.birthCertificate) {
+            const name = typeof draft.birthCertificate === 'object' ? draft.birthCertificate.name : 'acte_naissance.pdf';
+            const size = typeof draft.birthCertificate === 'object' ? draft.birthCertificate.size : '240.0';
+            renderDocUploaded(bcContainer, 'verified', name, size, () => {
+                formDraftState.updateMissingDraft({ birthCertificate: null });
+                resetBC();
+            });
+        }
+        if (draft.schoolDoc) {
+            const name = typeof draft.schoolDoc === 'object' ? draft.schoolDoc.name : 'certificat_scolarite.pdf';
+            const size = typeof draft.schoolDoc === 'object' ? draft.schoolDoc.size : '180.0';
+            renderDocUploaded(schoolContainer, 'school', name, size, () => {
+                formDraftState.updateMissingDraft({ schoolDoc: null });
+                resetSchool();
+            });
+        }
+        if (draft.guardianshipDoc) {
+            const name = typeof draft.guardianshipDoc === 'object' ? draft.guardianshipDoc.name : 'tutelle_legale.pdf';
+            const size = typeof draft.guardianshipDoc === 'object' ? draft.guardianshipDoc.size : '210.0';
+            renderDocUploaded(guardContainer, 'gavel', name, size, () => {
+                formDraftState.updateMissingDraft({ guardianshipDoc: null });
+                resetGuard();
+            });
+        }
+        if (draft.familyPhoto) {
+            const name = typeof draft.familyPhoto === 'object' ? draft.familyPhoto.name : 'photo_famille.jpg';
+            const size = typeof draft.familyPhoto === 'object' ? draft.familyPhoto.size : '320.0';
+            renderDocUploaded(familyContainer, 'family_history', name, size, () => {
+                formDraftState.updateMissingDraft({ familyPhoto: null });
+                resetFamily();
+            });
+        }
+        if (draft.hospitalRecord) {
+            const name = typeof draft.hospitalRecord === 'object' ? draft.hospitalRecord.name : 'carnet_sante.pdf';
+            const size = typeof draft.hospitalRecord === 'object' ? draft.hospitalRecord.size : '150.0';
+            renderDocUploaded(hospitalContainer, 'medical_services', name, size, () => {
+                formDraftState.updateMissingDraft({ hospitalRecord: null });
+                resetHospital();
+            });
+        }
     }
-    if (draft.schoolDoc) {
-        const name = typeof draft.schoolDoc === 'object' ? draft.schoolDoc.name : 'certificat_scolarite.pdf';
-        const size = typeof draft.schoolDoc === 'object' ? draft.schoolDoc.size : '180.0';
-        renderDocUploaded(schoolContainer, 'school', name, size, () => {
-            formDraftState.updateMissingDraft({ schoolDoc: null });
-            resetSchool();
-        });
-    }
-    if (draft.guardianshipDoc) {
-        const name = typeof draft.guardianshipDoc === 'object' ? draft.guardianshipDoc.name : 'tutelle_legale.pdf';
-        const size = typeof draft.guardianshipDoc === 'object' ? draft.guardianshipDoc.size : '210.0';
-        renderDocUploaded(guardContainer, 'gavel', name, size, () => {
-            formDraftState.updateMissingDraft({ guardianshipDoc: null });
-            resetGuard();
-        });
-    }
-    if (draft.familyPhoto) {
-        const name = typeof draft.familyPhoto === 'object' ? draft.familyPhoto.name : 'photo_famille.jpg';
-        const size = typeof draft.familyPhoto === 'object' ? draft.familyPhoto.size : '320.0';
-        renderDocUploaded(familyContainer, 'family_history', name, size, () => {
-            formDraftState.updateMissingDraft({ familyPhoto: null });
-            resetFamily();
-        });
-    }
-    if (draft.hospitalRecord) {
-        const name = typeof draft.hospitalRecord === 'object' ? draft.hospitalRecord.name : 'carnet_sante.pdf';
-        const size = typeof draft.hospitalRecord === 'object' ? draft.hospitalRecord.size : '150.0';
-        renderDocUploaded(hospitalContainer, 'medical_services', name, size, () => {
-            formDraftState.updateMissingDraft({ hospitalRecord: null });
-            resetHospital();
-        });
-    }
+    restoreStep2Draft();
 
     async function handleSubmit(btn) {
-        const currentDraft = formDraftState.getMissingDraft();
-        console.log('[REPORT TRACE] Handling missing report final submission. Photo present:', !!currentDraft.photo, 'Length:', currentDraft.photo ? currentDraft.photo.length : 0);
+        const currentDraft = await formDraftState.getMissingDraftAsync();
+        const photoInSummary = document.getElementById('summaryChildPhoto')?.src;
+        const finalPhoto = currentDraft.photo || (photoInSummary && !photoInSummary.includes(window.location.host) ? photoInSummary : null) || (photoInSummary && photoInSummary.startsWith('data:') ? photoInSummary : null);
+        console.log('[REPORT TRACE] Handling missing report final submission. Photo present:', !!finalPhoto, 'Length:', finalPhoto ? finalPhoto.length : 0);
 
         const hasDocInUI = document.querySelector('.btn-remove-doc') !== null;
         const hasAnyDoc = currentDraft.birthCertificate || currentDraft.guardianshipDoc || currentDraft.schoolDoc || currentDraft.familyPhoto || currentDraft.hospitalRecord || hasDocInUI;
@@ -463,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
             clothingDescription: currentDraft.clothingDescription || "Non spécifié.",
             relationship: currentDraft.relationship || "mere",
             notes: currentDraft.notes || "",
-            photo: currentDraft.photo || null,
+            photo: finalPhoto || null,
             birthCertificate: currentDraft.birthCertificate || (document.querySelector('#birthCertificateContainer .btn-remove-doc') ? { name: "acte_naissance.pdf", size: "240.0", dataUrl: "" } : null),
             guardianshipDoc: currentDraft.guardianshipDoc || (document.querySelector('#guardianshipContainer .btn-remove-doc') ? { name: "tutelle.pdf", size: "200.0", dataUrl: "" } : null),
             schoolDoc: currentDraft.schoolDoc || (document.querySelector('#schoolContainer .btn-remove-doc') ? { name: "scolarite.pdf", size: "180.0", dataUrl: "" } : null),

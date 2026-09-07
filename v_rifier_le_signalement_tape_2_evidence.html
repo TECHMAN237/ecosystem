@@ -356,32 +356,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Restore draft
-    const draft = formDraftState.getFoundDraft();
-    if (draft.childPhoto || draft.photo) {
-        const photoUrl = draft.childPhoto || draft.photo;
-        renderImageCard(cardChild, photoUrl, "Photo enfant enregistrée", () => {
-            formDraftState.updateFoundDraft({ childPhoto: null });
-            resetChildCard();
-        });
+    // Restore draft asynchronously
+    async function restoreFoundStep2Draft() {
+        const draft = await formDraftState.getFoundDraftAsync();
+        if (draft.childPhoto || draft.photo) {
+            const photoUrl = draft.childPhoto || draft.photo;
+            renderImageCard(cardChild, photoUrl, "Photo enfant enregistrée", () => {
+                formDraftState.updateFoundDraft({ childPhoto: null, photo: null });
+                resetChildCard();
+            });
+        }
+        if (draft.envPhoto) {
+            renderImageCard(cardEnv, draft.envPhoto, "Photo environnement enregistrée", () => {
+                formDraftState.updateFoundDraft({ envPhoto: null });
+                resetEnvCard();
+            });
+        }
+        if (draft.extraPhotosCount) {
+            if (labelExtra) labelExtra.textContent = `${draft.extraPhotosCount} photo(s) ajoutée(s)`;
+        }
+        if (draft.videoName) {
+            if (labelVideo) labelVideo.textContent = `Vidéo: ${draft.videoName.substring(0, 15)}...`;
+        }
     }
-    if (draft.envPhoto) {
-        renderImageCard(cardEnv, draft.envPhoto, "Photo environnement enregistrée", () => {
-            formDraftState.updateFoundDraft({ envPhoto: null });
-            resetEnvCard();
-        });
-    }
-    if (draft.extraPhotosCount) {
-        if (labelExtra) labelExtra.textContent = `${draft.extraPhotosCount} photo(s) ajoutée(s)`;
-    }
-    if (draft.videoName) {
-        if (labelVideo) labelVideo.textContent = `Vidéo: ${draft.videoName.substring(0, 15)}...`;
-    }
+    restoreFoundStep2Draft();
 
     const errorBanner = document.getElementById('errorBanner');
 
     btnSubmit?.addEventListener('click', async () => {
-        const currentDraft = formDraftState.getFoundDraft();
+        const currentDraft = await formDraftState.getFoundDraftAsync();
 
         const hasChildPhoto = currentDraft.childPhoto || currentDraft.photo || (document.querySelector('#cardPhotoChild img') !== null);
         const hasEnvPhoto = currentDraft.envPhoto || (document.querySelector('#cardPhotoEnv img') !== null);
@@ -399,25 +402,26 @@ document.addEventListener('DOMContentLoaded', () => {
         btnSubmit.style.opacity = '0.7';
 
         const genderLabel = currentDraft.gender === 'fille' ? 'Fillette' : (currentDraft.gender === 'garcon' ? 'Garçon' : 'Sexe inconnu');
-        const defaultPhoto = currentDraft.gender === 'fille' 
-            ? '/assets/children/child-08.webp'
-            : '/assets/children/child-05.webp';
 
-        const childPhotoVal = currentDraft.childPhoto || currentDraft.photo || (document.querySelector('#cardPhotoChild img') ? document.querySelector('#cardPhotoChild img').src : null) || defaultPhoto;
+        const childPhotoVal = currentDraft.childPhoto || currentDraft.photo || (document.querySelector('#cardPhotoChild img') ? document.querySelector('#cardPhotoChild img').src : null) || null;
         const envPhotoVal = currentDraft.envPhoto || (document.querySelector('#cardPhotoEnv img') ? document.querySelector('#cardPhotoEnv img').src : null) || null;
 
+        const childNameEntered = (currentDraft.childName || currentDraft.name || '').trim();
+        const finalChildName = childNameEntered || `Enfant trouvé (${genderLabel})`;
+
         const finalReport = {
-            name: `Enfant trouvé (${genderLabel})`,
-            age: currentDraft.age || 7,
+            name: finalChildName,
+            childName: finalChildName,
+            age: currentDraft.age ? Number(currentDraft.age) : null,
             gender: currentDraft.gender || 'inconnu',
-            height: currentDraft.height || 'Env. 1m10',
-            location: currentDraft.location || 'Yaoundé, Mokolo',
+            height: currentDraft.height || null,
+            location: currentDraft.location || 'Localisation non précisée',
             date: currentDraft.date || new Date().toISOString().split('T')[0],
-            time: currentDraft.time || '14:15',
-            physicalDescription: currentDraft.physicalDescription || 'Teint noir, visage rond.',
-            clothingDescription: currentDraft.clothingDescription || 'T-shirt bleu, pantalon noir.',
+            time: currentDraft.time || new Date().toTimeString().split(' ')[0].substring(0, 5),
+            physicalDescription: currentDraft.physicalDescription || '',
+            clothingDescription: currentDraft.clothingDescription || '',
             currentSafeLocation: safeLocationSelect ? safeLocationSelect.value : 'Poste de Police',
-            gps: '4.0500° N, 9.7000° E',
+            gps: currentDraft.gps || '',
             photo: childPhotoVal,
             envPhoto: envPhotoVal
         };

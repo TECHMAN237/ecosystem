@@ -150,7 +150,7 @@
         
         <!-- Hero Image Section -->
         <section class="relative w-full aspect-[4/5] bg-surface-container-high shrink-0 overflow-hidden group md:col-span-5 md:rounded-2xl md:shadow-md md:sticky md:top-20">
-            <img id="childPhoto" alt="Photo de l'enfant trouvé" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" src="/assets/children/child-05.webp"/>
+            <img id="childPhoto" alt="Photo de l'enfant trouvé" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20fill%3D%22%23e2e8f0%22%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22%23f1f5f9%22%2F%3E%3Ccircle%20cx%3D%22100%22%20cy%3D%2275%22%20r%3D%2240%22%20fill%3D%22%23cbd5e1%22%2F%3E%3Cpath%20d%3D%22M30%20180%20c0-40%2030-65%2070-65%20s70%2025%2070%2065%20z%22%20fill%3D%22%23cbd5e1%22%2F%3E%3C%2Fsvg%3E"/>
             <!-- Gradient Overlay for text readability -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none"></div>
             <!-- Safe Badge -->
@@ -166,14 +166,14 @@
             </div>
             <!-- Core Identity Overlay -->
             <div class="absolute bottom-0 left-0 w-full p-container-margin text-white z-10 flex flex-col gap-1.5">
-                <h1 id="childNameAge" class="font-display text-display text-white mb-0.5 drop-shadow-md">Garçon trouvé, env. 7 ans</h1>
+                <h1 id="childNameAge" class="font-display text-display text-white mb-0.5 drop-shadow-md">Enfant trouvé</h1>
                 <div class="flex items-center gap-2 font-label-sm text-label-sm text-white/90">
                     <span class="material-symbols-outlined text-[16px] text-emerald-400">location_on</span>
-                    <span id="locationText">Yaoundé, Avenue Kennedy</span>
+                    <span id="locationText">Localisation en cours...</span>
                 </div>
                 <div class="flex items-center gap-2 font-label-sm text-label-sm text-white/90">
                     <span class="material-symbols-outlined text-[16px] text-emerald-400">schedule</span>
-                    <span id="dateText">Trouvé le 14/05/2024 • 10:15</span>
+                    <span id="dateText">Date de découverte</span>
                 </div>
             </div>
         </section>
@@ -266,58 +266,79 @@
 
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const reportDataStr = sessionStorage.getItem('current_view_report');
-    if (reportDataStr) {
-        try {
-            const report = JSON.parse(reportDataStr);
-            console.log("Rendering dynamic found report details:", report);
+<script type="module">
+import { reportService } from './src/reportService.js';
 
+document.addEventListener('DOMContentLoaded', async () => {
+    let report = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const reportId = urlParams.get('id');
+
+    if (reportId) {
+        report = await reportService.getReportByIdRemote(reportId);
+    }
+
+    if (!report) {
+        const reportDataStr = sessionStorage.getItem('current_view_report');
+        if (reportDataStr) {
+            try {
+                report = JSON.parse(reportDataStr);
+            } catch(e) {}
+        }
+    }
+
+    if (report) {
+        try {
             // 1. Photo
-            if (report.photo) {
-                document.getElementById('childPhoto').src = report.photo;
+            const photoEl = document.getElementById('childPhoto');
+            if (photoEl) {
+                photoEl.src = report.photo || reportService.NEUTRAL_CHILD_PHOTO_PLACEHOLDER;
+                photoEl.onerror = () => {
+                    photoEl.onerror = null;
+                    photoEl.src = reportService.NEUTRAL_CHILD_PHOTO_PLACEHOLDER;
+                };
             }
 
             // 2. Status badge
             const statusBadge = document.getElementById('statusBadge');
             if (statusBadge) {
-                if (report.status === 'Published' || report.status === 'Active') {
+                if (report.status === 'Published' || report.status === 'Active' || report.status === 'Trouvé') {
                     statusBadge.innerHTML = '<span class="material-symbols-outlined fill text-[14px]">verified_user</span> EN SÉCURITÉ';
                 } else {
-                    statusBadge.innerHTML = `<span class="material-symbols-outlined fill text-[14px]">verified_user</span> ${report.status.toUpperCase()}`;
+                    statusBadge.innerHTML = `<span class="material-symbols-outlined fill text-[14px]">verified_user</span> ${(report.status || 'TROUVÉ').toUpperCase()}`;
                 }
             }
 
             // 3. Name & age estimé
-            const ageLabel = report.age ? `env. ${report.age} ans` : 'âge inconnu';
-            document.getElementById('childNameAge').textContent = `${report.name || 'Enfant trouvé'}, ${ageLabel}`;
+            const displayName = (report.name || report.child_full_name || report.childName || '').trim() || 'Enfant trouvé';
+            const ageLabel = report.age ? `env. ${report.age} ans` : 'âge non précisé';
+            document.getElementById('childNameAge').textContent = `${displayName}, ${ageLabel}`;
 
             // 4. Location Text
-            document.getElementById('locationText').textContent = report.location || "Yaoundé";
+            document.getElementById('locationText').textContent = report.location || report.found_location || "Localisation non précisée";
 
             // 5. Date Text
-            const dateStr = report.date || "Inconnue";
-            const timeStr = report.time || "Non spécifiée";
-            document.getElementById('dateText').textContent = `Trouvé le ${dateStr} • ${timeStr}`;
+            const dateStr = report.date || report.found_date || "Date non précisée";
+            const timeStr = report.time || report.found_time || "";
+            document.getElementById('dateText').textContent = `Trouvé le ${dateStr}${timeStr ? ' • ' + timeStr : ''}`;
 
             // 6. Sex
             const sexText = document.getElementById('sexText');
             if (sexText) {
-                const g = (report.gender || "").toLowerCase();
+                const g = (report.gender || report.child_gender || "").toLowerCase();
                 sexText.textContent = (g === 'fille' || g === 'f') ? 'Fille' : ((g === 'garcon' || g === 'm') ? 'Garçon' : 'Inconnu');
             }
 
             // 7. Height
             const heightText = document.getElementById('heightText');
             if (heightText) {
-                heightText.textContent = report.height || "Env. 1m15";
+                heightText.textContent = report.height || "Non précisée";
             }
 
             // 8. Status Text
             const statusText = document.getElementById('statusText');
             if (statusText) {
-                statusText.textContent = report.currentSafeLocation ? 'Sécurisé' : 'Recherche Famille';
+                statusText.textContent = report.status || (report.currentSafeLocation ? 'Sécurisé' : 'Recherche Famille');
             }
 
             // 9. Description Text

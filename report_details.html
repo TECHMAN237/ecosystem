@@ -212,7 +212,7 @@
 <main class="flex-1 flex flex-col md:grid md:grid-cols-12 md:gap-8 md:max-w-6xl md:mx-auto md:p-8 w-full pb-safe">
 <!-- Hero Image Section -->
 <section class="relative w-full aspect-[4/5] bg-surface-container-high shrink-0 overflow-hidden group md:col-span-5 md:rounded-2xl md:shadow-md md:sticky md:top-20">
-<img id="childPhoto" alt="Photo de l'enfant" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" data-alt="Portrait photographique d'un jeune garçon d'origine africaine, environ 8 ans, regardant directement la caméra avec une expression neutre." src="/assets/children/child-01.webp"/>
+<img id="childPhoto" alt="Photo de l'enfant" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20fill%3D%22%23e2e8f0%22%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22%23f1f5f9%22%2F%3E%3Ccircle%20cx%3D%22100%22%20cy%3D%2275%22%20r%3D%2240%22%20fill%3D%22%23cbd5e1%22%2F%3E%3Cpath%20d%3D%22M30%20180%20c0-40%2030-65%2070-65%20s70%2025%2070%2065%20z%22%20fill%3D%22%23cbd5e1%22%2F%3E%3C%2Fsvg%3E"/>
 <!-- Gradient Overlay for text readability -->
 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
 <!-- Urgent Badge -->
@@ -228,14 +228,14 @@
 </div>
 <!-- Core Identity Overlay -->
 <div class="absolute bottom-0 left-0 w-full p-container-margin text-white z-10 flex flex-col gap-2">
-<h1 id="childNameAge" class="font-display text-display text-white mb-1 drop-shadow-md">Kevin, 8 ans</h1>
+<h1 id="childNameAge" class="font-display text-display text-white mb-1 drop-shadow-md">Enfant disparu</h1>
 <div class="flex items-center gap-2 font-label-sm text-label-sm text-white/90">
 <span class="material-symbols-outlined text-[16px]">location_on</span>
-<span id="lastLocationText">Yaoundé, Centre</span>
+<span id="lastLocationText">Localisation en cours...</span>
 </div>
 <div class="flex items-center gap-2 font-label-sm text-label-sm text-white/90">
 <span class="material-symbols-outlined text-[16px]">schedule</span>
-<span id="lastSeenDate">12/05/2024 • 14:30</span>
+<span id="lastSeenDate">Date de signalement</span>
 </div>
 </div>
 </section>
@@ -320,17 +320,37 @@
 </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const reportDataStr = sessionStorage.getItem('current_view_report');
-    if (reportDataStr) {
-        try {
-            const report = JSON.parse(reportDataStr);
-            console.log("Rendering dynamic report details:", report);
+<script type="module">
+import { reportService } from './src/reportService.js';
 
+document.addEventListener('DOMContentLoaded', async () => {
+    let report = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const reportId = urlParams.get('id');
+
+    if (reportId) {
+        report = await reportService.getReportByIdRemote(reportId);
+    }
+
+    if (!report) {
+        const reportDataStr = sessionStorage.getItem('current_view_report');
+        if (reportDataStr) {
+            try {
+                report = JSON.parse(reportDataStr);
+            } catch(e) {}
+        }
+    }
+
+    if (report) {
+        try {
             // 1. Photo
-            if (report.photo) {
-                document.getElementById('childPhoto').src = report.photo;
+            const photoEl = document.getElementById('childPhoto');
+            if (photoEl) {
+                photoEl.src = report.photo || reportService.NEUTRAL_CHILD_PHOTO_PLACEHOLDER;
+                photoEl.onerror = () => {
+                    photoEl.onerror = null;
+                    photoEl.src = reportService.NEUTRAL_CHILD_PHOTO_PLACEHOLDER;
+                };
             }
 
             // 2. Urgent / Status badge

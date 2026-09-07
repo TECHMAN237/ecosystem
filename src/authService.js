@@ -97,7 +97,15 @@ export function getAndClearReturnUrl() {
 export function isOnboardingCompleted(user, profile = null) {
   if (!user || !user.id) return false;
   
-  // 1. PostgreSQL Database profiles table check (Primary authority)
+  // 1. If profile already exists and has both full_name and role, the account is fully completed
+  if (profile && profile.full_name && profile.role) {
+    try {
+      localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
+    } catch (e) {}
+    return true;
+  }
+
+  // 2. PostgreSQL Database profiles table check (Primary authority)
   if (profile && (profile.onboarding_completed === true || profile.onboarding_completed === 'true')) {
     try {
       localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
@@ -105,7 +113,7 @@ export function isOnboardingCompleted(user, profile = null) {
     return true;
   }
 
-  // 2. Supabase Auth user_metadata check
+  // 3. Supabase Auth user_metadata check
   if (user.user_metadata && user.user_metadata.onboarding_completed === true) {
     try {
       localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
@@ -113,7 +121,7 @@ export function isOnboardingCompleted(user, profile = null) {
     return true;
   }
 
-  // 3. LocalStorage check (as verified persistence for current device)
+  // 4. LocalStorage check (as verified persistence for current device)
   const localVal = localStorage.getItem(`raydar_onboarding_completed_${user.id}`);
   if (localVal === 'true') return true;
 
@@ -745,8 +753,8 @@ export async function protectRoute(routeType) {
   const isInternalNavValid = navCheck.isValid || hasActiveInAppSession;
   const navigationType = hasActiveInAppSession ? 'IN_APP_ACTIVE' : navCheck.type;
 
-  // Direct external link gatekeeper
-  if (!isPublic && !isInternalNavValid) {
+  // Direct external link gatekeeper: ONLY apply if there is NO active Supabase session
+  if (!isPublic && !session && !isInternalNavValid) {
     logAuthTrace({
       currentUrl: window.location.pathname + window.location.search,
       destination: './login_child_safety.html',
@@ -758,7 +766,7 @@ export async function protectRoute(routeType) {
       authenticated: Boolean(session),
       userId: session?.user?.id,
       returnUrl: window.location.pathname + window.location.search,
-      redirectReason: 'Direct URL entry detected — explicit login required',
+      redirectReason: 'Direct URL entry detected without active session — explicit login required',
       redirectSourceFunction: 'protectRoute.directEntryGate'
     });
     saveReturnUrlAndRedirectToLogin();
@@ -768,6 +776,10 @@ export async function protectRoute(routeType) {
       user: null,
       profile: null
     };
+  }
+
+  if (session && typeof window !== 'undefined') {
+    sessionStorage.setItem('raydar_active_session', 'true');
   }
 
   // Protect private pages

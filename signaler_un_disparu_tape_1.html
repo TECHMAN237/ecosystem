@@ -322,30 +322,33 @@ document.addEventListener('DOMContentLoaded', () => {
         fileInput.addEventListener('change', handleFileChange);
     }
 
-    // Restore existing draft
-    const draft = formDraftState.getMissingDraft();
-    if (draft.photo) {
-        console.log('[REPORT TRACE] Restoring existing photo from draft in Step 1');
-        renderPhotoPreview(draft.photo);
+    // Restore existing draft asynchronously (with IndexedDB fallback)
+    async function restoreDraft() {
+        const draft = await formDraftState.getMissingDraftAsync();
+        if (draft.photo) {
+            console.log('[REPORT TRACE] Restoring existing photo from draft in Step 1, length:', draft.photo.length);
+            renderPhotoPreview(draft.photo);
+        }
+        if (draft.name) fullNameInput.value = draft.name;
+        if (draft.age) ageInput.value = draft.age;
+        if (draft.gender) genderSelect.value = draft.gender;
+        if (draft.location) locationInput.value = draft.location;
+        if (draft.date) dateInput.value = draft.date;
+        if (draft.physicalDescription) physicalInput.value = draft.physicalDescription;
+        if (draft.notes) notesInput.value = draft.notes;
+        if (draft.relationship) {
+            const radio = document.querySelector(`input[name="relationship"][value="${draft.relationship}"]`);
+            if (radio) radio.checked = true;
+        }
     }
-    if (draft.name) fullNameInput.value = draft.name;
-    if (draft.age) ageInput.value = draft.age;
-    if (draft.gender) genderSelect.value = draft.gender;
-    if (draft.location) locationInput.value = draft.location;
-    if (draft.date) dateInput.value = draft.date;
-    if (draft.physicalDescription) physicalInput.value = draft.physicalDescription;
-    if (draft.notes) notesInput.value = draft.notes;
-    if (draft.relationship) {
-        const radio = document.querySelector(`input[name="relationship"][value="${draft.relationship}"]`);
-        if (radio) radio.checked = true;
-    }
+    restoreDraft();
 
     // Save and redirect
-    btnSubmit.addEventListener('click', () => {
+    btnSubmit.addEventListener('click', async () => {
         const checkedRadio = document.querySelector('input[name="relationship"]:checked');
         const relationship = checkedRadio ? checkedRadio.value : "mere";
 
-        const currentDraft = formDraftState.getMissingDraft();
+        const currentDraft = await formDraftState.getMissingDraftAsync();
         console.log('[REPORT TRACE] Submitting Step 1. Photo present:', !!currentDraft.photo);
 
         formDraftState.updateMissingDraft({
@@ -357,7 +360,8 @@ document.addEventListener('DOMContentLoaded', () => {
             physicalDescription: physicalInput.value.trim() || "Aucune description",
             notes: notesInput.value.trim() || "",
             relationship: relationship,
-            height: "1m20"
+            height: "1m20",
+            photo: currentDraft.photo || null
         });
 
         window.location.href = './v_rifier_le_lien_de_parent.html';

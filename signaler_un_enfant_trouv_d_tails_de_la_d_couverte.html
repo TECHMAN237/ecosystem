@@ -256,13 +256,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnNext.addEventListener('click', () => {
         const childName = childNameInput.value.trim();
+        const enteredLoc = locationInput.value.trim();
+        const enteredTime = timeInput.value.trim();
+        const enteredGender = genderSelect.value;
+        const enteredClothing = clothingInput.value.trim();
+
         formDraftState.updateFoundDraft({
-            name: childName || draft.name || `Enfant trouvé (${genderSelect.value === 'fille' ? 'Fillette' : 'Garçon'})`,
+            name: childName || draft.name || (enteredGender === 'fille' ? 'Enfant trouvé (Fillette)' : 'Enfant trouvé (Garçon)'),
             childName: childName,
-            location: locationInput.value.trim() || draft.location || "Yaoundé, Mokolo",
-            time: timeInput.value.trim() || "14:15",
-            gender: genderSelect.value || draft.gender || "inconnu",
-            clothingDescription: clothingInput.value.trim() || draft.clothingDescription || "T-shirt bleu, pantalon noir"
+            location: enteredLoc || draft.location || '',
+            time: enteredTime || draft.time || '',
+            gender: enteredGender || draft.gender || 'inconnu',
+            clothingDescription: enteredClothing || draft.clothingDescription || ''
         });
 
         window.location.href = './v_rifier_le_signalement_tape_2_evidence.html';

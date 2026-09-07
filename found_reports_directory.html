@@ -262,7 +262,7 @@
                         const report = reportService.getReportById(id);
                         if (report) {
                             sessionStorage.setItem('current_view_report', JSON.stringify(report));
-                            window.location.href = './found_report_details.html';
+                            window.location.href = `./found_report_details.html?id=${encodeURIComponent(id)}`;
                         }
                     });
                 });

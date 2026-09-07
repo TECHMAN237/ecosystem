@@ -211,49 +211,13 @@
     </button>
   </div>
   <div id="recentMissingCarousel" class="flex overflow-x-auto gap-4 pb-3 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-5 px-5">
-    <!-- Card 1 (Kevin Martin / Emmanuel T.) -->
-    <div class="flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 shadow-[0_6px_24px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.02)] border border-outline-variant/20 flex gap-3.5 items-center hover:shadow-[0_12px_32px_rgba(83,44,230,0.06)] hover:-translate-y-0.5 transition-all duration-300">
-      <div class="w-[96px] h-[112px] rounded-[14px] overflow-hidden flex-shrink-0 bg-surface-container-high relative shadow-inner">
-        <img alt="Kevin Martin" class="w-full h-full object-cover object-top" src="/assets/children/child-01.webp" />
-      </div>
-      <div class="flex-1 flex flex-col h-full justify-between py-0.5">
-        <div>
-          <h3 class="font-bold text-[16px] text-on-surface leading-snug mb-0.5">Kevin Martin</h3>
-          <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1.5">
-            <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
-            À 3 km d'ici
-          </p>
-          <div class="mb-2">
-            <span class="bg-error-container text-error text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Urgent</span>
-          </div>
-        </div>
-        <button class="view-details-btn w-full py-2 px-3 bg-[#F4F6F9] border border-[#E2E8F0] text-primary rounded-full font-bold text-[11px] flex items-center justify-between shadow-[0_1px_2px_rgba(15,23,42,0.04)] hover:bg-[#EAEFF5] hover:border-[#CBD5E1] active:scale-98 transition-all" onclick="window.location.href='./report_details.html'">
-          <span>Voir les détails</span>
-          <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Card 2 (Amina K.) -->
-    <div class="flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 shadow-[0_6px_24px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.02)] border border-outline-variant/20 flex gap-3.5 items-center hover:shadow-[0_12px_32px_rgba(83,44,230,0.06)] hover:-translate-y-0.5 transition-all duration-300">
-      <div class="w-[96px] h-[112px] rounded-[14px] overflow-hidden flex-shrink-0 bg-surface-container-high relative shadow-inner">
-        <img alt="Amina K." class="w-full h-full object-cover object-top" src="/assets/children/child-02.webp" />
-      </div>
-      <div class="flex-1 flex flex-col h-full justify-between py-0.5">
-        <div>
-          <h3 class="font-bold text-[16px] text-on-surface leading-snug mb-0.5">Amina K.</h3>
-          <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1.5">
-            <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
-            À 5 km d'ici
-          </p>
-          <div class="mb-2">
-            <span class="bg-error-container text-error text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Urgent</span>
-          </div>
-        </div>
-        <button class="view-details-btn w-full py-2 px-3 bg-[#F4F6F9] border border-[#E2E8F0] text-primary rounded-full font-bold text-[11px] flex items-center justify-between shadow-[0_1px_2px_rgba(15,23,42,0.04)] hover:bg-[#EAEFF5] hover:border-[#CBD5E1] active:scale-98 transition-all" onclick="window.location.href='./report_details.html'">
-          <span>Voir les détails</span>
-          <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-        </button>
+    <!-- Initial Loading Skeleton -->
+    <div class="flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 border border-outline-variant/20 flex gap-3.5 items-center animate-pulse">
+      <div class="w-[96px] h-[112px] rounded-[14px] bg-surface-container-high shrink-0"></div>
+      <div class="flex-1 space-y-2">
+        <div class="h-4 bg-surface-container-high rounded w-3/4"></div>
+        <div class="h-3 bg-surface-container-high rounded w-1/2"></div>
+        <div class="h-6 bg-surface-container-high rounded-full w-20"></div>
       </div>
     </div>
   </div>
@@ -395,72 +359,82 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dynamically load user profile from reportService
     loadAndSyncProfile();
 
-    function renderCarousel() {
+    async function renderCarousel() {
         const carousel = document.getElementById('recentMissingCarousel');
         if (!carousel) return;
-        const missing = reportService.getMissingReports();
-        const found = reportService.getFoundReports();
-        const allReports = [...missing, ...found].sort((a, b) => new Date(b.createdAt || b.created_at || 0) - new Date(a.createdAt || a.created_at || 0));
         
-        console.log('[REPORT TRACE] Rendering home carousel with reports count:', allReports.length);
-        if (allReports.length > 0) {
-            carousel.innerHTML = allReports.map(report => {
-                const isFound = report.type === 'found' || report.currentSafeLocation || (report.name && report.name.includes('trouvé'));
-                const badgeText = isFound ? 'Trouvé' : (report.urgency || 'Urgent');
-                const badgeClass = isFound ? 'bg-green-100 text-green-700' : 'bg-error-container text-error';
-                return `
-                <div class="flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 shadow-[0_6px_24px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.02)] border border-outline-variant/20 flex gap-3.5 items-center hover:shadow-[0_12px_32px_rgba(83,44,230,0.06)] hover:-translate-y-0.5 transition-all duration-300">
-                  <div class="w-[96px] h-[112px] rounded-[14px] overflow-hidden flex-shrink-0 bg-surface-container-high relative shadow-inner">
-                    <img alt="${report.name}" class="w-full h-full object-cover" src="${report.photo}" onerror="this.src='/assets/children/child-01.webp'" />
-                  </div>
-                  <div class="flex-1 flex flex-col h-full justify-between py-0.5">
-                    <div>
-                      <h3 class="font-bold text-[16px] text-on-surface leading-snug mb-0.5 truncate">${report.name}</h3>
-                      <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1.5 truncate">
-                        <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
-                        ${report.location}
-                      </p>
-                      <div class="mb-2">
-                        <span class="${badgeClass} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">${badgeText}</span>
+        try {
+            // Fetch strictly the 4 most recent real reports (Missing + Found) from Supabase
+            const recentReports = await reportService.getRecentRealReports(4);
+            console.log('[REPORT TRACE] Rendering home carousel with recent real reports count:', recentReports.length);
+            
+            if (recentReports && recentReports.length > 0) {
+                carousel.innerHTML = recentReports.map(report => {
+                    const isFound = report.type === 'found' || report.status === 'Trouvé';
+                    const badgeText = isFound ? 'Trouvé' : (report.urgency || 'Urgent');
+                    const badgeClass = isFound ? 'bg-green-100 text-green-700' : 'bg-error-container text-error';
+                    const photoSrc = report.photo || reportService.NEUTRAL_CHILD_PHOTO_PLACEHOLDER;
+                    const childDisplayName = report.name || (isFound ? 'Enfant trouvé' : 'Enfant disparu');
+                    const locText = report.location || 'Localisation inconnue';
+
+                    return `
+                    <div class="flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 shadow-[0_6px_24px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.02)] border border-outline-variant/20 flex gap-3.5 items-center hover:shadow-[0_12px_32px_rgba(83,44,230,0.06)] hover:-translate-y-0.5 transition-all duration-300">
+                      <div class="w-[96px] h-[112px] rounded-[14px] overflow-hidden flex-shrink-0 bg-surface-container-high relative shadow-inner">
+                        <img alt="${childDisplayName}" class="w-full h-full object-cover" src="${photoSrc}" onerror="this.onerror=null; this.src='${reportService.NEUTRAL_CHILD_PHOTO_PLACEHOLDER}';" />
+                      </div>
+                      <div class="flex-1 flex flex-col h-full justify-between py-0.5 min-w-0">
+                        <div>
+                          <h3 class="font-bold text-[16px] text-on-surface leading-snug mb-0.5 truncate">${childDisplayName}</h3>
+                          <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1.5 truncate">
+                            <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
+                            ${locText}
+                          </p>
+                          <div class="mb-2">
+                            <span class="${badgeClass} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">${badgeText}</span>
+                          </div>
+                        </div>
+                        <button class="view-details-btn w-full py-2 px-3 bg-[#F4F6F9] border border-[#E2E8F0] text-primary rounded-full font-bold text-[11px] flex items-center justify-between shadow-[0_1px_2px_rgba(15,23,42,0.04)] hover:bg-[#EAEFF5] hover:border-[#CBD5E1] active:scale-98 transition-all" 
+                                data-id="${report.id}" data-is-found="${isFound}">
+                          <span>Voir les détails</span>
+                          <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                        </button>
                       </div>
                     </div>
-                    <button class="view-details-btn w-full py-2 px-3 bg-[#F4F6F9] border border-[#E2E8F0] text-primary rounded-full font-bold text-[11px] flex items-center justify-between shadow-[0_1px_2px_rgba(15,23,42,0.04)] hover:bg-[#EAEFF5] hover:border-[#CBD5E1] active:scale-98 transition-all" 
-                            data-id="${report.id}" data-is-found="${isFound}">
-                      <span>Voir les détails</span>
-                      <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-                    </button>
-                  </div>
-                </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
 
-            // Bind click listeners
-            carousel.querySelectorAll('.view-details-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-id');
-                    const isFound = btn.getAttribute('data-is-found') === 'true';
-                    const report = reportService.getReportById(id);
-                    if (report) {
-                        sessionStorage.setItem('current_view_report', JSON.stringify(report));
-                        window.location.href = isFound ? './found_report_details.html' : './report_details.html';
-                    }
+                // Bind click listeners
+                carousel.querySelectorAll('.view-details-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.getAttribute('data-id');
+                        const isFound = btn.getAttribute('data-is-found') === 'true';
+                        window.location.href = isFound 
+                            ? `./found_report_details.html?id=${encodeURIComponent(id)}` 
+                            : `./report_details.html?id=${encodeURIComponent(id)}`;
+                    });
                 });
-            });
-        } else {
-            carousel.innerHTML = `<p class="text-xs text-on-surface-variant px-4">Aucun cas de disparition actif.</p>`;
-        }
+            } else {
+                carousel.innerHTML = `
+                <div class="w-full py-8 text-center text-on-surface-variant text-sm flex flex-col items-center justify-center">
+                    <span class="material-symbols-outlined text-3xl mb-1 text-outline">search_off</span>
+                    <p>Aucun signalement actif.</p>
+                </div>`;
+            }
 
-        // Update bottom card counters
-        const foundCountText = document.getElementById('foundCountText');
-        if (foundCountText) {
-            const foundCount = reportService.getFoundReports().length;
-            foundCountText.textContent = foundCount > 0 ? `${foundCount} enfant(s) trouvé(s) en attente.` : "Aucun signalement en attente.";
-        }
+            // Update bottom card counters
+            const foundCountText = document.getElementById('foundCountText');
+            if (foundCountText) {
+                const foundCount = reportService.getFoundReports().length;
+                foundCountText.textContent = foundCount > 0 ? `${foundCount} enfant(s) trouvé(s) en attente.` : "Aucun signalement en attente.";
+            }
 
-        const missingCountText = document.getElementById('missingCountText');
-        if (missingCountText) {
-            const missingCount = reportService.getMissingReports().length;
-            missingCountText.textContent = missingCount > 0 ? `${missingCount} alerte(s) active(s) à proximité.` : "Aucune alerte active.";
+            const missingCountText = document.getElementById('missingCountText');
+            if (missingCountText) {
+                const missingCount = reportService.getMissingReports().length;
+                missingCountText.textContent = missingCount > 0 ? `${missingCount} alerte(s) active(s) à proximité.` : "Aucune alerte active.";
+            }
+        } catch (err) {
+            console.error('[HOMEPAGE] renderCarousel error:', err);
         }
     }
 

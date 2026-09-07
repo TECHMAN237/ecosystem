@@ -93,14 +93,10 @@ export const AFRICAN_CHILD_PORTRAITS = {
   ]
 };
 
+export const NEUTRAL_CHILD_PHOTO_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Crect width='200' height='240' fill='%23F1F5F9'/%3E%3Cg fill='%2394A3B8'%3E%3Ccircle cx='100' cy='85' r='36' fill='%23CBD5E1'/%3E%3Cpath d='M40 210c0-33.137 26.863-60 60-60s60 26.863 60 60z' fill='%23CBD5E1'/%3E%3Ctext x='100' y='225' font-family='system-ui, -apple-system, sans-serif' font-size='12' font-weight='600' text-anchor='middle' fill='%2364748B'%3EPhoto non fournie%3C/text%3E%3C/g%3E%3C/svg%3E";
+
 export function getDefaultChildPortrait(gender = "", index = 0, isFound = false) {
-  const pool = isFound ? AFRICAN_CHILD_PORTRAITS.found : AFRICAN_CHILD_PORTRAITS.missing;
-  const isFemale = /fille|f|female/i.test(gender);
-  if (isFemale) {
-    const femaleList = pool.filter((_, i) => (isFound ? [1, 3, 5] : [1, 3, 4, 7]).includes(i));
-    if (femaleList.length > 0) return femaleList[index % femaleList.length];
-  }
-  return pool[index % pool.length] || pool[0];
+  return NEUTRAL_CHILD_PHOTO_PLACEHOLDER;
 }
 
 const DEMO_MISSING_REPORTS = [
@@ -431,6 +427,147 @@ function mergeReports(localList, remoteList) {
 
 export const reportService = {
   DEFAULT_AVATAR,
+  NEUTRAL_CHILD_PHOTO_PLACEHOLDER,
+
+  async getRecentRealReports(limit = 4) {
+    try {
+      const [missingRes, foundRes] = await Promise.allSettled([
+        withTimeout(supabase.from('missing_reports').select('*').order('created_at', { ascending: false }).limit(limit * 2), 4000, { data: [] }),
+        withTimeout(supabase.from('found_reports').select('*').order('created_at', { ascending: false }).limit(limit * 2), 4000, { data: [] })
+      ]);
+
+      const realReports = [];
+
+      if (missingRes.status === 'fulfilled' && Array.isArray(missingRes.value?.data)) {
+        missingRes.value.data.forEach(row => {
+          const isFound = row.status === 'Trouvé' || (row.physical_description && row.physical_description.includes('[TROUVÉ]'));
+          realReports.push({
+            id: row.id,
+            name: row.child_full_name,
+            age: row.child_age,
+            gender: row.child_gender,
+            location: row.last_seen_location,
+            date: row.last_seen_date,
+            time: row.last_seen_time,
+            physicalDescription: row.physical_description,
+            clothingDescription: row.clothing_description,
+            photo: row.child_photo_url || null,
+            status: row.status || (isFound ? 'Trouvé' : 'Published'),
+            urgency: isFound ? 'Recherche Famille' : (row.status === 'Urgent' ? 'Urgent' : 'Nouveau'),
+            created_at: row.created_at,
+            createdAt: row.created_at,
+            type: isFound ? 'found' : 'missing'
+          });
+        });
+      }
+
+      if (foundRes.status === 'fulfilled' && Array.isArray(foundRes.value?.data)) {
+        foundRes.value.data.forEach(row => {
+          if (!realReports.some(r => r.id === row.id)) {
+            realReports.push({
+              id: row.id,
+              name: row.child_full_name || 'Enfant trouvé',
+              age: null,
+              gender: row.child_gender,
+              location: row.found_location,
+              date: row.found_date,
+              time: row.found_time,
+              physicalDescription: row.physical_description,
+              clothingDescription: row.clothing_description,
+              photo: row.child_photo_url || null,
+              status: row.status || 'Trouvé',
+              urgency: 'Recherche Famille',
+              created_at: row.created_at,
+              createdAt: row.created_at,
+              type: 'found'
+            });
+          }
+        });
+      }
+
+      // If remote returned reports, sort strictly newest-first (descending created_at)
+      if (realReports.length > 0) {
+        realReports.sort((a, b) => {
+          const timeA = new Date(a.created_at || a.createdAt || 0).getTime();
+          const timeB = new Date(b.created_at || b.createdAt || 0).getTime();
+          return timeB - timeA;
+        });
+        return realReports.slice(0, limit);
+      }
+
+      // If remote was temporarily empty or unreachable, check local store for real user reports
+      const localMissing = (this.getMissingReports() || []).filter(r => r && r.id && !r.id.startsWith('m-'));
+      const localFound = (this.getFoundReports() || []).filter(r => r && r.id && !r.id.startsWith('f-'));
+      const localMerged = [...localMissing, ...localFound];
+      localMerged.sort((a, b) => {
+        const timeA = new Date(a.created_at || a.createdAt || 0).getTime();
+        const timeB = new Date(b.created_at || b.createdAt || 0).getTime();
+        return timeB - timeA;
+      });
+      return localMerged.slice(0, limit);
+    } catch (e) {
+      console.warn("[REPORT TRACE] Error getting recent real reports:", e);
+      return [];
+    }
+  },
+
+  async getReportByIdRemote(id) {
+    if (!id) return null;
+    try {
+      const [missingRes, foundRes] = await Promise.allSettled([
+        withTimeout(supabase.from('missing_reports').select('*').eq('id', id).maybeSingle(), 3500, { data: null }),
+        withTimeout(supabase.from('found_reports').select('*').eq('id', id).maybeSingle(), 3500, { data: null })
+      ]);
+
+      if (missingRes.status === 'fulfilled' && missingRes.value?.data) {
+        const row = missingRes.value.data;
+        const isFound = row.status === 'Trouvé' || (row.physical_description && row.physical_description.includes('[TROUVÉ]'));
+        return {
+          id: row.id,
+          reporterId: row.reporter_id,
+          name: row.child_full_name,
+          age: row.child_age,
+          gender: row.child_gender,
+          location: row.last_seen_location,
+          date: row.last_seen_date,
+          time: row.last_seen_time,
+          physicalDescription: row.physical_description,
+          clothingDescription: row.clothing_description,
+          notes: row.incident_description,
+          contactPhone: row.emergency_contact_phone,
+          photo: row.child_photo_url || null,
+          status: row.status || (isFound ? 'Trouvé' : 'Published'),
+          urgency: isFound ? 'Recherche Famille' : (row.status === 'Urgent' ? 'Urgent' : 'Nouveau'),
+          type: isFound ? 'found' : 'missing',
+          createdAt: row.created_at
+        };
+      }
+
+      if (foundRes.status === 'fulfilled' && foundRes.value?.data) {
+        const row = foundRes.value.data;
+        return {
+          id: row.id,
+          reporterId: row.reporter_id,
+          name: row.child_full_name || 'Enfant trouvé',
+          age: null,
+          gender: row.child_gender,
+          location: row.found_location,
+          date: row.found_date,
+          time: row.found_time,
+          physicalDescription: row.physical_description,
+          clothingDescription: row.clothing_description,
+          photo: row.child_photo_url || null,
+          status: row.status || 'Trouvé',
+          urgency: 'Recherche Famille',
+          type: 'found',
+          createdAt: row.created_at
+        };
+      }
+    } catch (e) {
+      console.warn("[REPORT TRACE] getReportByIdRemote error:", e);
+    }
+    return this.getReportById(id);
+  },
 
   getMissingReports() {
     initLocalStorage();
@@ -491,7 +628,7 @@ export const reportService = {
 
   // Upload file or image directly to Supabase Storage with fast compression and timeout protection
   async uploadFileToSupabaseStorage(fileOrBase64, bucketName = "avatars", reportType = "reports", reportId = null) {
-    if (!fileOrBase64) return DEFAULT_AVATAR;
+    if (!fileOrBase64) return null;
     console.log(`[REPORT TRACE] uploadFileToSupabaseStorage starting for type: ${reportType}, bucket: ${bucketName}...`);
     try {
       // 1. Client-side downscaling & compression to prevent multi-megabyte hanging uploads
@@ -527,34 +664,39 @@ export const reportService = {
         const filePath = `${reportType}/${folder}/${rId}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
         console.log(`[REPORT TRACE] Target storage path: ${filePath}`);
 
-        // 8-second timeout so storage operations are safe
-        const uploadResult = await withTimeout(
-          supabase.storage
-            .from("avatars")
-            .upload(filePath, blob, { contentType, upsert: true }),
-          8000,
-          { error: { message: "Storage upload timeout" }, data: null }
-        );
+        // Try upload to Supabase Storage bucket
+        try {
+          const uploadResult = await withTimeout(
+            supabase.storage
+              .from("avatars")
+              .upload(filePath, blob, { contentType, upsert: true }),
+            8000,
+            { error: { message: "Storage upload timeout" }, data: null }
+          );
 
-        if (uploadResult && !uploadResult.error && uploadResult.data) {
-          const { data: publicData } = supabase.storage
-            .from("avatars")
-            .getPublicUrl(filePath);
-          if (publicData && publicData.publicUrl) {
-            console.log("[REPORT TRACE] Storage public URL verified:", publicData.publicUrl);
-            return publicData.publicUrl;
+          if (uploadResult && !uploadResult.error && uploadResult.data) {
+            const { data: publicData } = supabase.storage
+              .from("avatars")
+              .getPublicUrl(filePath);
+            if (publicData && publicData.publicUrl) {
+              console.log("[REPORT TRACE] Storage public URL verified:", publicData.publicUrl);
+              return publicData.publicUrl;
+            }
+          } else {
+            console.warn("[REPORT TRACE] Notice uploading to storage bucket:", uploadResult?.error?.message);
           }
-        } else {
-          console.warn("[REPORT TRACE] Notice uploading to storage bucket:", uploadResult?.error?.message);
+        } catch (uploadErr) {
+          console.warn("[REPORT TRACE] Storage upload error notice:", uploadErr?.message || uploadErr);
         }
       }
 
-      // If storage upload fails or times out, return optimized compressed string safely
-      console.log("[REPORT TRACE] Using local compressed image data string as valid photo source");
-      return typeof optimized === "string" ? optimized : DEFAULT_AVATAR;
+      // CRITICAL: If storage upload fails (e.g. bucket not configured or network error), 
+      // return the REAL optimized user image string. ZERO DATA LOSS. NEVER return a demo avatar!
+      console.log("[REPORT TRACE] Preserving real user photo data string (zero data loss, no demo replacement)");
+      return typeof optimized === "string" ? optimized : (typeof fileOrBase64 === "string" ? fileOrBase64 : null);
     } catch (err) {
       console.warn("[REPORT TRACE] Storage upload exception:", err);
-      return typeof fileOrBase64 === "string" ? fileOrBase64 : DEFAULT_AVATAR;
+      return typeof fileOrBase64 === "string" ? fileOrBase64 : null;
     }
   },
 
@@ -620,7 +762,7 @@ export const reportService = {
             time: row.last_seen_time,
             physicalDescription: cleanPhysical,
             clothingDescription: row.clothing_description,
-            photo: row.child_photo_url || getDefaultChildPortrait(row.child_gender, idx, isFound),
+            photo: row.child_photo_url || null,
             status: row.status || (isFound ? 'Trouvé' : 'Published'),
             urgency: isFound ? 'Recherche Famille' : 'Nouveau',
             currentSafeLocation: currentSafeLocation,
@@ -662,7 +804,7 @@ export const reportService = {
             time: row.found_time,
             physicalDescription: cleanPhysical,
             clothingDescription: row.clothing_description,
-            photo: row.child_photo_url || getDefaultChildPortrait(row.child_gender, idx, true),
+            photo: row.child_photo_url || null,
             status: row.status || 'Trouvé',
             urgency: 'Recherche Famille',
             currentSafeLocation: currentSafeLocation,
@@ -705,7 +847,7 @@ export const reportService = {
         photoUrl = await this.uploadFileToSupabaseStorage(photoUrl, "avatars", "missing-reports", dbId);
       }
       if (!photoUrl) {
-        photoUrl = getDefaultChildPortrait(reportData.gender, 0, false);
+        photoUrl = null;
       }
       console.log('[REPORT TRACE] Final photo URL for missing report:', photoUrl ? photoUrl.substring(0, 60) + '...' : 'NONE');
 
@@ -835,7 +977,7 @@ export const reportService = {
         photoUrl = await this.uploadFileToSupabaseStorage(photoUrl, "avatars", "found-reports", dbId);
       }
       if (!photoUrl) {
-        photoUrl = getDefaultChildPortrait(reportData.gender, 0, true);
+        photoUrl = null;
       }
       console.log('[REPORT TRACE] Final photo URL for found report:', photoUrl ? photoUrl.substring(0, 60) + '...' : 'NONE');
 
@@ -900,7 +1042,35 @@ export const reportService = {
       );
 
       if (insertErr) {
-        console.warn("[REPORT TRACE] Notice inserting found report in Supabase:", insertErr.message || insertErr);
+        console.warn("[REPORT TRACE] Notice inserting found report in found_reports:", insertErr.message || insertErr);
+        // Fallback insertion into missing_reports with status 'Trouvé' to ensure database persistence
+        const { error: fallbackErr } = await withTimeout(
+          supabase.from('missing_reports').insert([{
+            id: dbId,
+            reporter_id: supabaseReporterId,
+            child_full_name: newReport.name || "Enfant trouvé",
+            child_age: newReport.age ? Number(newReport.age) : null,
+            child_gender: newReport.gender,
+            last_seen_location: newReport.location,
+            last_seen_date: newReport.date || new Date().toISOString().split('T')[0],
+            last_seen_time: newReport.time || new Date().toTimeString().split(' ')[0],
+            physical_description: physicalDescWithFound,
+            clothing_description: newReport.clothingDescription,
+            incident_description: `[TROUVÉ] Enfant trouvé sécurisé à: ${newReport.currentSafeLocation || 'Poste de police'}`,
+            emergency_contact_name: "Secouriste / Découvreur",
+            emergency_contact_phone: "677000000",
+            child_photo_url: newReport.photo,
+            status: "Trouvé",
+            is_public: true
+          }]),
+          6000,
+          { error: null }
+        );
+        if (fallbackErr) {
+          console.warn("[REPORT TRACE] Fallback insert notice:", fallbackErr.message || fallbackErr);
+        } else {
+          console.log("[REPORT TRACE] Successfully persisted found report via missing_reports table with status Trouvé");
+        }
       } else {
         console.log("[REPORT TRACE] Successfully inserted found report into Supabase PostgreSQL found_reports");
       }
