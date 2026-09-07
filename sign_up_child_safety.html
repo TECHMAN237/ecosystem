@@ -17,51 +17,51 @@
                     "colors": {
                         "on-error": "#ffffff",
                         "tertiary-fixed-dim": "#ffb68e",
-                        "on-primary-container": "#f6f0ff",
-                        "secondary-fixed": "#e4e2e4",
-                        "primary-container": "#6c4dff",
-                        "on-secondary-container": "#636264",
-                        "on-primary-fixed": "#190064",
+                        "on-primary-container": "#532ce6",
+                        "secondary-fixed": "#E2E8F0",
+                        "primary-container": "#F5F3FF",
+                        "on-secondary-container": "#475569",
+                        "on-primary-fixed": "#1e0b75",
                         "on-tertiary-fixed": "#331200",
-                        "surface-container-highest": "#e5e0ef",
-                        "surface-container-high": "#ebe6f4",
+                        "surface-container-highest": "#E2E8F0",
+                        "surface-container-high": "#F1F5F9",
                         "on-tertiary-fixed-variant": "#773300",
-                        "on-error-container": "#93000a",
-                        "surface-container-low": "#F5F4F2",
+                        "on-error-container": "#991B1B",
+                        "surface-container-low": "#F8F9FA",
                         "on-primary": "#ffffff",
-                        "outline": "#787588",
-                        "surface-dim": "#ddd8e6",
+                        "outline": "#94A3B8",
+                        "surface-dim": "#F1F5F9",
                         "on-tertiary": "#ffffff",
-                        "on-secondary-fixed": "#1b1b1d",
-                        "surface-tint": "#5b38ee",
-                        "secondary-fixed-dim": "#c8c6c8",
-                        "on-secondary-fixed-variant": "#474649",
-                        "surface-container": "#f1ebfa",
+                        "on-secondary-fixed": "#0F172A",
+                        "surface-tint": "#532ce6",
+                        "secondary-fixed-dim": "#CBD5E1",
+                        "on-secondary-fixed-variant": "#475569",
+                        "surface-container": "#F8F9FA",
                         "primary-fixed": "#e5deff",
-                        "on-surface": "#1c1a24",
-                        "error": "#ba1a1a",
+                        "on-surface": "#0F172A",
+                        "error": "#DC2626",
                         "tertiary-container": "#b55100",
-                        "surface": "#F5F4F2",
-                        "secondary-container": "#e2dfe1",
-                        "background": "#F5F4F2",
-                        "secondary": "#5f5e60",
+                        "surface": "#ffffff",
+                        "secondary-container": "#F1F5F9",
+                        "background": "#F8F9FA",
+                        "secondary": "#64748B",
                         "tertiary-fixed": "#ffdbca",
                         "on-tertiary-container": "#ffefe9",
-                        "outline-variant": "#c9c4d9",
+                        "outline-variant": "#EAECF0",
                         "primary-fixed-dim": "#c8bfff",
                         "on-secondary": "#ffffff",
-                        "error-container": "#ffdad6",
-                        "surface-bright": "#F5F4F2",
+                        "error-container": "#FEF2F2",
+                        "surface-bright": "#FFFFFF",
                         "inverse-primary": "#c8bfff",
-                        "on-background": "#1c1a24",
+                        "on-background": "#0F172A",
                         "surface-container-lowest": "#ffffff",
-                        "on-primary-fixed-variant": "#4206d7",
+                        "on-primary-fixed-variant": "#4321c4",
                         "inverse-on-surface": "#f4eefd",
-                        "surface-variant": "#e5e0ef",
+                        "surface-variant": "#F1F5F9",
                         "primary": "#532ce6",
                         "tertiary": "#8f3e00",
-                        "on-surface-variant": "#474556",
-                        "inverse-surface": "#312f3a"
+                        "on-surface-variant": "#64748B",
+                        "inverse-surface": "#1E293B"
                     },
                     "borderRadius": {
                         "DEFAULT": "1rem",
@@ -106,18 +106,15 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
         body {
-            background-color: #F7F7FA;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(108, 77, 255, 0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(108, 77, 255, 0.03) 0px, transparent 50%);
+            background-color: #F8F9FA;
         }
         .soft-glow {
-            box-shadow: 0px 4px 20px rgba(108, 77, 255, 0.06);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         .form-input:focus {
             outline: none;
             border-color: #532ce6;
-            box-shadow: 0 0 0 4px rgba(83, 44, 230, 0.1);
+            box-shadow: 0 0 0 3px rgba(83, 44, 230, 0.1);
         }
     </style>
 <style>
@@ -126,25 +123,25 @@
     }
   </style>
   </head>
-<body class="min-h-screen flex items-center justify-center p-container-margin font-body-md text-on-background">
-<main class="w-full max-w-[480px] animate-in fade-in duration-700 slide-in-from-bottom-4">
+<body class="min-h-screen flex items-center justify-center p-4 bg-[#F8F9FA] font-body-md text-[#0F172A]">
+<main class="w-full max-w-[440px] animate-in fade-in duration-700 slide-in-from-bottom-4 my-8">
 <!-- Logo/Brand Anchor -->
-<div class="flex flex-col items-center mb-xl">
-<div class="w-16 h-16 bg-primary-container rounded-lg flex items-center justify-center mb-md soft-glow">
-<span class="material-symbols-outlined text-on-primary-container text-[32px]" data-icon="security">security</span>
+<div class="flex flex-col items-center mb-6 text-center">
+<div class="w-14 h-14 bg-[#F5F3FF] border border-[#532CE6]/20 rounded-2xl flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-[#532CE6] text-[28px]" data-icon="security">security</span>
 </div>
-<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Créer un compte</h1>
-<p class="font-body-md text-on-surface-variant mt-xs mb-md">Rejoignez notre réseau sécurisé pour la protection des enfants.</p>
+<h1 class="text-2xl font-bold text-[#0F172A] tracking-tight">Créer un compte</h1>
+<p class="text-xs text-[#64748B] mt-1 mb-4">Rejoignez notre réseau sécurisé pour la protection des enfants.</p>
 <!-- Progress Tracker: Step 1 of 3 -->
-<div class="flex items-center justify-center gap-xs">
-    <div class="w-6 h-2 rounded-full bg-primary"></div>
-    <div class="w-2 h-2 rounded-full bg-outline-variant"></div>
-    <div class="w-2 h-2 rounded-full bg-outline-variant"></div>
-    <span class="text-label-sm text-outline ml-xs">Étape 1 sur 3</span>
+<div class="flex items-center justify-center gap-2">
+    <div class="w-7 h-2 rounded-full bg-[#532CE6]"></div>
+    <div class="w-2.5 h-2.5 rounded-full bg-[#E2E8F0]"></div>
+    <div class="w-2.5 h-2.5 rounded-full bg-[#E2E8F0]"></div>
+    <span class="text-xs font-semibold text-[#64748B] ml-2">Étape 1 sur 3</span>
 </div>
 </div>
 <!-- Main Signup Card -->
-<div class="bg-surface-container-lowest rounded-lg p-lg md:p-xl soft-glow relative overflow-hidden">
+<div class="bg-white rounded-2xl border border-[#EAECF0] p-6 shadow-sm relative overflow-hidden">
 <!-- Decorative Subtle Gradient -->
 <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
 <form class="space-y-lg relative z-10" id="signupForm" action="./account_type_selection_updated_flow.html">
@@ -207,16 +204,21 @@ J'accepte les <a class="text-primary font-bold hover:underline" href="./privacy_
 <span class="material-symbols-outlined text-[22px]" data-icon="arrow_forward" id="btnIcon">arrow_forward</span>
 </button>
 <!-- Divider -->
-<div class="relative flex items-center py-sm">
+<div class="relative flex items-center py-2">
 <div class="flex-grow border-t border-outline-variant"></div>
-<span class="flex-shrink mx-4 font-label-sm text-outline">OU S'INSCRIRE AVEC</span>
+<span class="flex-shrink mx-3 text-xs font-semibold text-outline uppercase tracking-wider">OU S'INSCRIRE AVEC</span>
 <div class="flex-grow border-t border-outline-variant"></div>
 </div>
 <!-- Social Options -->
 <div class="flex flex-col">
-<button id="googleBtn" class="flex items-center justify-center gap-sm h-12 w-full border border-outline-variant rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-150" type="button">
-<img alt="" class="w-5 h-5" data-alt="Official Google logo icon with vibrant four-color palette of red, yellow, green, and blue, presented in a clean minimalist vector style against a transparent background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXIwjbuw9-mp5q5wkp1Am3651RSVhLo8Jdhuh5gA2RhOVMVjAPPC0KD4EK97x-e8AHO2s56_9hu2KqXzofpokpbN6PeNBwjMpGznPtKeIYozTZr0e_DZXAEj8KmkyssaquYqWOW1BJ1Nuzua1Dwfra7MTpNIzGEF6YzHoV2Yfp2U5bcZL5HPAaHCL4TnZSlf4oFv2k8spxKJBZaShiumADVD6R5UCq1mvioiEI96d1U22DeuwetLAVrZ5GKWJgGTkcCd8MxnyvRMEJ"/>
-<span class="font-label-bold">Google</span>
+<button id="googleBtn" class="w-full h-12 sm:h-13 bg-white border border-outline-variant hover:border-outline hover:bg-surface-container-high rounded-full flex items-center justify-center gap-3 px-4 font-bold text-[14.5px] sm:text-[15px] text-on-surface shadow-sm hover:shadow active:scale-[0.99] transition-all cursor-pointer" type="button">
+<svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+</svg>
+<span id="googleBtnText">S'inscrire avec Google</span>
 </button>
 </div>
 </form>
@@ -369,13 +371,24 @@ initStep1();
 
 if (googleBtn) {
     googleBtn.addEventListener('click', async () => {
-        errorMsg.classList.add('hidden');
-        errorText.textContent = '';
+        if (errorMsg) errorMsg.classList.add('hidden');
+        if (errorText) errorText.textContent = '';
+        const confirmBox = document.getElementById('confirmMsg');
+        if (confirmBox) confirmBox.classList.add('hidden');
+        
         try {
+            googleBtn.disabled = true;
+            googleBtn.classList.add('opacity-75', 'cursor-wait');
+            const googleBtnText = document.getElementById('googleBtnText');
+            if (googleBtnText) googleBtnText.textContent = 'Connexion à Google...';
             console.log("Initiating Google Sign-Up with select_account prompt...");
             await signInWithGoogle();
         } catch (err) {
             console.error("Google sign up error:", err);
+            googleBtn.disabled = false;
+            googleBtn.classList.remove('opacity-75', 'cursor-wait');
+            const googleBtnText = document.getElementById('googleBtnText');
+            if (googleBtnText) googleBtnText.textContent = "S'inscrire avec Google";
             showError("Erreur lors de l'inscription Google: " + (err.message || "Veuillez réessayer."));
         }
     });

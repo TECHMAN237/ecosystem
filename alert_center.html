@@ -35,53 +35,53 @@
           theme: {
             extend: {
               "colors": {
-                      "outline-variant": "#c9c4d9",
-                      "inverse-surface": "#312f3a",
-                      "surface-dim": "#ddd8e6",
+                      "outline-variant": "#EAECF0",
+                      "inverse-surface": "#1E293B",
+                      "surface-dim": "#F1F5F9",
                       "primary": "#532ce6",
                       "on-tertiary-container": "#ffefe9",
                       "on-error": "#ffffff",
-                      "on-primary-fixed": "#190064",
-                      "secondary-fixed-dim": "#c8c6c8",
+                      "on-primary-fixed": "#1e0b75",
+                      "secondary-fixed-dim": "#CBD5E1",
                       "tertiary-container": "#b55100",
                       "primary-fixed": "#e5deff",
-                      "on-secondary-container": "#636264",
+                      "on-secondary-container": "#475569",
                       "inverse-primary": "#c8bfff",
-                      "secondary-container": "#e2dfe1",
-                      "on-primary-fixed-variant": "#4206d7",
-                      "background": "#F5F4F2",
-                      "surface-container-high": "#ebe6f4",
-                      "on-primary-container": "#f6f0ff",
+                      "secondary-container": "#F1F5F9",
+                      "on-primary-fixed-variant": "#4321c4",
+                      "background": "#EDF0F5",
+                      "surface-container-high": "#F1F5F9",
+                      "on-primary-container": "#532ce6",
                       "tertiary-fixed": "#ffdbca",
-                      "on-error-container": "#93000a",
-                      "primary-container": "#6c4dff",
-                      "surface-tint": "#5b38ee",
-                      "surface-container-highest": "#e5e0ef",
+                      "on-error-container": "#991B1B",
+                      "primary-container": "#F5F3FF",
+                      "surface-tint": "#532ce6",
+                      "surface-container-highest": "#E2E8F0",
                       "on-primary": "#ffffff",
-                      "surface-variant": "#e5e0ef",
+                      "surface-variant": "#F1F5F9",
                       "surface-container-lowest": "#ffffff",
-                      "surface-container": "#f1ebfa",
-                      "secondary": "#5f5e60",
-                      "on-surface": "#1c1a24",
+                      "surface-container": "#EDF0F5",
+                      "secondary": "#64748B",
+                      "on-surface": "#0F172A",
                       "inverse-on-surface": "#f4eefd",
                       "on-secondary": "#ffffff",
-                      "secondary-fixed": "#e4e2e4",
+                      "secondary-fixed": "#E2E8F0",
                       "primary-fixed-dim": "#c8bfff",
                       "on-tertiary": "#ffffff",
-                      "error-container": "#ffdad6",
+                      "error-container": "#FEF2F2",
                       "tertiary": "#8f3e00",
-                      "surface-bright": "#F5F4F2",
-                      "on-background": "#1c1a24",
+                      "surface-bright": "#FFFFFF",
+                      "on-background": "#0F172A",
                       "tertiary-fixed-dim": "#ffb68e",
-                      "surface-container-low": "#F5F4F2",
+                      "surface-container-low": "#EDF0F5",
                       "on-tertiary-fixed": "#331200",
-                      "on-surface-variant": "#474556",
-                      "outline": "#787588",
-                      "surface": "#F5F4F2",
-                      "error": "#ba1a1a",
-                      "on-secondary-fixed-variant": "#474649",
+                      "on-surface-variant": "#64748B",
+                      "outline": "#CBD5E1",
+                      "surface": "#ffffff",
+                      "error": "#DC2626",
+                      "on-secondary-fixed-variant": "#475569",
                       "on-tertiary-fixed-variant": "#773300",
-                      "on-secondary-fixed": "#1b1b1d"
+                      "on-secondary-fixed": "#0F172A"
               },
               "borderRadius": {
                       "DEFAULT": "1rem",
@@ -162,24 +162,24 @@
 </div>
 </section>
 <!-- Filter Chips -->
-<section class="px-container-margin mb-lg overflow-x-auto hide-scrollbar flex gap-sm items-center pb-1" id="filterChipsContainer">
-<button data-category="all" class="px-lg py-sm rounded-full bg-primary text-on-primary font-label-bold text-label-bold shadow-md whitespace-nowrap flex items-center gap-1.5 transition-all">
-    All <span id="count-all" class="px-1.5 py-0.2 bg-white/20 text-white font-bold text-[10px] rounded-full">0</span>
+<section class="px-container-margin mb-lg overflow-x-auto hide-scrollbar flex gap-2 items-center pb-1" id="filterChipsContainer">
+<button data-category="all" class="px-4 py-2 rounded-full bg-primary text-white font-bold text-xs shadow-sm whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Tous <span id="count-all" class="px-1.5 py-0.5 bg-white/20 text-white font-bold text-[10px] rounded-full">0</span>
 </button>
-<button data-category="EMERGENCY" class="px-lg py-sm rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm hover:bg-surface-container-high hover:text-primary whitespace-nowrap flex items-center gap-1.5 transition-all">
-    Emergency <span id="count-EMERGENCY" class="px-1.5 py-0.2 bg-primary/15 text-primary font-bold text-[10px] rounded-full">0</span>
+<button data-category="EMERGENCY" class="px-4 py-2 rounded-full bg-white text-[#64748B] hover:text-[#0F172A] border border-[#EAECF0] font-medium text-xs whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Urgences <span id="count-EMERGENCY" class="px-1.5 py-0.5 bg-[#FEF2F2] text-[#DC2626] font-bold text-[10px] rounded-full border border-[#FECACA]">0</span>
 </button>
-<button data-category="REPORT" class="px-lg py-sm rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm hover:bg-surface-container-high hover:text-primary whitespace-nowrap flex items-center gap-1.5 transition-all">
-    Reports <span id="count-REPORT" class="px-1.5 py-0.2 bg-primary/15 text-primary font-bold text-[10px] rounded-full">0</span>
+<button data-category="REPORT" class="px-4 py-2 rounded-full bg-white text-[#64748B] hover:text-[#0F172A] border border-[#EAECF0] font-medium text-xs whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Signalements <span id="count-REPORT" class="px-1.5 py-0.5 bg-[#F8F9FA] text-[#64748B] font-bold text-[10px] rounded-full border border-[#EAECF0]">0</span>
 </button>
-<button data-category="COMMUNITY" class="px-lg py-sm rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm hover:bg-surface-container-high hover:text-primary whitespace-nowrap flex items-center gap-1.5 transition-all">
-    Community <span id="count-COMMUNITY" class="px-1.5 py-0.2 bg-primary/15 text-primary font-bold text-[10px] rounded-full">0</span>
+<button data-category="COMMUNITY" class="px-4 py-2 rounded-full bg-white text-[#64748B] hover:text-[#0F172A] border border-[#EAECF0] font-medium text-xs whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Communauté <span id="count-COMMUNITY" class="px-1.5 py-0.5 bg-[#F8F9FA] text-[#64748B] font-bold text-[10px] rounded-full border border-[#EAECF0]">0</span>
 </button>
-<button data-category="MATCH" class="px-lg py-sm rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm hover:bg-surface-container-high hover:text-primary whitespace-nowrap flex items-center gap-1.5 transition-all">
-    Matches <span id="count-MATCH" class="px-1.5 py-0.2 bg-primary/15 text-primary font-bold text-[10px] rounded-full">0</span>
+<button data-category="MATCH" class="px-4 py-2 rounded-full bg-white text-[#64748B] hover:text-[#0F172A] border border-[#EAECF0] font-medium text-xs whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Correspondances <span id="count-MATCH" class="px-1.5 py-0.5 bg-[#F5F3FF] text-[#532CE6] font-bold text-[10px] rounded-full border border-[#532CE6]/20">0</span>
 </button>
-<button data-category="WEARABLE" class="px-lg py-sm rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm hover:bg-surface-container-high hover:text-primary whitespace-nowrap flex items-center gap-1.5 transition-all">
-    V2 <span id="count-WEARABLE" class="px-1.5 py-0.2 bg-primary/15 text-primary font-bold text-[10px] rounded-full">0</span>
+<button data-category="WEARABLE" class="px-4 py-2 rounded-full bg-white text-[#64748B] hover:text-[#0F172A] border border-[#EAECF0] font-medium text-xs whitespace-nowrap flex items-center gap-1.5 transition-all">
+    Objets Connectés <span id="count-WEARABLE" class="px-1.5 py-0.5 bg-[#F8F9FA] text-[#64748B] font-bold text-[10px] rounded-full border border-[#EAECF0]">0</span>
 </button>
 </section>
 
@@ -206,42 +206,42 @@
         {
             id: 'alt-1',
             category: 'EMERGENCY',
-            title: 'Liam is Missing',
-            subtitle: 'Central Park, North Sector',
-            description: '"Last seen near the water fountain wearing a yellow hoodie."',
-            timestamp: '2m ago',
+            title: 'Liam est porté disparu',
+            subtitle: 'Central Park, Secteur Nord',
+            description: '"Vu pour la dernière fois près de la fontaine, portant un sweat jaune."',
+            timestamp: 'Il y a 2m',
             read: false,
             priority: 'high',
             type: 'missing_child',
-            photo: 'https://lh3.googleusercontent.com/aida-public/AB6AXuALSmf5_N5T3I5bUbJsEcUGpn-DRuSkphH2uJa_oMoR8Pk3kToesG0mKRqFv_0eBWgmakZ7mnAfKK2pTJlmQ8ZMY3kOtq6pa7Inz8y5er-zQEKHKybA723pNAg2dyebCBCMl6B6gzOuazXulv_q8cpzgStpnZNt3HemTFgHOVq85_EeLP-dEnm5Ay4bcwYhkAPmfJGDIRGyzyqDXWnUbCRga8X54dZxNyn8gs5VZtKHmpO9hKX9ld-oGSQxCwKQS8m85ni-0XwNZHts',
-            actionText: 'View Details',
+            photo: '/assets/children/child-01.webp',
+            actionText: 'Voir les détails',
             actionUrl: './report_details.html'
         },
         {
             id: 'alt-2',
             category: 'WEARABLE',
-            title: "SOS Triggered - Sarah's Watch",
-            description: "Emergency button pressed at Home (Geo-fence verified).",
-            timestamp: '5m ago',
+            title: "SOS déclenché - Montre Sarah",
+            description: "Bouton d'urgence actionné à Domicile (Périmètre vérifié).",
+            timestamp: 'Il y a 5m',
             read: false,
             priority: 'high',
             type: 'sos',
-            actionTextPrimary: 'Call Sarah',
-            actionTextSecondary: 'Live GPS'
+            actionTextPrimary: 'Appeler Sarah',
+            actionTextSecondary: 'GPS Direct'
         },
         {
             id: 'alt-3',
             category: 'MATCH',
-            title: 'POTENTIAL MATCH FOUND',
-            confidence: '98% Confidence',
-            description: "Visual identification systems have flagged a high-confidence match at Subway Station A12.",
-            timestamp: '10m ago',
+            title: 'CORRESPONDANCE TROUVÉE',
+            confidence: '98% de similarité',
+            description: "Le système de reconnaissance visuelle a identifié une forte correspondance près de la station de métro.",
+            timestamp: 'Il y a 10m',
             read: false,
             priority: 'normal',
             type: 'match',
-            databasePhoto: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAjXc6s0M-RxE8WkKzyveFh2YbG8g9FUnAke3hX-BrYNaBTM-fAQaeKNq3ICh-U6-qs8zejz3BtIiU4Rezcqr7_RoDn2VvYH3AKB83swuFtpa03WG5lVkVSRErfMzAR1X0cR8dYDdSpg4PVI8qn-OdlNh6Yl0TpAG1D49XUKVkwhh4a7F0gzYO2kc3xPoKlJ0OJPkAC9xITgB-zGBi0Y2RTpwihn2zFlArU28y5aI8_otDg2xp1HPlXRG-coY4Dv4mg5NrS90EofYHg',
-            foundPhoto: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBNJNWHYOcNSq1Dg-JHAXU_nZ_POOj2pUAf0SY6RiJRJZoh3rrZ_vWQXZx8GmzlmvZK4iPh1aCLJ_BPMgQrfkc2StNQ4yqX3BtgbdvnnNHJGmwXDm-xgDVfTNauRqv-mvEwR-dcMhN9t9Bd9gjRVKspsFEWutmf5Hwc4D2n-QnZv9xqjpUPbORmeFKFb7CXKiLzuosUj4vYSrelf8wlpHfYXRx09mj-EApWR3fentirr8XZQDTwHt1CB6RrTUTmEYHKx3fCzMP2r6ZZ',
-            actionText: 'Review Match',
+            databasePhoto: '/assets/children/child-03.webp',
+            foundPhoto: '/assets/children/child-05.webp',
+            actionText: 'Examiner le match',
             actionUrl: './ai_smart_matching.html'
         },
         {
@@ -308,16 +308,16 @@
         {
             id: 'alt-9',
             category: 'MATCH',
-            title: 'Strong Match Found',
-            confidence: '95% Confidence',
-            description: "High facial similarity score reported by biometric verification engine.",
-            timestamp: '4h ago',
+            title: 'Forte correspondance trouvée',
+            confidence: '95% de similarité',
+            description: "Score de similarité faciale élevé détecté par le moteur de comparaison biométrique.",
+            timestamp: 'Il y a 4h',
             read: true,
             priority: 'normal',
             type: 'match',
-            databasePhoto: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAjXc6s0M-RxE8WkKzyveFh2YbG8g9FUnAke3hX-BrYNaBTM-fAQaeKNq3ICh-U6-qs8zejz3BtIiU4Rezcqr7_RoDn2VvYH3AKB83swuFtpa03WG5lVkVSRErfMzAR1X0cR8dYDdSpg4PVI8qn-OdlNh6Yl0TpAG1D49XUKVkwhh4a7F0gzYO2kc3xPoKlJ0OJPkAC9xITgB-zGBi0Y2RTpwihn2zFlArU28y5aI8_otDg2xp1HPlXRG-coY4Dv4mg5NrS90EofYHg',
-            foundPhoto: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBNJNWHYOcNSq1Dg-JHAXU_nZ_POOj2pUAf0SY6RiJRJZoh3rrZ_vWQXZx8GmzlmvZK4iPh1aCLJ_BPMgQrfkc2StNQ4yqX3BtgbdvnnNHJGmwXDm-xgDVfTNauRqv-mvEwR-dcMhN9t9Bd9gjRVKspsFEWutmf5Hwc4D2n-QnZv9xqjpUPbORmeFKFb7CXKiLzuosUj4vYSrelf8wlpHfYXRx09mj-EApWR3fentirr8XZQDTwHt1CB6RrTUTmEYHKx3fCzMP2r6ZZ',
-            actionText: 'Review Match',
+            databasePhoto: '/assets/children/child-02.webp',
+            foundPhoto: '/assets/children/child-08.webp',
+            actionText: 'Examiner le match',
             actionUrl: './ai_smart_matching.html'
         },
         {
@@ -375,114 +375,109 @@
 
         let html = '';
         filtered.forEach(alt => {
-            const unreadIndicator = !alt.read ? '<span class="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-white"></span>' : '';
+            const unreadIndicator = !alt.read ? '<span class="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-white"></span>' : '';
 
             if (alt.category === 'EMERGENCY') {
                 html += `
-                <div class="relative bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] overflow-hidden border-l-4 border-error">
+                <div class="relative bg-[#FEF2F2] rounded-2xl border border-[#FECACA] p-5 shadow-sm">
                     ${unreadIndicator}
-                    <div class="p-lg">
-                        <div class="flex justify-between items-start mb-md">
-                            <div class="flex items-center gap-sm">
-                                <span class="flex h-3 w-3 rounded-full bg-error animate-pulse"></span>
-                                <span class="font-label-bold text-label-bold text-error uppercase tracking-wider">${alt.title.includes('Battery') ? 'System Warning' : 'Urgent Alert'}</span>
-                            </div>
-                            <span class="font-label-sm text-label-sm text-on-surface-variant">${alt.timestamp}</span>
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="flex h-2.5 w-2.5 rounded-full bg-[#DC2626] animate-pulse"></span>
+                            <span class="font-bold text-xs text-[#DC2626] uppercase tracking-wider">${alt.title.includes('Battery') ? 'Alerte Système' : 'Alerte Urgente'}</span>
                         </div>
-                        <div class="flex gap-lg">
-                            ${alt.photo ? `<img alt="Alert Photo" class="w-20 h-20 rounded-lg object-cover shadow-sm" src="${alt.photo}"/>` : `<div class="w-20 h-20 rounded-lg bg-error/10 text-error flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-3xl">warning</span></div>`}
-                            <div class="flex-1">
-                                <h3 class="font-headline-md text-headline-md text-on-surface">${alt.title}</h3>
-                                ${alt.subtitle ? `<p class="font-label-bold text-label-bold text-primary mt-base">${alt.subtitle}</p>` : ''}
-                                <p class="font-body-md text-body-md text-on-surface-variant mt-sm">${alt.description}</p>
-                            </div>
-                        </div>
-                        <button class="w-full mt-lg py-md bg-error text-on-error rounded-full font-label-bold text-label-bold active:scale-95 transition-transform" onclick="window.location.href='${alt.actionUrl || './report_details.html'}'; markAsRead('${alt.id}')">${alt.actionText || 'View Details'}</button>
+                        <span class="text-xs text-[#64748B] font-medium">${alt.timestamp}</span>
                     </div>
+                    <div class="flex gap-4 items-center">
+                        ${alt.photo ? `<img alt="Photo Alerte" class="w-20 h-20 rounded-xl object-cover border border-[#FECACA] shadow-sm shrink-0" src="${alt.photo}"/>` : `<div class="w-16 h-16 rounded-xl bg-[#FEE2E2] text-[#DC2626] flex items-center justify-center shrink-0 border border-[#FECACA]"><span class="material-symbols-outlined text-2xl">warning</span></div>`}
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-base text-[#0F172A]">${alt.title}</h3>
+                            ${alt.subtitle ? `<p class="font-semibold text-xs text-[#DC2626] mt-0.5">${alt.subtitle}</p>` : ''}
+                            <p class="text-sm text-[#475569] mt-1 line-clamp-2">${alt.description}</p>
+                        </div>
+                    </div>
+                    <button class="w-full mt-4 py-2.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-xl font-bold text-sm shadow-sm active:scale-98 transition-all" onclick="window.location.href='${alt.actionUrl || './report_details.html'}'; markAsRead('${alt.id}')">${alt.actionText || 'Voir les détails'}</button>
                 </div>`;
             } else if (alt.category === 'WEARABLE') {
                 html += `
-                <div class="bg-inverse-surface rounded-lg p-lg shadow-lg relative overflow-hidden">
+                <div class="bg-white rounded-2xl border border-[#EAECF0] p-5 shadow-sm hover:shadow-md transition-all relative">
                     ${unreadIndicator}
-                    <div class="absolute top-0 right-0 p-lg">
-                        <span class="material-symbols-outlined text-primary-fixed text-3xl opacity-20">watch</span>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[#532CE6] text-xl" style="font-variation-settings: 'FILL' 1;">watch</span>
+                            <span class="bg-[#F5F3FF] text-[#532CE6] border border-[#532CE6]/15 font-bold text-xs px-2.5 py-0.5 rounded-full">Objet Connecté V2</span>
+                        </div>
+                        <span class="text-xs text-[#64748B] font-medium">${alt.timestamp}</span>
                     </div>
-                    <div class="flex items-center gap-sm mb-md">
-                        <span class="material-symbols-outlined text-primary-fixed" style="font-variation-settings: 'FILL' 1;">emergency_home</span>
-                        <span class="font-label-bold text-label-bold text-primary-fixed">V2 DEVICE ALERT</span>
-                        <span class="w-2 h-2 rounded-full bg-primary-fixed"></span>
-                        <span class="font-label-sm text-label-sm text-outline-variant">${alt.timestamp}</span>
-                    </div>
-                    <h3 class="font-headline-md text-headline-md text-on-primary-container">${alt.title}</h3>
-                    <p class="font-body-md text-body-md text-outline-variant mt-sm">${alt.description}</p>
+                    <h3 class="font-bold text-base text-[#0F172A]">${alt.title}</h3>
+                    <p class="text-sm text-[#64748B] mt-1">${alt.description}</p>
                     ${alt.actionTextPrimary ? `
-                    <div class="flex gap-md mt-lg">
-                        <button class="flex-1 py-md bg-primary-container text-on-primary-container rounded-full font-label-bold text-label-bold active:scale-95 transition-transform" onclick="markAsRead('${alt.id}')">${alt.actionTextPrimary}</button>
-                        <button class="flex-1 py-md bg-surface-container-highest text-on-surface rounded-full font-label-bold text-label-bold active:scale-95 transition-transform" onclick="markAsRead('${alt.id}')">${alt.actionTextSecondary}</button>
+                    <div class="flex gap-3 mt-4">
+                        <button class="flex-1 py-2.5 bg-[#532CE6] text-white rounded-xl font-bold text-sm shadow-sm active:scale-98 transition-all hover:bg-[#4321C4]" onclick="markAsRead('${alt.id}')">${alt.actionTextPrimary}</button>
+                        <button class="flex-1 py-2.5 bg-[#F1F5F9] text-[#0F172A] rounded-xl font-bold text-sm border border-[#EAECF0] active:scale-98 transition-all hover:bg-[#E2E8F0]" onclick="markAsRead('${alt.id}')">${alt.actionTextSecondary}</button>
                     </div>` : `
-                    <button class="w-full mt-lg py-md bg-surface-container-highest text-on-surface rounded-full font-label-bold text-label-bold active:scale-95 transition-transform" onclick="markAsRead('${alt.id}')">Détails de l'appareil</button>`}
+                    <button class="w-full mt-4 py-2.5 bg-[#F1F5F9] text-[#0F172A] rounded-xl font-bold text-sm border border-[#EAECF0] active:scale-98 transition-all hover:bg-[#E2E8F0]" onclick="markAsRead('${alt.id}')">Détails de l'appareil</button>`}
                 </div>`;
             } else if (alt.category === 'MATCH') {
                 html += `
-                <div class="bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] border border-primary/10 relative">
+                <div class="bg-white rounded-2xl border border-[#EAECF0] p-5 shadow-sm hover:shadow-md hover:border-[#532CE6]/30 transition-all relative">
                     ${unreadIndicator}
-                    <div class="p-lg">
-                        <div class="flex justify-between items-center mb-md">
-                            <div class="bg-primary/10 text-primary px-sm py-base rounded-full flex items-center gap-xs">
-                                <span class="material-symbols-outlined text-sm">verified_user</span>
-                                <span class="font-label-bold text-label-bold">${alt.title}</span>
-                            </div>
-                            <span class="font-label-bold text-label-bold text-tertiary">${alt.confidence}</span>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="bg-[#F5F3FF] text-[#532CE6] border border-[#532CE6]/15 px-2.5 py-0.5 rounded-full flex items-center gap-1.5 text-xs font-bold">
+                            <span class="material-symbols-outlined text-sm">verified_user</span>
+                            <span>${alt.title}</span>
                         </div>
-                        <div class="flex items-center justify-between gap-md mb-lg">
-                            <div class="flex-1 text-center">
-                                <img alt="Database" class="w-full aspect-square rounded-lg object-cover grayscale opacity-60" src="${alt.databasePhoto}"/>
-                                <span class="font-label-sm text-label-sm text-outline mt-xs block">Database</span>
-                            </div>
-                            <span class="material-symbols-outlined text-primary text-3xl">compare_arrows</span>
-                            <div class="flex-1 text-center">
-                                <img alt="Found" class="w-full aspect-square rounded-lg object-cover" src="${alt.foundPhoto}"/>
-                                <span class="font-label-sm text-label-sm text-primary font-bold mt-xs block">Found Now</span>
-                            </div>
+                        <span class="text-xs font-bold text-[#532CE6] bg-[#F5F3FF] px-2 py-0.5 rounded-md">${alt.confidence}</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-4 mb-4">
+                        <div class="flex-1 text-center">
+                            <img alt="Base de données" class="w-full aspect-square rounded-xl object-cover grayscale opacity-70 border border-[#EAECF0]" src="${alt.databasePhoto}"/>
+                            <span class="text-[11px] text-[#64748B] font-medium mt-1.5 block">Signalé</span>
                         </div>
-                        <p class="font-body-md text-body-md text-on-surface-variant mb-lg">${alt.description}</p>
-                        <div class="flex gap-md">
-                            <button class="flex-1 py-md border border-outline-variant text-on-surface-variant rounded-full font-label-bold text-label-bold active:scale-95 transition-transform" onclick="markAsRead('${alt.id}')">Dismiss</button>
-                            <button class="flex-1 py-md bg-primary text-on-primary rounded-full font-label-bold text-label-bold shadow-md active:scale-95 transition-transform" onclick="window.location.href='${alt.actionUrl}'; markAsRead('${alt.id}')">${alt.actionText}</button>
+                        <span class="material-symbols-outlined text-[#532CE6] text-2xl">compare_arrows</span>
+                        <div class="flex-1 text-center">
+                            <img alt="Trouvé" class="w-full aspect-square rounded-xl object-cover border border-[#532CE6]/30" src="${alt.foundPhoto}"/>
+                            <span class="text-[11px] text-[#532CE6] font-bold mt-1.5 block">Identifié</span>
                         </div>
+                    </div>
+                    <p class="text-sm text-[#64748B] mb-4">${alt.description}</p>
+                    <div class="flex gap-3">
+                        <button class="flex-1 py-2.5 border border-[#EAECF0] text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8F9FA] rounded-xl font-bold text-sm transition-all" onclick="markAsRead('${alt.id}')">Ignorer</button>
+                        <button class="flex-1 py-2.5 bg-[#532CE6] text-white rounded-xl font-bold text-sm shadow-sm hover:bg-[#4321C4] transition-all" onclick="window.location.href='${alt.actionUrl}'; markAsRead('${alt.id}')">${alt.actionText || 'Examiner'}</button>
                     </div>
                 </div>`;
             } else if (alt.category === 'REPORT') {
                 html += `
-                <div class="bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] p-lg flex gap-md items-start relative">
+                <div class="bg-white rounded-2xl border border-[#EAECF0] p-5 shadow-sm hover:shadow-md transition-all flex gap-4 items-start relative">
                     ${unreadIndicator}
-                    <div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center flex-shrink-0">
-                        <span class="material-symbols-outlined text-on-surface-variant">description</span>
+                    <div class="w-11 h-11 bg-[#F1F5F9] border border-[#EAECF0] rounded-xl flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[#64748B] text-xl">description</span>
                     </div>
-                    <div class="flex-1">
-                        <div class="flex justify-between">
-                            <h3 class="font-headline-md text-headline-md text-on-surface">${alt.title}</h3>
-                            <span class="font-label-sm text-label-sm text-on-surface-variant">${alt.timestamp}</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-base text-[#0F172A]">${alt.title}</h3>
+                            <span class="text-xs text-[#64748B] font-medium">${alt.timestamp}</span>
                         </div>
-                        <p class="font-body-md text-body-md text-on-surface-variant mt-base">${alt.description}</p>
-                        <button class="mt-md text-primary font-label-bold text-label-bold flex items-center gap-xs" onclick="window.location.href='${alt.actionUrl || './report_details.html'}'; markAsRead('${alt.id}')">
-                            ${alt.actionText || 'View Report'} <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        <p class="text-sm text-[#64748B] mt-1">${alt.description}</p>
+                        <button class="mt-3 text-[#532CE6] font-bold text-xs flex items-center gap-1 hover:underline" onclick="window.location.href='${alt.actionUrl || './report_details.html'}'; markAsRead('${alt.id}')">
+                            ${alt.actionText || 'Voir le rapport'} <span class="material-symbols-outlined text-sm">arrow_forward</span>
                         </button>
                     </div>
                 </div>`;
             } else if (alt.category === 'COMMUNITY') {
                 html += `
-                <div class="bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] overflow-hidden border-t border-primary/5 relative">
+                <div class="bg-white rounded-2xl border border-[#EAECF0] p-5 shadow-sm hover:shadow-md transition-all relative">
                     ${unreadIndicator}
-                    <div class="bg-primary/5 p-lg border-l-4 border-primary">
-                        <div class="flex items-center gap-sm mb-sm">
-                            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">groups</span>
-                            <span class="font-label-bold text-label-bold text-primary">COMMUNITY BEACON ACTIVE</span>
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-1.5 bg-[#F5F3FF] text-[#532CE6] border border-[#532CE6]/15 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">groups</span>
+                            <span>COMMUNAUTÉ ACTIVE</span>
                         </div>
-                        <h3 class="font-headline-md text-headline-md text-on-surface">${alt.title}</h3>
-                        <p class="font-body-md text-body-md text-on-surface-variant mt-base">${alt.description}</p>
-                        <button class="w-full mt-lg py-md bg-white border border-primary text-primary rounded-full font-label-bold text-label-bold shadow-sm hover:bg-primary/5 active:scale-95 transition-all" onclick="window.location.href='${alt.actionUrl || './report_details.html'}'; markAsRead('${alt.id}')">${alt.actionText || 'Help Nearby'}</button>
+                        <span class="text-xs text-[#64748B] font-medium">${alt.timestamp}</span>
                     </div>
+                    <h3 class="font-bold text-base text-[#0F172A] mt-2">${alt.title}</h3>
+                    <p class="text-sm text-[#64748B] mt-1">${alt.description}</p>
+                    <button class="w-full mt-4 py-2.5 bg-white border border-[#532CE6] text-[#532CE6] hover:bg-[#F5F3FF] rounded-xl font-bold text-sm shadow-sm active:scale-98 transition-all" onclick="window.location.href='${alt.actionUrl || './report_details.html'}'; markAsRead('${alt.id}')">${alt.actionText || 'Participer'}</button>
                 </div>`;
             }
         });
@@ -511,11 +506,9 @@
 
             // Update chip styles
             document.querySelectorAll('#filterChipsContainer button').forEach(b => {
-                b.classList.remove('bg-primary', 'text-on-primary', 'shadow-md', 'font-label-bold');
-                b.classList.add('bg-surface-container', 'text-on-surface', 'font-label-sm');
+                b.className = 'px-4 py-2 rounded-full bg-white text-[#64748B] hover:text-[#0F172A] border border-[#EAECF0] font-medium text-xs whitespace-nowrap flex items-center gap-1.5 transition-all';
             });
-            this.classList.remove('bg-surface-container', 'text-on-surface', 'font-label-sm');
-            this.classList.add('bg-primary', 'text-on-primary', 'shadow-md', 'font-label-bold');
+            this.className = 'px-4 py-2 rounded-full bg-primary text-white font-bold text-xs shadow-sm whitespace-nowrap flex items-center gap-1.5 transition-all';
 
             renderAlerts();
         });

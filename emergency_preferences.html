@@ -17,51 +17,51 @@
                     "colors": {
                         "primary-fixed": "#e5deff",
                         "tertiary-fixed-dim": "#ffb68e",
-                        "surface-tint": "#5b38ee",
-                        "surface-container": "#f1ebfa",
+                        "surface-tint": "#532ce6",
+                        "surface-container": "#F8F9FA",
                         "on-primary": "#ffffff",
                         "inverse-primary": "#c8bfff",
                         "surface-container-lowest": "#ffffff",
-                        "primary-container": "#6c4dff",
+                        "primary-container": "#F5F3FF",
                         "on-error": "#ffffff",
-                        "secondary": "#5f5e60",
-                        "surface-dim": "#ddd8e6",
-                        "secondary-container": "#e2dfe1",
+                        "secondary": "#64748B",
+                        "surface-dim": "#F1F5F9",
+                        "secondary-container": "#F1F5F9",
                         "primary": "#532ce6",
                         "on-tertiary-fixed": "#331200",
-                        "on-primary-fixed-variant": "#4206d7",
+                        "on-primary-fixed-variant": "#4321c4",
                         "primary-fixed-dim": "#c8bfff",
-                        "on-surface-variant": "#474556",
+                        "on-surface-variant": "#64748B",
                         "on-tertiary-fixed-variant": "#773300",
                         "inverse-on-surface": "#f4eefd",
                         "tertiary-fixed": "#ffdbca",
-                        "surface-variant": "#e5e0ef",
-                        "secondary-fixed": "#e4e2e4",
-                        "on-secondary-fixed-variant": "#474649",
-                        "on-secondary-fixed": "#1b1b1d",
-                        "on-error-container": "#93000a",
-                        "on-background": "#1c1a24",
-                        "error": "#ba1a1a",
-                        "background": "#F5F4F2",
+                        "surface-variant": "#F1F5F9",
+                        "secondary-fixed": "#E2E8F0",
+                        "on-secondary-fixed-variant": "#475569",
+                        "on-secondary-fixed": "#0F172A",
+                        "on-error-container": "#991B1B",
+                        "on-background": "#0F172A",
+                        "error": "#DC2626",
+                        "background": "#F8F9FA",
                         "on-secondary": "#ffffff",
-                        "surface-container-low": "#F5F4F2",
-                        "secondary-fixed-dim": "#c8c6c8",
+                        "surface-container-low": "#F8F9FA",
+                        "secondary-fixed-dim": "#CBD5E1",
                         "tertiary": "#8f3e00",
-                        "surface-container-high": "#ebe6f4",
-                        "on-secondary-container": "#636264",
-                        "inverse-surface": "#312f3a",
-                        "on-primary-container": "#f6f0ff",
+                        "surface-container-high": "#F1F5F9",
+                        "on-secondary-container": "#475569",
+                        "inverse-surface": "#1E293B",
+                        "on-primary-container": "#532ce6",
                         "on-tertiary": "#ffffff",
-                        "on-primary-fixed": "#190064",
-                        "outline-variant": "#c9c4d9",
+                        "on-primary-fixed": "#1e0b75",
+                        "outline-variant": "#EAECF0",
                         "on-tertiary-container": "#ffefe9",
-                        "outline": "#787588",
-                        "error-container": "#ffdad6",
+                        "outline": "#94A3B8",
+                        "error-container": "#FEF2F2",
                         "tertiary-container": "#b55100",
-                        "surface-container-highest": "#e5e0ef",
-                        "on-surface": "#1c1a24",
-                        "surface": "#F5F4F2",
-                        "surface-bright": "#F5F4F2"
+                        "surface-container-highest": "#E2E8F0",
+                        "on-surface": "#0F172A",
+                        "surface": "#ffffff",
+                        "surface-bright": "#FFFFFF"
                     },
                     "borderRadius": {
                         "DEFAULT": "1rem",
@@ -140,111 +140,101 @@
 </script>
 
 </head>
-<body class="font-body-md text-on-surface">
+<body class="bg-background text-on-surface font-body-md min-h-screen">
 <!-- Top AppBar -->
-<header class="sticky top-0 z-50 bg-surface dark:bg-surface-dim shadow-[0px_4px_20px_rgba(108,77,255,0.06)] h-16 w-full">
+<header class="sticky top-0 z-50 bg-white border-b border-[#EAECF0] h-16 w-full">
 <div class="flex items-center justify-between px-container-margin h-full max-w-7xl mx-auto">
-<div class="flex items-center gap-4">
-<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-200" onclick="history.back()">
-<span class="material-symbols-outlined text-primary">arrow_back</span>
+<div class="flex items-center gap-3">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] transition-colors active:scale-95 text-[#64748B] hover:text-[#0F172A]" onclick="history.back()">
+<span class="material-symbols-outlined">arrow_back</span>
 </button>
-<h1 class="font-headline-md text-headline-md text-primary">Emergency Preferences</h1>
+<h1 class="text-base font-bold text-[#0F172A]">Préférences d'Urgence</h1>
 </div>
-<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-200">
-<span class="material-symbols-outlined text-primary">notifications</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] transition-colors active:scale-95 text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./alert_center.html'">
+<span class="material-symbols-outlined">notifications</span>
 </button>
 </div>
 </header>
-<main class="max-w-xl mx-auto md:ml-64 md:max-w-4xl md:mx-auto px-container-margin pt-lg pb-32">
+<main class="max-w-xl mx-auto px-container-margin pt-6 pb-32 space-y-4">
 <!-- Introduction -->
-<section class="mb-lg">
-<p class="font-body-lg text-on-surface-variant">Configure how SafeGuardian responds in critical moments. These settings are encrypted and shared only with your chosen responders.</p>
-</section>
+<div class="bg-white border border-[#EAECF0] rounded-2xl p-4 shadow-sm flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-[#FEF2F2] border border-[#DC2626]/20 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[#DC2626] text-[20px]" style="font-variation-settings: 'FILL' 1;">emergency</span>
+</div>
+<p class="text-xs text-[#64748B]">Configurez la réponse automatique de RAYDAR en cas d'urgence. Ces paramètres sont sécurisés et partagés uniquement avec les intervenants autorisés.</p>
+</div>
 <!-- Primary Contact Card -->
-<section class="bg-surface-container-lowest rounded-lg p-xl soft-shadow mb-lg border border-surface-variant/50">
-<div class="flex items-center gap-3 mb-lg">
-<div class="bg-primary-fixed p-3 rounded-full">
-<span class="material-symbols-outlined text-primary">contact_emergency</span>
-</div>
-<h2 class="font-headline-md text-headline-md">Primary Contact</h2>
-</div>
-<div class="space-y-md">
-<div>
-<label class="font-label-bold text-label-bold text-on-surface-variant block mb-base ml-base">CONTACT NAME</label>
-<input class="w-full h-12 px-md bg-surface border border-outline-variant rounded-full focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-body-md" placeholder="Enter name" type="text" value="Sarah Jenkins"/>
+<section class="bg-white rounded-2xl p-6 shadow-sm border border-[#EAECF0]">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-xl bg-[#F5F3FF] border border-[#532CE6]/15 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#532CE6]">contact_emergency</span>
 </div>
 <div>
-<label class="font-label-bold text-label-bold text-on-surface-variant block mb-base ml-base">PHONE NUMBER</label>
-<input class="w-full h-12 px-md bg-surface border border-outline-variant rounded-full focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-body-md" placeholder="Enter phone" type="tel" value="+1 (555) 012-3456"/>
+<h2 class="text-base font-bold text-[#0F172A]">Contact d'Urgence Principal</h2>
+<p class="text-xs text-[#64748B]">Personne à contacter en priorité absolue</p>
+</div>
+</div>
+<div class="space-y-3">
+<div>
+<label class="font-bold text-xs text-[#64748B] block mb-1">NOM COMPLET</label>
+<input class="w-full h-11 px-4 bg-[#F8F9FA] border border-[#EAECF0] rounded-xl focus:ring-1 focus:ring-[#532CE6] focus:border-[#532CE6] outline-none transition-all text-sm text-[#0F172A]" placeholder="Entrez le nom" type="text" value="Sarah Jenkins"/>
+</div>
+<div>
+<label class="font-bold text-xs text-[#64748B] block mb-1">NUMÉRO DE TÉLÉPHONE</label>
+<input class="w-full h-11 px-4 bg-[#F8F9FA] border border-[#EAECF0] rounded-xl focus:ring-1 focus:ring-[#532CE6] focus:border-[#532CE6] outline-none transition-all text-sm text-[#0F172A]" placeholder="Entrez le numéro" type="tel" value="+237 677 12 34 56"/>
 </div>
 </div>
 </section>
 <!-- Location Sharing Card -->
-<section class="bg-surface-container-lowest rounded-lg p-xl soft-shadow mb-lg border border-surface-variant/50">
+<section class="bg-white rounded-2xl p-6 shadow-sm border border-[#EAECF0]">
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-3">
-<div class="bg-primary-fixed p-3 rounded-full">
-<span class="material-symbols-outlined text-primary">location_on</span>
+<div class="w-10 h-10 rounded-xl bg-[#F5F3FF] border border-[#532CE6]/15 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#532CE6]">location_on</span>
 </div>
 <div>
-<h2 class="font-headline-md text-headline-md">Location Sharing</h2>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Always share during alerts</p>
+<h2 class="text-base font-bold text-[#0F172A]">Partage de Position</h2>
+<p class="text-xs text-[#64748B]">Toujours transmettre lors des alertes</p>
 </div>
 </div>
 <label class="relative inline-flex items-center cursor-pointer">
-<input checked="" class="sr-only peer custom-toggle" type="checkbox"/>
-<div class="w-14 h-8 bg-surface-container-highest rounded-full transition-all duration-300 toggle-bg"></div>
-<div class="absolute left-1 top-1 w-6 h-6 bg-outline rounded-full transition-all duration-300 transform toggle-dot"></div>
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-[#E2E8F0] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#532CE6]"></div>
 </label>
 </div>
 </section>
 <!-- Auto-SOS Card -->
-<section class="bg-surface-container-lowest rounded-lg p-xl soft-shadow mb-lg border border-surface-variant/50 urgent-accent">
-<div class="flex items-center gap-3 mb-md">
-<div class="bg-error-container p-3 rounded-full">
-<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">emergency</span>
+<section class="bg-white rounded-2xl p-6 shadow-sm border border-[#EAECF0]">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded-xl bg-[#FEF2F2] border border-[#DC2626]/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#DC2626]" style="font-variation-settings: 'FILL' 1;">sensors</span>
 </div>
-<h2 class="font-headline-md text-headline-md">Auto-SOS Trigger</h2>
+<div>
+<h2 class="text-base font-bold text-[#0F172A]">Déclenchement Auto-SOS</h2>
+<p class="text-xs text-[#64748B]">Activer les protocoles en cas d'impact ou anomalie</p>
 </div>
-<p class="font-body-md text-on-surface-variant mb-lg">Automatically initiate emergency protocols if high-impact motion or prolonged inactivity is detected while traveling.</p>
-<div class="space-y-sm">
-<button class="w-full flex items-center justify-between p-md rounded-lg hover:bg-surface-container-high transition-all active:scale-[0.98] group">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">sensors</span>
-<span class="font-label-bold text-label-bold">Impact Sensitivity</span>
 </div>
+<div class="divide-y divide-[#EAECF0] mt-3">
+<div class="flex items-center justify-between py-3">
 <div class="flex items-center gap-2">
-<span class="font-body-md text-primary">High</span>
-<span class="material-symbols-outlined text-outline">chevron_right</span>
+<span class="material-symbols-outlined text-[#64748B] text-[18px]">speed</span>
+<span class="text-xs font-semibold text-[#0F172A]">Sensibilité aux chocs</span>
 </div>
-</button>
-<button class="w-full flex items-center justify-between p-md rounded-lg hover:bg-surface-container-high transition-all active:scale-[0.98] group">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">timer</span>
-<span class="font-label-bold text-label-bold">Inactivity Buffer</span>
+<span class="text-xs font-bold text-[#532CE6] bg-[#F5F3FF] border border-[#532CE6]/20 px-2.5 py-0.5 rounded-md">Élevée</span>
 </div>
+<div class="flex items-center justify-between py-3">
 <div class="flex items-center gap-2">
-<span class="font-body-md text-primary">2 Minutes</span>
-<span class="material-symbols-outlined text-outline">chevron_right</span>
+<span class="material-symbols-outlined text-[#64748B] text-[18px]">timer</span>
+<span class="text-xs font-semibold text-[#0F172A]">Délai d'inactivité</span>
 </div>
-</button>
+<span class="text-xs font-bold text-[#0F172A] bg-[#F8F9FA] border border-[#EAECF0] px-2.5 py-0.5 rounded-md">2 Minutes</span>
 </div>
-</section>
-<!-- Advanced Actions -->
-<section class="grid grid-cols-2 gap-md">
-<button class="flex flex-col items-center justify-center p-lg bg-surface-container-low rounded-lg border border-dashed border-outline-variant hover:bg-surface-container-high transition-colors">
-<span class="material-symbols-outlined text-primary mb-2">shield_with_heart</span>
-<span class="font-label-bold text-label-bold text-center">Safety Network</span>
-</button>
-<button class="flex flex-col items-center justify-center p-lg bg-surface-container-low rounded-lg border border-dashed border-outline-variant hover:bg-surface-container-high transition-colors">
-<span class="material-symbols-outlined text-primary mb-2">history</span>
-<span class="font-label-bold text-label-bold text-center">Alert History</span>
-</button>
+</div>
 </section>
 <!-- Save Button -->
-<div class="mt-xl">
-<button class="w-full bg-primary text-on-primary font-headline-md text-headline-md py-4 rounded-full shadow-lg active:scale-95 transition-transform">
-                Save Preferences
+<div class="pt-2">
+<button class="w-full bg-[#532CE6] hover:bg-[#4321C4] text-white font-bold text-sm py-3.5 rounded-xl shadow-sm active:scale-95 transition-all">
+                Enregistrer les Préférences
             </button>
 </div>
 </main>

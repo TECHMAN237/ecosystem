@@ -4,24 +4,64 @@
  * Does not change layout structure or branding colors.
  */
 :root {
+  /* Brand Primary (Violet controlled accent) */
   --cs-primary: #532ce6;
-  --cs-primary-soft: rgba(83, 44, 230, 0.1);
-  --cs-outline: #c9c4d9;
-  --cs-outline-subtle: rgba(201, 196, 217, 0.55);
-  --cs-surface: #F4F3F0;
+  --cs-primary-hover: #4321c4;
+  --cs-primary-soft: rgba(83, 44, 230, 0.06);
+  --cs-primary-container: #F5F3FF;
+  --cs-on-primary-container: #532ce6;
+
+  /* Surfaces & Backgrounds — Soft Neutral & Crisp White Cards */
+  --cs-bg-app: #EDF0F5;
+  --cs-background: #EDF0F5;
+  --cs-surface: #ffffff;
   --cs-surface-card: #ffffff;
-  --cs-on-surface: #1c1a24;
-  --cs-on-variant: #474556;
-  --cs-error: #ba1a1a;
-  --cs-success: #1b7a4e;
+  --cs-surface-secondary: #EDF0F5;
+  --cs-surface-muted: #E2E8F0;
+
+  /* Borders & Dividers — Subtle Crisp Neutral */
+  --cs-outline: #CBD5E1;
+  --cs-outline-subtle: #E2E8F0;
+  --cs-border-subtle: 1px solid #E2E8F0;
+
+  /* Typography — Dark Neutral Text Hierarchy */
+  --cs-on-surface: #0F172A;
+  --cs-on-variant: #64748B;
+  --cs-on-muted: #94A3B8;
+
+  /* Semantic Emergency / Warning — Controlled Red */
+  --cs-error: #DC2626;
+  --cs-error-container: #FEF2F2;
+  --cs-error-border: #FECACA;
+  --cs-on-error-container: #991B1B;
+
+  /* Semantic Success / Found — Controlled Green */
+  --cs-success: #16A34A;
+  --cs-success-container: #F0FDF4;
+  --cs-success-border: #BBF7D0;
+  --cs-on-success-container: #166534;
+
+  /* Semantic Warning / Attention — Controlled Amber */
+  --cs-warning: #D97706;
+  --cs-warning-container: #FFFBEB;
+  --cs-warning-border: #FDE68A;
+
+  /* Radii & Sizes */
   --cs-radius-sm: 12px;
   --cs-radius-md: 16px;
   --cs-radius-lg: 20px;
   --cs-radius-xl: 24px;
+  --cs-radius-card: 20px;
+  --cs-radius-navbar: 28px;
+  --cs-radius-header: 24px;
   --cs-radius-pill: 9999px;
-  --cs-shadow-card: 0 10px 30px rgba(28, 26, 36, 0.045), 0 2px 8px rgba(28, 26, 36, 0.025);
-  --cs-shadow-soft: 0 1px 3px rgba(28, 26, 36, 0.04);
-  --cs-shadow-nav: 0 -6px 24px rgba(0, 0, 0, 0.05), 0 -2px 8px rgba(0, 0, 0, 0.02);
+
+  /* Shadows — Soft, Subtle & Modern */
+  --cs-shadow-card: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+  --cs-shadow-card-hover: 0 4px 12px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+  --cs-shadow-soft: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --cs-shadow-nav: 0 -4px 16px rgba(15, 23, 42, 0.03), 0 -1px 2px rgba(15, 23, 42, 0.02);
+
   --cs-touch: 44px;
   --cs-input-h: 48px;
   --cs-btn-h: 48px;
@@ -118,7 +158,7 @@ body:not(.bg-cyber-grid) header[class*="fixed"],
 body:not(.bg-cyber-grid) header.sticky,
 body:not(.bg-cyber-grid) header.fixed {
   border-bottom: 1px solid var(--cs-outline-subtle);
-  background-color: rgba(253, 248, 255, 0.94) !important;
+  background-color: rgba(255, 255, 255, 0.98) !important;
 }
 
 nav.fixed[class*="bottom"],
@@ -171,11 +211,11 @@ nav.fixed button {
 
 [class*="cursor-pointer"][class*="rounded"]:active {
   transform: scale(0.995);
-  background-color: #f7f1ff;
+  background-color: var(--cs-surface-secondary);
 }
 
 [class*="hover:bg-surface-container"]:hover {
-  background-color: #f7f1ff !important;
+  background-color: var(--cs-surface-secondary) !important;
 }
 
 /* —— Buttons —— */
@@ -280,12 +320,18 @@ input[class*="rounded-full"][class*="pl-"] {
 [class*="border-emergency"] {
   border-left-width: 4px !important;
   border-left-color: var(--cs-error) !important;
+  background-color: var(--cs-error-container) !important;
+  border-top: 1px solid var(--cs-error-border) !important;
+  border-right: 1px solid var(--cs-error-border) !important;
+  border-bottom: 1px solid var(--cs-error-border) !important;
 }
 
 [class*="bg-error-container"] {
   border-radius: var(--cs-radius-md) !important;
   padding: 14px 16px !important;
-  border: 1px solid rgba(186, 26, 26, 0.12);
+  background-color: var(--cs-error-container) !important;
+  border: 1px solid var(--cs-error-border) !important;
+  color: var(--cs-on-error-container) !important;
 }
 
 [class*="bg-error"][class*="rounded-full"],
@@ -480,15 +526,15 @@ label[class*="cursor-pointer"] {
 
 /* —— V1 Child Safety UI Redesign System Refinements —— */
 :root {
-  --cs-bg-app: #eae7e1;
+  --cs-bg-app: #EDF0F5;
   --cs-surface-card: #ffffff;
-  --cs-radius-card: 24px;
-  --cs-radius-navbar: 30px;
-  --cs-radius-header: 28px;
-  --cs-shadow-card: 0 8px 24px rgba(28, 26, 36, 0.05), 0 2px 6px rgba(28, 26, 36, 0.02);
-  --cs-shadow-card-hover: 0 16px 36px rgba(83, 44, 230, 0.09), 0 2px 10px rgba(83, 44, 230, 0.04);
-  --cs-shadow-nav: 0 -8px 28px rgba(28, 26, 36, 0.08), 0 -2px 10px rgba(28, 26, 36, 0.03);
-  --cs-border-subtle: 1px solid rgba(201, 196, 217, 0.22);
+  --cs-radius-card: 20px;
+  --cs-radius-navbar: 0px;
+  --cs-radius-header: 24px;
+  --cs-shadow-card: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  --cs-shadow-card-hover: 0 4px 14px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
+  --cs-shadow-nav: 0 -4px 20px rgba(15, 23, 42, 0.06), 0 -1px 2px rgba(15, 23, 42, 0.03);
+  --cs-border-subtle: 1px solid #E2E8F0;
 }
 
 /* ── Global Background ── */
@@ -521,23 +567,27 @@ body:not(.bg-cyber-grid) main div[class*="bg-white"][class*="rounded-"]:not(.no-
   padding: 16px 20px !important;
 }
 
-/* ── Floating Bottom Navigation ── */
+/* ── Fixed Bottom Navigation (Docked, crisp white surface, clear top separation) ── */
 nav.fixed[class*="bottom"],
 nav[class*="fixed"][class*="bottom"] {
   position: fixed !important;
-  bottom: 12px !important;
-  left: 16px !important;
-  right: 16px !important;
-  width: calc(100% - 32px) !important;
-  max-width: 420px !important;
-  margin: 0 auto !important;
-  border-radius: var(--cs-radius-navbar) !important;
-  border: var(--cs-border-subtle) !important;
-  box-shadow: 0 12px 36px rgba(28, 26, 36, 0.12), 0 4px 12px rgba(28, 26, 36, 0.04) !important;
-  background-color: rgba(255, 255, 255, 0.97) !important;
-  backdrop-filter: blur(16px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-  padding: 8px 4px !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  border-top: 1px solid #E2E8F0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.05), 0 -1px 2px rgba(15, 23, 42, 0.03) !important;
+  background-color: #FFFFFF !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  padding: 8px 16px !important;
+  padding-bottom: max(10px, env(safe-area-inset-bottom, 0px)) !important;
   height: auto !important;
   min-height: 64px !important;
   display: flex !important;
@@ -546,10 +596,10 @@ nav[class*="fixed"][class*="bottom"] {
   z-index: 50 !important;
 }
 
-/* Nav link items inside floating navbar */
+/* Nav link items inside navbar */
 nav.fixed[class*="bottom"] a,
 nav[class*="fixed"][class*="bottom"] a {
-  border-radius: 16px !important;
+  border-radius: 12px !important;
   padding: 6px 12px !important;
   min-width: 56px !important;
   display: flex !important;
@@ -561,9 +611,77 @@ nav[class*="fixed"][class*="bottom"] a {
 }
 
 /* Active nav item highlight */
-nav.fixed[class*="bottom"] a[class*="bg-primary-container"],
-nav[class*="fixed"][class*="bottom"] a[class*="bg-primary-container"] {
+nav.fixed[class*="bottom"] a[class*="text-[#532CE6]"],
+nav.fixed[class*="bottom"] a[class*="bg-[#F5F3FF]"],
+nav[class*="fixed"][class*="bottom"] a[class*="text-[#532CE6]"],
+nav[class*="fixed"][class*="bottom"] a[class*="bg-[#F5F3FF]"] {
+  background-color: #F5F3FF !important;
+  color: #532CE6 !important;
   transform: scale(1) !important;
+}
+
+nav.fixed[class*="bottom"] a[class*="text-[#64748B]"],
+nav[class*="fixed"][class*="bottom"] a[class*="text-[#64748B]"] {
+  color: #64748B !important;
+}
+
+nav.fixed[class*="bottom"] a[class*="text-[#64748B]"]:hover,
+nav[class*="fixed"][class*="bottom"] a[class*="text-[#64748B]"]:hover {
+  color: #0F172A !important;
+}
+
+/* ── "Voir les détails" button: off-white interactive surface (Card ≠ Button ≠ Page Background) ── */
+.view-details-btn,
+button.view-details-btn,
+button[onclick*="report_details.html"] {
+  background-color: var(--cs-surface-btn-details, #F4F6F9) !important;
+  border: 1px solid var(--cs-border-btn-details, #E2E8F0) !important;
+  color: var(--cs-primary, #532ce6) !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+
+.view-details-btn:hover,
+button.view-details-btn:hover,
+button[onclick*="report_details.html"]:hover {
+  background-color: var(--cs-surface-btn-details-hover, #EAEFF5) !important;
+  border-color: #CBD5E1 !important;
+}
+
+/* ── Action Buttons: Signaler un disparu (Entire Container = Red) & Signaler un retrouvé (Entire Container = Blue/Violet) ── */
+.btn-action-disparu,
+button.btn-action-disparu {
+  background-color: #DC2626 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #DC2626 !important;
+}
+
+.btn-action-disparu:hover,
+button.btn-action-disparu:hover {
+  background-color: #B91C1C !important;
+  border-color: #B91C1C !important;
+}
+
+.btn-action-disparu span,
+.btn-action-disparu .material-symbols-outlined {
+  color: #FFFFFF !important;
+}
+
+.btn-action-retrouve,
+button.btn-action-retrouve {
+  background-color: #2563EB !important;
+  color: #FFFFFF !important;
+  border: 1px solid #2563EB !important;
+}
+
+.btn-action-retrouve:hover,
+button.btn-action-retrouve:hover {
+  background-color: #1D4ED8 !important;
+  border-color: #1D4ED8 !important;
+}
+
+.btn-action-retrouve span,
+.btn-action-retrouve .material-symbols-outlined {
+  color: #FFFFFF !important;
 }
 
 /* Ensure body has enough padding at the bottom */
@@ -572,9 +690,9 @@ body:not(.bg-cyber-grid) {
 }
 
 /* ── Top App Bar / Sticky Header polish ── */
-body:not(.bg-cyber-grid) header.fixed[class*="top"],
-body:not(.bg-cyber-grid) header.sticky[class*="top"],
-body:not(.bg-cyber-grid) header[class*="sticky"][class*="top"] {
+body:not(.bg-cyber-grid) header.fixed[class*="top"]:not([class*="bg-[#532CE6]"]):not(.gradient-header),
+body:not(.bg-cyber-grid) header.sticky[class*="top"]:not([class*="bg-[#532CE6]"]):not(.gradient-header),
+body:not(.bg-cyber-grid) header[class*="sticky"][class*="top"]:not([class*="bg-[#532CE6]"]):not(.gradient-header) {
   background-color: var(--cs-bg-app) !important;
   box-shadow: none !important;
   border-bottom: var(--cs-border-subtle) !important;
@@ -611,6 +729,39 @@ button[class*="bg-gradient"]:active {
   transform: scale(0.98) !important;
 }
 
+/* ── Navigation Bar Transformation (Mobile Floating Pill & Desktop Violet Bar) ── */
+.mobile-nav-wrapper {
+  pointer-events: none !important;
+  bottom: 1.25rem !important;
+  bottom: max(1.25rem, calc(1rem + env(safe-area-inset-bottom, 0px))) !important;
+}
+
+.mobile-bottom-nav {
+  pointer-events: auto !important;
+  border-radius: 28px !important;
+  background-color: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 12px 36px rgba(83, 44, 230, 0.18), 0 4px 16px rgba(15, 23, 42, 0.08) !important;
+}
+
+.mobile-bottom-nav a {
+  min-height: 48px !important;
+  min-width: 44px !important;
+}
+
+/* Desktop Violet Branding Bar */
+.desktop-navbar {
+  background-color: #532CE6 !important;
+  border-bottom: 1px solid #4321C4 !important;
+  box-shadow: 0 4px 20px rgba(83, 44, 230, 0.25) !important;
+}
+
+.desktop-navbar a,
+.desktop-navbar span,
+.desktop-navbar button {
+  color: #FFFFFF;
+}
+
 /* ── Desktop sidebar (keep clean, no card treatment) ── */
 aside {
   border: none !important;
@@ -618,5 +769,6 @@ aside {
   border-radius: 0 !important;
   background-color: var(--cs-surface-card) !important;
 }
+
 
 

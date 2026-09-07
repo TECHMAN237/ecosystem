@@ -21,53 +21,54 @@
             theme: {
                 extend: {
                     "colors": {
-                        "on-error-container": "#93000a",
-                        "background": "#F5F4F2",
+                        "on-error-container": "#991B1B",
+                        "background": "#F8F9FA",
                         "on-tertiary-fixed-variant": "#773300",
                         "tertiary": "#8f3e00",
                         "on-tertiary-fixed": "#331200",
-                        "surface-container-low": "#f7f1ff",
-                        "on-secondary-container": "#636264",
+                        "surface-container-low": "#F8F9FA",
+                        "on-secondary-container": "#475569",
                         "tertiary-container": "#b55100",
-                        "outline": "#787588",
-                        "secondary-container": "#e2dfe1",
+                        "outline": "#94A3B8",
+                        "secondary-container": "#F1F5F9",
                         "tertiary-fixed": "#ffdbca",
                         "inverse-primary": "#c8bfff",
-                        "on-primary-fixed": "#190064",
+                        "on-primary-fixed": "#1e0b75",
                         "on-tertiary": "#ffffff",
-                        "on-primary-container": "#f6f0ff",
-                        "error-container": "#ffdad6",
+                        "on-primary-container": "#532ce6",
+                        "error-container": "#FEF2F2",
                         "on-error": "#ffffff",
-                        "error": "#ba1a1a",
+                        "error": "#DC2626",
                         "primary": "#532ce6",
-                        "surface-container-high": "#ebe6f4",
+                        "surface-container-high": "#F1F5F9",
                         "primary-fixed-dim": "#c8bfff",
-                        "secondary": "#5f5e60",
-                        "primary-container": "#6c4dff",
-                        "surface-variant": "#e5e0ef",
-                        "inverse-surface": "#312f3a",
-                        "surface-dim": "#ddd8e6",
+                        "secondary": "#64748B",
+                        "primary-container": "#F5F3FF",
+                        "surface-variant": "#F1F5F9",
+                        "inverse-surface": "#1E293B",
+                        "surface-dim": "#F1F5F9",
                         "primary-fixed": "#e5deff",
-                        "surface-container-highest": "#e5e0ef",
+                        "surface-container-highest": "#E2E8F0",
                         "tertiary-fixed-dim": "#ffb68e",
-                        "on-secondary-fixed": "#1b1b1d",
-                        "on-surface": "#1c1a24",
+                        "on-secondary-fixed": "#0F172A",
+                        "on-surface": "#0F172A",
                         "on-secondary": "#ffffff",
-                        "secondary-fixed-dim": "#c8c6c8",
-                        "surface-container": "#f1ebfa",
-                        "secondary-fixed": "#e4e2e4",
+                        "secondary-fixed-dim": "#CBD5E1",
+                        "surface-container": "#EDF0F5",
+                        "secondary-fixed": "#E2E8F0",
                         "inverse-on-surface": "#f4eefd",
-                        "surface": "#F5F4F2",
-                        "on-secondary-fixed-variant": "#474649",
-                        "outline-variant": "#c9c4d9",
-                        "surface-bright": "#F5F4F2",
+                        "surface": "#ffffff",
+                        "on-secondary-fixed-variant": "#475569",
+                        "outline-variant": "#E2E8F0",
+                        "surface-bright": "#FFFFFF",
                         "surface-container-lowest": "#ffffff",
                         "on-primary": "#ffffff",
                         "on-tertiary-container": "#ffefe9",
-                        "on-surface-variant": "#474556",
-                        "on-primary-fixed-variant": "#4206d7",
-                        "on-background": "#1c1a24",
-                        "surface-tint": "#5b38ee"
+                        "on-surface-variant": "#64748B",
+                        "on-primary-fixed-variant": "#4321c4",
+                        "on-background": "#0F172A",
+                        "background": "#EDF0F5",
+                        "surface-tint": "#532ce6"
                     },
                     "borderRadius": {
                         "DEFAULT": "1rem",
@@ -109,7 +110,7 @@
     </script>
 <style>
         body {
-            background-color: #f7f1ff; /* Custom background as requested */
+            background-color: #EDF0F5;
         }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -138,37 +139,37 @@
 </script>
 
 </head>
-<body class="font-body-md text-on-surface antialiased min-h-screen">
+<body class="font-body-md text-on-surface antialiased min-h-screen bg-background">
 <!-- Top AppBar -->
-<header class="w-full sticky top-0 z-50 bg-surface dark:bg-surface-dim shadow-[0px_4px_20px_rgba(108,77,255,0.06)]">
+<header class="w-full sticky top-0 z-50 bg-white border-b border-[#EAECF0]">
 <div class="flex items-center justify-between px-container-margin h-16 w-full max-w-screen-xl mx-auto">
-<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high active:scale-95 transition-all" onclick="history.back()">
-<span class="material-symbols-outlined text-primary">arrow_back</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] active:scale-95 transition-all text-[#64748B] hover:text-[#0F172A]" onclick="history.back()">
+<span class="material-symbols-outlined">arrow_back</span>
 </button>
-<h1 class="font-display text-headline-md font-bold text-on-surface">My Case Dashboard</h1>
-<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high active:scale-95 transition-all" onclick="window.location.href='./alert_center.html'">
-<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<h1 class="text-base font-bold text-[#0F172A]">Mes Dossiers & Signalements</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] active:scale-95 transition-all text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./alert_center.html'">
+<span class="material-symbols-outlined">notifications</span>
 </button>
 </div>
 </header>
-<main class="max-w-screen-md mx-auto px-container-margin py-lg">
+<main class="max-w-screen-md mx-auto px-container-margin py-6">
 <!-- Toggle Segmented Control -->
-<div class="bg-surface-container-high/60 backdrop-blur p-1 rounded-full flex border border-outline-variant/15 shadow-inner mb-lg">
-<button id="tabMissing" class="flex-1 py-2.5 px-4 rounded-full font-bold text-sm bg-white text-on-surface shadow-[0_4px_12px_rgba(28,26,36,0.08)] transition-all">
-                Missing Children
+<div class="bg-[#F1F5F9] p-1 rounded-xl flex border border-[#EAECF0] mb-6">
+<button id="tabMissing" class="flex-1 py-2 px-4 rounded-lg font-bold text-xs bg-[#532CE6] text-white shadow-sm transition-all">
+                Enfants Disparus
             </button>
-<button id="tabFound" class="flex-1 py-2.5 px-4 rounded-full font-semibold text-sm text-on-surface-variant hover:text-on-surface transition-all">
-                Found Children
+<button id="tabFound" class="flex-1 py-2 px-4 rounded-lg font-semibold text-xs text-[#64748B] hover:text-[#0F172A] transition-all">
+                Enfants Trouvés
             </button>
 </div>
 <!-- Case List -->
-<div class="space-y-md" id="caseListContainer">
+<div class="space-y-4" id="caseListContainer">
     <!-- Dynamic Content -->
 </div>
 </main>
 <!-- Floating Action Button -->
-<button onclick="window.location.href='./signaler_un_disparu_tape_1.html'" class="fixed bottom-24 right-container-margin w-16 h-16 rounded-full fab-gradient text-white shadow-xl flex items-center justify-center active:scale-90 transition-transform z-40 group">
-<span class="material-symbols-outlined text-[32px] group-hover:rotate-90 transition-transform duration-300">add</span>
+<button onclick="window.location.href='./signaler_un_disparu_tape_1.html'" class="fixed bottom-24 right-container-margin w-14 h-14 rounded-full bg-[#532CE6] hover:bg-[#4321C4] text-white shadow-lg flex items-center justify-center active:scale-90 transition-all z-40 group">
+<span class="material-symbols-outlined text-[28px] group-hover:rotate-90 transition-transform duration-300">add</span>
 </button>
 <!-- Bottom Navigation Bar -->
 <script>
@@ -204,10 +205,10 @@ async function renderCases() {
 
     if (reports.length === 0) {
         container.innerHTML = `
-            <div class="bg-surface-container-lowest rounded-lg p-lg text-center border border-outline-variant/10">
-                <span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-sm">folder_open</span>
-                <p class="text-body-lg text-on-surface-variant font-semibold">Aucun signalement actif.</p>
-                <p class="text-body-md text-on-surface-variant/70 mt-xs">Les cas signalés s'afficheront ici.</p>
+            <div class="bg-white rounded-2xl p-8 text-center border border-[#EAECF0] shadow-sm">
+                <span class="material-symbols-outlined text-[48px] text-[#94A3B8] mb-2">folder_open</span>
+                <p class="text-sm text-[#0F172A] font-semibold">Aucun signalement actif.</p>
+                <p class="text-xs text-[#64748B] mt-1">Les cas signalés s'afficheront ici.</p>
             </div>
         `;
         return;
@@ -215,39 +216,39 @@ async function renderCases() {
 
     container.innerHTML = reports.map(report => {
         const isMissing = report.type === 'missing';
-        const urgencyLabel = report.urgency || (isMissing ? 'Active' : 'Recherche Famille');
-        const urgencyBg = isMissing ? 'bg-tertiary-fixed text-on-tertiary-fixed' : 'bg-success text-white bg-green-600';
-        const displayLabel = isMissing ? 'MISSING' : 'FOUND';
-        const displayColor = isMissing ? 'text-primary-container' : 'text-secondary';
+        const urgencyLabel = report.urgency || (isMissing ? 'En cours' : 'Recherche Famille');
+        const urgencyBg = isMissing ? 'bg-[#FEF2F2] text-[#DC2626] border border-[#DC2626]/20' : 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+        const displayLabel = isMissing ? 'DISPARU' : 'TROUVÉ';
+        const displayColor = isMissing ? 'text-[#DC2626]' : 'text-emerald-700';
         
         return `
-            <div class="bg-surface-container-lowest rounded-lg p-md custom-shadow border border-outline-variant/10 active:scale-[0.98] transition-all cursor-pointer hover:border-primary/25" data-id="${report.id}">
-                <div class="flex justify-between items-start mb-md">
-                    <div class="flex items-center gap-md">
-                        <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-primary-container/20">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-[#EAECF0] active:scale-[0.99] transition-all cursor-pointer hover:border-[#532CE6]/30" data-id="${report.id}">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-14 h-14 rounded-full overflow-hidden border border-[#EAECF0] bg-[#F8F9FA] flex-shrink-0">
                             <img alt="${report.name}" class="w-full h-full object-cover" src="${report.photo}" />
                         </div>
                         <div>
-                            <h3 class="font-headline-md ${displayColor} font-bold">${displayLabel}: ${report.name} (${report.age} ans)</h3>
-                            <p class="font-label-sm text-on-surface-variant">${report.location} • ${report.date || ''}</p>
+                            <h3 class="font-bold text-sm text-[#0F172A]"><span class="${displayColor} text-xs font-semibold mr-1.5">[${displayLabel}]</span>${report.name} (${report.age} ans)</h3>
+                            <p class="text-xs text-[#64748B] mt-0.5">${report.location} • ${report.date || ''}</p>
                         </div>
                     </div>
-                    <span class="${urgencyBg} px-3 py-1 rounded-full font-label-bold text-[10px] tracking-wider uppercase">${urgencyLabel}</span>
+                    <span class="${urgencyBg} px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wider uppercase">${urgencyLabel}</span>
                 </div>
                 <!-- Bottom Action Row -->
-                <div class="flex justify-between items-center pt-md border-t border-outline-variant/30">
-                    <div class="flex items-center gap-xs">
-                        <button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container hover:bg-primary-container hover:text-white transition-all text-primary edit-btn" data-id="${report.id}">
-                            <span class="material-symbols-outlined text-[20px]">edit</span>
+                <div class="flex justify-between items-center pt-3 border-t border-[#EAECF0]">
+                    <div class="flex items-center gap-2">
+                        <button class="w-9 h-9 rounded-full flex items-center justify-center bg-[#F8F9FA] border border-[#EAECF0] hover:bg-[#F5F3FF] hover:border-[#532CE6]/30 hover:text-[#532CE6] transition-all text-[#64748B] edit-btn shadow-sm" data-id="${report.id}">
+                            <span class="material-symbols-outlined text-[18px]">edit</span>
                         </button>
-                        <button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container hover:bg-error-container hover:text-white transition-all text-error relative delete-btn" data-id="${report.id}">
-                            <span class="material-symbols-outlined text-[20px]">delete</span>
+                        <button class="w-9 h-9 rounded-full flex items-center justify-center bg-[#F8F9FA] border border-[#EAECF0] hover:bg-[#FEF2F2] hover:border-[#DC2626]/30 hover:text-[#DC2626] transition-all text-[#64748B] relative delete-btn shadow-sm" data-id="${report.id}">
+                            <span class="material-symbols-outlined text-[18px]">delete</span>
                         </button>
-                        <span class="ml-2 font-label-bold text-label-sm text-primary-container uppercase">En cours</span>
+                        <span class="ml-1 text-xs font-medium text-[#64748B]">Suivi actif</span>
                     </div>
-                    <button class="flex items-center gap-xs px-4 py-2 rounded-full bg-surface-container hover:bg-primary-container hover:text-white transition-all text-primary font-label-bold view-progress-btn" data-id="${report.id}">
-                        <span class="material-symbols-outlined text-[20px]">bar_chart</span>
-                        <span class="">Progress</span>
+                    <button class="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#F5F3FF] border border-[#532CE6]/20 hover:bg-[#EDE9FE] transition-all text-[#532CE6] text-xs font-semibold view-progress-btn" data-id="${report.id}">
+                        <span class="material-symbols-outlined text-[16px]">bar_chart</span>
+                        <span>Progression</span>
                     </button>
                 </div>
             </div>
@@ -305,11 +306,11 @@ function updateTabButtons() {
     const tabFound = document.getElementById('tabFound');
 
     if (currentTab === 'missing') {
-        tabMissing.className = "flex-1 py-2.5 px-4 rounded-full font-bold text-sm bg-white text-on-surface shadow-[0_4px_12px_rgba(28,26,36,0.08)] transition-all";
-        tabFound.className = "flex-1 py-2.5 px-4 rounded-full font-semibold text-sm text-on-surface-variant hover:text-on-surface transition-all";
+        tabMissing.className = "flex-1 py-2 px-4 rounded-lg font-bold text-xs bg-[#532CE6] text-white shadow-sm transition-all";
+        tabFound.className = "flex-1 py-2 px-4 rounded-lg font-semibold text-xs text-[#64748B] hover:text-[#0F172A] transition-all";
     } else {
-        tabFound.className = "flex-1 py-2.5 px-4 rounded-full font-bold text-sm bg-white text-on-surface shadow-[0_4px_12px_rgba(28,26,36,0.08)] transition-all";
-        tabMissing.className = "flex-1 py-2.5 px-4 rounded-full font-semibold text-sm text-on-surface-variant hover:text-on-surface transition-all";
+        tabFound.className = "flex-1 py-2 px-4 rounded-lg font-bold text-xs bg-[#532CE6] text-white shadow-sm transition-all";
+        tabMissing.className = "flex-1 py-2 px-4 rounded-lg font-semibold text-xs text-[#64748B] hover:text-[#0F172A] transition-all";
     }
 }
 

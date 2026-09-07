@@ -15,54 +15,54 @@
                 extend: {
                     colors: {
                         "inverse-on-surface": "#f4eefd",
-                        "surface-bright": "#F5F4F2",
-                        "surface-container": "#f1ebfa",
+                        "surface-bright": "#FFFFFF",
+                        "surface-container": "#EDF0F5",
                         "on-tertiary-fixed": "#331200",
-                        "surface-container-highest": "#e5e0ef",
+                        "surface-container-highest": "#E2E8F0",
                         "primary-fixed": "#e5deff",
-                        "secondary": "#5f5e60",
-                        "on-surface": "#1c1a24",
-                        "inverse-surface": "#312f3a",
-                        "surface-dim": "#ddd8e6",
-                        "secondary-fixed-dim": "#c8c6c8",
-                        "error-container": "#ffdad6",
-                        "on-primary-container": "#f6f0ff",
-                        "on-secondary-fixed-variant": "#474649",
-                        "on-background": "#1c1a24",
+                        "secondary": "#64748B",
+                        "on-surface": "#0F172A",
+                        "inverse-surface": "#1E293B",
+                        "surface-dim": "#F1F5F9",
+                        "secondary-fixed-dim": "#CBD5E1",
+                        "error-container": "#FEF2F2",
+                        "on-primary-container": "#532ce6",
+                        "on-secondary-fixed-variant": "#475569",
+                        "on-background": "#0F172A",
                         "tertiary": "#8f3e00",
                         "on-secondary": "#ffffff",
-                        "secondary-fixed": "#e4e2e4",
+                        "secondary-fixed": "#E2E8F0",
                         "surface-container-lowest": "#ffffff",
-                        "on-primary-fixed-variant": "#4206d7",
-                        "on-primary-fixed": "#190064",
+                        "on-primary-fixed-variant": "#4321c4",
+                        "on-primary-fixed": "#1e0b75",
                         "on-primary": "#ffffff",
-                        "surface-container-high": "#ebe6f4",
+                        "surface-container-high": "#F1F5F9",
                         "tertiary-container": "#b55100",
-                        "primary-container": "#6c4dff",
+                        "primary-container": "#F5F3FF",
                         "primary-fixed-dim": "#c8bfff",
-                        "surface-tint": "#5b38ee",
-                        "secondary-container": "#e2dfe1",
-                        "surface-variant": "#e5e0ef",
-                        "outline": "#787588",
+                        "surface-tint": "#532ce6",
+                        "secondary-container": "#F1F5F9",
+                        "surface-variant": "#F1F5F9",
+                        "outline": "#CBD5E1",
                         "tertiary-fixed-dim": "#ffb68e",
-                        "outline-variant": "#c9c4d9",
-                        "on-secondary-container": "#636264",
+                        "outline-variant": "#E2E8F0",
+                        "on-secondary-container": "#475569",
                         "on-tertiary": "#ffffff",
                         "on-tertiary-fixed-variant": "#773300",
-                        "background": "#F5F4F2",
+                        "background": "#EDF0F5",
                         "primary": "#532ce6",
                         "on-error": "#ffffff",
                         "on-tertiary-container": "#ffefe9",
-                        "on-secondary-fixed": "#1b1b1d",
-                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0F172A",
+                        "error": "#DC2626",
                         "inverse-primary": "#c8bfff",
-                        "on-surface-variant": "#474556",
-                        "on-error-container": "#93000a",
-                        "surface-container-low": "#F5F4F2",
-                        "surface": "#F5F4F2",
+                        "on-surface-variant": "#64748B",
+                        "on-error-container": "#991B1B",
+                        "surface-container-low": "#EDF0F5",
+                        "surface": "#ffffff",
                         "tertiary-fixed": "#ffdbca",
-                        "emergency": "#FF4D4F",
-                        "new-badge": "#6c4dff"
+                        "emergency": "#DC2626",
+                        "new-badge": "#532ce6"
                     },
                     borderRadius: {
                         "DEFAULT": "1rem",
@@ -160,11 +160,11 @@
     </div>
 
     <!-- View Selection Tabs -->
-    <div class="flex bg-surface-container-high/60 backdrop-blur p-1 rounded-full max-w-md mx-auto border border-outline-variant/15 shadow-inner">
-        <button class="flex-1 text-on-surface-variant font-semibold py-2.5 rounded-full text-center text-sm hover:text-on-surface transition-all active:scale-98" onclick="window.location.href='./reports_directory.html'">
+    <div class="flex bg-[#F1F5F9] p-1 rounded-full max-w-md mx-auto border border-[#EAECF0]">
+        <button class="flex-1 text-[#64748B] font-semibold py-2.5 rounded-full text-center text-sm hover:text-[#0F172A] transition-all active:scale-98" onclick="window.location.href='./reports_directory.html'">
             Disparus
         </button>
-        <button class="flex-1 bg-white text-on-surface font-bold py-2.5 rounded-full shadow-[0_4px_12px_rgba(28,26,36,0.08)] text-center text-sm transition-all active:scale-98" onclick="window.location.href='./found_reports_directory.html'">
+        <button class="flex-1 bg-white text-[#0F172A] font-bold py-2.5 rounded-full shadow-sm text-center text-sm transition-all active:scale-98" onclick="window.location.href='./found_reports_directory.html'">
             Trouvés
         </button>
     </div>
@@ -172,11 +172,11 @@
     <!-- Search Bar -->
     <div class="flex items-center gap-3 max-w-3xl mx-auto">
         <div class="relative flex-1">
-            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary/60" style="font-variation-settings: 'FILL' 0;">search</span>
-            <input id="searchInput" class="w-full bg-white border border-outline-variant/35 rounded-2xl py-3 pl-12 pr-4 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all text-sm placeholder-on-surface-variant/50 text-on-surface" placeholder="Rechercher parmi les enfants trouvés..." type="text"/>
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#94A3B8]" style="font-variation-settings: 'FILL' 0;">search</span>
+            <input id="searchInput" class="w-full bg-white border border-[#EAECF0] rounded-2xl py-3 pl-12 pr-4 focus:outline-none focus:border-[#532CE6] focus:ring-2 focus:ring-[#532CE6]/10 transition-all text-sm placeholder-[#94A3B8] text-[#0F172A]" placeholder="Rechercher parmi les enfants trouvés..." type="text"/>
         </div>
-        <button id="btnFilter" class="bg-white border border-outline-variant/35 rounded-2xl w-12 h-12 flex items-center justify-center text-on-surface hover:bg-surface-container-low/50 transition-colors shadow-sm shrink-0">
-            <span class="material-symbols-outlined text-[20px] text-primary" style="font-variation-settings: 'FILL' 0;">tune</span>
+        <button id="btnFilter" class="bg-white border border-[#EAECF0] rounded-2xl w-12 h-12 flex items-center justify-center text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8F9FA] transition-colors shadow-sm shrink-0">
+            <span class="material-symbols-outlined text-[20px] text-[#532CE6]" style="font-variation-settings: 'FILL' 0;">tune</span>
         </button>
     </div>
 
@@ -195,9 +195,9 @@
             function renderReports(reports) {
                 if (reports.length === 0) {
                     container.innerHTML = `
-                        <div class="bg-white rounded-2xl p-8 text-center border border-outline-variant/30 shadow-sm max-w-3xl mx-auto">
-                            <span class="material-symbols-outlined text-outline text-[48px] mb-2">search_off</span>
-                            <p class="text-on-surface-variant font-medium">Aucun signalement trouvé</p>
+                        <div class="bg-white rounded-2xl p-8 text-center border border-[#EAECF0] shadow-sm max-w-3xl mx-auto">
+                            <span class="material-symbols-outlined text-[#94A3B8] text-[48px] mb-2">search_off</span>
+                            <p class="text-[#64748B] font-medium">Aucun signalement trouvé</p>
                         </div>
                     `;
                     return;
@@ -205,52 +205,52 @@
 
                 container.innerHTML = reports.map(report => {
                     const labelAge = report.age ? `, env. ${report.age} ans` : '';
-                    let badgeClass = 'bg-amber-50 text-amber-600 border border-amber-100';
+                    let badgeClass = 'bg-[#FEF9C3] text-[#854D0E] border border-[#FEF08A]';
                     let badgeLabel = 'Recherche Famille';
 
                     if (report.currentSafeLocation) {
-                        badgeClass = 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+                        badgeClass = 'bg-[#F0FDF4] text-[#166534] border border-[#BBF7D0]';
                         badgeLabel = 'Sécurisé';
                     } else if (report.status === 'Urgent') {
-                        badgeClass = 'bg-error-container text-error animate-pulse border border-error-variant';
+                        badgeClass = 'bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]';
                         badgeLabel = 'Urgent';
                     }
 
                     const genderLabel = (report.gender || "").toLowerCase() === 'fille' ? 'Fille' : 'Garçon';
 
                     return `
-                        <div class="report-card bg-white rounded-2xl p-4 flex gap-4 items-center border border-outline-variant/30 shadow-[0_4px_20px_rgba(28,26,36,0.04)] hover:shadow-[0_12px_32px_rgba(83,44,230,0.1)] hover:border-primary/25 hover:-translate-y-0.5 transition-all duration-300 relative cursor-pointer" 
+                        <div class="report-card bg-white rounded-2xl p-4 flex gap-4 items-center border border-[#EAECF0] shadow-sm hover:shadow-md hover:border-[#532CE6]/30 hover:-translate-y-0.5 transition-all duration-300 relative cursor-pointer" 
                              data-id="${report.id}">
-                            <div class="w-24 h-28 rounded-xl border border-primary/20 p-1 flex-shrink-0 relative bg-surface-container shadow-inner">
-                                <div class="w-full h-full rounded-lg overflow-hidden bg-surface-container-high">
-                                    <img alt="${report.name}" class="w-full h-full object-cover object-center" src="${report.photo}" />
+                            <div class="w-24 h-28 rounded-xl border border-[#EAECF0] p-1 flex-shrink-0 relative bg-[#F8F9FA]">
+                                <div class="w-full h-full rounded-lg overflow-hidden bg-[#F1F5F9]">
+                                    <img alt="${report.name}" class="w-full h-full object-cover object-center" src="${report.photo || '/assets/children/child-02.webp'}" onerror="this.onerror=null; this.src='/assets/children/child-02.webp';" />
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0 py-0.5 flex flex-col justify-between h-28">
                                 <div>
                                     <div class="flex items-center justify-between gap-2 mb-1.5">
-                                        <h3 class="font-bold text-[17px] text-on-surface leading-tight tracking-tight truncate">${report.name}${labelAge}</h3>
+                                        <h3 class="font-bold text-[17px] text-[#0F172A] leading-tight tracking-tight truncate">${report.name}${labelAge}</h3>
                                         <span class="${badgeClass} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">${badgeLabel}</span>
                                     </div>
-                                    <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1">
-                                        <span class="material-symbols-outlined text-[15px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
+                                    <p class="text-xs text-[#64748B] flex items-center gap-1 mb-1">
+                                        <span class="material-symbols-outlined text-[15px] text-[#532CE6]" style="font-variation-settings: 'FILL' 1;">location_on</span>
                                         ${report.location}
                                     </p>
-                                    <p class="text-[11px] text-outline flex items-center gap-1">
+                                    <p class="text-[11px] text-[#94A3B8] flex items-center gap-1">
                                         <span class="material-symbols-outlined text-[14px]">schedule</span>
                                         Trouvé le ${report.date} • ${report.time || '12:00'}
                                     </p>
                                 </div>
                                 <div class="flex items-center gap-2 mt-auto w-full overflow-hidden flex-nowrap">
-                                    <span class="text-[10.5px] text-primary font-bold bg-primary/5 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">${genderLabel}</span>
-                                    <span class="text-[10.5px] text-primary font-bold bg-primary/5 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">${report.height || 'Env. 1m15'}</span>
-                                    <span class="bg-surface-container text-on-surface-variant text-[10px] font-semibold px-2 py-0.5 rounded-md flex items-center gap-1 whitespace-nowrap shrink-0 ml-auto">
-                                        <span class="material-symbols-outlined text-[13px] text-primary" style="font-variation-settings: 'FILL' 1;">my_location</span>
+                                    <span class="text-[10.5px] text-[#532CE6] font-bold bg-[#F5F3FF] border border-[#532CE6]/15 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">${genderLabel}</span>
+                                    <span class="text-[10.5px] text-[#532CE6] font-bold bg-[#F5F3FF] border border-[#532CE6]/15 rounded-md px-2 py-0.5 whitespace-nowrap shrink-0">${report.height || 'Env. 1m15'}</span>
+                                    <span class="bg-[#F8F9FA] text-[#64748B] border border-[#EAECF0] text-[10px] font-semibold px-2 py-0.5 rounded-md flex items-center gap-1 whitespace-nowrap shrink-0 ml-auto">
+                                        <span class="material-symbols-outlined text-[13px] text-[#532CE6]" style="font-variation-settings: 'FILL' 1;">my_location</span>
                                         Proche
                                     </span>
                                 </div>
                             </div>
-                            <span class="material-symbols-outlined text-outline-variant mr-1" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
+                            <span class="material-symbols-outlined text-[#94A3B8] mr-1" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
                         </div>
                     `;
                 }).join('');

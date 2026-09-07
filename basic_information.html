@@ -351,6 +351,15 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
 
                 // Route guard: only redirect if user already has a complete profile
                 const authInfo = await protectRoute('profile_completion');
+
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+                console.log("=== [STEP 3: BASIC INFORMATION - INIT SESSION CHECK] ===");
+                console.log("SESSION:", session?.user?.id);
+                console.log("GET USER:", user?.id);
+                console.log("SESSION ERROR:", sessionError);
+                console.log("USER ERROR:", userError);
                 
                 if (authInfo && authInfo.user) {
                     activeUser = authInfo.user;
@@ -531,8 +540,18 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                     throw new Error("Impossible de vérifier votre session d'authentification Supabase. Veuillez vous reconnecter.");
                 }
 
-                console.log("[Profile Submission Diagnostic] Target Supabase User ID:", targetUser.id);
-                console.log("[Profile Submission Diagnostic] Target User Email:", targetUser.email || emailInput);
+                const { data: { session: submitSession }, error: submitSessionErr } = await supabase.auth.getSession();
+                const { data: { user: submitUser }, error: submitUserErr } = await supabase.auth.getUser();
+
+                console.log("=== [STEP 3: BASIC INFORMATION - PRE-INSERT CHECK] ===");
+                console.log("AUTH USER ID:", targetUser.id);
+                console.log("SESSION USER ID:", submitSession?.user?.id);
+                console.log("PROFILE USER ID TO SEND:", targetUser.id);
+                console.log("SESSION:", submitSession?.user?.id);
+                console.log("GET USER:", submitUser?.id);
+                console.log("SESSION ERROR:", submitSessionErr);
+                console.log("USER ERROR:", submitUserErr);
+
                 const photo = targetUser.user_metadata?.avatar_url || targetUser.user_metadata?.picture || '';
 
                 // Execute profile creation/update with verified Supabase Auth user ID
@@ -565,7 +584,13 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                 window.location.replace('./onboarding_community_protection_step_1.html');
 
             } catch (err) {
-                console.error('Registration/Profile completion error:', err);
+                console.error('Registration/Profile completion error detail:', {
+                    message: err.message,
+                    code: err.code,
+                    details: err.details,
+                    hint: err.hint,
+                    fullError: err
+                });
                 showError(err.message || "Une erreur inattendue est survenue lors de l'enregistrement. Veuillez vérifier vos informations et réessayer.");
                 isSubmitting = false;
                 setLoading(false);

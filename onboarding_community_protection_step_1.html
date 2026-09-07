@@ -17,53 +17,53 @@
         theme: {
           extend: {
             "colors": {
-                    "surface-container-high": "#ebe6f4",
-                    "on-background": "#1c1a24",
+                    "surface-container-high": "#F1F5F9",
+                    "on-background": "#0F172A",
                     "tertiary": "#8f3e00",
-                    "surface-container-low": "#F5F4F2",
-                    "on-primary-fixed-variant": "#4206d7",
-                    "inverse-surface": "#312f3a",
+                    "surface-container-low": "#F8F9FA",
+                    "on-primary-fixed-variant": "#4321c4",
+                    "inverse-surface": "#1E293B",
                     "primary-fixed-dim": "#c8bfff",
-                    "surface-bright": "#F5F4F2",
-                    "on-secondary-container": "#636264",
-                    "outline": "#787588",
+                    "surface-bright": "#FFFFFF",
+                    "on-secondary-container": "#475569",
+                    "outline": "#94A3B8",
                     "on-secondary": "#ffffff",
-                    "surface": "#F5F4F2",
+                    "surface": "#ffffff",
                     "on-primary": "#ffffff",
                     "primary": "#532ce6",
                     "on-tertiary-fixed": "#331200",
-                    "on-secondary-fixed-variant": "#474649",
+                    "on-secondary-fixed-variant": "#475569",
                     "inverse-primary": "#c8bfff",
-                    "secondary-fixed": "#e4e2e4",
-                    "secondary-fixed-dim": "#c8c6c8",
-                    "on-primary-container": "#f6f0ff",
+                    "secondary-fixed": "#E2E8F0",
+                    "secondary-fixed-dim": "#CBD5E1",
+                    "on-primary-container": "#532ce6",
                     "inverse-on-surface": "#f4eefd",
                     "tertiary-container": "#b55100",
                     "tertiary-fixed-dim": "#ffb68e",
                     "tertiary-fixed": "#ffdbca",
-                    "on-error-container": "#93000a",
+                    "on-error-container": "#991B1B",
                     "on-tertiary": "#ffffff",
                     "on-error": "#ffffff",
-                    "secondary": "#5f5e60",
-                    "secondary-container": "#e2dfe1",
-                    "background": "#F5F4F2",
-                    "primary-container": "#6c4dff",
-                    "outline-variant": "#c9c4d9",
-                    "surface-container-highest": "#e5e0ef",
-                    "error": "#ba1a1a",
-                    "on-surface": "#1c1a24",
-                    "on-secondary-fixed": "#1b1b1d",
-                    "surface-variant": "#e5e0ef",
-                    "error-container": "#ffdad6",
+                    "secondary": "#64748B",
+                    "secondary-container": "#F1F5F9",
+                    "background": "#F8F9FA",
+                    "primary-container": "#F5F3FF",
+                    "outline-variant": "#EAECF0",
+                    "surface-container-highest": "#E2E8F0",
+                    "error": "#DC2626",
+                    "on-surface": "#0F172A",
+                    "on-secondary-fixed": "#0F172A",
+                    "surface-variant": "#F1F5F9",
+                    "error-container": "#FEF2F2",
                     "primary-fixed": "#e5deff",
                     "on-tertiary-container": "#ffefe9",
-                    "surface-tint": "#5b38ee",
-                    "surface-container": "#f1ebfa",
-                    "on-surface-variant": "#474556",
+                    "surface-tint": "#532ce6",
+                    "surface-container": "#F8F9FA",
+                    "on-surface-variant": "#64748B",
                     "on-tertiary-fixed-variant": "#773300",
-                    "surface-dim": "#ddd8e6",
+                    "surface-dim": "#F1F5F9",
                     "surface-container-lowest": "#ffffff",
-                    "on-primary-fixed": "#190064"
+                    "on-primary-fixed": "#1e0b75"
             },
             "borderRadius": {
                     "DEFAULT": "1rem",
@@ -105,17 +105,8 @@
       }
     </script>
 <style>
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        .glow-effect {
-            box-shadow: 0 0 30px rgba(108, 77, 255, 0.2);
-        }
         .step-ring {
-            background: conic-gradient(#532ce6 33%, #e5e0ef 0);
+            background: conic-gradient(#532ce6 33%, #E2E8F0 0);
         }
     </style>
 <style>
@@ -133,65 +124,63 @@
 </script>
 
 </head>
-<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col overflow-x-hidden">
+<body class="bg-[#F8F9FA] text-[#0F172A] font-body-md antialiased min-h-screen flex flex-col overflow-x-hidden">
 <!-- Top Navigation / Login & Skip -->
-<header class="flex items-center justify-between px-container-margin py-md sticky top-0 z-10 bg-background/80 backdrop-blur-md">
-<a class="inline-flex items-center gap-1.5 px-md py-2 bg-surface-container-lowest border border-primary/40 text-primary rounded-full font-label-bold text-sm hover:bg-primary-fixed/30 active:scale-95 transition-all shadow-sm" href="./login_child_safety.html">
-    <span class="material-symbols-outlined text-[18px]">login</span>
+<header class="flex items-center justify-between px-6 py-4 sticky top-0 z-10 bg-[#F8F9FA]/90 backdrop-blur-md max-w-xl mx-auto w-full">
+<a class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-[#EAECF0] text-[#532CE6] rounded-xl font-bold text-xs hover:bg-[#F5F3FF] active:scale-95 transition-all shadow-sm" href="./login_child_safety.html">
+    <span class="material-symbols-outlined text-[16px]">login</span>
     <span>Se connecter</span>
 </a>
-<button class="font-label-bold text-label-bold text-on-surface-variant px-md py-xs rounded-full hover:bg-surface-container transition-colors" onclick="handleSkipOnboarding()">
-            Passer
+<button class="font-semibold text-xs text-[#64748B] px-3 py-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors" onclick="handleSkipOnboarding()">
+    Passer
 </button>
 </header>
-<main class="flex-1 flex flex-col px-container-margin">
+<main class="flex-1 flex flex-col px-6 max-w-xl mx-auto w-full pb-8">
 <!-- Step Indicator Header -->
-<div class="flex items-center gap-md mb-xl">
-<div class="relative w-10 h-10 rounded-full flex items-center justify-center p-[3px] step-ring">
-<div class="bg-white w-full h-full rounded-full flex items-center justify-center">
-<span class="font-label-bold text-label-bold text-primary">1</span>
+<div class="flex items-center gap-3 mb-6 mt-2">
+<div class="relative w-9 h-9 rounded-full flex items-center justify-center p-[3px] step-ring">
+<div class="bg-white w-full h-full rounded-full flex items-center justify-center shadow-xs">
+<span class="font-bold text-xs text-[#532CE6]">1</span>
 </div>
 </div>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Community Protection</h1>
+<h1 class="text-lg font-bold text-[#0F172A]">Protection Communautaire</h1>
 </div>
 <!-- Central Illustration Card -->
-<div class="flex-1 flex items-center justify-center min-h-[300px] mb-xl">
-<div class="relative w-full aspect-square max-w-[320px] rounded-xl glass-card flex items-center justify-center overflow-visible glow-effect">
+<div class="flex-1 flex items-center justify-center min-h-[260px] mb-8">
+<div class="relative w-full aspect-square max-w-[280px] rounded-2xl bg-white border border-[#EAECF0] shadow-sm flex items-center justify-center overflow-visible">
 <!-- Shield Badge (Top Right) -->
-<div class="absolute -top-4 -right-4 w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-lg text-white">
-<span class="material-symbols-outlined text-[28px]" data-icon="security">security</span>
+<div class="absolute -top-3 -right-3 w-12 h-12 bg-[#532CE6] rounded-xl flex items-center justify-center shadow-sm text-white">
+<span class="material-symbols-outlined text-[24px]">security</span>
 </div>
 <!-- Network Illustration Placeholder -->
-<div class="w-full h-full p-xl flex items-center justify-center">
-<img alt="Community Network Visual" class="w-full h-auto object-contain opacity-90" data-alt="A futuristic network visualization featuring glowing violet nodes connected by delicate luminescent lines on a soft-focus background. The visual style is minimalist and clean, utilizing a professional light-mode aesthetic with ethereal purple and blue highlights. Subtle gradients create a sense of deep connectivity and technological safety, maintaining a calm and trustworthy mood suitable for a child safety application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuADqFPuj3wSERecz-BxOUAtUWf8eTn5rf1opX0BUl5DSoq6Tf4w2HSEEp5pWN7c9VWU1T85asUWVuMNNwseeugbOUcLH3tA9Lyh3LWXle6VmcIEMOcmaX3NVtsEPUY1cjMwxFXWwvRw0Ux2qPPut-KjXF1D8ETLaEgyRV-fyBrkd-czG3lUSIPJPYKtOaHUtysfY921Xz-RepXiXcU2QvsaPDckzvlnHGbzvLjdD7_YY0ycX9qhqzEJ-acJNEhoh2Js959TZ9w18E5J"/>
+<div class="w-full h-full p-8 flex items-center justify-center">
+<img alt="Visualisation réseau" class="w-full h-auto object-contain opacity-85" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADqFPuj3wSERecz-BxOUAtUWf8eTn5rf1opX0BUl5DSoq6Tf4w2HSEEp5pWN7c9VWU1T85asUWVuMNNwseeugbOUcLH3tA9Lyh3LWXle6VmcIEMOcmaX3NVtsEPUY1cjMwxFXWwvRw0Ux2qPPut-KjXF1D8ETLaEgyRV-fyBrkd-czG3lUSIPJPYKtOaHUtysfY921Xz-RepXiXcU2QvsaPDckzvlnHGbzvLjdD7_YY0ycX9qhqzEJ-acJNEhoh2Js959TZ9w18E5J"/>
 </div>
 <!-- Community Badge (Bottom Left) -->
-<div class="absolute -bottom-4 -left-4 w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-lg text-primary border-2 border-primary-fixed">
-<span class="material-symbols-outlined text-[28px]" data-icon="group">group</span>
+<div class="absolute -bottom-3 -left-3 w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm text-[#532CE6] border border-[#EAECF0]">
+<span class="material-symbols-outlined text-[24px]">group</span>
 </div>
 </div>
 </div>
 <!-- Content Area -->
-<div class="text-center space-y-md mb-xl">
-<h2 class="font-display text-display text-on-background">Community Protection</h2>
-<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[300px] mx-auto leading-relaxed">
-                Together, we create a secure network. Report incidents and receive real-time alerts to keep children safe in your area.
-            </p>
+<div class="text-center space-y-2 mb-8">
+<h2 class="text-2xl font-bold text-[#0F172A]">Ensemble pour la Sécurité</h2>
+<p class="text-sm text-[#64748B] max-w-[340px] mx-auto leading-relaxed">
+    Créez un réseau d'entraide vigilant. Signalez les disparitions et recevez des alertes instantanées pour protéger chaque enfant.
+</p>
 </div>
 <!-- Footer Actions -->
-<footer class="mt-auto pb-xl flex flex-col items-center gap-xl">
+<footer class="mt-auto flex flex-col items-center gap-6 w-full">
 <!-- Pagination Dots -->
-<div class="flex gap-xs">
-<!-- Active Step -->
-<div class="w-6 h-2 rounded-full bg-primary-container"></div>
-<!-- Inactive Steps -->
-<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
-<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<div class="flex gap-2">
+<div class="w-7 h-2 rounded-full bg-[#532CE6]"></div>
+<div class="w-2.5 h-2 rounded-full bg-[#E2E8F0]"></div>
+<div class="w-2.5 h-2 rounded-full bg-[#E2E8F0]"></div>
 </div>
 <!-- Primary Action Button -->
-<button class="w-full bg-primary-container text-on-primary-container font-headline-md text-headline-md py-md px-xl rounded-full flex items-center justify-center gap-sm active:scale-95 transition-transform duration-200 shadow-md" onclick="window.location.href='./onboarding_reporter.html'">
-<span>Next</span>
-<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+<button class="w-full bg-[#532CE6] hover:bg-[#4321c4] text-white font-bold text-sm py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 active:scale-98 transition-all shadow-sm" onclick="window.location.href='./onboarding_reporter.html'">
+<span>Suivant</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
 </button>
 </footer>
 </main>

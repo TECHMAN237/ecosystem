@@ -226,18 +226,43 @@
 
         if (isOAuthCallback) {
             console.log("[Index Router] Returning from Google OAuth callback...");
+            console.log("[OAuth Diagnostic] URL Hash:", window.location.hash ? "present" : "none");
+            console.log("[OAuth Diagnostic] URL Search:", window.location.search ? "present" : "none");
+
             // Let Supabase process the OAuth session and route to the appropriate screen
             supabase.auth.onAuthStateChange(async (event, session) => {
+                console.log("=== [AUTH EVENT: " + event + "] ===");
+                console.log("SESSION EXISTS:", !!session);
+                console.log("SESSION USER ID:", session?.user?.id);
+
+                const { data: { user }, error: userError } = await supabase.auth.getUser();
+                const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
+
+                console.log("SESSION:", currentSession?.user?.id);
+                console.log("GET USER:", user?.id);
+                console.log("SESSION ERROR:", sessionError);
+                console.log("USER ERROR:", userError);
+
                 if (event === 'SIGNED_IN' || session) {
                     await protectRoute('login');
                 }
             });
+
             // Backup check in case session is already initialized
             setTimeout(async () => {
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+                console.log("=== [BACKUP CHECK getSession / getUser] ===");
+                console.log("SESSION:", session?.user?.id);
+                console.log("GET USER:", user?.id);
+                console.log("SESSION ERROR:", sessionError);
+                console.log("USER ERROR:", userError);
+
                 if (session) {
                     await protectRoute('login');
                 } else {
+                    console.warn("[Index Router] No session detected after OAuth callback timeout. Redirecting to login.");
                     window.location.replace('./login_child_safety.html');
                 }
             }, 800);

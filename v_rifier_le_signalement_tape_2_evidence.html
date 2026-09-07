@@ -400,8 +400,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const genderLabel = currentDraft.gender === 'fille' ? 'Fillette' : (currentDraft.gender === 'garcon' ? 'Garçon' : 'Sexe inconnu');
         const defaultPhoto = currentDraft.gender === 'fille' 
-            ? 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&q=80&w=500'
-            : 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&q=80&w=500';
+            ? '/assets/children/child-08.webp'
+            : '/assets/children/child-05.webp';
 
         const childPhotoVal = currentDraft.childPhoto || currentDraft.photo || (document.querySelector('#cardPhotoChild img') ? document.querySelector('#cardPhotoChild img').src : null) || defaultPhoto;
         const envPhotoVal = currentDraft.envPhoto || (document.querySelector('#cardPhotoEnv img') ? document.querySelector('#cardPhotoEnv img').src : null) || null;

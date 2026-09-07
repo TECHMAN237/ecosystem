@@ -14,53 +14,53 @@
       theme: {
         extend: {
           "colors": {
-                  "on-secondary-fixed-variant": "#474649",
+                  "on-secondary-fixed-variant": "#475569",
                   "on-secondary": "#ffffff",
-                  "surface-container-high": "#ebe6f4",
-                  "secondary": "#5f5e60",
-                  "error-container": "#ffdad6",
-                  "on-surface-variant": "#474556",
-                  "on-primary-fixed-variant": "#4206d7",
-                  "secondary-container": "#e2dfe1",
+                  "surface-container-high": "#F1F5F9",
+                  "secondary": "#64748B",
+                  "error-container": "#FEF2F2",
+                  "on-surface-variant": "#64748B",
+                  "on-primary-fixed-variant": "#4321c4",
+                  "secondary-container": "#F1F5F9",
                   "tertiary-fixed-dim": "#ffb68e",
-                  "surface": "#F5F4F2",
-                  "surface-container-low": "#F5F4F2",
+                  "surface": "#ffffff",
+                  "surface-container-low": "#F8F9FA",
                   "tertiary-fixed": "#ffdbca",
-                  "secondary-fixed": "#e4e2e4",
-                  "inverse-surface": "#312f3a",
+                  "secondary-fixed": "#E2E8F0",
+                  "inverse-surface": "#1E293B",
                   "tertiary-container": "#b55100",
-                  "on-surface": "#1c1a24",
-                  "on-secondary-container": "#636264",
+                  "on-surface": "#0F172A",
+                  "on-secondary-container": "#475569",
                   "inverse-primary": "#c8bfff",
                   "inverse-on-surface": "#f4eefd",
-                  "error": "#ba1a1a",
-                  "surface-tint": "#5b38ee",
+                  "error": "#DC2626",
+                  "surface-tint": "#532ce6",
                   "on-tertiary": "#ffffff",
-                  "background": "#F5F4F2",
+                  "background": "#F8F9FA",
                   "primary-fixed-dim": "#c8bfff",
                   "on-tertiary-fixed-variant": "#773300",
                   "on-tertiary-fixed": "#331200",
                   "on-primary": "#ffffff",
-                  "on-background": "#1c1a24",
-                  "surface-container-highest": "#e5e0ef",
-                  "surface-variant": "#e5e0ef",
+                  "on-background": "#0F172A",
+                  "surface-container-highest": "#E2E8F0",
+                  "surface-variant": "#F1F5F9",
                   "surface-container-lowest": "#ffffff",
-                  "surface-bright": "#F5F4F2",
+                  "surface-bright": "#FFFFFF",
                   "primary": "#532ce6",
-                  "surface-container": "#f1ebfa",
+                  "surface-container": "#F8F9FA",
                   "on-error": "#ffffff",
-                  "on-primary-fixed": "#190064",
-                  "on-error-container": "#93000a",
-                  "surface-dim": "#ddd8e6",
-                  "outline": "#787588",
+                  "on-primary-fixed": "#1e0b75",
+                  "on-error-container": "#991B1B",
+                  "surface-dim": "#F1F5F9",
+                  "outline": "#94A3B8",
                   "on-tertiary-container": "#ffefe9",
-                  "primary-container": "#6c4dff",
+                  "primary-container": "#F5F3FF",
                   "primary-fixed": "#e5deff",
-                  "on-secondary-fixed": "#1b1b1d",
+                  "on-secondary-fixed": "#0F172A",
                   "tertiary": "#8f3e00",
-                  "on-primary-container": "#f6f0ff",
-                  "secondary-fixed-dim": "#c8c6c8",
-                  "outline-variant": "#c9c4d9"
+                  "on-primary-container": "#532ce6",
+                  "secondary-fixed-dim": "#CBD5E1",
+                  "outline-variant": "#EAECF0"
           },
           "borderRadius": {
                   "DEFAULT": "1rem",
@@ -106,17 +106,10 @@
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
     .custom-shadow {
-      box-shadow: 0px 4px 20px rgba(108, 77, 255, 0.06);
+      box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
     }
     .gradient-header {
-      background: linear-gradient(135deg, #6c4dff 0%, #a389ff 100%);
-    }
-    .glass-effect {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(8px);
-    }
-    .fab-glow {
-      box-shadow: 0px 0px 15px rgba(108, 77, 255, 0.4);
+      background: linear-gradient(135deg, #532CE6 0%, #6C4DFF 100%);
     }
     ::-webkit-scrollbar {
       display: none;
@@ -125,117 +118,113 @@
 </head>
 <body class="bg-background text-on-surface font-body-md min-h-screen pb-32">
 <!-- Top Navigation Shell -->
-<header class="w-full top-0 left-0 sticky flex justify-between items-center px-container-margin py-md bg-surface dark:bg-background shadow-[0px_4px_20px_rgba(108,77,255,0.06)] z-40">
-<div class="flex items-center gap-xs">
-<span class="material-symbols-outlined text-primary font-bold text-headline-lg-mobile">security</span>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed">Portail Gardien</h1>
+<header class="w-full top-0 left-0 sticky flex justify-between items-center px-container-margin py-md bg-[#532CE6] text-white border-b border-white/10 z-40">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-white font-bold text-headline-lg-mobile">security</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-white">Portail Gardien</h1>
 </div>
-<button class="material-symbols-outlined text-primary dark:text-primary-fixed hover:opacity-80 transition-opacity active:scale-95 duration-200" onclick="window.location.href='./alert_center.html'">notifications</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors active:scale-95" onclick="window.location.href='./alert_center.html'">
+  <span class="material-symbols-outlined">notifications</span>
+</button>
 </header>
 <!-- Hero Profile Section -->
-<section class="gradient-header pt-lg pb-xl px-container-margin rounded-b-xl relative overflow-hidden">
-<!-- Abstract Shapes for Premium Feel -->
-<div class="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-24 -mt-12"></div>
-<div class="absolute bottom-0 left-0 w-32 h-32 bg-primary-container/20 rounded-full -ml-16 -mb-8"></div>
+<section class="gradient-header bg-gradient-to-r from-[#532CE6] to-[#6C4DFF] text-white pt-6 pb-8 px-container-margin relative overflow-hidden">
 <div class="flex flex-col items-center gap-md relative z-10">
 <div class="relative">
-<div class="w-24 h-24 rounded-full border-4 border-white/30 overflow-hidden custom-shadow">
-<img id="profileAvatar" data-user-avatar class="w-full h-full object-cover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='60' fill='%23ECE8FF'/%3E%3Cpath d='M60 28c11.045 0 20 8.955 20 20s-8.955 20-20 20-20-8.955-20-20 8.955-20 20-20zm0 48c18.336 0 34 9.168 34 22v4H26v-4c0-12.832 15.664-22 34-22z' fill='%23532CE6'/%3E%3C/svg%3E"/>
+<div class="w-24 h-24 rounded-full border-4 border-white/40 p-0.5 overflow-hidden shadow-lg bg-white/20">
+<img id="profileAvatar" data-user-avatar class="w-full h-full object-cover rounded-full" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='60' fill='%23ECE8FF'/%3E%3Cpath d='M60 28c11.045 0 20 8.955 20 20s-8.955 20-20 20-20-8.955-20-20 8.955-20 20-20zm0 48c18.336 0 34 9.168 34 22v4H26v-4c0-12.832 15.664-22 34-22z' fill='%23532CE6'/%3E%3C/svg%3E"/>
 </div>
-<div class="absolute bottom-1 right-1 bg-primary text-white w-7 h-7 rounded-full flex items-center justify-center border-2 border-white">
+<div class="absolute bottom-0 right-0 bg-white text-[#532CE6] w-7 h-7 rounded-full flex items-center justify-center border-2 border-[#532CE6] shadow-sm">
 <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
 </div>
 </div>
 <div class="text-center flex flex-col items-center">
-<h2 id="profileName" data-user-name class="font-headline-lg text-headline-lg text-white">Gardien de la Sécurité</h2>
-<p id="profileRole" data-user-role class="font-label-sm text-label-sm text-white/80 tracking-wide uppercase">Gardien d'Élite de la Communauté</p>
-<button id="editProfileBtn" class="mt-2.5 px-4 py-1.5 border border-white/40 text-white hover:bg-white/10 rounded-full font-bold text-xs flex items-center gap-1.5 transition-all">
-  <span class="material-symbols-outlined text-sm">edit</span>
+<h2 id="profileName" data-user-name class="font-bold text-xl text-white">Gardien de la Sécurité</h2>
+<p id="profileRole" data-user-role class="text-xs text-white/80 font-medium tracking-wide uppercase mt-0.5">Gardien d'Élite de la Communauté</p>
+<button id="editProfileBtn" class="mt-3 px-4 py-1.5 bg-white/15 hover:bg-white/25 text-white border border-white/30 rounded-full font-semibold text-xs flex items-center gap-1.5 transition-all shadow-sm backdrop-blur-sm">
+  <span class="material-symbols-outlined text-sm text-white">edit</span>
   <span>Modifier le profil</span>
 </button>
 </div>
 </div>
 </section>
-<main class="px-container-margin -mt-8 relative z-20 space-y-lg">
+<main class="px-container-margin mt-4 relative z-20 space-y-4">
 <!-- Stats Section -->
-<div class="grid grid-cols-2 gap-md">
-<div class="bg-surface-container-lowest p-lg rounded-lg custom-shadow flex flex-col items-center text-center">
-<span class="material-symbols-outlined text-primary mb-xs" style="font-variation-settings: 'FILL' 1;">description</span>
-<span class="font-headline-md text-headline-md text-on-surface">14</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Signalements effectués</span>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-white border border-[#EAECF0] p-4 rounded-xl flex flex-col items-center text-center shadow-sm">
+<span class="material-symbols-outlined text-primary mb-1 text-[22px]" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="font-bold text-xl text-[#0F172A]">14</span>
+<span class="text-xs text-[#64748B]">Signalements effectués</span>
 </div>
-<div class="bg-surface-container-lowest p-lg rounded-lg custom-shadow flex flex-col items-center text-center">
-<span class="material-symbols-outlined text-tertiary mb-xs" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
-<span class="font-headline-md text-headline-md text-on-surface">850</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Karma</span>
+<div class="bg-white border border-[#EAECF0] p-4 rounded-xl flex flex-col items-center text-center shadow-sm">
+<span class="material-symbols-outlined text-amber-600 mb-1 text-[22px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+<span class="font-bold text-xl text-[#0F172A]">850</span>
+<span class="text-xs text-[#64748B]">Karma</span>
 </div>
 </div>
 <!-- Personal Details Card -->
-<section id="profileDetailsCard" class="bg-surface-container-lowest p-lg rounded-lg custom-shadow space-y-3">
-  <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Informations Personnelles</h3>
-  <div class="grid grid-cols-2 gap-y-2.5 text-body-md border-t border-surface-container pt-3">
-    <span class="text-on-surface-variant font-medium">Nom d'utilisateur :</span>
-    <span id="detailUsername" class="text-on-surface font-semibold text-right">@elena_rod</span>
+<section id="profileDetailsCard" class="bg-white border border-[#EAECF0] p-5 rounded-2xl shadow-sm space-y-3">
+  <h3 class="font-bold text-base text-[#0F172A] mb-1">Informations Personnelles</h3>
+  <div class="grid grid-cols-2 gap-y-2.5 text-sm border-t border-[#EAECF0] pt-3">
+    <span class="text-[#64748B] font-medium">Nom d'utilisateur :</span>
+    <span id="detailUsername" class="text-[#0F172A] font-semibold text-right">@elena_rod</span>
     
-    <span class="text-on-surface-variant font-medium">Téléphone :</span>
-    <span id="detailPhone" class="text-on-surface font-semibold text-right">+237 677123456</span>
+    <span class="text-[#64748B] font-medium">Téléphone :</span>
+    <span id="detailPhone" class="text-[#0F172A] font-semibold text-right">+237 677123456</span>
     
-    <span class="text-on-surface-variant font-medium">Ville :</span>
-    <span id="detailCity" class="text-on-surface font-semibold text-right">Yaoundé</span>
+    <span class="text-[#64748B] font-medium">Ville :</span>
+    <span id="detailCity" class="text-[#0F172A] font-semibold text-right">Yaoundé</span>
   </div>
 </section>
 <!-- Community Mode Section -->
-<section class="bg-surface-container-lowest p-lg rounded-lg custom-shadow">
-<div class="flex items-center justify-between mb-md">
-<div class="flex items-center gap-sm">
-<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center">
-<span class="material-symbols-outlined text-primary" id="mode-icon">radar</span>
+<section class="bg-white border border-[#EAECF0] p-5 rounded-2xl shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-[#F5F3FF] border border-[#532CE6]/15 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#532CE6]" id="mode-icon">radar</span>
 </div>
 <div>
-<h3 class="font-headline-md text-headline-md text-on-surface">Mode Actif</h3>
-<p class="font-label-sm text-label-sm text-primary" id="mode-status">Prêt à aider</p>
+<h3 class="font-bold text-base text-[#0F172A]">Mode Actif</h3>
+<p class="text-xs font-semibold text-[#532CE6]" id="mode-status">Prêt à aider</p>
 </div>
 </div>
 <!-- Modern Toggle Switch -->
 <label class="relative inline-flex items-center cursor-pointer">
 <input checked="" class="sr-only peer" id="mode-toggle" type="checkbox"/>
-<div class="w-14 h-8 bg-surface-container-high rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary"></div>
+<div class="w-11 h-6 bg-[#E2E8F0] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#532CE6]"></div>
 </label>
 </div>
-<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+<p class="text-sm text-[#64748B] leading-relaxed">
         Lorsqu'il est actif, vous recevrez des alertes d'urgence SOS de la part d'enfants ou de parents à moins de 500 mètres de votre position actuelle. Votre vigilance sauve des vies.
       </p>
 </section>
 <!-- My Cases & Reports Card -->
-<section class="bg-surface-container-lowest p-lg rounded-lg custom-shadow">
-<h3 class="font-headline-md text-headline-md text-on-surface mb-md">Mes Dossiers &amp; Signalements</h3>
-<button class="w-full bg-primary hover:bg-primary-container text-white py-md px-lg rounded-full font-headline-md flex items-center justify-center gap-sm transition-all active:scale-95 mb-md" onclick="window.location.href='./my_case_dashboard_refined_actions.html'">
-<span class="material-symbols-outlined">description</span>
+<section class="bg-white border border-[#EAECF0] p-5 rounded-2xl shadow-sm">
+<h3 class="font-bold text-base text-[#0F172A] mb-3">Mes Dossiers &amp; Signalements</h3>
+<button class="w-full bg-[#532CE6] hover:bg-[#4321C4] text-white py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 mb-3 shadow-sm" onclick="window.location.href='./my_case_dashboard_refined_actions.html'">
+<span class="material-symbols-outlined text-[20px]">description</span>
 <span>Voir mes signalements</span>
 </button>
-<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+<p class="text-sm text-[#64748B] leading-relaxed">
 Accédez à l'historique complet de vos signalements d'enfants disparus et trouvés. Suivez et gérez tous vos dossiers.
 </p>
 </section>
 <!-- V2 Device Preview Card -->
-<section class="relative bg-inverse-surface p-lg rounded-lg overflow-hidden flex items-center gap-lg">
-<div class="absolute -right-8 -top-8 w-32 h-32 bg-primary/20 rounded-full blur-2xl"></div>
-<div class="relative z-10 w-24 h-24 flex-shrink-0">
-<div class="w-full h-full bg-surface/5 rounded-lg border border-white/10 flex items-center justify-center overflow-hidden">
-<img class="w-full h-full object-cover mix-blend-screen" data-alt="A futuristic, sleek smart wearable bracelet specifically designed for child safety. The device features a soft matte purple finish with a hidden LED interface that subtly glows. It is presented as a high-end tech product against a dark, atmospheric background with soft, ethereal lighting that highlights its organic, rounded geometry and premium materials." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgY96otwHFZCR9CAwDZsgwe11tSv5pZE4roETcVUokmz2uKe5BVyypv770bFXxdE1heZt8AHIKNJTwxWsZ793J-p_zpSInubjYn4Zdv2iNjb7hgzheqREcfWi2-dReCgpKIAqXR5j6r8vKKeyMtaL-J7FdMSD1l0sdlWWuhaICKaO0tC1p7Km_aNeIfbI_ixfrbsZ_nbnQ0j6gETW-T56jYw_pVwEp9H13tYYVma7exe5jxqtsgFhpkfjLLuauyTP53RDVgbdCxnUS"/>
+<section class="bg-white border border-[#EAECF0] p-5 rounded-2xl shadow-sm flex items-center gap-4">
+<div class="w-16 h-16 rounded-xl bg-[#F8F9FA] border border-[#EAECF0] flex items-center justify-center overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A futuristic, sleek smart wearable bracelet specifically designed for child safety." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgY96otwHFZCR9CAwDZsgwe11tSv5pZE4roETcVUokmz2uKe5BVyypv770bFXxdE1heZt8AHIKNJTwxWsZ793J-p_zpSInubjYn4Zdv2iNjb7hgzheqREcfWi2-dReCgpKIAqXR5j6r8vKKeyMtaL-J7FdMSD1l0sdlWWuhaICKaO0tC1p7Km_aNeIfbI_ixfrbsZ_nbnQ0j6gETW-T56jYw_pVwEp9H13tYYVma7exe5jxqtsgFhpkfjLLuauyTP53RDVgbdCxnUS"/>
 </div>
-</div>
-<div class="relative z-10 flex-1">
-<h3 class="font-headline-md text-headline-md text-white mb-xs">Protection V2</h3>
-<p class="font-label-sm text-label-sm text-white/60 mb-md">Le système de bracelet intelligent de protection arrive bientôt.</p>
-<button class="bg-primary hover:bg-primary-container text-white px-md py-xs rounded-full font-label-bold text-label-bold transition-all active:scale-95" onclick="window.location.href='./v2_smart_device_preview.html'">
+<div class="flex-1">
+<h3 class="font-bold text-sm text-[#0F172A]">Protection V2</h3>
+<p class="text-xs text-[#64748B] mb-2">Le système de bracelet intelligent de protection arrive bientôt.</p>
+<button class="bg-[#F5F3FF] hover:bg-[#EDE9FE] border border-[#532CE6]/20 text-[#532CE6] px-3 py-1.5 rounded-lg font-bold text-xs transition-all active:scale-95" onclick="window.location.href='./v2_smart_device_preview.html'">
           En savoir plus
         </button>
 </div>
 </section>
 <!-- Settings List -->
-<div class="bg-surface-container-lowest rounded-lg custom-shadow overflow-hidden mb-8">
-<div class="divide-y divide-surface-container">
+<div class="bg-white border border-[#EAECF0] rounded-2xl shadow-sm overflow-hidden mb-8">
+<div class="divide-y divide-[#EAECF0]">
 <button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./notifications_settings.html'">
 <div class="flex items-center gap-md">
 <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">notifications</span>

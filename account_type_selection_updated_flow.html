@@ -15,51 +15,51 @@
         theme: {
           extend: {
             "colors": {
-                    "on-primary-fixed": "#190064",
+                    "on-primary-fixed": "#1e0b75",
                     "on-primary": "#ffffff",
-                    "surface-bright": "#F5F4F2",
-                    "error-container": "#ffdad6",
-                    "error": "#ba1a1a",
-                    "surface-container": "#f1ebfa",
-                    "on-surface-variant": "#474556",
-                    "surface": "#F5F4F2",
-                    "background": "#F5F4F2",
+                    "surface-bright": "#FFFFFF",
+                    "error-container": "#FEF2F2",
+                    "error": "#DC2626",
+                    "surface-container": "#F8F9FA",
+                    "on-surface-variant": "#64748B",
+                    "surface": "#ffffff",
+                    "background": "#F8F9FA",
                     "on-tertiary": "#ffffff",
-                    "on-primary-fixed-variant": "#4206d7",
-                    "inverse-surface": "#312f3a",
+                    "on-primary-fixed-variant": "#4321c4",
+                    "inverse-surface": "#1E293B",
                     "on-secondary": "#ffffff",
-                    "secondary-fixed": "#e4e2e4",
+                    "secondary-fixed": "#E2E8F0",
                     "inverse-on-surface": "#f4eefd",
                     "on-error": "#ffffff",
                     "tertiary-container": "#b55100",
-                    "on-secondary-fixed-variant": "#474649",
-                    "surface-container-low": "#F5F4F2",
-                    "on-secondary-container": "#636264",
-                    "secondary-container": "#e2dfe1",
-                    "on-background": "#1c1a24",
+                    "on-secondary-fixed-variant": "#475569",
+                    "surface-container-low": "#F8F9FA",
+                    "on-secondary-container": "#475569",
+                    "secondary-container": "#F1F5F9",
+                    "on-background": "#0F172A",
                     "surface-container-lowest": "#ffffff",
-                    "surface-container-high": "#ebe6f4",
-                    "surface-dim": "#ddd8e6",
-                    "surface-variant": "#e5e0ef",
-                    "secondary-fixed-dim": "#c8c6c8",
-                    "on-surface": "#1c1a24",
-                    "outline-variant": "#c9c4d9",
-                    "outline": "#787588",
+                    "surface-container-high": "#F1F5F9",
+                    "surface-dim": "#F1F5F9",
+                    "surface-variant": "#F1F5F9",
+                    "secondary-fixed-dim": "#CBD5E1",
+                    "on-surface": "#0F172A",
+                    "outline-variant": "#EAECF0",
+                    "outline": "#94A3B8",
                     "tertiary": "#8f3e00",
                     "on-tertiary-fixed-variant": "#773300",
-                    "surface-container-highest": "#e5e0ef",
+                    "surface-container-highest": "#E2E8F0",
                     "primary-fixed-dim": "#c8bfff",
-                    "on-primary-container": "#f6f0ff",
+                    "on-primary-container": "#532ce6",
                     "tertiary-fixed-dim": "#ffb68e",
-                    "on-error-container": "#93000a",
-                    "secondary": "#5f5e60",
-                    "on-secondary-fixed": "#1b1b1d",
-                    "surface-tint": "#5b38ee",
+                    "on-error-container": "#991B1B",
+                    "secondary": "#64748B",
+                    "on-secondary-fixed": "#0F172A",
+                    "surface-tint": "#532ce6",
                     "on-tertiary-fixed": "#331200",
                     "inverse-primary": "#c8bfff",
                     "primary-fixed": "#e5deff",
                     "tertiary-fixed": "#ffdbca",
-                    "primary-container": "#6c4dff",
+                    "primary-container": "#F5F3FF",
                     "on-tertiary-container": "#ffefe9",
                     "primary": "#532ce6"
             },
@@ -104,8 +104,8 @@
 <style>
         .active-selection {
             border: 2px solid #532ce6 !important;
-            background-color: #f6f0ff !important;
-            box-shadow: 0px 4px 20px rgba(108, 77, 255, 0.12) !important;
+            background-color: #F5F3FF !important;
+            box-shadow: 0px 4px 14px rgba(83, 44, 230, 0.08) !important;
         }
         .progress-pill {
             width: 24px;
@@ -117,7 +117,7 @@
             width: 8px;
             height: 8px;
             border-radius: 999px;
-            background-color: #e5e0ef;
+            background-color: #E2E8F0;
         }
     </style>
 <style>
@@ -126,96 +126,84 @@
     }
   </style>
 </head>
-<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-md">
 <!-- TopAppBar -->
-<header class="w-full top-0 sticky z-40 bg-background flex items-center px-container-margin py-md">
-<div class="flex items-center gap-md">
-<button class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors p-xs rounded-full active:scale-95 transition-transform" onclick="handleStepBack()">arrow_back</button>
-<h1 class="font-headline-lg text-headline-lg text-primary">Guardian Flow</h1>
+<header class="w-full top-0 sticky z-40 bg-white border-b border-[#EAECF0] h-16 flex items-center px-container-margin">
+<div class="flex items-center gap-3 w-full max-w-2xl mx-auto">
+<button class="material-symbols-outlined text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors p-2 rounded-full active:scale-95 transition-transform" onclick="handleStepBack()">arrow_back</button>
+<h1 class="text-base font-bold text-[#0F172A]">Choix du rôle</h1>
 </div>
 </header>
-<main class="flex-1 px-container-margin pt-md pb-xl">
+<main class="flex-1 px-container-margin pt-6 pb-40 max-w-2xl mx-auto w-full">
 <!-- Progress Tracker -->
-<div class="flex items-center gap-xs mb-lg">
-<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
-<div class="w-6 h-2 rounded-full bg-primary"></div>
-<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
-<span class="text-label-sm text-outline ml-xs">Étape 2 sur 3</span>
+<div class="flex items-center gap-2 mb-6">
+<div class="w-2.5 h-2.5 rounded-full bg-[#E2E8F0]"></div>
+<div class="w-7 h-2 rounded-full bg-[#532CE6]"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-[#E2E8F0]"></div>
+<span class="text-xs font-semibold text-[#64748B] ml-2">Étape 2 sur 3</span>
 </div>
 <!-- Header Section -->
-<section class="mb-xl">
-<h2 class="font-display text-display text-on-surface mb-xs">Comment souhaitez-vous utiliser Child Safety ?</h2>
-<p class="font-body-lg text-body-lg text-secondary" id="subtitleText">Aidez-nous à personnaliser votre expérience.</p>
+<section class="mb-6">
+<h2 class="text-2xl font-bold text-[#0F172A] mb-1">Comment souhaitez-vous utiliser RAYDAR ?</h2>
+<p class="text-sm text-[#64748B]" id="subtitleText">Aidez-nous à personnaliser votre expérience.</p>
 </section>
 <!-- Error Message Banner -->
-<div id="errorMsg" class="hidden bg-error-container text-on-error-container p-md rounded-lg text-sm flex items-center gap-sm mb-md relative z-20">
-<span class="material-symbols-outlined text-[20px]" data-icon="error">error</span>
+<div id="errorMsg" class="hidden bg-[#FEF2F2] border border-[#DC2626]/20 text-[#DC2626] p-3.5 rounded-xl text-xs flex items-center gap-2 mb-4 relative z-20">
+<span class="material-symbols-outlined text-[18px]">error</span>
 <span id="errorText" class="font-medium"></span>
 </div>
 <!-- Bento Selection Grid -->
-<div class="grid grid-cols-2 md:grid-cols-3 gap-md mb-xl" id="selection-grid">
-<!-- Parent -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6" id="selection-grid">
 <!-- Mother -->
-<button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
-<div class="mb-md p-sm bg-primary-fixed rounded-full">
-<span class="material-symbols-outlined text-primary text-[32px]">woman</span>
+<button class="account-card group flex flex-col items-center p-5 bg-white border border-[#EAECF0] rounded-2xl transition-all duration-200 hover:border-[#532CE6]/30 active:scale-98 text-center shadow-sm" onclick="selectAccount(this)">
+<div class="mb-3 w-12 h-12 bg-[#F5F3FF] border border-[#532CE6]/15 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-[#532CE6] text-[26px]">woman</span>
 </div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Mère</h3>
-<p class="text-label-sm text-outline">Coordinatrice principale de sécurité</p>
+<h3 class="font-bold text-sm text-[#0F172A] mb-1">Mère</h3>
+<p class="text-xs text-[#64748B]">Coordinatrice principale</p>
 </button>
 <!-- Father -->
-<button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
-<div class="mb-md p-sm bg-primary-fixed rounded-full">
-<span class="material-symbols-outlined text-primary text-[32px]">man</span>
+<button class="account-card group flex flex-col items-center p-5 bg-white border border-[#EAECF0] rounded-2xl transition-all duration-200 hover:border-[#532CE6]/30 active:scale-98 text-center shadow-sm" onclick="selectAccount(this)">
+<div class="mb-3 w-12 h-12 bg-[#F5F3FF] border border-[#532CE6]/15 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-[#532CE6] text-[26px]">man</span>
 </div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Père</h3>
-<p class="text-label-sm text-outline">Protection familiale fiable</p>
+<h3 class="font-bold text-sm text-[#0F172A] mb-1">Père</h3>
+<p class="text-xs text-[#64748B]">Protection familiale</p>
 </button>
 <!-- Guardian -->
-<button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
-<div class="mb-md p-sm bg-primary-fixed rounded-full">
-<span class="material-symbols-outlined text-primary text-[32px]">shield_person</span>
+<button class="account-card group flex flex-col items-center p-5 bg-white border border-[#EAECF0] rounded-2xl transition-all duration-200 hover:border-[#532CE6]/30 active:scale-98 text-center shadow-sm" onclick="selectAccount(this)">
+<div class="mb-3 w-12 h-12 bg-[#F5F3FF] border border-[#532CE6]/15 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-[#532CE6] text-[26px]">shield_person</span>
 </div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Tuteur / Tutrice</h3>
-<p class="text-label-sm text-outline">Superviseur légal de sécurité</p>
+<h3 class="font-bold text-sm text-[#0F172A] mb-1">Tuteur / Tutrice</h3>
+<p class="text-xs text-[#64748B]">Superviseur légal</p>
 </button>
 <!-- Community Member -->
-<button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
-<div class="mb-md p-sm bg-primary-fixed rounded-full">
-<span class="material-symbols-outlined text-primary text-[32px]">groups</span>
+<button class="account-card group flex flex-col items-center p-5 bg-white border border-[#EAECF0] rounded-2xl transition-all duration-200 hover:border-[#532CE6]/30 active:scale-98 text-center shadow-sm" onclick="selectAccount(this)">
+<div class="mb-3 w-12 h-12 bg-[#F5F3FF] border border-[#532CE6]/15 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-[#532CE6] text-[26px]">groups</span>
 </div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Membre de la Communauté</h3>
-<p class="text-label-sm text-outline">Défenseur de la sécurité locale</p>
+<h3 class="font-bold text-sm text-[#0F172A] mb-1">Communauté</h3>
+<p class="text-xs text-[#64748B]">Défenseur local</p>
 </button>
 <!-- Volunteer Helper -->
-<button class="account-card group flex flex-col items-center p-lg bg-surface-container-lowest border border-outline-variant rounded-lg transition-all duration-200 hover:bg-surface-container-low active:scale-98 text-center shadow-[0px_4px_20px_rgba(108,77,255,0.06)]" onclick="selectAccount(this)">
-<div class="mb-md p-sm bg-primary-fixed rounded-full">
-<span class="material-symbols-outlined text-primary text-[32px]">volunteer_activism</span>
+<button class="account-card group flex flex-col items-center p-5 bg-white border border-[#EAECF0] rounded-2xl transition-all duration-200 hover:border-[#532CE6]/30 active:scale-98 text-center shadow-sm" onclick="selectAccount(this)">
+<div class="mb-3 w-12 h-12 bg-[#F5F3FF] border border-[#532CE6]/15 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-[#532CE6] text-[26px]">volunteer_activism</span>
 </div>
-<h3 class="font-headline-md text-headline-md text-on-surface mb-base">Bénévole Secouriste</h3>
-<p class="text-label-sm text-outline">Soutien aux interventions d'urgence</p>
+<h3 class="font-bold text-sm text-[#0F172A] mb-1">Bénévole</h3>
+<p class="text-xs text-[#64748B]">Soutien d'urgence</p>
 </button>
-</div>
-<!-- Illustrations Section (Asymmetric) -->
-<div class="mt-lg relative overflow-hidden rounded-xl h-48 w-full bg-surface-container-high hidden md:block">
-<img alt="Community Protection" class="w-full h-full object-cover mix-blend-multiply opacity-80" data-alt="A warm and protective digital illustration showing a diverse community of caregivers and parents holding hands in a circle around a glowing safety emblem. The style is modern minimalist with soft gradients of primary purple and violet, set against a bright white background that exudes trust and calm efficiency. The lighting is soft and high-key, reinforcing a sense of collective security and proactive child safety." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEqG2XeYZhg4TvgTZHCRny59tUyebkzUOr4buS6bXJr0vhLPI1Kbmmaws1gWvaYucmlGQp-jucM_tkOHdEeu2RsyAZXlYLnhAXmagRGw_OUFUA6dMZfFXlacCNWCZAGG_rmJLQPGZV7wt5ngT53h5-kWZgEP3hQ8vp6RJ_TghEsSKZ2YHFRe6dG0ApgblD_k1ZI4jwnMI8QUWFWaU6HrMstOpkzMd7TMt5k-PzluINXFeBdWbiGcsIfrjuWQTcqV3qnFxGqv5HXEzf"/>
-<div class="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent flex items-center px-lg">
-<div class="max-w-xs">
-<h4 class="font-headline-md text-primary">Rejoindre un Réseau Sûr</h4>
-<p class="text-body-md text-secondary">Chaque choix renforce notre communauté pour la sécurité des enfants.</p>
-</div>
-</div>
 </div>
 </main>
 <!-- Bottom Action Bar -->
-<footer class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-lg rounded-t-lg flex flex-col gap-sm px-container-margin py-md relative z-30 border-t border-outline-variant/30">
-<button class="w-full h-14 bg-outline text-on-primary rounded-full font-bold text-[17px] flex items-center justify-center gap-2 transition-all opacity-50 cursor-not-allowed" disabled="" id="continue-btn">
+<footer class="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-[#EAECF0] shadow-sm flex flex-col gap-2 px-container-margin py-3 max-w-2xl mx-auto left-0 right-0">
+<button class="w-full py-3.5 bg-[#EAECF0] text-[#94A3B8] rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-not-allowed" disabled="" id="continue-btn">
             <span id="btnText">Continuer</span>
-            <span class="material-symbols-outlined text-[20px]" id="btnIcon">arrow_forward</span>
+            <span class="material-symbols-outlined text-[18px]" id="btnIcon">arrow_forward</span>
 </button>
-<a class="w-full h-12 border-2 border-primary text-primary hover:bg-primary/10 active:scale-95 transition-all rounded-full flex items-center justify-center font-headline-md text-base font-bold shadow-sm" href="./login_child_safety.html">
-            <span class="material-symbols-outlined mr-xs text-[20px]">login</span>
-            <span>Vous avez déjà un compte ? Se connecter</span>
+<a class="w-full py-2.5 text-center text-xs font-semibold text-[#532CE6] hover:underline" href="./login_child_safety.html">
+            Vous avez déjà un compte ? Se connecter
 </a>
 </footer>
 <!-- Spacer for fixed footer -->
@@ -268,7 +256,15 @@ let isOAuthUser = false;
 
 // Check if user is authenticated with Google
 try {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    console.log("=== [STEP 2: ACCOUNT TYPE SELECTION - SESSION CHECK] ===");
+    console.log("SESSION:", session?.user?.id);
+    console.log("GET USER:", user?.id);
+    console.log("SESSION ERROR:", sessionError);
+    console.log("USER ERROR:", userError);
+
     if (session && session.user) {
         isOAuthUser = true;
         sessionStorage.setItem('signup_is_google', 'true');

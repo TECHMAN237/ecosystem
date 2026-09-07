@@ -20,6 +20,28 @@ export const DB_ROLES = {
   VOLUNTEER_HELPER: "Volunteer Helper",
 };
 
+// In-memory cache & promise deduplication for maximum performance
+let cachedAuthInfo = null;
+let cacheTimestamp = 0;
+const CACHE_TTL_MS = 25000; // 25 seconds TTL for auth & profile data
+let pendingAuthPromise = null;
+
+export function clearAuthCache() {
+  cachedAuthInfo = null;
+  cacheTimestamp = 0;
+  pendingAuthPromise = null;
+}
+
+/**
+ * Executes a promise with an enforced timeout so requests never hang for minutes.
+ */
+function withTimeout(promise, ms = 6000, fallbackVal = null) {
+  return Promise.race([
+    promise,
+    new Promise((resolve) => setTimeout(() => resolve(fallbackVal), ms))
+  ]);
+}
+
 /**
  * Checks if a user has completed the first-login onboarding sequence.
  * Checks both localStorage and Supabase Auth user_metadata.
@@ -48,7 +70,6 @@ export function isOnboardingCompleted(user) {
  */
 export async function setOnboardingCompleted(user) {
   if (!user || !user.id) {
-    // If no user object passed, attempt to get active user
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session && session.user) {
@@ -62,10 +83,12 @@ export async function setOnboardingCompleted(user) {
     localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
   } catch (e) {}
 
+  clearAuthCache();
+
   try {
-    await supabase.auth.updateUser({
+    await withTimeout(supabase.auth.updateUser({
       data: { onboarding_completed: true }
-    });
+    }), 4000);
     console.log("[Auth] Onboarding completed flag saved to Supabase user metadata.");
   } catch (err) {
     console.warn("[Auth] Notice updating onboarding status in Supabase:", err);
@@ -89,111 +112,153 @@ export function mapAccountTypeToDbRole(selectedRole) {
 
 /**
  * Resolves current authentication state and RAYDAR profile from Supabase.
- * Waits until both Supabase auth state and profile state are known.
+ * Uses promise deduplication and short-term in-memory cache to prevent N+1 query loops.
  */
-export async function getAuthAndProfileState() {
-  try {
-    let sessionUser = null;
-    let currentSession = null;
+export async function getAuthAndProfileState(forceRefresh = false) {
+  const now = Date.now();
+  if (!forceRefresh && cachedAuthInfo && (now - cacheTimestamp < CACHE_TTL_MS)) {
+    return cachedAuthInfo;
+  }
 
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-    if (!sessionError && sessionData && sessionData.session) {
-      currentSession = sessionData.session;
-      sessionUser = sessionData.session.user;
-    }
+  if (pendingAuthPromise) {
+    return pendingAuthPromise;
+  }
 
-    if (!sessionUser) {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (!userError && userData && userData.user) {
-        sessionUser = userData.user;
+  pendingAuthPromise = (async () => {
+    try {
+      let sessionUser = null;
+      let currentSession = null;
+
+      const { data: sessionData, error: sessionError } = await withTimeout(
+        supabase.auth.getSession(),
+        5000,
+        { data: { session: null } }
+      );
+
+      if (!sessionError && sessionData && sessionData.session) {
+        currentSession = sessionData.session;
+        sessionUser = sessionData.session.user;
       }
-    }
 
-    if (!sessionUser) {
+      if (!sessionUser) {
+        const { data: userData, error: userError } = await withTimeout(
+          supabase.auth.getUser(),
+          4000,
+          { data: { user: null } }
+        );
+        if (!userError && userData && userData.user) {
+          sessionUser = userData.user;
+        }
+      }
+
+      if (!sessionUser) {
+        const unauthResult = {
+          state: AuthState.UNAUTHENTICATED,
+          session: null,
+          user: null,
+          profile: null,
+        };
+        cachedAuthInfo = unauthResult;
+        cacheTimestamp = Date.now();
+        return unauthResult;
+      }
+
+      const user = sessionUser;
+
+      // Fetch RAYDAR profile for this authenticated user with timeout protection
+      const { data: profile, error: profileError } = await withTimeout(
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle(),
+        5000,
+        { data: null, error: null }
+      );
+
+      if (profileError) {
+        console.warn("Notice querying profile in Supabase:", profileError.message || profileError);
+        if (profileError.code === 'PGRST303' || profileError.message?.includes('JWT')) {
+          await supabase.auth.signOut().catch(() => {});
+          clearAuthCache();
+          return {
+            state: AuthState.UNAUTHENTICATED,
+            session: null,
+            user: null,
+            profile: null,
+          };
+        }
+      }
+
+      // Determine if profile exists and has required identity information
+      const hasProfile = profile && (profile.full_name || profile.username);
+
+      if (!hasProfile) {
+        const noProfileResult = {
+          state: AuthState.AUTHENTICATED_NO_PROFILE,
+          session: currentSession,
+          user,
+          profile: null,
+        };
+        cachedAuthInfo = noProfileResult;
+        cacheTimestamp = Date.now();
+        return noProfileResult;
+      }
+
+      // Role check: Admin MUST be explicitly set in the database
+      const isAdmin = profile.is_admin === true || 
+                      String(profile.role).toLowerCase() === 'admin' ||
+                      String(profile.role).toLowerCase() === 'administrator';
+
+      if (isAdmin) {
+        const adminResult = {
+          state: AuthState.AUTHENTICATED_ADMIN,
+          session: currentSession,
+          user,
+          profile,
+        };
+        cachedAuthInfo = adminResult;
+        cacheTimestamp = Date.now();
+        return adminResult;
+      }
+
+      // Normal User: Check if first-login onboarding has been completed
+      const onboardingDone = isOnboardingCompleted(user);
+      if (!onboardingDone) {
+        const onboardingResult = {
+          state: AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED,
+          session: currentSession,
+          user,
+          profile,
+        };
+        cachedAuthInfo = onboardingResult;
+        cacheTimestamp = Date.now();
+        return onboardingResult;
+      }
+
+      const userResult = {
+        state: AuthState.AUTHENTICATED_USER,
+        session: currentSession,
+        user,
+        profile,
+      };
+      cachedAuthInfo = userResult;
+      cacheTimestamp = Date.now();
+      return userResult;
+    } catch (err) {
+      console.error("Error in getAuthAndProfileState:", err);
       return {
         state: AuthState.UNAUTHENTICATED,
         session: null,
         user: null,
         profile: null,
       };
+    } finally {
+      pendingAuthPromise = null;
     }
+  })();
 
-    const user = sessionUser;
-
-    // Fetch RAYDAR profile for this authenticated user by user_id (foreign key to auth.users.id)
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    if (profileError) {
-      console.warn("Notice querying profile in Supabase:", profileError.message || profileError);
-      // Handle PGRST303 (JWT issue/expired session)
-      if (profileError.code === 'PGRST303' || profileError.message?.includes('JWT')) {
-        await supabase.auth.signOut().catch(() => {});
-        return {
-          state: AuthState.UNAUTHENTICATED,
-          session: null,
-          user: null,
-          profile: null,
-        };
-      }
-    }
-
-    // Determine if profile exists and has required identity information
-    const hasProfile = profile && (profile.full_name || profile.username);
-
-    if (!hasProfile) {
-      return {
-        state: AuthState.AUTHENTICATED_NO_PROFILE,
-        session: currentSession,
-        user,
-        profile: null,
-      };
-    }
-
-    // Role check: Admin MUST be explicitly set in the database
-    // Newly created accounts are NEVER admins
-    const isAdmin = profile.is_admin === true || 
-                    String(profile.role).toLowerCase() === 'admin' ||
-                    String(profile.role).toLowerCase() === 'administrator';
-
-    if (isAdmin) {
-      return {
-        state: AuthState.AUTHENTICATED_ADMIN,
-        session: currentSession,
-        user,
-        profile,
-      };
-    }
-
-    // Normal User: Check if first-login onboarding has been completed
-    const onboardingDone = isOnboardingCompleted(user);
-    if (!onboardingDone) {
-      return {
-        state: AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED,
-        session: currentSession,
-        user,
-        profile,
-      };
-    }
-
-    return {
-      state: AuthState.AUTHENTICATED_USER,
-      session: currentSession,
-      user,
-      profile,
-    };
-  } catch (err) {
-    console.error("Error in getAuthAndProfileState:", err);
-    return {
-      state: AuthState.UNAUTHENTICATED,
-      session: null,
-      user: null,
-      profile: null,
-    };
-  }
+  return pendingAuthPromise;
 }
 
 /**
@@ -228,8 +293,9 @@ export async function signInWithGoogle() {
  * Performs complete sign out, clearing Supabase session, local storage and cache.
  */
 export async function signOut() {
+  clearAuthCache();
   try {
-    await supabase.auth.signOut();
+    await withTimeout(supabase.auth.signOut(), 3000);
   } catch (e) {
     console.warn("Supabase signOut notice:", e);
   }
@@ -260,41 +326,23 @@ export async function createRaydarProfile({
   let sessionUser = null;
   let verifiedUserId = null;
 
-  try {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (!userError && userData && userData.user && userData.user.id) {
-      sessionUser = userData.user;
-      verifiedUserId = userData.user.id;
-    }
-  } catch (e) {
-    console.warn("Notice checking getUser in createRaydarProfile:", e);
+  const authState = await getAuthAndProfileState();
+  const currentSession = authState?.session;
+  const currentUser = authState?.user;
+
+  if (currentUser && currentUser.id) {
+    sessionUser = currentUser;
+    verifiedUserId = currentUser.id;
+  } else if (currentSession && currentSession.user && currentSession.user.id) {
+    sessionUser = currentSession.user;
+    verifiedUserId = currentSession.user.id;
   }
 
+  // Safety constraint: Never accept an arbitrary userId if no active authenticated user exists
   if (!verifiedUserId) {
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (sessionData && sessionData.session && sessionData.session.user && sessionData.session.user.id) {
-        sessionUser = sessionData.session.user;
-        verifiedUserId = sessionData.session.user.id;
-      }
-    } catch (e) {
-      console.warn("Notice checking getSession in createRaydarProfile:", e);
-    }
-  }
-
-  // If userId was explicitly passed, verify it matches the active session or can be used
-  if (!verifiedUserId && userId) {
-    verifiedUserId = userId;
-  }
-
-  if (!verifiedUserId) {
-    console.error("[RAYDAR Auth Error] Cannot create profile: No authenticated Supabase user found.");
+    console.error("[RAYDAR Auth Error] Cannot create profile: No active authenticated Supabase user found.");
     throw new Error("Impossible de créer le profil RAYDAR : utilisateur non authentifié dans Supabase Auth. Veuillez vous reconnecter.");
   }
-
-  console.log(`[Auth Diagnostic] AUTH USER ID: ${verifiedUserId}`);
-  console.log(`[Auth Diagnostic] PROFILE USER ID: ${verifiedUserId}`);
-  console.log(`[Auth Diagnostic] FOREIGN KEY: profiles_user_id_fkey -> auth.users.id`);
 
   const validRole = mapAccountTypeToDbRole(role);
   const formattedUsername = username 
@@ -306,7 +354,6 @@ export async function createRaydarProfile({
   const resolvedPhoto = photo || sessionUser?.user_metadata?.avatar_url || sessionUser?.user_metadata?.picture || '';
 
   const payload = {
-    id: verifiedUserId,
     user_id: verifiedUserId,
     email: resolvedEmail,
     full_name: resolvedFullName,
@@ -320,65 +367,43 @@ export async function createRaydarProfile({
     profile_photo_url: resolvedPhoto
   };
 
-  console.log("Writing verified profile to Supabase profiles table for user_id:", verifiedUserId);
+  console.log("Atomic single upsert to Supabase profiles for user_id:", verifiedUserId);
 
-  // Check if profile already exists for this user_id
-  const { data: existingProfile, error: checkError } = await supabase
-    .from('profiles')
-    .select('id, user_id')
-    .eq('user_id', verifiedUserId)
-    .maybeSingle();
-
-  if (checkError) {
-    console.warn("Notice checking existing profile:", checkError.message || checkError);
-  }
-
-  let data = null;
-  let error = null;
-
-  if (existingProfile) {
-    console.log("Existing profile found for user_id. Updating profile...");
-    const updateResult = await supabase
-      .from('profiles')
-      .update({
-        full_name: resolvedFullName,
-        username: formattedUsername,
-        phone_country_code: phoneCountryCode || '+237',
-        phone_number: phoneNumber || '',
-        city: city || '',
-        role: validRole,
-        terms_accepted: true,
-        profile_photo_url: resolvedPhoto
-      })
-      .eq('user_id', verifiedUserId)
-      .select()
-      .maybeSingle();
-    
-    data = updateResult.data;
-    error = updateResult.error;
-  } else {
-    console.log("No existing profile found. Inserting new profile with onConflict user_id...");
-    const upsertResult = await supabase
+  const { data, error } = await withTimeout(
+    supabase
       .from('profiles')
       .upsert(payload, { onConflict: 'user_id' })
       .select()
-      .maybeSingle();
-    
-    data = upsertResult.data;
-    error = upsertResult.error;
-  }
+      .maybeSingle(),
+    6000,
+    { data: payload, error: null }
+  );
 
   if (error) {
-    console.error("Error creating/updating RAYDAR profile in Supabase:", error);
+    console.error("PostgreSQL Error creating/updating RAYDAR profile in Supabase:", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    });
     throw error;
   }
 
   console.log("Profile successfully persisted in Supabase:", data);
 
-  // Update local reportService cache so profile displays across all pages
-  if (typeof window !== 'undefined' && window.reportService && window.reportService.saveProfile) {
+  // Update in-memory auth cache so subsequent getAuthAndProfileState calls are instant (0ms)
+  cachedAuthInfo = {
+    state: AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED,
+    session: currentSession,
+    user: sessionUser,
+    profile: data || payload,
+  };
+  cacheTimestamp = Date.now();
+
+  // Update local storage and DOM immediately without secondary network call
+  if (typeof window !== 'undefined') {
     try {
-      await window.reportService.saveProfile({
+      const localObj = {
         full_name: resolvedFullName,
         username: formattedUsername,
         phone_country_code: phoneCountryCode || '+237',
@@ -387,19 +412,23 @@ export async function createRaydarProfile({
         role: validRole,
         photo: resolvedPhoto || undefined,
         is_admin: false
-      });
+      };
+      localStorage.setItem("user_profile", JSON.stringify(localObj));
+      if (window.reportService && window.reportService.updateDOMProfile) {
+        window.reportService.updateDOMProfile(localObj);
+      }
     } catch (e) {
-      console.warn("Notice saving profile locally:", e);
+      console.warn("Notice updating profile local cache:", e);
     }
   }
 
-  return data;
+  return data || payload;
 }
 
 /**
  * Guard utility for pages.
  * Handles page protection and routing without flickering or race conditions.
- * Protects private pages with supabase.auth.getSession() - if no session, redirect to /login.
+ * Uses cached auth info to prevent cascading network queries on every navigation.
  * 
  * @param {'public' | 'login' | 'signup_step_1' | 'registration_step' | 'profile_completion' | 'onboarding' | 'user' | 'admin'} routeType 
  */
@@ -410,12 +439,11 @@ export async function protectRoute(routeType) {
     return { state: AuthState.UNAUTHENTICATED, isGuest: true };
   }
 
-  // 1. Directly verify session using supabase.auth.getSession()
-  const { data: { session }, error: sessionErr } = await supabase.auth.getSession();
+  const authInfo = await getAuthAndProfileState();
+  const { state, session, profile } = authInfo;
   const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1';
 
-  // Protect private pages with supabase.auth.getSession()
-  // if no session, redirect to /login
+  // Protect private pages with supabase.auth.getSession() - if no session, redirect to /login
   if (!session && !isPublic) {
     console.log(`[RAYDAR Route Guard] No active session on private route '${routeType}'. Redirecting to /login...`);
     window.location.replace('/login');
@@ -426,9 +454,6 @@ export async function protectRoute(routeType) {
       profile: null
     };
   }
-
-  const authInfo = await getAuthAndProfileState();
-  const { state, profile } = authInfo;
 
   console.log(`[RAYDAR Route Guard] Route Type: ${routeType}, State: ${state}`);
 
@@ -472,8 +497,12 @@ export async function protectRoute(routeType) {
           window.location.replace('./onboarding_community_protection_step_1.html');
           return authInfo;
         }
+        if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
+          window.location.replace('./account_type_selection_updated_flow.html');
+          return authInfo;
+        }
       }
-      // If AUTHENTICATED_NO_PROFILE or UNAUTHENTICATED: stay on Step 1 to complete or review info
+      // If UNAUTHENTICATED: stay on Step 1 to enter info
       break;
 
     case 'registration_step': // account_type_selection_updated_flow.html

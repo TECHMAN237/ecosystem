@@ -22,51 +22,51 @@
           "colors": {
             "primary-fixed": "#e5deff",
             "tertiary-fixed-dim": "#ffb68e",
-            "surface-tint": "#5b38ee",
-            "surface-container": "#f1ebfa",
+            "surface-tint": "#532ce6",
+            "surface-container": "#F8F9FA",
             "on-primary": "#ffffff",
             "inverse-primary": "#c8bfff",
             "surface-container-lowest": "#ffffff",
-            "primary-container": "#6c4dff",
+            "primary-container": "#F5F3FF",
             "on-error": "#ffffff",
-            "secondary": "#5f5e60",
-            "surface-dim": "#ddd8e6",
-            "secondary-container": "#e2dfe1",
+            "secondary": "#64748B",
+            "surface-dim": "#F1F5F9",
+            "secondary-container": "#F1F5F9",
             "primary": "#532ce6",
             "on-tertiary-fixed": "#331200",
-            "on-primary-fixed-variant": "#4206d7",
+            "on-primary-fixed-variant": "#4321c4",
             "primary-fixed-dim": "#c8bfff",
-            "on-surface-variant": "#474556",
+            "on-surface-variant": "#64748B",
             "on-tertiary-fixed-variant": "#773300",
             "inverse-on-surface": "#f4eefd",
             "tertiary-fixed": "#ffdbca",
-            "surface-variant": "#e5e0ef",
-            "secondary-fixed": "#e4e2e4",
-            "on-secondary-fixed-variant": "#474649",
-            "on-secondary-fixed": "#1b1b1d",
-            "on-error-container": "#93000a",
-            "on-background": "#1c1a24",
-            "error": "#ba1a1a",
-            "background": "#F5F4F2",
+            "surface-variant": "#F1F5F9",
+            "secondary-fixed": "#E2E8F0",
+            "on-secondary-fixed-variant": "#475569",
+            "on-secondary-fixed": "#0F172A",
+            "on-error-container": "#991B1B",
+            "on-background": "#0F172A",
+            "error": "#DC2626",
+            "background": "#F8F9FA",
             "on-secondary": "#ffffff",
-            "surface-container-low": "#F5F4F2",
-            "secondary-fixed-dim": "#c8c6c8",
+            "surface-container-low": "#F8F9FA",
+            "secondary-fixed-dim": "#CBD5E1",
             "tertiary": "#8f3e00",
-            "surface-container-high": "#ebe6f4",
-            "on-secondary-container": "#636264",
-            "inverse-surface": "#312f3a",
-            "on-primary-container": "#f6f0ff",
+            "surface-container-high": "#F1F5F9",
+            "on-secondary-container": "#475569",
+            "inverse-surface": "#1E293B",
+            "on-primary-container": "#532ce6",
             "on-tertiary": "#ffffff",
-            "on-primary-fixed": "#190064",
-            "outline-variant": "#c9c4d9",
+            "on-primary-fixed": "#1e0b75",
+            "outline-variant": "#EAECF0",
             "on-tertiary-container": "#ffefe9",
-            "outline": "#787588",
-            "error-container": "#ffdad6",
+            "outline": "#94A3B8",
+            "error-container": "#FEF2F2",
             "tertiary-container": "#b55100",
-            "surface-container-highest": "#e5e0ef",
-            "on-surface": "#1c1a24",
-            "surface": "#F5F4F2",
-            "surface-bright": "#F5F4F2"
+            "surface-container-highest": "#E2E8F0",
+            "on-surface": "#0F172A",
+            "surface": "#ffffff",
+            "surface-bright": "#FFFFFF"
           },
           "borderRadius": {
             "DEFAULT": "1rem",
@@ -136,105 +136,117 @@
 </script>
 
 </head>
-<body class="bg-background font-body-md text-on-background min-h-screen pb-32">
-<!-- TopAppBar Logic -->
-<header class="bg-surface shadow-[0px_4px_20px_rgba(108,77,255,0.06)] fixed top-0 left-0 w-full z-50">
+<body class="bg-background font-body-md text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-white border-b border-[#EAECF0] fixed top-0 left-0 w-full z-50">
 <div class="flex items-center justify-between px-container-margin h-16 w-full max-w-7xl mx-auto">
-<div class="flex items-center gap-4">
-<button aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors active:scale-95" onclick="history.back()">
-<span class="material-symbols-outlined text-primary">arrow_back</span>
+<div class="flex items-center gap-3">
+<button aria-label="Retour" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] transition-colors active:scale-95 text-[#64748B] hover:text-[#0F172A]" onclick="history.back()">
+<span class="material-symbols-outlined">arrow_back</span>
 </button>
-<h1 class="font-headline-lg text-headline-lg font-bold tracking-tight text-primary">Notifications</h1>
+<h1 class="text-base font-bold text-[#0F172A]">Notifications</h1>
 </div>
-<button aria-label="Notifications" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors">
-<span class="material-symbols-outlined text-primary">notifications</span>
+<button aria-label="Notifications" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] transition-colors active:scale-95 text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./alert_center.html'">
+<span class="material-symbols-outlined">notifications</span>
 </button>
 </div>
 </header>
-<main class="mt-20 px-container-margin max-w-2xl mx-auto space-y-gutter">
-<!-- Hero Visualization (Optional Decorative Element for Premium Feel) -->
-<div class="relative w-full h-40 rounded-lg overflow-hidden mb-8 shadow-[0px_4px_20px_rgba(108,77,255,0.06)]">
-<img alt="Safety Settings Visual" class="w-full h-full object-cover opacity-80" data-alt="A sophisticated abstract digital background with soft, flowing gradients of lavender, deep violet, and electric purple. The lighting is high-key and diffused, creating a serene and safe atmosphere. Floating translucent shapes subtly suggest connectivity and security layers, maintaining a premium minimalist aesthetic consistent with a high-end safety application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDAowiYugDWgISsMc7Tg69BABXDheNR_RBd29bVKNkzd_mbmJ2Dwbnc0MGeXpQcI0CqEU0JucE2Mh-aVtuCMJ59oFkI1ZWZiPdc1zr1DfZzAalI1H5E_r-0un1EDsRx595i9CJJPp9_VQZ0Zr1VVjE9Aq9PAAwXVZOyWJabj3EycNIRtrK_MaqTb08_n06OYyoOXrqb9WKUhS4udpPAFRDqQEOA-TPomhF0r35V4SZ86xflNyFnh7sDL38NTxLPxY5YDS3TqxWyYhJ"/>
-<div class="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent flex items-center p-xl">
-<p class="font-headline-md text-on-primary-container max-w-[200px]">Customize how we keep you informed.</p>
+<main class="pt-20 px-container-margin max-w-2xl mx-auto space-y-4">
+<!-- Intro info card -->
+<div class="bg-white rounded-2xl border border-[#EAECF0] p-4 shadow-sm flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-[#F5F3FF] border border-[#532CE6]/15 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[#532CE6] text-[20px]">notifications_active</span>
 </div>
+<p class="text-xs text-[#64748B]">Personnalisez la façon dont RAYDAR vous alerte en temps réel lors de disparitions signalées à proximité.</p>
 </div>
 <!-- Communication Methods Card -->
-<section class="bg-surface-container-lowest rounded-lg p-xl shadow-[0px_4px_20px_rgba(108,77,255,0.06)] border border-primary/5">
-<div class="flex items-center gap-3 mb-lg">
-<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">send</span>
-<h2 class="font-headline-md text-headline-md text-on-surface">Channels</h2>
+<section class="bg-white rounded-2xl p-6 shadow-sm border border-[#EAECF0]">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-xl bg-[#F5F3FF] border border-[#532CE6]/15 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#532CE6]">send</span>
 </div>
-<div class="space-y-lg">
+<div>
+<h2 class="text-base font-bold text-[#0F172A]">Canaux de Transmission</h2>
+<p class="text-xs text-[#64748B]">Choisissez vos canaux d'alerte prioritaires</p>
+</div>
+</div>
+<div class="space-y-4">
 <!-- Push Alerts Toggle -->
 <div class="flex items-center justify-between">
-<div class="space-y-1">
-<p class="font-body-lg text-body-lg font-semibold text-on-surface">Push Alerts</p>
-<p class="text-label-sm text-on-surface-variant">Real-time alerts directly to your device</p>
+<div class="space-y-0.5">
+<p class="font-bold text-sm text-[#0F172A]">Alertes Push Instantanées</p>
+<p class="text-xs text-[#64748B]">Alertes prioritaires diffusées directement sur votre appareil</p>
 </div>
-<button class="w-12 h-7 bg-primary-container rounded-full relative transition-colors duration-200" onclick="toggleSwitch(this)">
-<span class="block w-5 h-5 bg-white rounded-full absolute left-1 top-1 transition-transform duration-200 toggle-active shadow-sm"></span>
-</button>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-[#E2E8F0] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#532CE6]"></div>
+</label>
 </div>
-<div class="h-px bg-outline-variant/30"></div>
+<div class="h-px bg-[#EAECF0]"></div>
 <!-- SMS Toggle -->
 <div class="flex items-center justify-between">
-<div class="space-y-1">
-<p class="font-body-lg text-body-lg font-semibold text-on-surface">SMS Notifications</p>
-<p class="text-label-sm text-on-surface-variant">Emergency text messages for critical events</p>
+<div class="space-y-0.5">
+<p class="font-bold text-sm text-[#0F172A]">Alertes SMS d'Urgence</p>
+<p class="text-xs text-[#64748B]">Messages texte d'urgence pour les événements critiques</p>
 </div>
-<button class="w-12 h-7 bg-outline-variant/50 rounded-full relative transition-colors duration-200" onclick="toggleSwitch(this)">
-<span class="block w-5 h-5 bg-white rounded-full absolute left-1 top-1 transition-transform duration-200 shadow-sm"></span>
-</button>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-[#E2E8F0] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#532CE6]"></div>
+</label>
 </div>
-<div class="h-px bg-outline-variant/30"></div>
+<div class="h-px bg-[#EAECF0]"></div>
 <!-- Email Toggle -->
 <div class="flex items-center justify-between">
-<div class="space-y-1">
-<p class="font-body-lg text-body-lg font-semibold text-on-surface">Email Updates</p>
-<p class="text-label-sm text-on-surface-variant">Weekly summaries and report logs</p>
+<div class="space-y-0.5">
+<p class="font-bold text-sm text-[#0F172A]">Récapitulatifs Email</p>
+<p class="text-xs text-[#64748B]">Résumés hebdomadaires et journaux d'activité</p>
 </div>
-<button class="w-12 h-7 bg-primary-container rounded-full relative transition-colors duration-200" onclick="toggleSwitch(this)">
-<span class="block w-5 h-5 bg-white rounded-full absolute left-1 top-1 transition-transform duration-200 toggle-active shadow-sm"></span>
-</button>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-[#E2E8F0] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#532CE6]"></div>
+</label>
 </div>
 </div>
 </section>
 <!-- Quiet Hours Card -->
-<section class="bg-surface-container-lowest rounded-lg p-xl shadow-[0px_4px_20px_rgba(108,77,255,0.06)] border border-primary/5">
-<div class="flex items-center justify-between mb-lg">
+<section class="bg-white rounded-2xl p-6 shadow-sm border border-[#EAECF0]">
+<div class="flex items-center justify-between mb-4">
 <div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">bedtime</span>
-<h2 class="font-headline-md text-headline-md text-on-surface">Quiet Hours</h2>
+<div class="w-10 h-10 rounded-xl bg-[#F8F9FA] border border-[#EAECF0] flex items-center justify-center">
+<span class="material-symbols-outlined text-[#64748B]">bedtime</span>
 </div>
-<button class="w-12 h-7 bg-outline-variant/50 rounded-full relative transition-colors duration-200" onclick="toggleSwitch(this)">
-<span class="block w-5 h-5 bg-white rounded-full absolute left-1 top-1 transition-transform duration-200 shadow-sm"></span>
-</button>
+<div>
+<h2 class="text-base font-bold text-[#0F172A]">Heures Silencieuses</h2>
+<p class="text-xs text-[#64748B]">Suspendre les notifications non urgentes</p>
 </div>
-<p class="text-body-md text-on-surface-variant mb-xl">Mute non-critical alerts during your selected time window. SOS alerts are always active.</p>
-<div class="grid grid-cols-2 gap-md">
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-[#E2E8F0] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#532CE6]"></div>
+</label>
+</div>
+<p class="text-xs text-[#64748B] mb-3">Les alertes critiques d'urgence absolue outrepassent toujours ce mode pour des raisons de sécurité.</p>
+<div class="grid grid-cols-2 gap-3">
 <!-- Start Time -->
-<div class="bg-surface-container-low rounded-lg p-lg border border-outline-variant/20 group hover:border-primary/40 transition-colors">
-<label class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider mb-xs block">From</label>
+<div class="bg-[#F8F9FA] rounded-xl p-3 border border-[#EAECF0]">
+<label class="font-bold text-[11px] text-[#64748B] uppercase tracking-wider mb-1 block">De</label>
 <div class="flex items-baseline gap-1">
-<span class="font-display text-display text-primary">22:00</span>
-<span class="font-label-bold text-label-bold text-primary opacity-60">PM</span>
+<span class="text-xl font-bold text-[#0F172A]">22:00</span>
 </div>
 </div>
 <!-- End Time -->
-<div class="bg-surface-container-low rounded-lg p-lg border border-outline-variant/20 group hover:border-primary/40 transition-colors">
-<label class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider mb-xs block">Until</label>
+<div class="bg-[#F8F9FA] rounded-xl p-3 border border-[#EAECF0]">
+<label class="font-bold text-[11px] text-[#64748B] uppercase tracking-wider mb-1 block">À</label>
 <div class="flex items-baseline gap-1">
-<span class="font-display text-display text-primary">07:00</span>
-<span class="font-label-bold text-label-bold text-primary opacity-60">AM</span>
+<span class="text-xl font-bold text-[#0F172A]">07:00</span>
 </div>
 </div>
 </div>
 </section>
-<!-- Content-specific Action -->
-<div class="pt-lg">
-<button class="w-full h-14 bg-primary text-on-primary font-headline-md rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all">
-        Save All Settings
+<!-- Save Button -->
+<div class="pt-2">
+<button class="w-full bg-[#532CE6] hover:bg-[#4321C4] text-white font-bold text-sm py-3.5 rounded-xl shadow-sm active:scale-95 transition-all">
+        Enregistrer les Préférences
       </button>
 </div>
 </main>
