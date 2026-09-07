@@ -1,13 +1,13 @@
 // RAYDAR Authentication & Role-Based Access Control Service
-// Enforces strict separation between Supabase Auth and RAYDAR Profile State
+// Enforces strict separation between Supabase Auth, RAYDAR Profile State, and Onboarding State
 import { supabase } from "./supabaseClient.js";
 
 export const AuthState = {
   INITIALIZING: 'INITIALIZING',
   UNAUTHENTICATED: 'UNAUTHENTICATED',
   AUTHENTICATED_NO_PROFILE: 'AUTHENTICATED_NO_PROFILE',
-  AUTHENTICATED_PROFILE_LOADING: 'AUTHENTICATED_PROFILE_LOADING',
-  AUTHENTICATED_USER_ONBOARDING_REQUIRED: 'AUTHENTICATED_USER_ONBOARDING_REQUIRED',
+  AUTHENTICATED_PROFILE_INCOMPLETE: 'AUTHENTICATED_PROFILE_INCOMPLETE',
+  AUTHENTICATED_ONBOARDING_REQUIRED: 'AUTHENTICATED_ONBOARDING_REQUIRED',
   AUTHENTICATED_USER: 'AUTHENTICATED_USER',
   AUTHENTICATED_ADMIN: 'AUTHENTICATED_ADMIN',
 };
@@ -24,7 +24,7 @@ export const DB_ROLES = {
 // In-memory cache & promise deduplication for maximum performance
 let cachedAuthInfo = null;
 let cacheTimestamp = 0;
-const CACHE_TTL_MS = 20000; // 20 seconds TTL for auth & profile data
+const CACHE_TTL_MS = 15000; // 15 seconds TTL for auth & profile data
 let pendingAuthPromise = null;
 
 export function clearAuthCache() {
@@ -92,15 +92,12 @@ export function getAndClearReturnUrl() {
 
 /**
  * Checks if a user has completed the first-login onboarding sequence.
+ * CRITICAL: Never assume onboarding is complete just because a name exists.
  */
 export function isOnboardingCompleted(user, profile = null) {
   if (!user || !user.id) return false;
   
-  // 1. LocalStorage check (synchronous & instant)
-  const localVal = localStorage.getItem(`raydar_onboarding_completed_${user.id}`);
-  if (localVal === 'true') return true;
-
-  // 2. Profile column in PostgreSQL database
+  // 1. PostgreSQL Database profiles table check (Primary authority)
   if (profile && (profile.onboarding_completed === true || profile.onboarding_completed === 'true')) {
     try {
       localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
@@ -108,7 +105,7 @@ export function isOnboardingCompleted(user, profile = null) {
     return true;
   }
 
-  // 3. Supabase Auth user_metadata check
+  // 2. Supabase Auth user_metadata check
   if (user.user_metadata && user.user_metadata.onboarding_completed === true) {
     try {
       localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
@@ -116,13 +113,9 @@ export function isOnboardingCompleted(user, profile = null) {
     return true;
   }
 
-  // 4. Any user with a valid profile is already established
-  if (profile && (profile.full_name || profile.username)) {
-    try {
-      localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
-    } catch (e) {}
-    return true;
-  }
+  // 3. LocalStorage check (as verified persistence for current device)
+  const localVal = localStorage.getItem(`raydar_onboarding_completed_${user.id}`);
+  if (localVal === 'true') return true;
 
   return false;
 }
@@ -189,8 +182,91 @@ export function mapAccountTypeToDbRole(selectedRole) {
 }
 
 /**
- * Resolves current authentication state and RAYDAR profile from Supabase.
- * Uses promise deduplication and short-term in-memory cache to prevent N+1 query loops.
+ * Detailed Forensic Flow & State Tracer for Auth State Machine audits.
+ */
+export function logAuthStateTrace({
+  provider = 'email',
+  authEvent = 'CHECK_STATE',
+  authUserId = null,
+  raydarProfile = 'NONE',
+  registration = 'NOT_STARTED',
+  onboarding = 'NOT_STARTED',
+  emailVerification = 'VERIFIED',
+  currentFlow = 'APP',
+  currentPage = '',
+  decision = 'ALLOW',
+  redirect = 'NONE',
+  reason = ''
+}) {
+  if (typeof window !== 'undefined') {
+    console.log(`[AUTH STATE TRACE]
+provider: ${provider}
+authEvent: ${authEvent}
+authUserId: ${authUserId || 'none'}
+raydarProfile: ${raydarProfile}
+registration: ${registration}
+onboarding: ${onboarding}
+emailVerification: ${emailVerification}
+currentFlow: ${currentFlow}
+currentPage: ${currentPage || window.location.pathname}
+decision: ${decision}
+redirect: ${redirect}
+reason: ${reason}`);
+  }
+}
+
+export function logAuthFlowTrace(params) {
+  logAuthStateTrace(params);
+}
+
+/**
+ * Structured forensic trace logger for route guard decisions.
+ */
+export function logAuthTrace({
+  currentUrl,
+  destination,
+  navigationType,
+  internalIntent,
+  intentTimestamp,
+  intentValid,
+  supabaseSession,
+  authenticated,
+  userId,
+  returnUrl,
+  redirectReason,
+  redirectSourceFunction
+}) {
+  if (typeof window !== 'undefined') {
+    console.log(`[AUTH TRACE]
+current URL: ${currentUrl || (window.location.pathname + window.location.search)}
+destination: ${destination || 'none'}
+navigation type: ${navigationType || 'DIRECT'}
+internal navigation intent: ${Boolean(internalIntent)}
+intent timestamp: ${intentTimestamp || 'none'}
+intentValid: ${Boolean(intentValid)}
+Supabase session: ${Boolean(supabaseSession)}
+authenticated: ${Boolean(authenticated)}
+userId: ${userId || 'none'}
+returnUrl: ${returnUrl || 'none'}
+redirect reason: ${redirectReason || 'none'}
+redirect source function: ${redirectSourceFunction || 'protectRoute'}`);
+  }
+}
+
+/**
+ * Authoritative central resolver of authentication, profile, and onboarding state.
+ * Returns {
+ *   state: AuthState,
+ *   session: object | null,
+ *   user: object | null,
+ *   profile: object | null,
+ *   raydarProfileState: 'NONE' | 'INCOMPLETE' | 'COMPLETE',
+ *   registrationState: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETE',
+ *   onboardingState: 'NOT_STARTED' | 'COMPLETE',
+ *   emailVerificationState: 'PENDING' | 'VERIFIED',
+ *   provider: 'email' | 'google',
+ *   nextRequiredStep: string
+ * }
  */
 export async function getAuthAndProfileState(forceRefresh = false) {
   const now = Date.now();
@@ -216,7 +292,6 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       if (!sessionError && sessionData && sessionData.session) {
         currentSession = sessionData.session;
         sessionUser = sessionData.session.user;
-        // CRITICAL: An authenticated user must NEVER be treated as a guest!
         localStorage.removeItem('is_guest');
       }
 
@@ -238,6 +313,12 @@ export async function getAuthAndProfileState(forceRefresh = false) {
           session: null,
           user: null,
           profile: null,
+          raydarProfileState: 'NONE',
+          registrationState: 'NOT_STARTED',
+          onboardingState: 'NOT_STARTED',
+          emailVerificationState: 'PENDING',
+          provider: 'email',
+          nextRequiredStep: './login_child_safety.html'
         };
         cachedAuthInfo = unauthResult;
         cacheTimestamp = Date.now();
@@ -245,25 +326,23 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       }
 
       const user = sessionUser;
+      const provider = user.app_metadata?.provider === 'google' || user.identities?.some(id => id.provider === 'google')
+        ? 'google'
+        : 'email';
 
-      // 1. Check if localStorage already has a verified cached profile for this exact user.id
-      let localProfileForUser = null;
-      try {
-        const rawLocal = localStorage.getItem('user_profile');
-        if (rawLocal) {
-          const parsed = JSON.parse(rawLocal);
-          if (parsed && (parsed.user_id === user.id || (!parsed.user_id && parsed.full_name))) {
-            localProfileForUser = parsed;
-          }
-        }
-      } catch (e) {}
+      const emailVerified = Boolean(
+        provider === 'google' || 
+        user.email_confirmed_at || 
+        user.confirmed_at || 
+        user.user_metadata?.email_verified
+      );
 
-      // 2. Fetch RAYDAR profile for this authenticated user with timeout protection
+      // Query authoritative PostgreSQL profiles table for this exact user_id
       const queryRes = await withTimeout(
         supabase
           .from('profiles')
           .select('*')
-          .or(`user_id.eq.${user.id},id.eq.${user.id}`)
+          .eq('user_id', user.id)
           .maybeSingle(),
         4000,
         { isTimeout: true, data: null, error: null }
@@ -273,137 +352,86 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       const profileError = queryRes?.error;
       const isTimeout = queryRes?.isTimeout;
 
-      if (profile && (profile.id || profile.user_id)) {
-        // Authoritative profile found in PostgreSQL!
+      // Fallback to local profile cache ONLY if it explicitly matches this user.id
+      if (!profile && (isTimeout || profileError)) {
         try {
-          localStorage.setItem('user_profile', JSON.stringify({ ...profile, user_id: user.id }));
-          localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
-        } catch (e) {}
-      } else if (isTimeout || profileError) {
-        console.warn("[Auth] Profile query delayed or encountered error:", profileError || "Timeout");
-        if (localProfileForUser && (localProfileForUser.full_name || localProfileForUser.username || localProfileForUser.user_id)) {
-          console.log("[Auth] Falling back to verified local profile cache for user:", user.id);
-          profile = localProfileForUser;
-        } else {
-          console.log("[Auth] Synthesizing session identity fallback for user:", user.id);
-          profile = {
-            user_id: user.id,
-            email: user.email || '',
-            full_name: user.user_metadata?.full_name || user.user_metadata?.name || (user.email ? user.email.split('@')[0] : 'Gardien'),
-            username: `@user_${user.id.substring(0, 8)}`,
-            role: user.user_metadata?.role || 'Guardian',
-            is_admin: false,
-            onboarding_completed: true
-          };
-          try {
-            localStorage.setItem('user_profile', JSON.stringify(profile));
-          } catch (e) {}
-        }
-      } else if (!profile && !profileError && !isTimeout) {
-        // PostgREST definitively executed and confirmed 0 rows returned
-        if (localProfileForUser && (localProfileForUser.full_name || localProfileForUser.username)) {
-          console.log("[Auth] Self-healing profile from local cache into Supabase for user:", user.id);
-          const healingPayload = {
-            user_id: user.id,
-            email: user.email || '',
-            full_name: localProfileForUser.full_name || 'Gardien',
-            username: localProfileForUser.username || `@user_${user.id.substring(0, 8)}`,
-            role: localProfileForUser.role || 'Guardian',
-            phone_country_code: localProfileForUser.phone_country_code || '+237',
-            phone_number: localProfileForUser.phone_number || '',
-            city: localProfileForUser.city || '',
-            profile_photo_url: localProfileForUser.photo || localProfileForUser.profile_photo_url || '',
-            onboarding_completed: true
-          };
-          try {
-            const { data: healedData } = await supabase
-              .from('profiles')
-              .upsert(healingPayload, { onConflict: 'user_id' })
-              .select()
-              .maybeSingle();
-            if (healedData) {
-              profile = healedData;
-              localStorage.setItem('user_profile', JSON.stringify({ ...healedData, user_id: user.id }));
-            } else {
-              profile = healingPayload;
+          const rawLocal = localStorage.getItem('user_profile');
+          if (rawLocal) {
+            const parsed = JSON.parse(rawLocal);
+            if (parsed && parsed.user_id === user.id) {
+              profile = parsed;
             }
-          } catch (e) {
-            profile = healingPayload;
           }
-        } else if (sessionStorage.getItem('signup_in_progress') !== 'true') {
-          // An existing authenticated user whose profile record is empty: synthesize immediately
-          console.log("[Auth] Synthesizing default profile for existing user session:", user.id);
-          profile = {
-            user_id: user.id,
-            email: user.email || '',
-            full_name: user.user_metadata?.full_name || user.user_metadata?.name || (user.email ? user.email.split('@')[0] : 'Gardien'),
-            username: `@user_${user.id.substring(0, 8)}`,
-            role: user.user_metadata?.role || 'Guardian',
-            is_admin: false,
-            onboarding_completed: true
-          };
-          try {
-            localStorage.setItem('user_profile', JSON.stringify(profile));
-          } catch (e) {}
-        }
+        } catch (e) {}
       }
 
-      // Determine if profile exists
-      const hasProfile = Boolean(profile && (profile.id || profile.user_id || profile.full_name || profile.username || profile.email));
+      // Check if profile exists and is complete in RAYDAR
+      const hasProfileRow = Boolean(profile && profile.user_id === user.id);
+      const isProfileComplete = Boolean(
+        hasProfileRow && 
+        profile.full_name && 
+        profile.role && 
+        profile.role !== ''
+      );
 
-      if (!hasProfile && sessionStorage.getItem('signup_in_progress') === 'true') {
-        // Genuinely new user in active sign-up flow
-        const noProfileResult = {
-          state: AuthState.AUTHENTICATED_NO_PROFILE,
-          session: currentSession,
-          user,
-          profile: null,
-        };
-        cachedAuthInfo = noProfileResult;
-        cacheTimestamp = Date.now();
-        return noProfileResult;
+      let raydarProfileState = 'NONE';
+      let registrationState = 'NOT_STARTED';
+
+      if (!hasProfileRow) {
+        raydarProfileState = 'NONE';
+        registrationState = 'NOT_STARTED';
+      } else if (!isProfileComplete) {
+        raydarProfileState = 'INCOMPLETE';
+        registrationState = 'IN_PROGRESS';
+      } else {
+        raydarProfileState = 'COMPLETE';
+        registrationState = 'COMPLETE';
       }
 
-      // If user is authenticated and not in new signup flow, ensure they have profile structure
-      if (!profile) {
-        profile = {
-          user_id: user.id,
-          email: user.email || '',
-          full_name: user.user_metadata?.full_name || user.user_metadata?.name || (user.email ? user.email.split('@')[0] : 'Gardien'),
-          username: `@user_${user.id.substring(0, 8)}`,
-          role: 'Guardian',
-          is_admin: false,
-          onboarding_completed: true
-        };
+      // Check onboarding state
+      const onboardingDone = isProfileComplete && isOnboardingCompleted(user, profile);
+      const onboardingState = onboardingDone ? 'COMPLETE' : 'NOT_STARTED';
+
+      // Determine the next required step for this user
+      let nextRequiredStep = './home_child_safety_v1.html';
+      let resolvedState = AuthState.AUTHENTICATED_USER;
+
+      if (!emailVerified) {
+        resolvedState = AuthState.AUTHENTICATED_NO_PROFILE;
+        nextRequiredStep = './login_child_safety.html';
+      } else if (raydarProfileState === 'NONE') {
+        resolvedState = AuthState.AUTHENTICATED_NO_PROFILE;
+        nextRequiredStep = './account_type_selection_updated_flow.html';
+      } else if (raydarProfileState === 'INCOMPLETE') {
+        resolvedState = AuthState.AUTHENTICATED_PROFILE_INCOMPLETE;
+        nextRequiredStep = './basic_information.html';
+      } else if (onboardingState !== 'COMPLETE') {
+        resolvedState = AuthState.AUTHENTICATED_ONBOARDING_REQUIRED;
+        nextRequiredStep = './onboarding_community_protection_step_1.html';
+      } else {
+        const isAdmin = profile?.is_admin === true || 
+                        String(profile?.role).toLowerCase() === 'admin' ||
+                        String(profile?.role).toLowerCase() === 'administrator';
+        resolvedState = isAdmin ? AuthState.AUTHENTICATED_ADMIN : AuthState.AUTHENTICATED_USER;
+        nextRequiredStep = isAdmin ? './admin_dashboard.html' : './home_child_safety_v1.html';
       }
 
-      // Role check: Admin MUST be explicitly set in the database
-      const isAdmin = profile.is_admin === true || 
-                      String(profile.role).toLowerCase() === 'admin' ||
-                      String(profile.role).toLowerCase() === 'administrator';
-
-      if (isAdmin) {
-        const adminResult = {
-          state: AuthState.AUTHENTICATED_ADMIN,
-          session: currentSession,
-          user,
-          profile,
-        };
-        cachedAuthInfo = adminResult;
-        cacheTimestamp = Date.now();
-        return adminResult;
-      }
-
-      // Normal User: Registered & authorized
-      const userResult = {
-        state: AuthState.AUTHENTICATED_USER,
+      const result = {
+        state: resolvedState,
         session: currentSession,
         user,
         profile,
+        raydarProfileState,
+        registrationState,
+        onboardingState,
+        emailVerificationState: emailVerified ? 'VERIFIED' : 'PENDING',
+        provider,
+        nextRequiredStep
       };
-      cachedAuthInfo = userResult;
+
+      cachedAuthInfo = result;
       cacheTimestamp = Date.now();
-      return userResult;
+      return result;
     } catch (err) {
       console.error("Error in getAuthAndProfileState:", err);
       return {
@@ -411,6 +439,12 @@ export async function getAuthAndProfileState(forceRefresh = false) {
         session: null,
         user: null,
         profile: null,
+        raydarProfileState: 'NONE',
+        registrationState: 'NOT_STARTED',
+        onboardingState: 'NOT_STARTED',
+        emailVerificationState: 'PENDING',
+        provider: 'email',
+        nextRequiredStep: './login_child_safety.html'
       };
     } finally {
       pendingAuthPromise = null;
@@ -421,12 +455,54 @@ export async function getAuthAndProfileState(forceRefresh = false) {
 }
 
 /**
+ * Resolves destination after explicit login or OAuth authentication.
+ * Directs new/incomplete users into registration/onboarding and existing users to home/destination.
+ */
+export async function resolveAuthDestination() {
+  const authInfo = await getAuthAndProfileState(true);
+  const { state, session, raydarProfileState, onboardingState, provider, nextRequiredStep } = authInfo;
+
+  if (!session || state === AuthState.UNAUTHENTICATED) {
+    return './login_child_safety.html';
+  }
+
+  // Check if a saved return URL exists
+  const returnUrl = getAndClearReturnUrl();
+
+  let destination = nextRequiredStep;
+  let decision = 'CONTINUE_REGISTRATION';
+  let reason = 'New or incomplete RAYDAR user';
+
+  if (raydarProfileState === 'COMPLETE' && onboardingState === 'COMPLETE') {
+    decision = 'GO_HOME';
+    reason = 'Existing complete RAYDAR user';
+    destination = returnUrl || (state === AuthState.AUTHENTICATED_ADMIN ? './admin_dashboard.html' : './home_child_safety_v1.html');
+  }
+
+  logAuthStateTrace({
+    provider,
+    authEvent: 'RESOLVE_DESTINATION',
+    authUserId: session.user.id,
+    raydarProfile: raydarProfileState,
+    registration: authInfo.registrationState,
+    onboarding: onboardingState,
+    emailVerification: authInfo.emailVerificationState,
+    currentFlow: raydarProfileState === 'COMPLETE' ? 'LOGIN' : (provider === 'google' ? 'GOOGLE_FIRST_LOGIN' : 'REGISTRATION'),
+    currentPage: window.location.pathname,
+    decision,
+    redirect: destination,
+    reason
+  });
+
+  registerInternalNavIntent(destination);
+  return destination;
+}
+
+/**
  * Initiates Google OAuth with account selection prompt.
- * Ensures the Google account selection screen is always shown.
  */
 export async function signInWithGoogle() {
   localStorage.removeItem('is_guest');
-  sessionStorage.removeItem('signup_in_progress');
 
   const redirectTo = `${window.location.origin}/`;
 
@@ -462,13 +538,12 @@ export async function signOut() {
   localStorage.removeItem('user_profile');
   localStorage.removeItem('guardians_local_user_id');
   sessionStorage.clear();
-  window.location.replace('/login');
+  window.location.replace('./login_child_safety.html');
 }
 
 /**
  * Creates or completes a RAYDAR profile for a user.
- * Guarantees that newly created users ALWAYS receive a normal user role and is_admin: false.
- * Strictly binds profiles.id and profiles.user_id to the verified Supabase Auth session auth.uid().
+ * Initializes onboarding_completed to false so the user goes through the mandatory 3 onboarding steps.
  */
 export async function createRaydarProfile({
   userId,
@@ -481,7 +556,6 @@ export async function createRaydarProfile({
   role = 'Guardian',
   photo = ''
 }) {
-  // Retrieve the authoritative current authenticated Supabase user
   let sessionUser = null;
   let verifiedUserId = null;
 
@@ -497,7 +571,6 @@ export async function createRaydarProfile({
     verifiedUserId = currentSession.user.id;
   }
 
-  // Safety constraint: Never accept an arbitrary userId if no active authenticated user exists
   if (!verifiedUserId) {
     console.error("[RAYDAR Auth Error] Cannot create profile: No active authenticated Supabase user found.");
     throw new Error("Impossible de créer le profil RAYDAR : utilisateur non authentifié dans Supabase Auth. Veuillez vous reconnecter.");
@@ -521,13 +594,13 @@ export async function createRaydarProfile({
     phone_number: phoneNumber || '',
     city: city || '',
     role: validRole,
-    is_admin: false, // Critical: Never assign admin to new registrations!
+    is_admin: false,
     terms_accepted: true,
     profile_photo_url: resolvedPhoto,
-    onboarding_completed: true
+    onboarding_completed: false // Critical: Onboarding begins AFTER profile creation!
   };
 
-  console.log("Atomic single upsert to Supabase profiles for user_id:", verifiedUserId);
+  console.log("Upserting profile in Supabase profiles table for user_id:", verifiedUserId);
 
   const { data, error } = await withTimeout(
     supabase
@@ -540,27 +613,25 @@ export async function createRaydarProfile({
   );
 
   if (error) {
-    console.error("PostgreSQL Error creating/updating RAYDAR profile in Supabase:", {
-      message: error.message,
-      code: error.code,
-      details: error.details,
-      hint: error.hint
-    });
+    console.error("PostgreSQL Error creating RAYDAR profile in Supabase:", error);
     throw error;
   }
 
-  console.log("Profile successfully persisted in Supabase:", data);
-
-  // Update in-memory auth cache so subsequent getAuthAndProfileState calls are instant (0ms)
+  // Update in-memory auth cache
   cachedAuthInfo = {
-    state: AuthState.AUTHENTICATED_USER,
+    state: AuthState.AUTHENTICATED_ONBOARDING_REQUIRED,
     session: currentSession,
     user: sessionUser,
     profile: data || payload,
+    raydarProfileState: 'COMPLETE',
+    registrationState: 'COMPLETE',
+    onboardingState: 'NOT_STARTED',
+    emailVerificationState: 'VERIFIED',
+    provider: authState.provider || 'email',
+    nextRequiredStep: './onboarding_community_protection_step_1.html'
   };
   cacheTimestamp = Date.now();
 
-  // Update local storage and DOM immediately without secondary network call
   if (typeof window !== 'undefined') {
     try {
       const localObj = {
@@ -573,10 +644,9 @@ export async function createRaydarProfile({
         role: validRole,
         photo: resolvedPhoto || undefined,
         is_admin: false,
-        onboarding_completed: true
+        onboarding_completed: false
       };
       localStorage.setItem("user_profile", JSON.stringify(localObj));
-      localStorage.setItem(`raydar_onboarding_completed_${verifiedUserId}`, 'true');
       if (window.reportService && window.reportService.updateDOMProfile) {
         window.reportService.updateDOMProfile(localObj);
       }
@@ -590,12 +660,8 @@ export async function createRaydarProfile({
 
 const INTENT_KEY = 'raydar_internal_nav_intent';
 const RELOAD_KEY = 'raydar_reload_intent';
-const INTENT_VALIDITY_WINDOW_MS = 25000; // 25 seconds window for navigation transition
+const INTENT_VALIDITY_WINDOW_MS = 25000; // 25 seconds window
 
-/**
- * Registers an internal navigation intent before an in-app transition.
- * Sets a single-use, timestamped payload with source and target info.
- */
 export function registerInternalNavIntent(targetUrl = '') {
   try {
     const payload = {
@@ -610,18 +676,11 @@ export function registerInternalNavIntent(targetUrl = '') {
   }
 }
 
-/**
- * Consumes and validates the one-time internal navigation intent.
- * Once checked, the token is IMMEDIATELY DELETED from sessionStorage to ensure single-use only.
- * 
- * Returns { isValid: boolean, intent: object | null, type: 'INTERNAL' | 'RELOAD' | 'DIRECT' }
- */
 export function consumeInternalNavIntent() {
   try {
-    // 1. Check one-time in-app navigation intent token
     const raw = sessionStorage.getItem(INTENT_KEY);
     if (raw) {
-      sessionStorage.removeItem(INTENT_KEY); // CRITICAL: Consumed immediately (one-time use)!
+      sessionStorage.removeItem(INTENT_KEY);
       const parsed = JSON.parse(raw);
       const isFresh = parsed && parsed.timestamp && (Date.now() - parsed.timestamp <= INTENT_VALIDITY_WINDOW_MS);
       if (isFresh) {
@@ -629,14 +688,13 @@ export function consumeInternalNavIntent() {
       }
     }
 
-    // 2. Check if this is an explicit in-tab page refresh (F5 / browser reload)
     let isReload = false;
     if (typeof performance !== 'undefined') {
       const navEntries = performance.getEntriesByType('navigation');
       if (navEntries && navEntries.length > 0) {
         isReload = navEntries[0].type === 'reload';
       } else if (performance.navigation) {
-        isReload = performance.navigation.type === 1; // TYPE_RELOAD
+        isReload = performance.navigation.type === 1;
       }
     }
     const rawReload = sessionStorage.getItem(RELOAD_KEY);
@@ -658,70 +716,27 @@ export function consumeInternalNavIntent() {
 }
 
 /**
- * Structured forensic trace logger for authentication and route guard decisions.
- */
-export function logAuthTrace({
-  currentUrl,
-  destination,
-  navigationType,
-  internalIntent,
-  intentTimestamp,
-  intentValid,
-  supabaseSession,
-  authenticated,
-  userId,
-  returnUrl,
-  redirectReason,
-  redirectSourceFunction
-}) {
-  if (typeof window !== 'undefined') {
-    console.log(`[AUTH TRACE]
-current URL: ${currentUrl || (window.location.pathname + window.location.search)}
-destination: ${destination || 'none'}
-navigation type: ${navigationType || 'DIRECT'}
-internal navigation intent: ${Boolean(internalIntent)}
-intent timestamp: ${intentTimestamp || 'none'}
-intent valid: ${Boolean(intentValid)}
-Supabase session: ${Boolean(supabaseSession)}
-authenticated: ${Boolean(authenticated)}
-user ID: ${userId || 'none'}
-returnUrl: ${returnUrl || 'none'}
-redirect reason: ${redirectReason || 'none'}
-redirect source function: ${redirectSourceFunction || 'protectRoute'}`);
-  }
-}
-
-/**
  * Guard utility for pages.
- * Handles page protection and routing without flickering or race conditions.
- * Uses cached auth info to prevent cascading network queries on every navigation.
- * 
  * @param {'public' | 'login' | 'signup_step_1' | 'registration_step' | 'profile_completion' | 'onboarding' | 'user' | 'admin'} routeType 
  */
 export async function protectRoute(routeType) {
-  // Check guest mode bypass for normal user pages only when unauthenticated
   if (routeType === 'user' && localStorage.getItem('is_guest') === 'true') {
     const { data: { session } } = await withTimeout(supabase.auth.getSession(), 2000, { data: { session: null } });
     if (!session) {
-      console.log("Guest mode active: allowing access to user page.");
       return { state: AuthState.UNAUTHENTICATED, isGuest: true };
     }
-    // If session actually exists, wipe the guest flag!
     localStorage.removeItem('is_guest');
   }
 
   const authInfo = await getAuthAndProfileState();
   const { state, session, profile } = authInfo;
-  const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1';
+  const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1' || routeType === 'registration_step' || routeType === 'profile_completion';
 
-  // Evaluate one-time internal navigation intent for this page load
   const navCheck = consumeInternalNavIntent();
   const isInternalNavValid = navCheck.isValid;
   const navigationType = navCheck.type;
 
-  // Direct/Shared external link gatekeeper:
-  // If user opens a private route directly without a valid one-time internal navigation intent,
-  // enforce explicit login verification regardless of existing Supabase session!
+  // Direct external link gatekeeper
   if (!isPublic && !isInternalNavValid) {
     logAuthTrace({
       currentUrl: window.location.pathname + window.location.search,
@@ -746,7 +761,7 @@ export async function protectRoute(routeType) {
     };
   }
 
-  // Protect private pages: if no active session, redirect to login
+  // Protect private pages
   if (!session && !isPublic) {
     logAuthTrace({
       currentUrl: window.location.pathname + window.location.search,
@@ -771,119 +786,101 @@ export async function protectRoute(routeType) {
     };
   }
 
-  if (!isPublic) {
-    logAuthTrace({
-      currentUrl: window.location.pathname + window.location.search,
-      destination: window.location.pathname + window.location.search,
-      navigationType: navigationType,
-      internalIntent: true,
-      intentTimestamp: navCheck.intent?.timestamp,
-      intentValid: true,
-      supabaseSession: true,
-      authenticated: true,
-      userId: session?.user?.id,
-      returnUrl: 'none',
-      redirectReason: 'Internal navigation intent validated. Access granted.',
-      redirectSourceFunction: 'protectRoute.allow'
-    });
-  }
-
-  console.log(`[RAYDAR Route Guard] Route Type: ${routeType}, State: ${state}`);
-
   switch (routeType) {
     case 'public':
       return authInfo;
 
-    case 'login': // Triggered after explicit login submission or OAuth callback
+    case 'login': {
       if (session) {
-        const returnUrl = getAndClearReturnUrl();
-        const destination = returnUrl || (state === AuthState.AUTHENTICATED_ADMIN ? './admin_dashboard.html' : './home_child_safety_v1.html');
-        
-        // Register one-time internal navigation intent for destination
-        registerInternalNavIntent(destination);
-        
-        logAuthTrace({
-          currentUrl: window.location.pathname + window.location.search,
-          destination: destination,
-          navigationType: 'INTERNAL',
-          internalIntent: true,
-          intentTimestamp: Date.now(),
-          intentValid: true,
-          supabaseSession: true,
-          authenticated: true,
-          userId: session.user.id,
-          returnUrl: returnUrl,
-          redirectReason: 'Explicit login successful. Navigating to destination.',
-          redirectSourceFunction: 'protectRoute.login'
-        });
-
-        window.location.replace(destination);
+        const dest = await resolveAuthDestination();
+        window.location.replace(dest);
         return authInfo;
       }
       break;
+    }
 
-    case 'signup_step_1': // sign_up_child_safety.html
-      if (session && sessionStorage.getItem('signup_in_progress') !== 'true') {
-        const target = state === AuthState.AUTHENTICATED_ADMIN ? './admin_dashboard.html' : './home_child_safety_v1.html';
-        registerInternalNavIntent(target);
-        window.location.replace(target);
-        return authInfo;
-      }
-      break;
+    case 'signup_step_1':
+      logAuthStateTrace({
+        provider: authInfo.provider,
+        authEvent: 'PAGE_INIT',
+        authUserId: session?.user?.id,
+        raydarProfile: authInfo.raydarProfileState,
+        registration: authInfo.registrationState,
+        onboarding: authInfo.onboardingState,
+        currentFlow: 'SIGNUP',
+        currentPage: 'sign_up_child_safety.html',
+        decision: 'ALLOW',
+        redirect: 'NONE',
+        reason: 'Signup Step 1 stays until user action'
+      });
+      return authInfo;
 
-    case 'registration_step': // account_type_selection_updated_flow.html
-      // If user already has an established profile and is not in fresh signup, route to home
-      if (session && sessionStorage.getItem('signup_in_progress') !== 'true') {
-        registerInternalNavIntent('./home_child_safety_v1.html');
-        window.location.replace('./home_child_safety_v1.html');
-        return authInfo;
-      }
-      if (!session) {
-        saveReturnUrlAndRedirectToLogin();
-        return authInfo;
-      }
-      break;
+    case 'registration_step':
+      logAuthStateTrace({
+        provider: authInfo.provider,
+        authEvent: 'PAGE_INIT',
+        authUserId: session?.user?.id,
+        raydarProfile: authInfo.raydarProfileState,
+        registration: 'IN_PROGRESS',
+        onboarding: authInfo.onboardingState,
+        currentFlow: authInfo.provider === 'google' ? 'GOOGLE_FIRST_LOGIN' : 'SIGNUP',
+        currentPage: 'account_type_selection_updated_flow.html',
+        decision: 'ALLOW',
+        redirect: 'NONE',
+        reason: 'Registration Step 2 stays until user action'
+      });
+      return authInfo;
 
-    case 'profile_completion': // basic_information.html
-      if (session && sessionStorage.getItem('signup_in_progress') !== 'true') {
-        registerInternalNavIntent('./home_child_safety_v1.html');
-        window.location.replace('./home_child_safety_v1.html');
-        return authInfo;
-      }
-      if (!session && !sessionStorage.getItem('signup_email')) {
-        saveReturnUrlAndRedirectToLogin();
-        return authInfo;
-      }
-      break;
+    case 'profile_completion':
+      logAuthStateTrace({
+        provider: authInfo.provider,
+        authEvent: 'PAGE_INIT',
+        authUserId: session?.user?.id,
+        raydarProfile: authInfo.raydarProfileState,
+        registration: 'IN_PROGRESS',
+        onboarding: authInfo.onboardingState,
+        currentFlow: authInfo.provider === 'google' ? 'GOOGLE_FIRST_LOGIN' : 'SIGNUP',
+        currentPage: 'basic_information.html',
+        decision: 'ALLOW',
+        redirect: 'NONE',
+        reason: 'Registration Step 3 stays until user action'
+      });
+      return authInfo;
 
-    case 'onboarding': // onboarding flow
+    case 'onboarding':
       if (!session || state === AuthState.UNAUTHENTICATED) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
-      if (state === AuthState.AUTHENTICATED_ADMIN) {
-        registerInternalNavIntent('./admin_dashboard.html');
-        window.location.replace('./admin_dashboard.html');
-        return authInfo;
-      }
-      registerInternalNavIntent('./home_child_safety_v1.html');
-      window.location.replace('./home_child_safety_v1.html');
+      logAuthStateTrace({
+        provider: authInfo.provider,
+        authEvent: 'PAGE_INIT',
+        authUserId: session.user.id,
+        raydarProfile: authInfo.raydarProfileState,
+        registration: 'COMPLETE',
+        onboarding: 'IN_PROGRESS',
+        currentFlow: 'ONBOARDING',
+        currentPage: window.location.pathname,
+        decision: 'ALLOW',
+        redirect: 'NONE',
+        reason: 'Onboarding in progress — user will proceed explicitly'
+      });
       return authInfo;
 
-    case 'user': // home_child_safety_v1, reports, alerts, case dashboard, etc.
+    case 'user':
       if (!session || state === AuthState.UNAUTHENTICATED) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
       return authInfo;
 
-    case 'admin': // admin_dashboard.html
+    case 'admin':
       if (!session || state === AuthState.UNAUTHENTICATED) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
       if (state !== AuthState.AUTHENTICATED_ADMIN) {
-        console.warn("Security Alert: Normal user attempted access to admin route. Redirecting to normal app.");
+        console.warn("Security Alert: Normal user attempted access to admin route.");
         sessionStorage.setItem('access_denied_message', 'Accès réservé aux administrateurs.');
         registerInternalNavIntent('./home_child_safety_v1.html');
         window.location.replace('./home_child_safety_v1.html');
@@ -895,29 +892,21 @@ export async function protectRoute(routeType) {
   return authInfo;
 }
 
-/**
- * Direct guard for private pages.
- * Protect private pages with supabase.auth.getSession()
- * if no session, redirect to /login with returnUrl.
- */
 export async function protectPrivatePage() {
   if (localStorage.getItem('is_guest') === 'true') {
     return { isGuest: true };
   }
   const { data: { session }, error } = await supabase.auth.getSession();
   if (error || !session) {
-    console.log("[Auth Guard] No active session. Redirecting to /login...");
     saveReturnUrlAndRedirectToLogin();
     return null;
   }
   return session;
 }
 
-// Global click & navigation capture to automatically register internal navigation intent
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
   document.addEventListener('click', (event) => {
     try {
-      // 1. Check anchor tag
       const anchor = event.target.closest('a');
       if (anchor) {
         const href = anchor.getAttribute('href');
@@ -927,7 +916,6 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
         }
       }
 
-      // 2. Check button or element with onclick / data-navigate
       const clickable = event.target.closest('button, [onclick], [data-navigate], [data-href]');
       if (clickable) {
         const onclickAttr = clickable.getAttribute('onclick') || '';
@@ -952,7 +940,6 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     }
   }, true);
 
-  // Record page reload intent before unload
   window.addEventListener('beforeunload', () => {
     try {
       sessionStorage.setItem(RELOAD_KEY, JSON.stringify({
@@ -963,7 +950,6 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
   });
 }
 
-// Expose on window for vanilla script compatibility
 if (typeof window !== 'undefined') {
   window.authService = {
     AuthState,
@@ -972,6 +958,7 @@ if (typeof window !== 'undefined') {
     isOnboardingCompleted,
     setOnboardingCompleted,
     getAuthAndProfileState,
+    resolveAuthDestination,
     signInWithGoogle,
     signOut,
     createRaydarProfile,
@@ -981,7 +968,9 @@ if (typeof window !== 'undefined') {
     getAndClearReturnUrl,
     registerInternalNavIntent,
     consumeInternalNavIntent,
-    logAuthTrace
+    logAuthTrace,
+    logAuthStateTrace,
+    logAuthFlowTrace
   };
   window.handleLogout = signOut;
   window.protectPrivatePage = protectPrivatePage;

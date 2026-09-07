@@ -163,6 +163,24 @@
 <span class="material-symbols-outlined text-[20px]" data-icon="error">error</span>
 <span id="errorText" class="font-medium"></span>
 </div>
+<!-- Existing Account Warning Banner (shown when email is already registered) -->
+<div id="existingAccountMsg" class="hidden bg-amber-50 border-2 border-amber-400 text-amber-950 p-4 rounded-2xl text-sm flex flex-col gap-3 shadow-sm mb-md">
+    <div class="flex items-start gap-3">
+        <span class="material-symbols-outlined text-[24px] text-amber-600 shrink-0">account_circle</span>
+        <div class="flex-1">
+            <h4 class="font-bold text-[15px] text-amber-900">Ce compte existe déjà</h4>
+            <p id="existingAccountText" class="text-xs text-amber-800 mt-1 leading-relaxed">
+                Un compte existe déjà avec cette adresse e-mail. Connectez-vous plutôt pour accéder à votre espace RAYDAR.
+            </p>
+        </div>
+    </div>
+    <div class="flex gap-2 pt-1">
+        <a id="goToLoginBtn" href="./login_child_safety.html" class="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 bg-[#532CE6] hover:bg-[#4320D0] text-white text-xs font-bold rounded-full shadow-sm active:scale-95 transition-all">
+            <span class="material-symbols-outlined text-[16px]">login</span>
+            <span>Se connecter</span>
+        </a>
+    </div>
+</div>
 <!-- Form Fields -->
 <form class="space-y-lg" id="basicInfoForm">
 <!-- Full Name -->
@@ -278,7 +296,7 @@
 </script>
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
-import { protectRoute, createRaydarProfile, AuthState, getAuthAndProfileState, mapAccountTypeToDbRole } from "./src/authService.js";
+import { protectRoute, createRaydarProfile, AuthState, getAuthAndProfileState, mapAccountTypeToDbRole, logAuthFlowTrace } from "./src/authService.js";
 import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
 
         let activeUser = null;
@@ -304,15 +322,42 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
 
         const errorMsg = document.getElementById('errorMsg');
         const errorText = document.getElementById('errorText');
+        const existingAccountMsg = document.getElementById('existingAccountMsg');
+        const existingAccountText = document.getElementById('existingAccountText');
+        const goToLoginBtn = document.getElementById('goToLoginBtn');
         const continueBtn = document.getElementById('continueBtn');
         const passwordSection = document.getElementById('passwordSection');
         const googleAuthNotice = document.getElementById('googleAuthNotice');
         const btnText = document.getElementById('btnText');
 
+        function hideAllBanners() {
+            if (errorMsg) errorMsg.classList.add('hidden');
+            if (existingAccountMsg) existingAccountMsg.classList.add('hidden');
+        }
+
+        function showExistingAccountAlert(email) {
+            hideAllBanners();
+            if (existingAccountText) {
+                existingAccountText.innerHTML = `Un compte existe déjà avec l'adresse e-mail <strong>${email}</strong>. Connectez-vous plutôt pour accéder à votre espace RAYDAR.`;
+            }
+            if (goToLoginBtn) {
+                goToLoginBtn.href = `./login_child_safety.html?email=${encodeURIComponent(email)}`;
+            }
+            if (existingAccountMsg) {
+                existingAccountMsg.classList.remove('hidden');
+                existingAccountMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
         function showError(msg) {
-            errorText.textContent = msg;
-            errorMsg.classList.remove('hidden');
-            errorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            hideAllBanners();
+            if (errorText && errorMsg) {
+                errorText.textContent = msg;
+                errorMsg.classList.remove('hidden');
+                errorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                alert(msg);
+            }
         }
 
         function setLoading(isLoading) {
@@ -472,7 +517,7 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                     }
                 }
 
-                // If user was not already authenticated (e.g. draft registration), sign up or sign in
+                // If user was not already authenticated (e.g. draft registration), sign up via Supabase Auth
                 if (!targetUser) {
                     const password = document.getElementById('password')?.value || sessionStorage.getItem('signup_password') || '';
                     const email = emailInput || sessionStorage.getItem('signup_email') || '';
@@ -504,53 +549,66 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                     });
 
                     if (authErr) {
-                        let msg = authErr.message;
-                        if (msg && msg.toLowerCase().includes('already registered')) {
-                            const { data: signData, error: signErr } = await supabase.auth.signInWithPassword({ email, password });
-                            if (signErr) {
-                                showError("Cette adresse e-mail est déjà utilisée. Veuillez vous connecter.");
-                                isSubmitting = false;
-                                setLoading(false);
-                                return;
-                            }
-                            if (!signData || !signData.session) {
-                                showError("Check your email and confirm your account before logging in.");
-                                isSubmitting = false;
-                                setLoading(false);
-                                return;
-                            }
-                            targetUser = signData.user;
-                        } else {
-                            showError(msg);
+                        const errLower = (authErr.message || '').toLowerCase();
+                        const isAlreadyRegistered = errLower.includes('already registered') || 
+                                                   errLower.includes('already exists') || 
+                                                   errLower.includes('email_exists') ||
+                                                   authErr.status === 422;
+
+                        if (isAlreadyRegistered) {
+                            logAuthFlowTrace({
+                                currentPage: 'basic_information.html',
+                                flow: 'SIGNUP',
+                                step: '3',
+                                email: email,
+                                action: 'USER_SUBMIT',
+                                decision: 'STOP_SIGNUP',
+                                redirect: 'NONE',
+                                reason: 'ACCOUNT_ALREADY_EXISTS'
+                            });
+                            showExistingAccountAlert(email);
                             isSubmitting = false;
                             setLoading(false);
                             return;
                         }
-                    } else if (!authData || !authData.session) {
-                        showError("Check your email and confirm your account before logging in.");
+
+                        showError(authErr.message || "Erreur lors de la création du compte.");
                         isSubmitting = false;
                         setLoading(false);
                         return;
-                    } else {
-                        targetUser = authData?.user;
                     }
+
+                    // Check if user already exists (identities array empty)
+                    if (authData && authData.user && Array.isArray(authData.user.identities) && authData.user.identities.length === 0) {
+                        logAuthFlowTrace({
+                            currentPage: 'basic_information.html',
+                            flow: 'SIGNUP',
+                            step: '3',
+                            email: email,
+                            action: 'USER_SUBMIT',
+                            decision: 'STOP_SIGNUP',
+                            redirect: 'NONE',
+                            reason: 'ACCOUNT_ALREADY_EXISTS (identities array empty)'
+                        });
+                        showExistingAccountAlert(email);
+                        isSubmitting = false;
+                        setLoading(false);
+                        return;
+                    }
+
+                    if (!authData || !authData.session) {
+                        showError("Veuillez vérifier votre boîte de réception pour confirmer votre compte avant de vous connecter.");
+                        isSubmitting = false;
+                        setLoading(false);
+                        return;
+                    }
+
+                    targetUser = authData.user;
                 }
 
                 if (!targetUser || !targetUser.id) {
-                    throw new Error("Impossible de vérifier votre session d'authentification Supabase. Veuillez vous reconnecter.");
+                    throw new Error("Impossible de vérifier votre compte d'authentification. Veuillez réessayer.");
                 }
-
-                const { data: { session: submitSession }, error: submitSessionErr } = await supabase.auth.getSession();
-                const { data: { user: submitUser }, error: submitUserErr } = await supabase.auth.getUser();
-
-                console.log("=== [STEP 3: BASIC INFORMATION - PRE-INSERT CHECK] ===");
-                console.log("AUTH USER ID:", targetUser.id);
-                console.log("SESSION USER ID:", submitSession?.user?.id);
-                console.log("PROFILE USER ID TO SEND:", targetUser.id);
-                console.log("SESSION:", submitSession?.user?.id);
-                console.log("GET USER:", submitUser?.id);
-                console.log("SESSION ERROR:", submitSessionErr);
-                console.log("USER ERROR:", submitUserErr);
 
                 const photo = targetUser.user_metadata?.avatar_url || targetUser.user_metadata?.picture || '';
 
@@ -580,19 +638,26 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                 sessionStorage.removeItem('signup_phone_number');
                 sessionStorage.removeItem('childSafetyAccountType');
 
-                console.log("Profile created successfully! Navigating to onboarding sequence (Page 1/3)...");
+                logAuthFlowTrace({
+                    currentPage: 'basic_information.html',
+                    flow: 'SIGNUP',
+                    step: '3',
+                    email: targetUser.email || emailInput,
+                    userId: targetUser.id,
+                    action: 'USER_CONFIRM',
+                    decision: 'CREATE_ACCOUNT_SUCCESS',
+                    redirect: './onboarding_community_protection_step_1.html',
+                    reason: 'Profile created successfully — user advances explicitly to onboarding'
+                });
+
                 window.location.replace('./onboarding_community_protection_step_1.html');
 
             } catch (err) {
-                console.error('Registration/Profile completion error detail:', {
-                    message: err.message,
-                    code: err.code,
-                    details: err.details,
-                    hint: err.hint,
-                    fullError: err
-                });
+                console.error('Registration/Profile completion error detail:', err);
                 showError(err.message || "Une erreur inattendue est survenue lors de l'enregistrement. Veuillez vérifier vos informations et réessayer.");
                 isSubmitting = false;
+                setLoading(false);
+            }
                 setLoading(false);
             }
         });

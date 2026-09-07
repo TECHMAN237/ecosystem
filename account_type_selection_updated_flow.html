@@ -240,9 +240,9 @@
 </script>
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
-import { protectRoute } from "./src/authService.js";
+import { protectRoute, logAuthFlowTrace } from "./src/authService.js";
 
-// Check route: only redirect if user already has an active session with completed profile
+// Check route: stay on Step 2
 await protectRoute('registration_step');
 
 const continueBtn = document.getElementById('continue-btn');
@@ -256,15 +256,7 @@ let isOAuthUser = false;
 
 // Check if user is authenticated with Google
 try {
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-    console.log("=== [STEP 2: ACCOUNT TYPE SELECTION - SESSION CHECK] ===");
-    console.log("SESSION:", session?.user?.id);
-    console.log("GET USER:", user?.id);
-    console.log("SESSION ERROR:", sessionError);
-    console.log("USER ERROR:", userError);
-
+    const { data: { session } } = await supabase.auth.getSession();
     if (session && session.user) {
         isOAuthUser = true;
         sessionStorage.setItem('signup_is_google', 'true');
@@ -337,7 +329,7 @@ continueBtn.addEventListener('click', (e) => {
         const fullname = sessionStorage.getItem('signup_fullname') || '';
         const email = sessionStorage.getItem('signup_email') || '';
         const password = sessionStorage.getItem('signup_password') || '';
-        if (!email || !password || !fullname) {
+        if (!email || !fullname) {
             showError('Les informations de l\'étape 1 sont manquantes. Veuillez revenir à l\'étape 1.');
             return;
         }
@@ -345,14 +337,17 @@ continueBtn.addEventListener('click', (e) => {
     
     setLoading(true);
     
-    try {
-        console.log('Step 2 complete. Account type selected:', role);
-        window.location.href = './basic_information.html';
-    } catch (err) {
-        console.error('Unexpected routing error:', err);
-        showError('Une erreur inattendue est survenue. Veuillez réessayer.');
-        setLoading(false);
-    }
+    logAuthFlowTrace({
+        currentPage: 'account_type_selection_updated_flow.html',
+        flow: 'SIGNUP',
+        step: '2',
+        action: 'USER_CONTINUE',
+        decision: 'ALLOW',
+        redirect: './basic_information.html',
+        reason: `Role selected (${role}) — advancing explicitly to Step 3`
+    });
+
+    window.location.href = './basic_information.html';
 });
 </script>
 </body></html>

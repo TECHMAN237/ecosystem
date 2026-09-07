@@ -226,11 +226,18 @@
     </script>
     <script type="module">
         import { supabase } from "./src/supabaseClient.js";
-        import { signInWithGoogle, protectRoute } from "./src/authService.js";
+        import { signInWithGoogle, protectRoute, logAuthFlowTrace } from "./src/authService.js";
 
         // If the user arrived via OAuth callback with access token or auth code, resolve login immediately
         const isOAuthCallback = window.location.hash.includes('access_token') || window.location.search.includes('code=');
         if (isOAuthCallback) {
+            logAuthFlowTrace({
+                currentPage: 'login_child_safety.html',
+                flow: 'LOGIN',
+                action: 'OAUTH_CALLBACK',
+                decision: 'RESOLVE_LOGIN',
+                reason: 'User returned with OAuth tokens'
+            });
             await protectRoute('login');
         }
 
@@ -393,6 +400,18 @@
                 console.log('Login successful! Real session confirmed for user:', session.user.id);
                 localStorage.removeItem('is_guest');
                 sessionStorage.removeItem('signup_in_progress');
+                sessionStorage.removeItem('raydar_auth_flow');
+                
+                logAuthFlowTrace({
+                    currentPage: 'login_child_safety.html',
+                    flow: 'LOGIN',
+                    email: email,
+                    userId: session.user.id,
+                    action: 'USER_SUBMIT_LOGIN',
+                    decision: 'ALLOW_LOGIN',
+                    reason: 'Valid credentials provided — resolving login destination'
+                });
+
                 await protectRoute('login');
             } catch (err) {
                 console.error('Unexpected login error:', err);

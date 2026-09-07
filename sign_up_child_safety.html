@@ -150,6 +150,24 @@
 <span class="material-symbols-outlined text-[20px]" data-icon="error">error</span>
 <span id="errorText" class="font-medium"></span>
 </div>
+<!-- Existing Account Warning Banner (shown when email is already registered) -->
+<div id="existingAccountMsg" class="hidden bg-amber-50 border-2 border-amber-400 text-amber-950 p-4 rounded-2xl text-sm flex flex-col gap-3 shadow-sm">
+    <div class="flex items-start gap-3">
+        <span class="material-symbols-outlined text-[24px] text-amber-600 shrink-0">account_circle</span>
+        <div class="flex-1">
+            <h4 class="font-bold text-[15px] text-amber-900">Ce compte existe déjà</h4>
+            <p id="existingAccountText" class="text-xs text-amber-800 mt-1 leading-relaxed">
+                Un compte existe déjà avec cette adresse e-mail. Connectez-vous plutôt pour accéder à votre espace RAYDAR.
+            </p>
+        </div>
+    </div>
+    <div class="flex gap-2 pt-1">
+        <a id="goToLoginBtn" href="./login_child_safety.html" class="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 bg-[#532CE6] hover:bg-[#4320D0] text-white text-xs font-bold rounded-full shadow-sm active:scale-95 transition-all">
+            <span class="material-symbols-outlined text-[16px]">login</span>
+            <span>Se connecter</span>
+        </a>
+    </div>
+</div>
 <!-- Confirmation Message Banner -->
 <div id="confirmMsg" class="hidden bg-primary/10 border-2 border-primary/40 text-on-surface p-md rounded-xl text-sm flex items-start gap-sm">
 <span class="material-symbols-outlined text-[24px] text-primary shrink-0" data-icon="mark_email_unread">mark_email_unread</span>
@@ -157,7 +175,7 @@
 <p id="confirmText" class="font-bold text-[15px] text-primary">Check your email and confirm your account before logging in.</p>
 <p class="text-xs text-on-surface-variant mt-1 leading-relaxed">A confirmation email has been sent. Please confirm your email address before logging in to access your account.</p>
 <div class="mt-3">
-<a href="/login" class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-white text-xs font-bold rounded-full hover:opacity-90 active:scale-95 transition-all shadow-sm">
+<a href="./login_child_safety.html" class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-white text-xs font-bold rounded-full hover:opacity-90 active:scale-95 transition-all shadow-sm">
 <span>Go to Login</span>
 <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
 </a>
@@ -269,78 +287,41 @@ J'accepte les <a class="text-primary font-bold hover:underline" href="./privacy_
 </script>
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
-import { protectRoute, AuthState } from "./src/authService.js";
+import { protectRoute, logAuthFlowTrace } from "./src/authService.js";
 
 const form = document.getElementById('signupForm');
 const errorMsg = document.getElementById('errorMsg');
 const errorText = document.getElementById('errorText');
+const existingAccountMsg = document.getElementById('existingAccountMsg');
+const existingAccountText = document.getElementById('existingAccountText');
+const goToLoginBtn = document.getElementById('goToLoginBtn');
+const confirmMsg = document.getElementById('confirmMsg');
+const confirmText = document.getElementById('confirmText');
 const submitBtn = document.getElementById('submitBtn');
 const btnText = document.getElementById('btnText');
 const btnIcon = document.getElementById('btnIcon');
-const passwordFieldGroup = document.getElementById('password')?.closest('.space-y-xs');
 
-let authenticatedUser = null;
+// Mark explicitly that we are in the SIGNUP flow
+sessionStorage.setItem('raydar_auth_flow', 'SIGNUP');
 
-// Route guard: if user already has complete profile, redirect appropriately
-async function initStep1() {
-    try {
-        const authInfo = await protectRoute('signup_step_1');
-        if (authInfo && authInfo.user) {
-            authenticatedUser = authInfo.user;
-            console.log("[Step 1] Authenticated session detected:", authenticatedUser.id);
-            
-            // User is already authenticated (e.g., via Google OAuth on login page)
-            const googleName = authenticatedUser.user_metadata?.full_name || authenticatedUser.user_metadata?.name || '';
-            const userEmail = authenticatedUser.email || '';
-            
-            if (googleName && document.getElementById('fullname')) {
-                document.getElementById('fullname').value = googleName;
-            }
-            if (userEmail && document.getElementById('email')) {
-                document.getElementById('email').value = userEmail;
-                document.getElementById('email').readOnly = true;
-                document.getElementById('email').classList.add('bg-surface-container-high', 'cursor-not-allowed');
-            }
+// Route guard: log trace and verify no automatic redirection
+await protectRoute('signup_step_1');
 
-            // Hide password section for OAuth user
-            if (passwordFieldGroup) {
-                passwordFieldGroup.classList.add('hidden');
-            }
-
-            // Update button label
-            if (btnText) btnText.textContent = 'Continuer (Étape 2/3)';
-
-            // Display info banner
-            if (errorMsg && errorText) {
-                errorMsg.classList.remove('hidden', 'bg-error-container', 'text-on-error-container');
-                errorMsg.classList.add('bg-primary-container/40', 'text-primary', 'border', 'border-primary/20');
-                const icon = errorMsg.querySelector('.material-symbols-outlined');
-                if (icon) icon.textContent = 'verified_user';
-                errorText.innerHTML = `Compte connecté : <strong>${userEmail}</strong>. Veuillez valider vos informations ci-dessous.`;
-            }
-        }
-    } catch (e) {
-        console.warn("[Step 1] Route guard check notice:", e);
+// Restore any draft Step 1 values if returning from Step 2
+try {
+    const draftName = sessionStorage.getItem('signup_fullname');
+    const draftEmail = sessionStorage.getItem('signup_email');
+    const draftPass = sessionStorage.getItem('signup_password');
+    if (draftName && document.getElementById('fullname')) {
+        document.getElementById('fullname').value = draftName;
     }
-
-    // Restore any draft Step 1 values if returning from Step 2
-    try {
-        const draftName = sessionStorage.getItem('signup_fullname');
-        const draftEmail = sessionStorage.getItem('signup_email');
-        const draftPass = sessionStorage.getItem('signup_password');
-        if (draftName && document.getElementById('fullname') && !document.getElementById('fullname').value) {
-            document.getElementById('fullname').value = draftName;
-        }
-        if (draftEmail && document.getElementById('email') && !document.getElementById('email').value) {
-            document.getElementById('email').value = draftEmail;
-        }
-        if (draftPass && document.getElementById('password') && !authenticatedUser) {
-            document.getElementById('password').value = draftPass;
-        }
-    } catch (e) {}
-}
-
-initStep1();
+    if (draftEmail && document.getElementById('email')) {
+        document.getElementById('email').value = draftEmail;
+    }
+    if (draftPass && document.getElementById('password')) {
+        document.getElementById('password').value = draftPass;
+    }
+} catch (e) {}
 
 const btnGuest = document.getElementById('btnGuest');
 if (btnGuest) {
@@ -351,21 +332,76 @@ if (btnGuest) {
     });
 }
 
+function hideAllBanners() {
+    if (errorMsg) errorMsg.classList.add('hidden');
+    if (existingAccountMsg) existingAccountMsg.classList.add('hidden');
+    if (confirmMsg) confirmMsg.classList.add('hidden');
+}
+
+function showExistingAccountAlert(email) {
+    hideAllBanners();
+    if (existingAccountText) {
+        existingAccountText.innerHTML = `Un compte existe déjà avec l'adresse e-mail <strong>${email}</strong>. Connectez-vous plutôt pour accéder à votre espace RAYDAR.`;
+    }
+    if (goToLoginBtn) {
+        goToLoginBtn.href = `./login_child_safety.html?email=${encodeURIComponent(email)}`;
+    }
+    if (existingAccountMsg) {
+        existingAccountMsg.classList.remove('hidden');
+        existingAccountMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+function showError(msg) {
+    hideAllBanners();
+    if (errorText && errorMsg) {
+        errorText.textContent = msg;
+        errorMsg.classList.remove('hidden');
+        errorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        alert(msg);
+    }
+}
+
+function showConfirmation(msg) {
+    hideAllBanners();
+    if (confirmBox && confirmText) {
+        confirmText.textContent = msg;
+        confirmMsg.classList.remove('hidden');
+        confirmMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        showError(msg);
+    }
+}
+
+function setLoading(isLoading) {
+    if (isLoading) {
+        submitBtn.disabled = true;
+        if (btnText) btnText.textContent = 'Vérification en cours...';
+        if (btnIcon) {
+            btnIcon.textContent = 'pending';
+            btnIcon.classList.add('animate-spin');
+        }
+    } else {
+        submitBtn.disabled = false;
+        if (btnText) btnText.textContent = 'Créer un compte';
+        if (btnIcon) {
+            btnIcon.textContent = 'arrow_forward';
+            btnIcon.classList.remove('animate-spin');
+        }
+    }
+}
+
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    hideAllBanners();
     
-    // Reset state
-    errorMsg.classList.add('hidden');
-    errorText.textContent = '';
-    const confirmBox = document.getElementById('confirmMsg');
-    if (confirmBox) confirmBox.classList.add('hidden');
+    const fullname = document.getElementById('fullname')?.value?.trim() || '';
+    const email = document.getElementById('email')?.value?.trim() || '';
+    const password = document.getElementById('password')?.value || '';
+    const terms = document.getElementById('terms')?.checked;
     
-    const fullname = document.getElementById('fullname').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password') ? document.getElementById('password').value : '';
-    const terms = document.getElementById('terms').checked;
-    
-    // Validation
+    // Client-side validations
     if (!fullname) {
         showError('Veuillez saisir votre nom complet.');
         return;
@@ -374,40 +410,34 @@ form.addEventListener('submit', async (e) => {
         showError('Veuillez saisir votre adresse e-mail.');
         return;
     }
+    if (!password) {
+        showError('Veuillez saisir un mot de passe.');
+        return;
+    }
+    if (password.length < 6) {
+        showError('Le mot de passe doit contenir au moins 6 caractères.');
+        return;
+    }
     if (!terms) {
         showError('Vous devez accepter les Conditions d\'utilisation et la Politique de confidentialité.');
         return;
     }
-
-    // If not authenticated via OAuth, validate password
-    if (!authenticatedUser) {
-        if (!password) {
-            showError('Veuillez saisir un mot de passe.');
-            return;
-        }
-        if (password.length < 6) {
-            showError('Le mot de passe doit contenir au moins 6 caractères.');
-            return;
-        }
-    }
     
-    // Show loading
     setLoading(true);
     
     try {
-        sessionStorage.setItem('signup_fullname', fullname);
-        sessionStorage.setItem('signup_email', email);
-        sessionStorage.setItem('signup_terms_accepted', 'true');
+        logAuthFlowTrace({
+            currentPage: 'sign_up_child_safety.html',
+            flow: 'SIGNUP',
+            step: '1',
+            email: email,
+            action: 'SUBMIT_STEP_1',
+            decision: 'CHECK_EXISTING_USER',
+            redirect: 'NONE',
+            reason: 'Attempting account creation / checking if account exists'
+        });
 
-        if (authenticatedUser) {
-            // User already has an authenticated session (Google OAuth)
-            console.log('Step 1 verified for authenticated user. Navigating to Step 2...');
-            window.location.href = './account_type_selection_updated_flow.html';
-            return;
-        }
-
-        // Email & Password registration: create Supabase Auth user NOW
-        console.log('Creating Supabase Auth user for email:', email);
+        // Call Supabase Auth signUp to check if email exists or create user
         const { data: authData, error: authErr } = await supabase.auth.signUp({
             email,
             password,
@@ -419,76 +449,101 @@ form.addEventListener('submit', async (e) => {
             }
         });
 
+        // 1. Check if Supabase explicitly returned an "already registered" error
         if (authErr) {
-            let msg = authErr.message;
-            if (msg && msg.toLowerCase().includes('already registered')) {
-                msg = "Cette adresse e-mail est déjà associée à un compte. Veuillez vous connecter.";
-            } else if (msg && msg.toLowerCase().includes('rate limit')) {
-                msg = "Trop de tentatives récentes. Veuillez patienter quelques instants.";
+            const errLower = (authErr.message || '').toLowerCase();
+            const isAlreadyRegistered = errLower.includes('already registered') || 
+                                       errLower.includes('already exists') || 
+                                       errLower.includes('email_exists') ||
+                                       authErr.status === 422;
+
+            if (isAlreadyRegistered) {
+                logAuthFlowTrace({
+                    currentPage: 'sign_up_child_safety.html',
+                    flow: 'SIGNUP',
+                    step: '1',
+                    email: email,
+                    action: 'USER_SUBMIT',
+                    decision: 'STOP_SIGNUP',
+                    redirect: 'NONE',
+                    reason: 'ACCOUNT_ALREADY_EXISTS'
+                });
+                showExistingAccountAlert(email);
+                setLoading(false);
+                return;
             }
-            showError(msg);
+
+            if (errLower.includes('rate limit')) {
+                showError("Trop de tentatives récentes. Veuillez patienter quelques instants.");
+            } else {
+                showError(authErr.message || "Erreur lors de l'inscription.");
+            }
             setLoading(false);
             return;
         }
 
-        // After signUp(), if data.session is null, don't redirect to the dashboard.
-        // Just show: "Check your email and confirm your account before logging in."
-        if (!authData || !authData.session) {
-            console.log('Supabase signUp returned null session (email confirmation required).');
-            showConfirmation("Check your email and confirm your account before logging in.");
+        // 2. Check if user already exists with identities length === 0 (Supabase pattern for existing emails)
+        if (authData && authData.user && Array.isArray(authData.user.identities) && authData.user.identities.length === 0) {
+            logAuthFlowTrace({
+                currentPage: 'sign_up_child_safety.html',
+                flow: 'SIGNUP',
+                step: '1',
+                email: email,
+                action: 'USER_SUBMIT',
+                decision: 'STOP_SIGNUP',
+                redirect: 'NONE',
+                reason: 'ACCOUNT_ALREADY_EXISTS (identities array empty)'
+            });
+            showExistingAccountAlert(email);
             setLoading(false);
             return;
         }
 
-        // If a session does exist (e.g. OAuth or confirm disabled)
-        console.log('Active session created. Checking profile status...');
-        const authState = await protectRoute('signup_step_1');
-        setLoading(false);
-        return;
-        
+        // 3. Check if email confirmation is required before login
+        if (authData && authData.user && !authData.session) {
+            logAuthFlowTrace({
+                currentPage: 'sign_up_child_safety.html',
+                flow: 'SIGNUP',
+                step: '1',
+                email: email,
+                action: 'CONFIRMATION_REQUIRED',
+                decision: 'SHOW_CONFIRMATION_NOTICE',
+                redirect: 'NONE',
+                reason: 'Supabase email confirmation enabled'
+            });
+            showConfirmation("Veuillez vérifier votre boîte de réception pour confirmer votre compte avant de vous connecter.");
+            setLoading(false);
+            return;
+        }
+
+        // 4. Successful new user registration -> save Step 1 draft and advance to Step 2
+        sessionStorage.setItem('signup_fullname', fullname);
+        sessionStorage.setItem('signup_email', email);
+        sessionStorage.setItem('signup_password', password);
+        sessionStorage.setItem('signup_terms_accepted', 'true');
+        if (authData?.user?.id) {
+            sessionStorage.setItem('signup_user_id', authData.user.id);
+        }
+
+        logAuthFlowTrace({
+            currentPage: 'sign_up_child_safety.html',
+            flow: 'SIGNUP',
+            step: '1',
+            email: email,
+            action: 'USER_CONTINUE',
+            decision: 'ALLOW',
+            redirect: './account_type_selection_updated_flow.html',
+            reason: 'Step 1 complete — user explicitly continues to Step 2'
+        });
+
+        // EXPLICIT USER-TRIGGERED NAVIGATION TO STEP 2
+        window.location.href = './account_type_selection_updated_flow.html';
+
     } catch (err) {
         console.error('Unexpected signup error:', err);
         showError(err.message || 'Une erreur inattendue est survenue lors de l\'inscription.');
         setLoading(false);
     }
 });
-
-function showConfirmation(msg) {
-    if (errorMsg) errorMsg.classList.add('hidden');
-    const confirmBox = document.getElementById('confirmMsg');
-    const confirmText = document.getElementById('confirmText');
-    if (confirmBox && confirmText) {
-        confirmText.textContent = msg;
-        confirmBox.classList.remove('hidden');
-        confirmBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } else {
-        showError(msg);
-    }
-}
-
-function showError(msg) {
-    const confirmBox = document.getElementById('confirmMsg');
-    if (confirmBox) confirmBox.classList.add('hidden');
-    errorMsg.className = "bg-error-container text-on-error-container p-md rounded-lg text-sm flex items-center gap-sm";
-    const icon = errorMsg.querySelector('.material-symbols-outlined');
-    if (icon) icon.textContent = 'error';
-    errorText.textContent = msg;
-    errorMsg.classList.remove('hidden');
-    errorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function setLoading(isLoading) {
-    if (isLoading) {
-        submitBtn.disabled = true;
-        btnText.textContent = 'Traitement en cours...';
-        btnIcon.textContent = 'pending';
-        btnIcon.classList.add('animate-spin');
-    } else {
-        submitBtn.disabled = false;
-        btnText.textContent = authenticatedUser ? 'Continuer (Étape 2/3)' : 'Créer un compte';
-        btnIcon.textContent = 'arrow_forward';
-        btnIcon.classList.remove('animate-spin');
-    }
-}
 </script>
 </body></html>
