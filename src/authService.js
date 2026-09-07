@@ -137,6 +137,7 @@ export async function setOnboardingCompleted(user) {
 
   try {
     localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
+    sessionStorage.setItem('raydar_active_session', 'true');
   } catch (e) {}
 
   clearAuthCache();
@@ -466,6 +467,12 @@ export async function resolveAuthDestination() {
     return './login_child_safety.html';
   }
 
+  // Mark in-app session as active
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem('raydar_active_session', 'true');
+    localStorage.removeItem('is_guest');
+  }
+
   // Check if a saved return URL exists
   const returnUrl = getAndClearReturnUrl();
 
@@ -537,6 +544,7 @@ export async function signOut() {
   localStorage.removeItem('is_guest');
   localStorage.removeItem('user_profile');
   localStorage.removeItem('guardians_local_user_id');
+  sessionStorage.removeItem('raydar_active_session');
   sessionStorage.clear();
   window.location.replace('./login_child_safety.html');
 }
@@ -732,9 +740,10 @@ export async function protectRoute(routeType) {
   const { state, session, profile } = authInfo;
   const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1' || routeType === 'registration_step' || routeType === 'profile_completion';
 
+  const hasActiveInAppSession = typeof window !== 'undefined' && sessionStorage.getItem('raydar_active_session') === 'true';
   const navCheck = consumeInternalNavIntent();
-  const isInternalNavValid = navCheck.isValid;
-  const navigationType = navCheck.type;
+  const isInternalNavValid = navCheck.isValid || hasActiveInAppSession;
+  const navigationType = hasActiveInAppSession ? 'IN_APP_ACTIVE' : navCheck.type;
 
   // Direct external link gatekeeper
   if (!isPublic && !isInternalNavValid) {

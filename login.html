@@ -264,7 +264,7 @@ const btnText = document.getElementById('btnText');
 const googleBtn = document.getElementById('googleBtn');
 
 // Route guard: if user is already authenticated, route them according to their role/profile
-protectRoute('public');
+await protectRoute('login');
 
 if (googleBtn) {
     googleBtn.addEventListener('click', async () => {
@@ -314,8 +314,9 @@ form.addEventListener('submit', async (e) => {
         }
         
         console.log('Login successful! Resolving profile and role-based route...');
-        localStorage.setItem('is_guest', 'false');
-        await protectRoute('public');
+        localStorage.removeItem('is_guest');
+        sessionStorage.setItem('raydar_active_session', 'true');
+        await protectRoute('login');
     } catch (err) {
         console.error('Unexpected login error:', err);
         showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");

@@ -328,6 +328,7 @@ if (btnGuest) {
     btnGuest.addEventListener('click', () => {
         localStorage.setItem('is_guest', 'true');
         sessionStorage.setItem('childSafetyAccountType', 'Guest');
+        sessionStorage.setItem('raydar_active_session', 'true');
         window.location.href = './home_child_safety_v1.html';
     });
 }
@@ -365,7 +366,7 @@ function showError(msg) {
 
 function showConfirmation(msg) {
     hideAllBanners();
-    if (confirmBox && confirmText) {
+    if (confirmMsg && confirmText) {
         confirmText.textContent = msg;
         confirmMsg.classList.remove('hidden');
         confirmMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });

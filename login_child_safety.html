@@ -210,7 +210,7 @@
                 </a>
             </p>
             <p class="text-[12px] text-[#94A3B8]">
-                <a class="hover:text-[#532CE6] transition-colors hover:underline" href="./home_child_safety_v1.html" onclick="localStorage.setItem('is_guest', 'true'); sessionStorage.setItem('childSafetyAccountType', 'Guest');">
+                <a class="hover:text-[#532CE6] transition-colors hover:underline" href="./home_child_safety_v1.html" onclick="localStorage.setItem('is_guest', 'true'); sessionStorage.setItem('childSafetyAccountType', 'Guest'); sessionStorage.setItem('raydar_active_session', 'true');">
                     Continue as guest
                 </a>
             </p>
@@ -399,6 +399,7 @@
                 
                 console.log('Login successful! Real session confirmed for user:', session.user.id);
                 localStorage.removeItem('is_guest');
+                sessionStorage.setItem('raydar_active_session', 'true');
                 sessionStorage.removeItem('signup_in_progress');
                 sessionStorage.removeItem('raydar_auth_flow');
                 
