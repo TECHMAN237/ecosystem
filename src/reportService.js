@@ -345,11 +345,34 @@ function generateUUID() {
   });
 }
 
+let _inMemoryMissing = null;
+let _inMemoryFound = null;
+let lastReportsSyncTime = 0;
+let pendingReportsSyncPromise = null;
+
 function safeSetLocalStorage(key, value) {
+  if (typeof window === "undefined") return;
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (e) {
     console.warn(`LocalStorage note for ${key}:`, e);
+    // If saving failed due to size quota (e.g. large base64 image strings),
+    // save an optimized version without breaking while in-memory cache holds full image
+    try {
+      if (Array.isArray(value)) {
+        const lean = value.map(item => {
+          if (!item) return item;
+          let p = item.photo;
+          if (p && typeof p === 'string' && p.startsWith('data:') && p.length > 50000) {
+            p = NEUTRAL_CHILD_PHOTO_PLACEHOLDER;
+          }
+          return { ...item, photo: p };
+        });
+        localStorage.setItem(key, JSON.stringify(lean));
+      }
+    } catch (e2) {
+      console.warn(`Failed to store fallback lean version for ${key}:`, e2);
+    }
   }
 }
 
@@ -453,7 +476,7 @@ export const reportService = {
             clothingDescription: row.clothing_description,
             photo: row.child_photo_url || null,
             status: row.status || (isFound ? 'Trouvé' : 'Published'),
-            urgency: isFound ? 'Recherche Famille' : (row.status === 'Urgent' ? 'Urgent' : 'Nouveau'),
+            urgency: isFound ? 'Trouvé' : (row.status === 'Urgent' ? 'Urgent' : 'Nouveau'),
             created_at: row.created_at,
             createdAt: row.created_at,
             type: isFound ? 'found' : 'missing'
@@ -475,8 +498,8 @@ export const reportService = {
               physicalDescription: row.physical_description,
               clothingDescription: row.clothing_description,
               photo: row.child_photo_url || null,
-              status: row.status || 'Trouvé',
-              urgency: 'Recherche Famille',
+              status: 'Trouvé',
+              urgency: 'Trouvé',
               created_at: row.created_at,
               createdAt: row.created_at,
               type: 'found'
@@ -485,29 +508,40 @@ export const reportService = {
         });
       }
 
-      // If remote returned reports, sort strictly newest-first (descending created_at)
+      // Merge with in-memory and local reports
+      const localMissing = (this.getMissingReports() || []).filter(r => r && r.id && !r.id.startsWith('m-'));
+      const localFound = (this.getFoundReports() || []).filter(r => r && r.id && !r.id.startsWith('f-'));
+      
+      [...localMissing, ...localFound].forEach(localR => {
+        const existingIdx = realReports.findIndex(r => r.id === localR.id);
+        if (existingIdx === -1) {
+          realReports.push(localR);
+        } else {
+          if (localR.photo && !realReports[existingIdx].photo) {
+            realReports[existingIdx].photo = localR.photo;
+          }
+        }
+      });
+
+      // Sort strictly newest-first (descending created_at)
       if (realReports.length > 0) {
         realReports.sort((a, b) => {
-          const timeA = new Date(a.created_at || a.createdAt || 0).getTime();
-          const timeB = new Date(b.created_at || b.createdAt || 0).getTime();
+          const timeA = new Date(a.created_at || a.createdAt || (a.date ? a.date : 0)).getTime() || 0;
+          const timeB = new Date(b.created_at || b.createdAt || (b.date ? b.date : 0)).getTime() || 0;
           return timeB - timeA;
         });
         return realReports.slice(0, limit);
       }
 
-      // If remote was temporarily empty or unreachable, check local store for real user reports
-      const localMissing = (this.getMissingReports() || []).filter(r => r && r.id && !r.id.startsWith('m-'));
-      const localFound = (this.getFoundReports() || []).filter(r => r && r.id && !r.id.startsWith('f-'));
-      const localMerged = [...localMissing, ...localFound];
-      localMerged.sort((a, b) => {
-        const timeA = new Date(a.created_at || a.createdAt || 0).getTime();
-        const timeB = new Date(b.created_at || b.createdAt || 0).getTime();
-        return timeB - timeA;
-      });
-      return localMerged.slice(0, limit);
+      // Fallback demo mixed
+      const allDemo = [...DEMO_MISSING_REPORTS, ...DEMO_FOUND_REPORTS];
+      allDemo.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      return allDemo.slice(0, limit);
     } catch (e) {
       console.warn("[REPORT TRACE] Error getting recent real reports:", e);
-      return [];
+      const allReports = [...this.getMissingReports(), ...this.getFoundReports()];
+      allReports.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      return allReports.slice(0, limit);
     }
   },
 
@@ -570,10 +604,19 @@ export const reportService = {
   },
 
   getMissingReports() {
+    if (_inMemoryMissing && _inMemoryMissing.length > 0) {
+      return [..._inMemoryMissing].sort((a, b) => {
+        const timeA = new Date(a.createdAt || a.created_at || (a.date ? a.date : 0)).getTime() || 0;
+        const timeB = new Date(b.createdAt || b.created_at || (b.date ? b.date : 0)).getTime() || 0;
+        return timeB - timeA;
+      });
+    }
     initLocalStorage();
     try {
       const reports = JSON.parse(localStorage.getItem("missing_reports") || "[]");
-      return reports.sort((a, b) => {
+      const list = reports.length > 0 ? reports : DEMO_MISSING_REPORTS;
+      _inMemoryMissing = list;
+      return list.sort((a, b) => {
         const timeA = new Date(a.createdAt || a.created_at || 0).getTime() || 0;
         const timeB = new Date(b.createdAt || b.created_at || 0).getTime() || 0;
         return timeB - timeA;
@@ -584,10 +627,19 @@ export const reportService = {
   },
 
   getFoundReports() {
+    if (_inMemoryFound && _inMemoryFound.length > 0) {
+      return [..._inMemoryFound].sort((a, b) => {
+        const timeA = new Date(a.createdAt || a.created_at || (a.date ? a.date : 0)).getTime() || 0;
+        const timeB = new Date(b.createdAt || b.created_at || (b.date ? b.date : 0)).getTime() || 0;
+        return timeB - timeA;
+      });
+    }
     initLocalStorage();
     try {
       const reports = JSON.parse(localStorage.getItem("found_reports") || "[]");
-      return reports.sort((a, b) => {
+      const list = reports.length > 0 ? reports : DEMO_FOUND_REPORTS;
+      _inMemoryFound = list;
+      return list.sort((a, b) => {
         const timeA = new Date(a.createdAt || a.created_at || 0).getTime() || 0;
         const timeB = new Date(b.createdAt || b.created_at || 0).getTime() || 0;
         return timeB - timeA;
@@ -595,6 +647,16 @@ export const reportService = {
     } catch (e) {
       return DEMO_FOUND_REPORTS;
     }
+  },
+
+  async fetchMissingReports(force = false) {
+    await this.syncReportsFromSupabase(force);
+    return this.getMissingReports();
+  },
+
+  async fetchFoundReports(force = false) {
+    await this.syncReportsFromSupabase(force);
+    return this.getFoundReports();
   },
 
   async getCurrentUserId() {
@@ -819,6 +881,9 @@ export const reportService = {
         const mergedMissing = mergeReports(missingLocal, supabaseMissing);
         const mergedFound = mergeReports(foundLocal, supabaseFound);
 
+        _inMemoryMissing = mergedMissing;
+        _inMemoryFound = mergedFound;
+
         safeSetLocalStorage("missing_reports", mergedMissing);
         safeSetLocalStorage("found_reports", mergedFound);
 
@@ -949,6 +1014,7 @@ export const reportService = {
       const reports = this.getMissingReports();
       const updatedList = [newReport, ...reports.filter(r => r.id !== dbId)];
       updatedList.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      _inMemoryMissing = updatedList;
       safeSetLocalStorage("missing_reports", updatedList);
 
       // 4. Notify all views across tabs/windows
@@ -1079,6 +1145,7 @@ export const reportService = {
       const reports = this.getFoundReports();
       const updatedList = [newReport, ...reports.filter(r => r.id !== dbId)];
       updatedList.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      _inMemoryFound = updatedList;
       safeSetLocalStorage("found_reports", updatedList);
 
       // 4. Notify all views

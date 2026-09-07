@@ -188,12 +188,13 @@
     <script type="module">
         import { reportService } from './src/reportService.js';
 
-        document.addEventListener('DOMContentLoaded', () => {
+        function initPage() {
             const container = document.getElementById('cardsContainer');
             const searchInput = document.getElementById('searchInput');
+            if (!container) return;
 
             function renderReports(reports) {
-                if (reports.length === 0) {
+                if (!reports || reports.length === 0) {
                     container.innerHTML = `
                         <div class="bg-white rounded-2xl p-8 text-center border border-[#EAECF0] shadow-sm max-w-3xl mx-auto">
                             <span class="material-symbols-outlined text-[#94A3B8] text-[48px] mb-2">search_off</span>
@@ -268,14 +269,17 @@
                 });
             }
 
-            // Initial fetch of found reports
-            function refreshFound() {
-                const query = searchInput ? searchInput.value : '';
+            // Immediate render from cache
+            renderReports(reportService.getFoundReports());
+
+            // Asynchronous fetch of found reports from Supabase
+            async function refreshFound() {
+                const query = searchInput ? searchInput.value.trim() : '';
                 if (query) {
                     const filtered = reportService.searchReports(query, true);
                     renderReports(filtered);
                 } else {
-                    const foundReports = reportService.getFoundReports();
+                    const foundReports = await reportService.fetchFoundReports();
                     renderReports(foundReports);
                 }
             }
@@ -283,13 +287,19 @@
             refreshFound();
 
             // Real-time search handler
-            searchInput?.addEventListener('input', (e) => {
+            searchInput?.addEventListener('input', () => {
                 refreshFound();
             });
 
-            window.addEventListener('raydar:reports-synced', refreshFound);
-            window.addEventListener('storage', refreshFound);
-        });
+            window.addEventListener('raydar:reports-synced', () => refreshFound());
+            window.addEventListener('storage', () => refreshFound());
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPage);
+        } else {
+            initPage();
+        }
     </script>
     </div>
 

@@ -97,15 +97,7 @@ export function getAndClearReturnUrl() {
 export function isOnboardingCompleted(user, profile = null) {
   if (!user || !user.id) return false;
   
-  // 1. If profile already exists and has both full_name and role, the account is fully completed
-  if (profile && profile.full_name && profile.role) {
-    try {
-      localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
-    } catch (e) {}
-    return true;
-  }
-
-  // 2. PostgreSQL Database profiles table check (Primary authority)
+  // 1. PostgreSQL Database profiles table check (Primary authority)
   if (profile && (profile.onboarding_completed === true || profile.onboarding_completed === 'true')) {
     try {
       localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
@@ -113,17 +105,25 @@ export function isOnboardingCompleted(user, profile = null) {
     return true;
   }
 
-  // 3. Supabase Auth user_metadata check
-  if (user.user_metadata && user.user_metadata.onboarding_completed === true) {
+  // 2. Supabase Auth user_metadata check
+  if (user.user_metadata && (user.user_metadata.onboarding_completed === true || user.user_metadata.onboarding_completed === 'true')) {
     try {
       localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
     } catch (e) {}
     return true;
   }
 
-  // 4. LocalStorage check (as verified persistence for current device)
+  // 3. LocalStorage check (as verified persistence for current device)
   const localVal = localStorage.getItem(`raydar_onboarding_completed_${user.id}`);
   if (localVal === 'true') return true;
+
+  // 4. If profile already exists and has both full_name and role, and user has active session
+  if (profile && profile.full_name && profile.role && profile.onboarding_completed !== false) {
+    try {
+      localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
+    } catch (e) {}
+    return true;
+  }
 
   return false;
 }
@@ -361,17 +361,44 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       const profileError = queryRes?.error;
       const isTimeout = queryRes?.isTimeout;
 
-      // Fallback to local profile cache ONLY if it explicitly matches this user.id
-      if (!profile && (isTimeout || profileError)) {
+      // Fallback & recovery: check local cache and Supabase Auth user_metadata if profile row not found
+      if (!profile) {
         try {
-          const rawLocal = localStorage.getItem('user_profile');
+          const rawLocal = localStorage.getItem('user_profile') || localStorage.getItem(`raydar_profile_${user.id}`);
+          let parsed = null;
           if (rawLocal) {
-            const parsed = JSON.parse(rawLocal);
-            if (parsed && parsed.user_id === user.id) {
-              profile = parsed;
-            }
+            try { parsed = JSON.parse(rawLocal); } catch(e) {}
           }
-        } catch (e) {}
+
+          const meta = user.user_metadata || {};
+          const candidateFullName = parsed?.full_name || meta.full_name || meta.name || '';
+          const candidateRole = parsed?.role || meta.role || meta.account_type || '';
+          const candidateUsername = parsed?.username || meta.username || `@user_${user.id.substring(0, 8)}`;
+
+          if (candidateFullName && candidateRole) {
+            profile = {
+              user_id: user.id,
+              email: user.email || parsed?.email || '',
+              full_name: candidateFullName,
+              username: candidateUsername,
+              role: mapAccountTypeToDbRole(candidateRole),
+              phone_number: parsed?.phone_number || meta.phone_number || '',
+              phone_country_code: parsed?.phone_country_code || meta.phone_country_code || '+237',
+              city: parsed?.city || meta.city || '',
+              is_admin: parsed?.is_admin === true || meta.is_admin === true,
+              onboarding_completed: parsed?.onboarding_completed === true || meta.onboarding_completed === true || localStorage.getItem(`raydar_onboarding_completed_${user.id}`) === 'true',
+              profile_photo_url: parsed?.photo || parsed?.profile_photo_url || meta.avatar_url || meta.picture || ''
+            };
+
+            // Background auto-heal into Supabase profiles table
+            supabase.from('profiles').upsert(profile, { onConflict: 'user_id' }).then(({ error }) => {
+              if (error) console.warn('[Auth] Background profile auto-heal notice:', error.message || error);
+              else console.log('[Auth] Profile successfully auto-healed in PostgreSQL profiles table');
+            }).catch(() => {});
+          }
+        } catch (e) {
+          console.warn("[Auth] Notice during profile fallback check:", e);
+        }
       }
 
       // Check if profile exists and is complete in RAYDAR
@@ -633,6 +660,26 @@ export async function createRaydarProfile({
     throw error;
   }
 
+  // Also sync profile metadata to Supabase Auth user metadata
+  try {
+    await withTimeout(
+      supabase.auth.updateUser({
+        data: {
+          full_name: resolvedFullName,
+          username: formattedUsername,
+          role: validRole,
+          phone_number: phoneNumber || '',
+          phone_country_code: phoneCountryCode || '+237',
+          city: city || '',
+          terms_accepted: true
+        }
+      }),
+      3000
+    );
+  } catch (mErr) {
+    console.warn("Notice updating user metadata in Supabase:", mErr);
+  }
+
   // Update in-memory auth cache
   cachedAuthInfo = {
     state: AuthState.AUTHENTICATED_ONBOARDING_REQUIRED,
@@ -663,6 +710,7 @@ export async function createRaydarProfile({
         onboarding_completed: false
       };
       localStorage.setItem("user_profile", JSON.stringify(localObj));
+      localStorage.setItem(`raydar_profile_${verifiedUserId}`, JSON.stringify(localObj));
       if (window.reportService && window.reportService.updateDOMProfile) {
         window.reportService.updateDOMProfile(localObj);
       }

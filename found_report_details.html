@@ -311,8 +311,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // 3. Name & age estimé
             const displayName = (report.name || report.child_full_name || report.childName || '').trim() || 'Enfant trouvé';
-            const ageLabel = report.age ? `env. ${report.age} ans` : 'âge non précisé';
-            document.getElementById('childNameAge').textContent = `${displayName}, ${ageLabel}`;
+            const ageLabel = report.age ? `env. ${report.age} ans` : '';
+            document.getElementById('childNameAge').textContent = ageLabel ? `${displayName}, ${ageLabel}` : displayName;
 
             // 4. Location Text
             document.getElementById('locationText').textContent = report.location || report.found_location || "Localisation non précisée";
