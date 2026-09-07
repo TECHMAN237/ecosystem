@@ -390,6 +390,11 @@ function initLocalStorage() {
   }, 100);
 }
 
+export function isDemoPhoto(url) {
+  if (!url || typeof url !== 'string') return false;
+  return url.includes('/assets/children/') || url.includes('/assets/avatars/') || url === DEFAULT_AVATAR;
+}
+
 function mergeReports(localList, remoteList) {
   const map = new Map();
   // Remote reports from Supabase DB
@@ -403,8 +408,13 @@ function mergeReports(localList, remoteList) {
         map.set(r.id, r);
       } else {
         const existing = map.get(r.id);
-        if (r.photo && !existing.photo) {
-          map.set(r.id, { ...existing, photo: r.photo });
+        // CRITICAL: If local report has a REAL user photo (e.g. data: or user uploaded storage url),
+        // and remote report has no photo or has a demo image, the user's real photo MUST ALWAYS WIN!
+        if (r.photo && (!existing.photo || isDemoPhoto(existing.photo))) {
+          console.log('[REPORT TRACE] Protecting real user photo from remote demo overwrite for report:', r.id);
+          map.set(r.id, { ...existing, ...r, photo: r.photo });
+        } else {
+          map.set(r.id, { ...existing, ...r });
         }
       }
     }
