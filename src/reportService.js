@@ -219,7 +219,7 @@ const DEMO_MISSING_REPORTS = [
 const DEMO_FOUND_REPORTS = [
   {
     id: "f-1",
-    name: "Enfant trouvé (Garçon)",
+    name: "Marc N.",
     age: 7,
     gender: "garcon",
     height: "Env. 1m15",
@@ -238,7 +238,7 @@ const DEMO_FOUND_REPORTS = [
   },
   {
     id: "f-2",
-    name: "Enfant trouvée (Fillette)",
+    name: "Sandra M.",
     age: 7,
     gender: "fille",
     height: "Env. 1m15",
@@ -257,7 +257,7 @@ const DEMO_FOUND_REPORTS = [
   },
   {
     id: "f-3",
-    name: "Enfant trouvé (Garçon)",
+    name: "Paul K.",
     age: 5,
     gender: "garcon",
     height: "Env. 1m05",
@@ -276,7 +276,7 @@ const DEMO_FOUND_REPORTS = [
   },
   {
     id: "f-4",
-    name: "Enfant trouvée (Jeune fille)",
+    name: "Aïcha B.",
     age: 11,
     gender: "fille",
     height: "Env. 1m38",
@@ -295,7 +295,7 @@ const DEMO_FOUND_REPORTS = [
   },
   {
     id: "f-5",
-    name: "Enfant trouvé (Garçon)",
+    name: "David M.",
     age: 9,
     gender: "garcon",
     height: "Env. 1m28",
@@ -314,7 +314,7 @@ const DEMO_FOUND_REPORTS = [
   },
   {
     id: "f-6",
-    name: "Enfant trouvée (Fillette)",
+    name: "Grace T.",
     age: 8,
     gender: "fille",
     height: "Env. 1m20",
@@ -452,11 +452,41 @@ export const reportService = {
   DEFAULT_AVATAR,
   NEUTRAL_CHILD_PHOTO_PLACEHOLDER,
 
+  // Fast synchronous accessor for instant UI rendering with 0ms delay
+  getCachedRecentReports(limit = 4) {
+    try {
+      const missing = this.getMissingReports() || [];
+      const found = this.getFoundReports() || [];
+      const combined = [...missing, ...found];
+      
+      // Deduplicate by ID
+      const map = new Map();
+      combined.forEach(r => {
+        if (r && r.id && !map.has(r.id)) {
+          map.set(r.id, r);
+        }
+      });
+      const list = Array.from(map.values());
+      
+      // Sort strictly newest-first (descending created_at / createdAt)
+      list.sort((a, b) => {
+        const timeA = new Date(a.created_at || a.createdAt || (a.date ? a.date : 0)).getTime() || 0;
+        const timeB = new Date(b.created_at || b.createdAt || (b.date ? b.date : 0)).getTime() || 0;
+        return timeB - timeA;
+      });
+
+      return list.slice(0, limit);
+    } catch (e) {
+      console.warn("[REPORT TRACE] getCachedRecentReports error:", e);
+      return [...DEMO_MISSING_REPORTS, ...DEMO_FOUND_REPORTS].slice(0, limit);
+    }
+  },
+
   async getRecentRealReports(limit = 4) {
     try {
       const [missingRes, foundRes] = await Promise.allSettled([
-        withTimeout(supabase.from('missing_reports').select('*').order('created_at', { ascending: false }).limit(limit * 2), 4000, { data: [] }),
-        withTimeout(supabase.from('found_reports').select('*').order('created_at', { ascending: false }).limit(limit * 2), 4000, { data: [] })
+        withTimeout(supabase.from('missing_reports').select('*').order('created_at', { ascending: false }).limit(limit * 2), 3500, { data: [] }),
+        withTimeout(supabase.from('found_reports').select('*').order('created_at', { ascending: false }).limit(limit * 2), 3500, { data: [] })
       ]);
 
       const realReports = [];
@@ -466,7 +496,7 @@ export const reportService = {
           const isFound = row.status === 'Trouvé' || (row.physical_description && row.physical_description.includes('[TROUVÉ]'));
           realReports.push({
             id: row.id,
-            name: row.child_full_name,
+            name: row.child_full_name || (isFound ? 'Enfant trouvé' : 'Enfant disparu'),
             age: row.child_age,
             gender: row.child_gender,
             location: row.last_seen_location,
@@ -508,7 +538,7 @@ export const reportService = {
         });
       }
 
-      // Merge with in-memory and local reports
+      // Merge with in-memory and local user reports
       const localMissing = (this.getMissingReports() || []).filter(r => r && r.id && !r.id.startsWith('m-'));
       const localFound = (this.getFoundReports() || []).filter(r => r && r.id && !r.id.startsWith('f-'));
       
@@ -520,28 +550,31 @@ export const reportService = {
           if (localR.photo && !realReports[existingIdx].photo) {
             realReports[existingIdx].photo = localR.photo;
           }
+          if (localR.name && realReports[existingIdx].name === 'Enfant trouvé') {
+            realReports[existingIdx].name = localR.name;
+          }
+        }
+      });
+
+      // If we have fewer real reports than requested limit, fill the rest with demo reports
+      const allDemo = [...DEMO_MISSING_REPORTS, ...DEMO_FOUND_REPORTS];
+      allDemo.forEach(demo => {
+        if (realReports.length < limit && !realReports.some(r => r.id === demo.id)) {
+          realReports.push(demo);
         }
       });
 
       // Sort strictly newest-first (descending created_at)
-      if (realReports.length > 0) {
-        realReports.sort((a, b) => {
-          const timeA = new Date(a.created_at || a.createdAt || (a.date ? a.date : 0)).getTime() || 0;
-          const timeB = new Date(b.created_at || b.createdAt || (b.date ? b.date : 0)).getTime() || 0;
-          return timeB - timeA;
-        });
-        return realReports.slice(0, limit);
-      }
+      realReports.sort((a, b) => {
+        const timeA = new Date(a.created_at || a.createdAt || (a.date ? a.date : 0)).getTime() || 0;
+        const timeB = new Date(b.created_at || b.createdAt || (b.date ? b.date : 0)).getTime() || 0;
+        return timeB - timeA;
+      });
 
-      // Fallback demo mixed
-      const allDemo = [...DEMO_MISSING_REPORTS, ...DEMO_FOUND_REPORTS];
-      allDemo.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-      return allDemo.slice(0, limit);
+      return realReports.slice(0, limit);
     } catch (e) {
       console.warn("[REPORT TRACE] Error getting recent real reports:", e);
-      const allReports = [...this.getMissingReports(), ...this.getFoundReports()];
-      allReports.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-      return allReports.slice(0, limit);
+      return this.getCachedRecentReports(limit);
     }
   },
 

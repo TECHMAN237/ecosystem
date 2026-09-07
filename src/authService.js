@@ -361,6 +361,20 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       const profileError = queryRes?.error;
       const isTimeout = queryRes?.isTimeout;
 
+      // Secondary check by email if profile not found by user_id
+      if (!profile && user.email) {
+        try {
+          const emailQueryRes = await withTimeout(
+            supabase.from('profiles').select('*').eq('email', user.email).maybeSingle(),
+            3000,
+            { data: null }
+          );
+          if (emailQueryRes?.data) {
+            profile = emailQueryRes.data;
+          }
+        } catch (e) {}
+      }
+
       // Fallback & recovery: check local cache and Supabase Auth user_metadata if profile row not found
       if (!profile) {
         try {
@@ -371,11 +385,11 @@ export async function getAuthAndProfileState(forceRefresh = false) {
           }
 
           const meta = user.user_metadata || {};
-          const candidateFullName = parsed?.full_name || meta.full_name || meta.name || '';
-          const candidateRole = parsed?.role || meta.role || meta.account_type || '';
+          const candidateFullName = parsed?.full_name || meta.full_name || meta.name || (user.email ? user.email.split('@')[0] : '');
+          const candidateRole = parsed?.role || meta.role || meta.account_type || 'Guardian';
           const candidateUsername = parsed?.username || meta.username || `@user_${user.id.substring(0, 8)}`;
 
-          if (candidateFullName && candidateRole) {
+          if (candidateFullName) {
             profile = {
               user_id: user.id,
               email: user.email || parsed?.email || '',
@@ -386,7 +400,7 @@ export async function getAuthAndProfileState(forceRefresh = false) {
               phone_country_code: parsed?.phone_country_code || meta.phone_country_code || '+237',
               city: parsed?.city || meta.city || '',
               is_admin: parsed?.is_admin === true || meta.is_admin === true,
-              onboarding_completed: parsed?.onboarding_completed === true || meta.onboarding_completed === true || localStorage.getItem(`raydar_onboarding_completed_${user.id}`) === 'true',
+              onboarding_completed: true,
               profile_photo_url: parsed?.photo || parsed?.profile_photo_url || meta.avatar_url || meta.picture || ''
             };
 
@@ -402,12 +416,10 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       }
 
       // Check if profile exists and is complete in RAYDAR
-      const hasProfileRow = Boolean(profile && profile.user_id === user.id);
+      const hasProfileRow = Boolean(profile);
       const isProfileComplete = Boolean(
         hasProfileRow && 
-        profile.full_name && 
-        profile.role && 
-        profile.role !== ''
+        (profile.full_name || profile.username || user.email)
       );
 
       let raydarProfileState = 'NONE';
@@ -424,8 +436,14 @@ export async function getAuthAndProfileState(forceRefresh = false) {
         registrationState = 'COMPLETE';
       }
 
-      // Check onboarding state
-      const onboardingDone = isProfileComplete && isOnboardingCompleted(user, profile);
+      // Check onboarding state: if profile is complete or user is established, mark complete
+      const onboardingDone = isProfileComplete && (
+        profile.onboarding_completed === true || 
+        profile.onboarding_completed === 'true' ||
+        user.user_metadata?.onboarding_completed === true ||
+        localStorage.getItem(`raydar_onboarding_completed_${user.id}`) === 'true' ||
+        Boolean(profile.full_name && profile.role)
+      );
       const onboardingState = onboardingDone ? 'COMPLETE' : 'NOT_STARTED';
 
       // Determine the next required step for this user
