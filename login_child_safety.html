@@ -228,8 +228,12 @@
         import { supabase } from "./src/supabaseClient.js";
         import { signInWithGoogle, protectRoute } from "./src/authService.js";
 
-        // Check if user is already logged in with an active session
-        await protectRoute('login');
+        // If the user arrived via OAuth callback with access token or auth code, resolve login immediately
+        const isOAuthCallback = window.location.hash.includes('access_token') || window.location.search.includes('code=');
+        if (isOAuthCallback) {
+            sessionStorage.setItem('raydar_in_app_session', 'true');
+            await protectRoute('login');
+        }
 
         const form = document.getElementById('loginForm');
         const errorMsg = document.getElementById('errorMsg');
@@ -389,6 +393,8 @@
                 
                 console.log('Login successful! Real session confirmed for user:', session.user.id);
                 localStorage.removeItem('is_guest');
+                sessionStorage.setItem('raydar_in_app_session', 'true');
+                sessionStorage.removeItem('signup_in_progress');
                 await protectRoute('login');
             } catch (err) {
                 console.error('Unexpected login error:', err);

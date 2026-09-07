@@ -263,7 +263,7 @@ export async function getAuthAndProfileState(forceRefresh = false) {
         supabase
           .from('profiles')
           .select('*')
-          .eq('user_id', user.id)
+          .or(`user_id.eq.${user.id},id.eq.${user.id}`)
           .maybeSingle(),
         4000,
         { isTimeout: true, data: null, error: null }
@@ -273,7 +273,7 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       const profileError = queryRes?.error;
       const isTimeout = queryRes?.isTimeout;
 
-      if (profile && profile.id) {
+      if (profile && (profile.id || profile.user_id)) {
         // Authoritative profile found in PostgreSQL!
         try {
           localStorage.setItem('user_profile', JSON.stringify({ ...profile, user_id: user.id }));
@@ -281,12 +281,11 @@ export async function getAuthAndProfileState(forceRefresh = false) {
         } catch (e) {}
       } else if (isTimeout || profileError) {
         console.warn("[Auth] Profile query delayed or encountered error:", profileError || "Timeout");
-        // CRITICAL: A network timeout or database error MUST NOT be interpreted as "user has no profile"!
-        if (localProfileForUser && (localProfileForUser.full_name || localProfileForUser.username)) {
+        if (localProfileForUser && (localProfileForUser.full_name || localProfileForUser.username || localProfileForUser.user_id)) {
           console.log("[Auth] Falling back to verified local profile cache for user:", user.id);
           profile = localProfileForUser;
         } else {
-          console.log("[Auth] Using session identity fallback for user:", user.id);
+          console.log("[Auth] Synthesizing session identity fallback for user:", user.id);
           profile = {
             user_id: user.id,
             email: user.email || '',
@@ -302,13 +301,12 @@ export async function getAuthAndProfileState(forceRefresh = false) {
         }
       } else if (!profile && !profileError && !isTimeout) {
         // PostgREST definitively executed and confirmed 0 rows returned
-        // Check if we have a locally saved profile from registration to self-heal
-        if (localProfileForUser && localProfileForUser.full_name) {
+        if (localProfileForUser && (localProfileForUser.full_name || localProfileForUser.username)) {
           console.log("[Auth] Self-healing profile from local cache into Supabase for user:", user.id);
           const healingPayload = {
             user_id: user.id,
             email: user.email || '',
-            full_name: localProfileForUser.full_name,
+            full_name: localProfileForUser.full_name || 'Gardien',
             username: localProfileForUser.username || `@user_${user.id.substring(0, 8)}`,
             role: localProfileForUser.role || 'Guardian',
             phone_country_code: localProfileForUser.phone_country_code || '+237',
@@ -326,18 +324,35 @@ export async function getAuthAndProfileState(forceRefresh = false) {
             if (healedData) {
               profile = healedData;
               localStorage.setItem('user_profile', JSON.stringify({ ...healedData, user_id: user.id }));
+            } else {
+              profile = healingPayload;
             }
           } catch (e) {
             profile = healingPayload;
           }
+        } else if (sessionStorage.getItem('signup_in_progress') !== 'true') {
+          // An existing authenticated user whose profile record is empty: synthesize immediately
+          console.log("[Auth] Synthesizing default profile for existing user session:", user.id);
+          profile = {
+            user_id: user.id,
+            email: user.email || '',
+            full_name: user.user_metadata?.full_name || user.user_metadata?.name || (user.email ? user.email.split('@')[0] : 'Gardien'),
+            username: `@user_${user.id.substring(0, 8)}`,
+            role: user.user_metadata?.role || 'Guardian',
+            is_admin: false,
+            onboarding_completed: true
+          };
+          try {
+            localStorage.setItem('user_profile', JSON.stringify(profile));
+          } catch (e) {}
         }
       }
 
       // Determine if profile exists
-      const hasProfile = Boolean(profile && (profile.full_name || profile.username));
+      const hasProfile = Boolean(profile && (profile.id || profile.user_id || profile.full_name || profile.username || profile.email));
 
-      if (!hasProfile) {
-        // Genuinely new user with no profile in database and no profile in local cache
+      if (!hasProfile && sessionStorage.getItem('signup_in_progress') === 'true') {
+        // Genuinely new user in active sign-up flow
         const noProfileResult = {
           state: AuthState.AUTHENTICATED_NO_PROFILE,
           session: currentSession,
@@ -347,6 +362,19 @@ export async function getAuthAndProfileState(forceRefresh = false) {
         cachedAuthInfo = noProfileResult;
         cacheTimestamp = Date.now();
         return noProfileResult;
+      }
+
+      // If user is authenticated and not in new signup flow, ensure they have profile structure
+      if (!profile) {
+        profile = {
+          user_id: user.id,
+          email: user.email || '',
+          full_name: user.user_metadata?.full_name || user.user_metadata?.name || (user.email ? user.email.split('@')[0] : 'Gardien'),
+          username: `@user_${user.id.substring(0, 8)}`,
+          role: 'Guardian',
+          is_admin: false,
+          onboarding_completed: true
+        };
       }
 
       // Role check: Admin MUST be explicitly set in the database
@@ -561,6 +589,25 @@ export async function createRaydarProfile({
 }
 
 /**
+ * Temporary forensic trace helper for route guard auditing.
+ */
+function logRouteTrace({ destination, fnName, reason, authUserId, profileId, profileExists, role }) {
+  if (typeof window !== 'undefined') {
+    console.log(`[RAYDAR ROUTE TRACE]
+CURRENT PAGE: ${window.location.pathname}
+DESTINATION: ${destination}
+FUNCTION: ${fnName}
+REASON: ${reason}
+AUTH USER ID: ${authUserId || 'none'}
+PROFILE ID: ${profileId || 'none'}
+PROFILE EXISTS: ${Boolean(profileExists)}
+ROLE: ${role || 'undefined'}
+SESSION STORAGE STATE: in_app=${sessionStorage.getItem('raydar_in_app_session')}, signup=${sessionStorage.getItem('signup_in_progress')}
+TIMESTAMP: ${new Date().toISOString()}`);
+  }
+}
+
+/**
  * Guard utility for pages.
  * Handles page protection and routing without flickering or race conditions.
  * Uses cached auth info to prevent cascading network queries on every navigation.
@@ -583,9 +630,38 @@ export async function protectRoute(routeType) {
   const { state, session, profile } = authInfo;
   const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1';
 
+  // Direct/Shared external link gatekeeper:
+  // If user opens a private user route directly without active in-app tab session, enforce login verification
+  if (!isPublic && (!session || sessionStorage.getItem('raydar_in_app_session') !== 'true')) {
+    logRouteTrace({
+      destination: './login_child_safety.html',
+      fnName: 'protectRoute.directLinkGate',
+      reason: !session ? 'No active session' : 'Direct link opened externally (requires fresh login)',
+      authUserId: session?.user?.id,
+      profileId: profile?.id,
+      profileExists: Boolean(profile),
+      role: profile?.role
+    });
+    saveReturnUrlAndRedirectToLogin();
+    return {
+      state: AuthState.UNAUTHENTICATED,
+      session: null,
+      user: null,
+      profile: null
+    };
+  }
+
   // Protect private pages: if no session and not public, redirect to login with returnUrl
   if (!session && !isPublic) {
-    console.log(`[RAYDAR Route Guard] No active session on private route '${routeType}'. Redirecting to /login...`);
+    logRouteTrace({
+      destination: './login_child_safety.html',
+      fnName: 'protectRoute.unauthenticated',
+      reason: `No session on private route '${routeType}'`,
+      authUserId: null,
+      profileId: null,
+      profileExists: false,
+      role: undefined
+    });
     saveReturnUrlAndRedirectToLogin();
     return {
       state: AuthState.UNAUTHENTICATED,
@@ -603,24 +679,39 @@ export async function protectRoute(routeType) {
 
     case 'login': // Triggered after explicit login or OAuth callback
       if (session) {
+        sessionStorage.setItem('raydar_in_app_session', 'true');
         const returnUrl = getAndClearReturnUrl();
         if (state === AuthState.AUTHENTICATED_ADMIN) {
+          logRouteTrace({
+            destination: returnUrl || './admin_dashboard.html',
+            fnName: 'protectRoute.login.admin',
+            reason: 'Admin authenticated',
+            authUserId: session.user.id,
+            profileId: profile?.id,
+            profileExists: Boolean(profile),
+            role: profile?.role
+          });
           window.location.replace(returnUrl || './admin_dashboard.html');
           return authInfo;
         }
-        if (state === AuthState.AUTHENTICATED_USER) {
+        if (state === AuthState.AUTHENTICATED_USER || state === AuthState.AUTHENTICATED_NO_PROFILE) {
+          logRouteTrace({
+            destination: returnUrl || './home_child_safety_v1.html',
+            fnName: 'protectRoute.login.user',
+            reason: 'User authenticated',
+            authUserId: session.user.id,
+            profileId: profile?.id,
+            profileExists: Boolean(profile),
+            role: profile?.role
+          });
           window.location.replace(returnUrl || './home_child_safety_v1.html');
-          return authInfo;
-        }
-        if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-          window.location.replace('./account_type_selection_updated_flow.html');
           return authInfo;
         }
       }
       break;
 
     case 'signup_step_1': // sign_up_child_safety.html
-      if (session) {
+      if (session && sessionStorage.getItem('signup_in_progress') !== 'true') {
         if (state === AuthState.AUTHENTICATED_ADMIN) {
           window.location.replace('./admin_dashboard.html');
           return authInfo;
@@ -629,47 +720,49 @@ export async function protectRoute(routeType) {
           window.location.replace('./home_child_safety_v1.html');
           return authInfo;
         }
-        if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-          window.location.replace('./account_type_selection_updated_flow.html');
-          return authInfo;
-        }
       }
       break;
 
     case 'registration_step': // account_type_selection_updated_flow.html
+      // CRITICAL: If user already has an active session and is not explicitly in fresh signup, send to home!
+      if (session && sessionStorage.getItem('signup_in_progress') !== 'true') {
+        logRouteTrace({
+          destination: './home_child_safety_v1.html',
+          fnName: 'protectRoute.registration_step.existingUser',
+          reason: 'Existing authenticated user visited registration page',
+          authUserId: session.user.id,
+          profileId: profile?.id,
+          profileExists: Boolean(profile),
+          role: profile?.role
+        });
+        window.location.replace('./home_child_safety_v1.html');
+        return authInfo;
+      }
       if (!session) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
-      // CRITICAL: An existing user must NEVER see role/registration selection!
-      if (state === AuthState.AUTHENTICATED_ADMIN) {
-        window.location.replace('./admin_dashboard.html');
-        return authInfo;
-      }
-      if (state === AuthState.AUTHENTICATED_USER) {
-        console.log("[Route Guard] Existing registered user visited registration step. Redirecting to home...");
-        window.location.replace('./home_child_safety_v1.html');
-        return authInfo;
-      }
-      // If AUTHENTICATED_NO_PROFILE: stay in registration flow
       break;
 
     case 'profile_completion': // basic_information.html
+      // CRITICAL: An existing user must NEVER see profile completion again!
+      if (session && sessionStorage.getItem('signup_in_progress') !== 'true') {
+        logRouteTrace({
+          destination: './home_child_safety_v1.html',
+          fnName: 'protectRoute.profile_completion.existingUser',
+          reason: 'Existing authenticated user visited basic_information page',
+          authUserId: session.user.id,
+          profileId: profile?.id,
+          profileExists: Boolean(profile),
+          role: profile?.role
+        });
+        window.location.replace('./home_child_safety_v1.html');
+        return authInfo;
+      }
       if (!session && !sessionStorage.getItem('signup_email')) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
-      // CRITICAL: An existing user must NEVER see profile completion again!
-      if (session && state === AuthState.AUTHENTICATED_ADMIN) {
-        window.location.replace('./admin_dashboard.html');
-        return authInfo;
-      }
-      if (session && state === AuthState.AUTHENTICATED_USER) {
-        console.log("[Route Guard] Existing registered user visited basic_information. Redirecting to home...");
-        window.location.replace('./home_child_safety_v1.html');
-        return authInfo;
-      }
-      // If AUTHENTICATED_NO_PROFILE: stay on basic_information to complete profile!
       break;
 
     case 'onboarding': // onboarding flow
@@ -677,40 +770,26 @@ export async function protectRoute(routeType) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
-      if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        window.location.replace('./account_type_selection_updated_flow.html');
-        return authInfo;
-      }
       if (state === AuthState.AUTHENTICATED_ADMIN) {
         window.location.replace('./admin_dashboard.html');
         return authInfo;
       }
-      if (state === AuthState.AUTHENTICATED_USER) {
-        window.location.replace('./home_child_safety_v1.html');
-        return authInfo;
-      }
-      break;
+      window.location.replace('./home_child_safety_v1.html');
+      return authInfo;
 
     case 'user': // home_child_safety_v1, reports, alerts, case dashboard, etc.
       if (!session || state === AuthState.UNAUTHENTICATED) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
-      if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        window.location.replace('./account_type_selection_updated_flow.html');
-        return authInfo;
-      }
-      // CRITICAL: An existing user navigating to home, clicking 'Accueil' or viewing tabs stays on the page!
-      // NEVER redirect an existing user to registration or onboarding on navigation!
-      break;
+      // CRITICAL NON-NEGOTIABLE RULE:
+      // An existing authenticated user navigating within the application (e.g. clicking 'Accueil',
+      // 'Profil', 'Signalements', 'Alertes', or refreshing) MUST NEVER BE REDIRECTED TO REGISTRATION!
+      return authInfo;
 
     case 'admin': // admin_dashboard.html
       if (!session || state === AuthState.UNAUTHENTICATED) {
         saveReturnUrlAndRedirectToLogin();
-        return authInfo;
-      }
-      if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
-        window.location.replace('./account_type_selection_updated_flow.html');
         return authInfo;
       }
       if (state !== AuthState.AUTHENTICATED_ADMIN) {
