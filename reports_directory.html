@@ -269,15 +269,26 @@
             }
 
             // Initial fetch of missing reports
-            const missingReports = reportService.getMissingReports();
-            renderReports(missingReports);
+            function refreshMissing() {
+                const query = searchInput ? searchInput.value : '';
+                if (query) {
+                    const filtered = reportService.searchReports(query, false);
+                    renderReports(filtered);
+                } else {
+                    const missingReports = reportService.getMissingReports();
+                    renderReports(missingReports);
+                }
+            }
+
+            refreshMissing();
 
             // Real-time search handler
-            searchInput.addEventListener('input', (e) => {
-                const query = e.target.value;
-                const filtered = reportService.searchReports(query, false); // isFound = false
-                renderReports(filtered);
+            searchInput?.addEventListener('input', (e) => {
+                refreshMissing();
             });
+
+            window.addEventListener('raydar:reports-synced', refreshMissing);
+            window.addEventListener('storage', refreshMissing);
         });
     </script>
 

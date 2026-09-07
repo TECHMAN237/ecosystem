@@ -359,7 +359,7 @@ function safeSetLocalStorage(key, value) {
 
 function initLocalStorage() {
   if (typeof window === "undefined") return;
-  const dbVersion = "v11_african_children_portraits_system";
+  const dbVersion = "v12_raydar_reports_engine_newest_first";
   const currentVer = localStorage.getItem("reports_db_version");
   
   let missing = [];
@@ -372,12 +372,15 @@ function initLocalStorage() {
   const hasUnsplash = (list) => list.some(r => r && r.photo && r.photo.includes("unsplash.com"));
 
   if (currentVer !== dbVersion || !localStorage.getItem("missing_reports") || !localStorage.getItem("found_reports") || hasUnsplash(missing) || hasUnsplash(found)) {
-    // Preserve any real user-created reports (those with custom photos or IDs not starting with 'm-' or 'f-')
+    // Preserve any real user-created reports
     const userMissing = missing.filter(r => r && !r.id.startsWith("m-") && (!r.photo || !r.photo.includes("unsplash.com")));
     const userFound = found.filter(r => r && !r.id.startsWith("f-") && (!r.photo || !r.photo.includes("unsplash.com")));
 
-    safeSetLocalStorage("missing_reports", [...DEMO_MISSING_REPORTS, ...userMissing]);
-    safeSetLocalStorage("found_reports", [...DEMO_FOUND_REPORTS, ...userFound]);
+    const initialMissing = mergeReports(userMissing, DEMO_MISSING_REPORTS);
+    const initialFound = mergeReports(userFound, DEMO_FOUND_REPORTS);
+
+    safeSetLocalStorage("missing_reports", initialMissing);
+    safeSetLocalStorage("found_reports", initialFound);
     try { localStorage.setItem("reports_db_version", dbVersion); } catch (e) {}
   }
   setTimeout(() => {
@@ -389,13 +392,31 @@ function initLocalStorage() {
 
 function mergeReports(localList, remoteList) {
   const map = new Map();
-  remoteList.forEach(r => map.set(r.id, r));
-  localList.forEach(r => {
-    if (!map.has(r.id)) {
-      map.set(r.id, r);
+  // Remote reports from Supabase DB
+  (remoteList || []).forEach(r => {
+    if (r && r.id) map.set(r.id, r);
+  });
+  // Local reports
+  (localList || []).forEach(r => {
+    if (r && r.id) {
+      if (!map.has(r.id)) {
+        map.set(r.id, r);
+      } else {
+        const existing = map.get(r.id);
+        if (r.photo && !existing.photo) {
+          map.set(r.id, { ...existing, photo: r.photo });
+        }
+      }
     }
   });
-  return Array.from(map.values());
+  const merged = Array.from(map.values());
+  // Sort ALL reports strictly newest-first (descending createdAt)
+  merged.sort((a, b) => {
+    const timeA = new Date(a.createdAt || a.created_at || (a.date ? a.date : 0)).getTime() || 0;
+    const timeB = new Date(b.createdAt || b.created_at || (b.date ? b.date : 0)).getTime() || 0;
+    return timeB - timeA;
+  });
+  return merged;
 }
 
 export const reportService = {
@@ -404,7 +425,12 @@ export const reportService = {
   getMissingReports() {
     initLocalStorage();
     try {
-      return JSON.parse(localStorage.getItem("missing_reports") || "[]");
+      const reports = JSON.parse(localStorage.getItem("missing_reports") || "[]");
+      return reports.sort((a, b) => {
+        const timeA = new Date(a.createdAt || a.created_at || 0).getTime() || 0;
+        const timeB = new Date(b.createdAt || b.created_at || 0).getTime() || 0;
+        return timeB - timeA;
+      });
     } catch (e) {
       return DEMO_MISSING_REPORTS;
     }
@@ -413,7 +439,12 @@ export const reportService = {
   getFoundReports() {
     initLocalStorage();
     try {
-      return JSON.parse(localStorage.getItem("found_reports") || "[]");
+      const reports = JSON.parse(localStorage.getItem("found_reports") || "[]");
+      return reports.sort((a, b) => {
+        const timeA = new Date(a.createdAt || a.created_at || 0).getTime() || 0;
+        const timeB = new Date(b.createdAt || b.created_at || 0).getTime() || 0;
+        return timeB - timeA;
+      });
     } catch (e) {
       return DEMO_FOUND_REPORTS;
     }
@@ -449,9 +480,9 @@ export const reportService = {
   },
 
   // Upload file or image directly to Supabase Storage with fast compression and timeout protection
-  async uploadFileToSupabaseStorage(fileOrBase64, bucketName = "avatars") {
+  async uploadFileToSupabaseStorage(fileOrBase64, bucketName = "avatars", reportType = "reports", reportId = null) {
     if (!fileOrBase64) return DEFAULT_AVATAR;
-    console.log("[Supabase Storage] Optimizing & uploading file...");
+    console.log(`[REPORT TRACE] uploadFileToSupabaseStorage starting for type: ${reportType}, bucket: ${bucketName}...`);
     try {
       // 1. Client-side downscaling & compression to prevent multi-megabyte hanging uploads
       const optimized = await compressImage(fileOrBase64, 1200, 0.82);
@@ -481,15 +512,17 @@ export const reportService = {
 
       if (blob) {
         const currentUid = await this.getCurrentUserId();
-        const folder = currentUid || 'public_reports';
-        const filePath = `${folder}/report_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+        const folder = currentUid || 'public';
+        const rId = reportId || generateUUID();
+        const filePath = `${reportType}/${folder}/${rId}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+        console.log(`[REPORT TRACE] Target storage path: ${filePath}`);
 
-        // 6-second timeout so storage errors never hang user operations
+        // 8-second timeout so storage operations are safe
         const uploadResult = await withTimeout(
           supabase.storage
             .from("avatars")
             .upload(filePath, blob, { contentType, upsert: true }),
-          6000,
+          8000,
           { error: { message: "Storage upload timeout" }, data: null }
         );
 
@@ -498,18 +531,19 @@ export const reportService = {
             .from("avatars")
             .getPublicUrl(filePath);
           if (publicData && publicData.publicUrl) {
-            console.log("[Supabase Storage] Upload successful:", publicData.publicUrl);
+            console.log("[REPORT TRACE] Storage public URL verified:", publicData.publicUrl);
             return publicData.publicUrl;
           }
         } else {
-          console.warn("[Supabase Storage] Notice uploading to bucket:", uploadResult?.error?.message);
+          console.warn("[REPORT TRACE] Notice uploading to storage bucket:", uploadResult?.error?.message);
         }
       }
 
       // If storage upload fails or times out, return optimized compressed string safely
+      console.log("[REPORT TRACE] Using local compressed image data string as valid photo source");
       return typeof optimized === "string" ? optimized : DEFAULT_AVATAR;
     } catch (err) {
-      console.warn("[Supabase Storage] Upload exception:", err);
+      console.warn("[REPORT TRACE] Storage upload exception:", err);
       return typeof fileOrBase64 === "string" ? fileOrBase64 : DEFAULT_AVATAR;
     }
   },
@@ -518,82 +552,131 @@ export const reportService = {
     if (typeof window === "undefined") return;
     const now = Date.now();
     if (!force && pendingReportsSyncPromise) return pendingReportsSyncPromise;
-    if (!force && now - lastReportsSyncTime < 15000) {
-      return; // Cache fresh within 15 seconds
+    if (!force && now - lastReportsSyncTime < 10000) {
+      return; // Cache fresh within 10 seconds
     }
 
     pendingReportsSyncPromise = (async () => {
+      console.log('[REPORT TRACE] syncReportsFromSupabase: Querying remote Supabase tables...');
       try {
-        const { data: rows, error } = await withTimeout(
-          supabase
-            .from('missing_reports')
-            .select('*')
-            .order('created_at', { ascending: false }),
-          5000,
-          { data: null, error: null }
-        );
+        const [missingRes, foundRes] = await Promise.allSettled([
+          withTimeout(
+            supabase.from('missing_reports').select('*').order('created_at', { ascending: false }),
+            6000,
+            { data: null, error: null }
+          ),
+          withTimeout(
+            supabase.from('found_reports').select('*').order('created_at', { ascending: false }),
+            6000,
+            { data: null, error: null }
+          )
+        ]);
 
-        if (!error && rows) {
-          lastReportsSyncTime = Date.now();
-          const missingLocal = JSON.parse(localStorage.getItem("missing_reports") || "[]");
-          const foundLocal = JSON.parse(localStorage.getItem("found_reports") || "[]");
+        const missingRows = (missingRes.status === 'fulfilled' && missingRes.value?.data) ? missingRes.value.data : [];
+        const foundRows = (foundRes.status === 'fulfilled' && foundRes.value?.data) ? foundRes.value.data : [];
 
-          const supabaseMissing = [];
-          const supabaseFound = [];
+        lastReportsSyncTime = Date.now();
+        const missingLocal = JSON.parse(localStorage.getItem("missing_reports") || "[]");
+        const foundLocal = JSON.parse(localStorage.getItem("found_reports") || "[]");
 
-          rows.forEach((row, idx) => {
-            const isFound = row.status === 'Trouvé' || (row.physical_description && row.physical_description.includes('[TROUVÉ]'));
-            let cleanPhysical = row.physical_description || '';
-            let currentSafeLocation = '';
-            let gps = '';
-            if (isFound) {
-              cleanPhysical = cleanPhysical.replace('[TROUVÉ]', '').trim();
-              if (cleanPhysical.includes('Lieu sûr:')) {
-                const parts = cleanPhysical.split('|');
-                cleanPhysical = parts[0].trim();
-                parts.forEach(p => {
-                  if (p.includes('Lieu sûr:')) currentSafeLocation = p.replace('Lieu sûr:', '').trim();
-                  if (p.includes('GPS:')) gps = p.replace('GPS:', '').trim();
-                });
-              }
+        const supabaseMissing = [];
+        const supabaseFound = [];
+
+        (missingRows || []).forEach((row, idx) => {
+          const isFound = row.status === 'Trouvé' || (row.physical_description && row.physical_description.includes('[TROUVÉ]'));
+          let cleanPhysical = row.physical_description || '';
+          let currentSafeLocation = '';
+          let gps = '';
+          if (isFound) {
+            cleanPhysical = cleanPhysical.replace('[TROUVÉ]', '').trim();
+            if (cleanPhysical.includes('Lieu sûr:')) {
+              const parts = cleanPhysical.split('|');
+              cleanPhysical = parts[0].trim();
+              parts.forEach(p => {
+                if (p.includes('Lieu sûr:')) currentSafeLocation = p.replace('Lieu sûr:', '').trim();
+                if (p.includes('GPS:')) gps = p.replace('GPS:', '').trim();
+              });
             }
+          }
 
-            const report = {
-              id: row.id,
-              reporterId: row.reporter_id,
-              name: row.child_full_name,
-              age: row.child_age,
-              gender: row.child_gender,
-              location: row.last_seen_location,
-              date: row.last_seen_date,
-              time: row.last_seen_time,
-              physicalDescription: cleanPhysical,
-              clothingDescription: row.clothing_description,
-              photo: row.child_photo_url || getDefaultChildPortrait(row.child_gender, idx, isFound),
-              status: row.status || (isFound ? 'Trouvé' : 'Published'),
-              urgency: isFound ? 'Recherche Famille' : 'Nouveau',
-              currentSafeLocation: currentSafeLocation,
-              gps: gps,
-              isPublic: row.is_public !== false,
-              createdAt: row.created_at || new Date().toISOString(),
-              type: isFound ? 'found' : 'missing'
-            };
+          const report = {
+            id: row.id,
+            reporterId: row.reporter_id,
+            name: row.child_full_name,
+            age: row.child_age,
+            gender: row.child_gender,
+            location: row.last_seen_location,
+            date: row.last_seen_date,
+            time: row.last_seen_time,
+            physicalDescription: cleanPhysical,
+            clothingDescription: row.clothing_description,
+            photo: row.child_photo_url || getDefaultChildPortrait(row.child_gender, idx, isFound),
+            status: row.status || (isFound ? 'Trouvé' : 'Published'),
+            urgency: isFound ? 'Recherche Famille' : 'Nouveau',
+            currentSafeLocation: currentSafeLocation,
+            gps: gps,
+            isPublic: row.is_public !== false,
+            createdAt: row.created_at || new Date().toISOString(),
+            type: isFound ? 'found' : 'missing'
+          };
 
-            if (isFound) {
-              supabaseFound.push(report);
-            } else {
-              supabaseMissing.push(report);
-            }
-          });
+          if (isFound) {
+            supabaseFound.push(report);
+          } else {
+            supabaseMissing.push(report);
+          }
+        });
 
-          const mergedMissing = mergeReports(missingLocal, supabaseMissing);
-          const mergedFound = mergeReports(foundLocal, supabaseFound);
+        (foundRows || []).forEach((row, idx) => {
+          let cleanPhysical = row.physical_description || '';
+          let currentSafeLocation = '';
+          let gps = '';
+          cleanPhysical = cleanPhysical.replace('[TROUVÉ]', '').trim();
+          if (cleanPhysical.includes('Lieu sûr:')) {
+            const parts = cleanPhysical.split('|');
+            cleanPhysical = parts[0].trim();
+            parts.forEach(p => {
+              if (p.includes('Lieu sûr:')) currentSafeLocation = p.replace('Lieu sûr:', '').trim();
+              if (p.includes('GPS:')) gps = p.replace('GPS:', '').trim();
+            });
+          }
 
-          safeSetLocalStorage("missing_reports", mergedMissing);
-          safeSetLocalStorage("found_reports", mergedFound);
+          const report = {
+            id: row.id,
+            reporterId: row.reporter_id,
+            name: row.child_full_name || "Enfant trouvé",
+            age: null,
+            gender: row.child_gender,
+            location: row.found_location,
+            date: row.found_date,
+            time: row.found_time,
+            physicalDescription: cleanPhysical,
+            clothingDescription: row.clothing_description,
+            photo: row.child_photo_url || getDefaultChildPortrait(row.child_gender, idx, true),
+            status: row.status || 'Trouvé',
+            urgency: 'Recherche Famille',
+            currentSafeLocation: currentSafeLocation,
+            gps: gps,
+            isPublic: row.is_public !== false,
+            createdAt: row.created_at || new Date().toISOString(),
+            type: 'found'
+          };
+          supabaseFound.push(report);
+        });
+
+        const mergedMissing = mergeReports(missingLocal, supabaseMissing);
+        const mergedFound = mergeReports(foundLocal, supabaseFound);
+
+        safeSetLocalStorage("missing_reports", mergedMissing);
+        safeSetLocalStorage("found_reports", mergedFound);
+
+        console.log(`[REPORT TRACE] Sync complete. Total Missing: ${mergedMissing.length}, Total Found: ${mergedFound.length}`);
+
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('raydar:reports-synced', { detail: { missing: mergedMissing, found: mergedFound } }));
         }
       } catch (e) {
-        console.warn("Supabase fetch notice:", e?.message || e);
+        console.warn("[REPORT TRACE] syncReportsFromSupabase exception:", e?.message || e);
       } finally {
         pendingReportsSyncPromise = null;
       }
@@ -604,14 +687,17 @@ export const reportService = {
 
   async createMissingReport(reportData) {
     initLocalStorage();
+    const dbId = generateUUID();
+    console.log('[REPORT TRACE] createMissingReport started with ID:', dbId, 'Name:', reportData.name);
     try {
       let photoUrl = reportData.photo || reportData.childPhoto;
-      if (photoUrl && (photoUrl.startsWith("data:") || photoUrl instanceof File || photoUrl instanceof Blob)) {
-        photoUrl = await this.uploadFileToSupabaseStorage(photoUrl, "avatars");
+      if (photoUrl && (photoUrl.startsWith("data:") || photoUrl.startsWith("blob:") || photoUrl instanceof File || photoUrl instanceof Blob)) {
+        photoUrl = await this.uploadFileToSupabaseStorage(photoUrl, "avatars", "missing-reports", dbId);
       }
       if (!photoUrl) {
         photoUrl = getDefaultChildPortrait(reportData.gender, 0, false);
       }
+      console.log('[REPORT TRACE] Final photo URL for missing report:', photoUrl ? photoUrl.substring(0, 60) + '...' : 'NONE');
 
       // Fast PARALLEL upload of supporting documents with timeout protection
       let docUrlsText = "";
@@ -622,7 +708,7 @@ export const reportService = {
           const docItem = reportData[dk];
           const docData = typeof docItem === 'object' && docItem.dataUrl ? docItem.dataUrl : docItem;
           if (typeof docData === 'string' && (docData.startsWith("data:") || docData.startsWith("http"))) {
-            const upUrl = await this.uploadFileToSupabaseStorage(docData, "avatars");
+            const upUrl = await this.uploadFileToSupabaseStorage(docData, "avatars", `docs-${dk}`, dbId);
             if (upUrl) return ` [${dk}: ${upUrl}]`;
           }
           return '';
@@ -636,7 +722,6 @@ export const reportService = {
           .join('');
       }
 
-      const dbId = generateUUID();
       const currentId = await this.getCurrentUserId();
       const supabaseReporterId = await this.getSupabaseReporterUuid();
 
@@ -670,11 +755,11 @@ export const reportService = {
               isPublic: true
             }
           }),
-          2000,
+          3000,
           null
         );
       } catch (fErr) {
-        console.log("[Supabase Edge Function] Notice invoking Edge Function:", fErr);
+        console.log("[REPORT TRACE] Edge Function notice:", fErr);
       }
 
       // 2. Direct PostgreSQL persistence with timeout protection
@@ -698,37 +783,52 @@ export const reportService = {
           status: "Published",
           is_public: true
         }]),
-        5000,
+        6000,
         { error: null }
       );
 
       if (insertErr) {
-        console.warn("Notice inserting missing report in Supabase:", insertErr.message || insertErr);
+        console.warn("[REPORT TRACE] Notice inserting missing report in Supabase:", insertErr.message || insertErr);
+      } else {
+        console.log("[REPORT TRACE] Successfully inserted missing report into Supabase PostgreSQL missing_reports");
       }
 
+      // 3. Local list immediate update - place at front
       const reports = this.getMissingReports();
-      reports.unshift(newReport);
-      safeSetLocalStorage("missing_reports", reports);
+      const updatedList = [newReport, ...reports.filter(r => r.id !== dbId)];
+      updatedList.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      safeSetLocalStorage("missing_reports", updatedList);
+
+      // 4. Notify all views across tabs/windows
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('raydar:reports-synced', { detail: { report: newReport, type: 'missing' } }));
+        window.dispatchEvent(new Event('storage'));
+      }
+
+      // 5. Trigger background sync
+      setTimeout(() => this.syncReportsFromSupabase(true), 500);
 
       return newReport;
     } catch (e) {
-      console.error("Error creating missing report:", e);
+      console.error("[REPORT TRACE] Error creating missing report:", e);
       return null;
     }
   },
 
   async createFoundReport(reportData) {
     initLocalStorage();
+    const dbId = generateUUID();
+    console.log('[REPORT TRACE] createFoundReport started with ID:', dbId, 'Name:', reportData.name);
     try {
       let photoUrl = reportData.photo || reportData.childPhoto;
-      if (photoUrl && (photoUrl.startsWith("data:") || photoUrl instanceof File || photoUrl instanceof Blob)) {
-        photoUrl = await this.uploadFileToSupabaseStorage(photoUrl, "avatars");
+      if (photoUrl && (photoUrl.startsWith("data:") || photoUrl.startsWith("blob:") || photoUrl instanceof File || photoUrl instanceof Blob)) {
+        photoUrl = await this.uploadFileToSupabaseStorage(photoUrl, "avatars", "found-reports", dbId);
       }
       if (!photoUrl) {
         photoUrl = getDefaultChildPortrait(reportData.gender, 0, true);
       }
+      console.log('[REPORT TRACE] Final photo URL for found report:', photoUrl ? photoUrl.substring(0, 60) + '...' : 'NONE');
 
-      const dbId = generateUUID();
       const currentId = await this.getCurrentUserId();
       const supabaseReporterId = await this.getSupabaseReporterUuid();
 
@@ -761,11 +861,11 @@ export const reportService = {
               isPublic: true
             }
           }),
-          2000,
+          3000,
           null
         );
       } catch (fErr) {
-        console.log("[Supabase Edge Function] Notice invoking Edge Function:", fErr);
+        console.log("[REPORT TRACE] Edge Function notice:", fErr);
       }
 
       // 2. Direct PostgreSQL persistence with timeout protection
@@ -785,21 +885,34 @@ export const reportService = {
           status: "Published",
           is_public: true
         }]),
-        5000,
+        6000,
         { error: null }
       );
 
       if (insertErr) {
-        console.warn("Notice inserting found report in Supabase:", insertErr.message || insertErr);
+        console.warn("[REPORT TRACE] Notice inserting found report in Supabase:", insertErr.message || insertErr);
+      } else {
+        console.log("[REPORT TRACE] Successfully inserted found report into Supabase PostgreSQL found_reports");
       }
 
+      // 3. Local list immediate update - place at front
       const reports = this.getFoundReports();
-      reports.unshift(newReport);
-      safeSetLocalStorage("found_reports", reports);
+      const updatedList = [newReport, ...reports.filter(r => r.id !== dbId)];
+      updatedList.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      safeSetLocalStorage("found_reports", updatedList);
+
+      // 4. Notify all views
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('raydar:reports-synced', { detail: { report: newReport, type: 'found' } }));
+        window.dispatchEvent(new Event('storage'));
+      }
+
+      // 5. Trigger background sync
+      setTimeout(() => this.syncReportsFromSupabase(true), 500);
 
       return newReport;
     } catch (e) {
-      console.error("Error creating found report:", e);
+      console.error("[REPORT TRACE] Error creating found report:", e);
       return null;
     }
   },

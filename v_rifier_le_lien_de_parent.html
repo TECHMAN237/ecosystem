@@ -433,6 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleSubmit(btn) {
         const currentDraft = formDraftState.getMissingDraft();
+        console.log('[REPORT TRACE] Handling missing report final submission. Photo present:', !!currentDraft.photo, 'Length:', currentDraft.photo ? currentDraft.photo.length : 0);
 
         const hasDocInUI = document.querySelector('.btn-remove-doc') !== null;
         const hasAnyDoc = currentDraft.birthCertificate || currentDraft.guardianshipDoc || currentDraft.schoolDoc || currentDraft.familyPhoto || currentDraft.hospitalRecord || hasDocInUI;
@@ -448,24 +449,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (errorBanner) errorBanner.classList.add('hidden');
         btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Envoi au serveur...';
         btn.style.opacity = "0.7";
-
-        const defaultPhoto = (currentDraft.gender === 'fille' || currentDraft.gender === 'f')
-            ? '/assets/children/child-02.webp'
-            : '/assets/children/child-01.webp';
+        btn.disabled = true;
 
         const finalReport = {
-            name: currentDraft.name || "Kevin Martin",
+            name: currentDraft.name || "Signalement Enfant",
             age: currentDraft.age || 8,
             gender: currentDraft.gender || "garcon",
             height: currentDraft.height || "1m20",
-            location: currentDraft.location || "Yaoundé, Mvog-Mbi",
+            location: currentDraft.location || "Yaoundé",
             date: currentDraft.date || new Date().toISOString().split('T')[0],
-            time: currentDraft.time || "14:30",
-            physicalDescription: currentDraft.physicalDescription || "Teint noir, cheveux courts.",
+            time: currentDraft.time || new Date().toTimeString().split(' ')[0].substring(0, 5),
+            physicalDescription: currentDraft.physicalDescription || "Aucune description physique supplémentaire.",
             clothingDescription: currentDraft.clothingDescription || "Non spécifié.",
             relationship: currentDraft.relationship || "mere",
             notes: currentDraft.notes || "",
-            photo: currentDraft.photo || defaultPhoto,
+            photo: currentDraft.photo || null,
             birthCertificate: currentDraft.birthCertificate || (document.querySelector('#birthCertificateContainer .btn-remove-doc') ? { name: "acte_naissance.pdf", size: "240.0", dataUrl: "" } : null),
             guardianshipDoc: currentDraft.guardianshipDoc || (document.querySelector('#guardianshipContainer .btn-remove-doc') ? { name: "tutelle.pdf", size: "200.0", dataUrl: "" } : null),
             schoolDoc: currentDraft.schoolDoc || (document.querySelector('#schoolContainer .btn-remove-doc') ? { name: "scolarite.pdf", size: "180.0", dataUrl: "" } : null),
@@ -473,11 +471,12 @@ document.addEventListener('DOMContentLoaded', () => {
             hospitalRecord: currentDraft.hospitalRecord || (document.querySelector('#hospitalRecordContainer .btn-remove-doc') ? { name: "sante.pdf", size: "150.0", dataUrl: "" } : null)
         };
 
-        // Create the missing report (with Supabase Storage upload + DB insert)
+        // Create the missing report (with unique Supabase Storage upload + DB insert + real-time sync)
+        console.log('[REPORT TRACE] Submitting finalReport to reportService.createMissingReport:', finalReport.name, 'Photo:', finalReport.photo ? finalReport.photo.substring(0, 50) + '...' : 'NONE');
         const savedReport = await reportService.createMissingReport(finalReport);
-        console.log("Saved missing report from multi-step workflow:", savedReport);
+        console.log('[REPORT TRACE] Saved missing report result:', savedReport);
 
-        // Clear draft
+        // Clear draft only after successful submission
         formDraftState.clearMissingDraft();
 
         btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Signalement Envoyé!';

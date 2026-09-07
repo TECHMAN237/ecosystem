@@ -156,13 +156,13 @@
 </div><!-- Form Card -->
 <div class="bg-surface-container-lowest rounded-xl p-lg soft-shadow border border-surface-variant">
 <form class="space-y-lg" id="missingForm">
-<!-- Photo Upload Area -->
-<div id="uploadContainer" class="flex flex-col items-center justify-center p-xl border-2 border-dashed border-outline-variant rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer group relative overflow-hidden">
-<div class="w-24 h-24 rounded-lg bg-surface-container-highest flex items-center justify-center mb-md group-hover:scale-105 transition-transform">
-<span class="material-symbols-outlined text-primary text-[48px]">add_a_photo</span>
+<!-- Photo Upload Area (Aligned with Found Report visual UX reference) -->
+<div id="uploadContainer" class="bg-surface rounded-2xl p-6 border-2 border-dashed border-outline-variant flex flex-col items-center justify-center text-center cursor-pointer hover:bg-surface-container-low hover:border-primary transition-all group shadow-[0px_4px_20px_rgba(108,77,255,0.06)] relative overflow-hidden aspect-square max-w-[340px] mx-auto w-full">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 group-hover:scale-110 transition-transform text-primary">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 0;">add_a_photo</span>
 </div>
-<span class="font-label-bold text-label-bold text-primary">Ajouter une photo récente</span>
-<span class="font-label-sm text-label-sm text-outline mt-base">Format JPG ou PNG (Max. 5MB)</span>
+<p class="font-label-bold text-label-bold text-on-surface mb-1">Ajouter une photo</p>
+<p class="font-body-md text-body-md text-on-surface-variant text-xs">Visage dégagé de préférence</p>
 <input id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
 </div>
 <!-- Personal Info Grid -->
@@ -247,6 +247,7 @@
 
 <script type="module">
 import { formDraftState } from './src/formDraftState.js';
+import { compressImage } from './src/reportService.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('fileInput');
@@ -272,29 +273,48 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    function renderPhotoPreview(base64) {
+    function renderPhotoPreview(photoSrc) {
+        if (!uploadContainer) return;
         uploadContainer.innerHTML = `
-            <div class="absolute inset-0 w-full h-full flex items-center justify-center bg-surface-container-low">
-                <img src="${base64}" class="w-full h-full object-contain" />
-                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <span class="text-white font-label-bold text-label-bold">Changer la photo</span>
+            <div class="absolute inset-0 w-full h-full">
+                <img src="${photoSrc}" class="w-full h-full object-cover rounded-2xl" alt="Photo de l'enfant" />
+                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-2xl">
+                    <span class="text-white font-label-bold text-label-bold bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm border border-white/20">Changer la photo</span>
                 </div>
             </div>
             <input id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
         `;
-        document.getElementById('fileInput').addEventListener('change', handleFileChange);
+        document.getElementById('fileInput')?.addEventListener('change', handleFileChange);
     }
 
-    function handleFileChange(e) {
-        const file = e.target.files[0];
+    async function handleFileChange(e) {
+        const file = e.target.files?.[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const base64 = evt.target.result;
-                formDraftState.updateMissingDraft({ photo: base64 });
-                renderPhotoPreview(base64);
-            };
-            reader.readAsDataURL(file);
+            console.log('[REPORT TRACE] Selected photo in Missing Report Step 1:', file.name, file.size, file.type);
+            
+            // Immediate fast preview
+            let tempUrl = "";
+            try {
+                tempUrl = URL.createObjectURL(file);
+                renderPhotoPreview(tempUrl);
+            } catch (err) {}
+
+            // Compress and save to draft state
+            try {
+                const compressed = await compressImage(file, 1000, 0.82);
+                console.log('[REPORT TRACE] Compressed photo string length:', compressed.length);
+                formDraftState.updateMissingDraft({ photo: compressed });
+                renderPhotoPreview(compressed);
+            } catch (cErr) {
+                console.warn('[REPORT TRACE] Compression fallback to FileReader:', cErr);
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const rawBase64 = evt.target.result;
+                    formDraftState.updateMissingDraft({ photo: rawBase64 });
+                    renderPhotoPreview(rawBase64);
+                };
+                reader.readAsDataURL(file);
+            }
         }
     }
 
@@ -305,6 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Restore existing draft
     const draft = formDraftState.getMissingDraft();
     if (draft.photo) {
+        console.log('[REPORT TRACE] Restoring existing photo from draft in Step 1');
         renderPhotoPreview(draft.photo);
     }
     if (draft.name) fullNameInput.value = draft.name;
@@ -323,6 +344,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSubmit.addEventListener('click', () => {
         const checkedRadio = document.querySelector('input[name="relationship"]:checked');
         const relationship = checkedRadio ? checkedRadio.value : "mere";
+
+        const currentDraft = formDraftState.getMissingDraft();
+        console.log('[REPORT TRACE] Submitting Step 1. Photo present:', !!currentDraft.photo);
 
         formDraftState.updateMissingDraft({
             name: fullNameInput.value.trim() || "Anonyme",

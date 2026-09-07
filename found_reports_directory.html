@@ -269,15 +269,26 @@
             }
 
             // Initial fetch of found reports
-            const foundReports = reportService.getFoundReports();
-            renderReports(foundReports);
+            function refreshFound() {
+                const query = searchInput ? searchInput.value : '';
+                if (query) {
+                    const filtered = reportService.searchReports(query, true);
+                    renderReports(filtered);
+                } else {
+                    const foundReports = reportService.getFoundReports();
+                    renderReports(foundReports);
+                }
+            }
+
+            refreshFound();
 
             // Real-time search handler
-            searchInput.addEventListener('input', (e) => {
-                const query = e.target.value;
-                const filtered = reportService.searchReports(query, true); // isFound = true
-                renderReports(filtered);
+            searchInput?.addEventListener('input', (e) => {
+                refreshFound();
             });
+
+            window.addEventListener('raydar:reports-synced', refreshFound);
+            window.addEventListener('storage', refreshFound);
         });
     </script>
     </div>

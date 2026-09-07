@@ -297,6 +297,7 @@
 
 <script type="module">
 import { formDraftState } from './src/formDraftState.js';
+import { compressImage } from './src/reportService.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.querySelector('input[type="file"]');
@@ -307,13 +308,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const heightInput = document.getElementById('height');
     const btnNext = document.getElementById('btnNext');
 
-    function renderPhotoPreview(base64) {
+    function renderPhotoPreview(photoSrc) {
         if (!uploadArea) return;
         uploadArea.innerHTML = `
             <div class="absolute inset-0 w-full h-full">
-                <img src="${base64}" class="w-full h-full object-cover" />
+                <img src="${photoSrc}" class="w-full h-full object-cover" alt="Photo preview" />
                 <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <span class="text-white font-label-bold text-label-bold">Changer la photo</span>
+                    <span class="text-white font-label-bold text-label-bold bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm border border-white/20">Changer la photo</span>
                 </div>
             </div>
             <input accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
@@ -321,16 +322,30 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadArea.querySelector('input[type="file"]')?.addEventListener('change', handleFileChange);
     }
 
-    function handleFileChange(e) {
-        const file = e.target.files[0];
+    async function handleFileChange(e) {
+        const file = e.target.files?.[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const base64 = evt.target.result;
-                formDraftState.updateMissingDraft({ photo: base64 });
-                renderPhotoPreview(base64);
-            };
-            reader.readAsDataURL(file);
+            console.log('[REPORT TRACE] Selected photo in create_missing_report:', file.name, file.size);
+            let tempUrl = "";
+            try {
+                tempUrl = URL.createObjectURL(file);
+                renderPhotoPreview(tempUrl);
+            } catch (err) {}
+
+            try {
+                const compressed = await compressImage(file, 1000, 0.82);
+                console.log('[REPORT TRACE] Compressed photo length in create_missing_report:', compressed.length);
+                formDraftState.updateMissingDraft({ photo: compressed });
+                renderPhotoPreview(compressed);
+            } catch (cErr) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const base64 = evt.target.result;
+                    formDraftState.updateMissingDraft({ photo: base64 });
+                    renderPhotoPreview(base64);
+                };
+                reader.readAsDataURL(file);
+            }
         }
     }
 
@@ -350,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Save on next click
     btnNext.addEventListener('click', () => {
-        const name = fullNameInput.value.trim() || "Kevin Martin";
+        const name = fullNameInput.value.trim() || "Anonyme";
         const age = parseInt(ageInput.value) || 8;
         const gender = genderSelect.value || "garcon";
         const height = heightInput.value.trim() || "1m20";

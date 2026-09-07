@@ -395,26 +395,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dynamically load user profile from reportService
     loadAndSyncProfile();
 
-    // Load and render recent reports (missing and found) in carousel
-    const carousel = document.getElementById('recentMissingCarousel');
-    if (carousel) {
+    function renderCarousel() {
+        const carousel = document.getElementById('recentMissingCarousel');
+        if (!carousel) return;
         const missing = reportService.getMissingReports();
         const found = reportService.getFoundReports();
-        const allReports = [...missing, ...found].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        const allReports = [...missing, ...found].sort((a, b) => new Date(b.createdAt || b.created_at || 0) - new Date(a.createdAt || a.created_at || 0));
+        
+        console.log('[REPORT TRACE] Rendering home carousel with reports count:', allReports.length);
         if (allReports.length > 0) {
             carousel.innerHTML = allReports.map(report => {
-                const isFound = report.type === 'found' || report.currentSafeLocation || report.name.includes('trouvé');
+                const isFound = report.type === 'found' || report.currentSafeLocation || (report.name && report.name.includes('trouvé'));
                 const badgeText = isFound ? 'Trouvé' : (report.urgency || 'Urgent');
                 const badgeClass = isFound ? 'bg-green-100 text-green-700' : 'bg-error-container text-error';
                 return `
                 <div class="flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 shadow-[0_6px_24px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.02)] border border-outline-variant/20 flex gap-3.5 items-center hover:shadow-[0_12px_32px_rgba(83,44,230,0.06)] hover:-translate-y-0.5 transition-all duration-300">
                   <div class="w-[96px] h-[112px] rounded-[14px] overflow-hidden flex-shrink-0 bg-surface-container-high relative shadow-inner">
-                    <img alt="${report.name}" class="w-full h-full object-cover" src="${report.photo}" />
+                    <img alt="${report.name}" class="w-full h-full object-cover" src="${report.photo}" onerror="this.src='/assets/children/child-01.webp'" />
                   </div>
                   <div class="flex-1 flex flex-col h-full justify-between py-0.5">
                     <div>
-                      <h3 class="font-bold text-[16px] text-on-surface leading-snug mb-0.5">${report.name}</h3>
-                      <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1.5">
+                      <h3 class="font-bold text-[16px] text-on-surface leading-snug mb-0.5 truncate">${report.name}</h3>
+                      <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1.5 truncate">
                         <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
                         ${report.location}
                       </p>
@@ -447,20 +449,24 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             carousel.innerHTML = `<p class="text-xs text-on-surface-variant px-4">Aucun cas de disparition actif.</p>`;
         }
+
+        // Update bottom card counters
+        const foundCountText = document.getElementById('foundCountText');
+        if (foundCountText) {
+            const foundCount = reportService.getFoundReports().length;
+            foundCountText.textContent = foundCount > 0 ? `${foundCount} enfant(s) trouvé(s) en attente.` : "Aucun signalement en attente.";
+        }
+
+        const missingCountText = document.getElementById('missingCountText');
+        if (missingCountText) {
+            const missingCount = reportService.getMissingReports().length;
+            missingCountText.textContent = missingCount > 0 ? `${missingCount} alerte(s) active(s) à proximité.` : "Aucune alerte active.";
+        }
     }
 
-    // Update bottom card counters
-    const foundCountText = document.getElementById('foundCountText');
-    if (foundCountText) {
-        const found = reportService.getFoundReports();
-        foundCountText.textContent = found.length > 0 ? `${found.length} enfant(s) trouvé(s) en attente.` : "Aucun signalement en attente.";
-    }
-
-    const missingCountText = document.getElementById('missingCountText');
-    if (missingCountText) {
-        const missing = reportService.getMissingReports();
-        missingCountText.textContent = missing.length > 0 ? `${missing.length} alerte(s) active(s) à proximité.` : "Aucune alerte active.";
-    }
+    renderCarousel();
+    window.addEventListener('raydar:reports-synced', renderCarousel);
+    window.addEventListener('storage', renderCarousel);
 });
 </script>
 
