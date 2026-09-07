@@ -588,22 +588,106 @@ export async function createRaydarProfile({
   return data || payload;
 }
 
+const INTENT_KEY = 'raydar_internal_nav_intent';
+const RELOAD_KEY = 'raydar_reload_intent';
+const INTENT_VALIDITY_WINDOW_MS = 25000; // 25 seconds window for navigation transition
+
 /**
- * Temporary forensic trace helper for route guard auditing.
+ * Registers an internal navigation intent before an in-app transition.
+ * Sets a single-use, timestamped payload with source and target info.
  */
-function logRouteTrace({ destination, fnName, reason, authUserId, profileId, profileExists, role }) {
+export function registerInternalNavIntent(targetUrl = '') {
+  try {
+    const payload = {
+      timestamp: Date.now(),
+      source: window.location.pathname + window.location.search,
+      target: targetUrl,
+      nonce: 'nav_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now()
+    };
+    sessionStorage.setItem(INTENT_KEY, JSON.stringify(payload));
+  } catch (e) {
+    console.warn("Notice registering internal navigation intent:", e);
+  }
+}
+
+/**
+ * Consumes and validates the one-time internal navigation intent.
+ * Once checked, the token is IMMEDIATELY DELETED from sessionStorage to ensure single-use only.
+ * 
+ * Returns { isValid: boolean, intent: object | null, type: 'INTERNAL' | 'RELOAD' | 'DIRECT' }
+ */
+export function consumeInternalNavIntent() {
+  try {
+    // 1. Check one-time in-app navigation intent token
+    const raw = sessionStorage.getItem(INTENT_KEY);
+    if (raw) {
+      sessionStorage.removeItem(INTENT_KEY); // CRITICAL: Consumed immediately (one-time use)!
+      const parsed = JSON.parse(raw);
+      const isFresh = parsed && parsed.timestamp && (Date.now() - parsed.timestamp <= INTENT_VALIDITY_WINDOW_MS);
+      if (isFresh) {
+        return { isValid: true, intent: parsed, type: 'INTERNAL' };
+      }
+    }
+
+    // 2. Check if this is an explicit in-tab page refresh (F5 / browser reload)
+    let isReload = false;
+    if (typeof performance !== 'undefined') {
+      const navEntries = performance.getEntriesByType('navigation');
+      if (navEntries && navEntries.length > 0) {
+        isReload = navEntries[0].type === 'reload';
+      } else if (performance.navigation) {
+        isReload = performance.navigation.type === 1; // TYPE_RELOAD
+      }
+    }
+    const rawReload = sessionStorage.getItem(RELOAD_KEY);
+    if (rawReload) {
+      sessionStorage.removeItem(RELOAD_KEY);
+      const parsedReload = JSON.parse(rawReload);
+      if (parsedReload && (Date.now() - parsedReload.timestamp <= 10000) && parsedReload.page === window.location.pathname) {
+        isReload = true;
+      }
+    }
+    if (isReload) {
+      return { isValid: true, intent: null, type: 'RELOAD' };
+    }
+  } catch (e) {
+    console.warn("Notice evaluating navigation intent:", e);
+  }
+
+  return { isValid: false, intent: null, type: 'DIRECT' };
+}
+
+/**
+ * Structured forensic trace logger for authentication and route guard decisions.
+ */
+export function logAuthTrace({
+  currentUrl,
+  destination,
+  navigationType,
+  internalIntent,
+  intentTimestamp,
+  intentValid,
+  supabaseSession,
+  authenticated,
+  userId,
+  returnUrl,
+  redirectReason,
+  redirectSourceFunction
+}) {
   if (typeof window !== 'undefined') {
-    console.log(`[RAYDAR ROUTE TRACE]
-CURRENT PAGE: ${window.location.pathname}
-DESTINATION: ${destination}
-FUNCTION: ${fnName}
-REASON: ${reason}
-AUTH USER ID: ${authUserId || 'none'}
-PROFILE ID: ${profileId || 'none'}
-PROFILE EXISTS: ${Boolean(profileExists)}
-ROLE: ${role || 'undefined'}
-SESSION STORAGE STATE: in_app=${sessionStorage.getItem('raydar_in_app_session')}, signup=${sessionStorage.getItem('signup_in_progress')}
-TIMESTAMP: ${new Date().toISOString()}`);
+    console.log(`[AUTH TRACE]
+current URL: ${currentUrl || (window.location.pathname + window.location.search)}
+destination: ${destination || 'none'}
+navigation type: ${navigationType || 'DIRECT'}
+internal navigation intent: ${Boolean(internalIntent)}
+intent timestamp: ${intentTimestamp || 'none'}
+intent valid: ${Boolean(intentValid)}
+Supabase session: ${Boolean(supabaseSession)}
+authenticated: ${Boolean(authenticated)}
+user ID: ${userId || 'none'}
+returnUrl: ${returnUrl || 'none'}
+redirect reason: ${redirectReason || 'none'}
+redirect source function: ${redirectSourceFunction || 'protectRoute'}`);
   }
 }
 
@@ -630,17 +714,28 @@ export async function protectRoute(routeType) {
   const { state, session, profile } = authInfo;
   const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1';
 
+  // Evaluate one-time internal navigation intent for this page load
+  const navCheck = consumeInternalNavIntent();
+  const isInternalNavValid = navCheck.isValid;
+  const navigationType = navCheck.type;
+
   // Direct/Shared external link gatekeeper:
-  // If user opens a private user route directly without active in-app tab session, enforce login verification
-  if (!isPublic && (!session || sessionStorage.getItem('raydar_in_app_session') !== 'true')) {
-    logRouteTrace({
+  // If user opens a private route directly without a valid one-time internal navigation intent,
+  // enforce explicit login verification regardless of existing Supabase session!
+  if (!isPublic && !isInternalNavValid) {
+    logAuthTrace({
+      currentUrl: window.location.pathname + window.location.search,
       destination: './login_child_safety.html',
-      fnName: 'protectRoute.directLinkGate',
-      reason: !session ? 'No active session' : 'Direct link opened externally (requires fresh login)',
-      authUserId: session?.user?.id,
-      profileId: profile?.id,
-      profileExists: Boolean(profile),
-      role: profile?.role
+      navigationType: 'DIRECT',
+      internalIntent: Boolean(navCheck.intent),
+      intentTimestamp: navCheck.intent?.timestamp,
+      intentValid: false,
+      supabaseSession: Boolean(session),
+      authenticated: Boolean(session),
+      userId: session?.user?.id,
+      returnUrl: window.location.pathname + window.location.search,
+      redirectReason: 'Direct URL entry detected — explicit login required',
+      redirectSourceFunction: 'protectRoute.directEntryGate'
     });
     saveReturnUrlAndRedirectToLogin();
     return {
@@ -651,16 +746,21 @@ export async function protectRoute(routeType) {
     };
   }
 
-  // Protect private pages: if no session and not public, redirect to login with returnUrl
+  // Protect private pages: if no active session, redirect to login
   if (!session && !isPublic) {
-    logRouteTrace({
+    logAuthTrace({
+      currentUrl: window.location.pathname + window.location.search,
       destination: './login_child_safety.html',
-      fnName: 'protectRoute.unauthenticated',
-      reason: `No session on private route '${routeType}'`,
-      authUserId: null,
-      profileId: null,
-      profileExists: false,
-      role: undefined
+      navigationType: navigationType,
+      internalIntent: Boolean(navCheck.intent),
+      intentTimestamp: navCheck.intent?.timestamp,
+      intentValid: isInternalNavValid,
+      supabaseSession: false,
+      authenticated: false,
+      userId: null,
+      returnUrl: window.location.pathname + window.location.search,
+      redirectReason: `No active session for private route '${routeType}'`,
+      redirectSourceFunction: 'protectRoute.unauthenticated'
     });
     saveReturnUrlAndRedirectToLogin();
     return {
@@ -669,6 +769,23 @@ export async function protectRoute(routeType) {
       user: null,
       profile: null
     };
+  }
+
+  if (!isPublic) {
+    logAuthTrace({
+      currentUrl: window.location.pathname + window.location.search,
+      destination: window.location.pathname + window.location.search,
+      navigationType: navigationType,
+      internalIntent: true,
+      intentTimestamp: navCheck.intent?.timestamp,
+      intentValid: true,
+      supabaseSession: true,
+      authenticated: true,
+      userId: session?.user?.id,
+      returnUrl: 'none',
+      redirectReason: 'Internal navigation intent validated. Access granted.',
+      redirectSourceFunction: 'protectRoute.allow'
+    });
   }
 
   console.log(`[RAYDAR Route Guard] Route Type: ${routeType}, State: ${state}`);
@@ -677,64 +794,47 @@ export async function protectRoute(routeType) {
     case 'public':
       return authInfo;
 
-    case 'login': // Triggered after explicit login or OAuth callback
+    case 'login': // Triggered after explicit login submission or OAuth callback
       if (session) {
-        sessionStorage.setItem('raydar_in_app_session', 'true');
         const returnUrl = getAndClearReturnUrl();
-        if (state === AuthState.AUTHENTICATED_ADMIN) {
-          logRouteTrace({
-            destination: returnUrl || './admin_dashboard.html',
-            fnName: 'protectRoute.login.admin',
-            reason: 'Admin authenticated',
-            authUserId: session.user.id,
-            profileId: profile?.id,
-            profileExists: Boolean(profile),
-            role: profile?.role
-          });
-          window.location.replace(returnUrl || './admin_dashboard.html');
-          return authInfo;
-        }
-        if (state === AuthState.AUTHENTICATED_USER || state === AuthState.AUTHENTICATED_NO_PROFILE) {
-          logRouteTrace({
-            destination: returnUrl || './home_child_safety_v1.html',
-            fnName: 'protectRoute.login.user',
-            reason: 'User authenticated',
-            authUserId: session.user.id,
-            profileId: profile?.id,
-            profileExists: Boolean(profile),
-            role: profile?.role
-          });
-          window.location.replace(returnUrl || './home_child_safety_v1.html');
-          return authInfo;
-        }
+        const destination = returnUrl || (state === AuthState.AUTHENTICATED_ADMIN ? './admin_dashboard.html' : './home_child_safety_v1.html');
+        
+        // Register one-time internal navigation intent for destination
+        registerInternalNavIntent(destination);
+        
+        logAuthTrace({
+          currentUrl: window.location.pathname + window.location.search,
+          destination: destination,
+          navigationType: 'INTERNAL',
+          internalIntent: true,
+          intentTimestamp: Date.now(),
+          intentValid: true,
+          supabaseSession: true,
+          authenticated: true,
+          userId: session.user.id,
+          returnUrl: returnUrl,
+          redirectReason: 'Explicit login successful. Navigating to destination.',
+          redirectSourceFunction: 'protectRoute.login'
+        });
+
+        window.location.replace(destination);
+        return authInfo;
       }
       break;
 
     case 'signup_step_1': // sign_up_child_safety.html
       if (session && sessionStorage.getItem('signup_in_progress') !== 'true') {
-        if (state === AuthState.AUTHENTICATED_ADMIN) {
-          window.location.replace('./admin_dashboard.html');
-          return authInfo;
-        }
-        if (state === AuthState.AUTHENTICATED_USER) {
-          window.location.replace('./home_child_safety_v1.html');
-          return authInfo;
-        }
+        const target = state === AuthState.AUTHENTICATED_ADMIN ? './admin_dashboard.html' : './home_child_safety_v1.html';
+        registerInternalNavIntent(target);
+        window.location.replace(target);
+        return authInfo;
       }
       break;
 
     case 'registration_step': // account_type_selection_updated_flow.html
-      // CRITICAL: If user already has an active session and is not explicitly in fresh signup, send to home!
+      // If user already has an established profile and is not in fresh signup, route to home
       if (session && sessionStorage.getItem('signup_in_progress') !== 'true') {
-        logRouteTrace({
-          destination: './home_child_safety_v1.html',
-          fnName: 'protectRoute.registration_step.existingUser',
-          reason: 'Existing authenticated user visited registration page',
-          authUserId: session.user.id,
-          profileId: profile?.id,
-          profileExists: Boolean(profile),
-          role: profile?.role
-        });
+        registerInternalNavIntent('./home_child_safety_v1.html');
         window.location.replace('./home_child_safety_v1.html');
         return authInfo;
       }
@@ -745,17 +845,8 @@ export async function protectRoute(routeType) {
       break;
 
     case 'profile_completion': // basic_information.html
-      // CRITICAL: An existing user must NEVER see profile completion again!
       if (session && sessionStorage.getItem('signup_in_progress') !== 'true') {
-        logRouteTrace({
-          destination: './home_child_safety_v1.html',
-          fnName: 'protectRoute.profile_completion.existingUser',
-          reason: 'Existing authenticated user visited basic_information page',
-          authUserId: session.user.id,
-          profileId: profile?.id,
-          profileExists: Boolean(profile),
-          role: profile?.role
-        });
+        registerInternalNavIntent('./home_child_safety_v1.html');
         window.location.replace('./home_child_safety_v1.html');
         return authInfo;
       }
@@ -771,9 +862,11 @@ export async function protectRoute(routeType) {
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_ADMIN) {
+        registerInternalNavIntent('./admin_dashboard.html');
         window.location.replace('./admin_dashboard.html');
         return authInfo;
       }
+      registerInternalNavIntent('./home_child_safety_v1.html');
       window.location.replace('./home_child_safety_v1.html');
       return authInfo;
 
@@ -782,9 +875,6 @@ export async function protectRoute(routeType) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
-      // CRITICAL NON-NEGOTIABLE RULE:
-      // An existing authenticated user navigating within the application (e.g. clicking 'Accueil',
-      // 'Profil', 'Signalements', 'Alertes', or refreshing) MUST NEVER BE REDIRECTED TO REGISTRATION!
       return authInfo;
 
     case 'admin': // admin_dashboard.html
@@ -795,6 +885,7 @@ export async function protectRoute(routeType) {
       if (state !== AuthState.AUTHENTICATED_ADMIN) {
         console.warn("Security Alert: Normal user attempted access to admin route. Redirecting to normal app.");
         sessionStorage.setItem('access_denied_message', 'Accès réservé aux administrateurs.');
+        registerInternalNavIntent('./home_child_safety_v1.html');
         window.location.replace('./home_child_safety_v1.html');
         return authInfo;
       }
@@ -822,6 +913,56 @@ export async function protectPrivatePage() {
   return session;
 }
 
+// Global click & navigation capture to automatically register internal navigation intent
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  document.addEventListener('click', (event) => {
+    try {
+      // 1. Check anchor tag
+      const anchor = event.target.closest('a');
+      if (anchor) {
+        const href = anchor.getAttribute('href');
+        if (href && !href.startsWith('#') && !href.startsWith('javascript:') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
+          registerInternalNavIntent(href);
+          return;
+        }
+      }
+
+      // 2. Check button or element with onclick / data-navigate
+      const clickable = event.target.closest('button, [onclick], [data-navigate], [data-href]');
+      if (clickable) {
+        const onclickAttr = clickable.getAttribute('onclick') || '';
+        const dataNav = clickable.getAttribute('data-navigate') || clickable.getAttribute('data-href') || '';
+        if (dataNav) {
+          registerInternalNavIntent(dataNav);
+          return;
+        }
+        if (onclickAttr.includes('location') || onclickAttr.includes('.html') || onclickAttr.includes('history.')) {
+          const match = onclickAttr.match(/['"](\.?\/[^'"]+\.html[^'"]*)['"]/);
+          if (match && match[1]) {
+            registerInternalNavIntent(match[1]);
+          } else {
+            registerInternalNavIntent();
+          }
+          return;
+        }
+        registerInternalNavIntent();
+      }
+    } catch (e) {
+      console.warn("Notice capturing navigation intent:", e);
+    }
+  }, true);
+
+  // Record page reload intent before unload
+  window.addEventListener('beforeunload', () => {
+    try {
+      sessionStorage.setItem(RELOAD_KEY, JSON.stringify({
+        timestamp: Date.now(),
+        page: window.location.pathname
+      }));
+    } catch (e) {}
+  });
+}
+
 // Expose on window for vanilla script compatibility
 if (typeof window !== 'undefined') {
   window.authService = {
@@ -837,9 +978,13 @@ if (typeof window !== 'undefined') {
     protectRoute,
     protectPrivatePage,
     saveReturnUrlAndRedirectToLogin,
-    getAndClearReturnUrl
+    getAndClearReturnUrl,
+    registerInternalNavIntent,
+    consumeInternalNavIntent,
+    logAuthTrace
   };
   window.handleLogout = signOut;
   window.protectPrivatePage = protectPrivatePage;
+  window.registerInternalNavIntent = registerInternalNavIntent;
 }
 

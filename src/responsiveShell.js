@@ -47,28 +47,24 @@
         const styleEl = document.createElement('style');
         styleEl.id = styleId;
         styleEl.textContent = `
-            /* Desktop Layout Offsets: Full-Width Top Branding Navbar */
+            /* Desktop Layout: Left Sidebar (min-width: 768px) */
             @media (min-width: 768px) {
                 body:not(.v2-preview-page) main,
                 body:not(.v2-preview-page) .main-content-area {
-                    margin-left: 0 !important;
-                    max-width: 100% !important;
-                    padding-top: 5rem !important;
+                    margin-left: 240px !important;
+                    width: calc(100% - 240px) !important;
+                    max-width: calc(100% - 240px) !important;
+                    padding-top: 1.5rem !important;
+                    padding-bottom: 3rem !important;
+                }
+                body:not(.v2-preview-page) header.sticky.top-0,
+                body:not(.v2-preview-page) header.fixed.top-0 {
+                    margin-left: 240px !important;
+                    width: calc(100% - 240px) !important;
+                    max-width: calc(100% - 240px) !important;
                 }
                 body:not(.v2-preview-page) {
-                    padding-bottom: 2rem !important;
-                }
-                /* Offset fixed action bars on desktop */
-                body:not(.v2-preview-page) nav.fixed.bottom-0:not(.mobile-bottom-nav),
-                body:not(.v2-preview-page) footer.fixed.bottom-0:not(.mobile-bottom-nav),
-                body:not(.v2-preview-page) div.fixed.bottom-0:not(.mobile-bottom-nav) {
-                    left: 0 !important;
-                    width: 100% !important;
-                }
-                /* Offset page headers under top desktop bar */
-                body:not(.v2-preview-page) header.sticky.top-0:not(.desktop-navbar),
-                body:not(.v2-preview-page) header.fixed.top-0:not(.desktop-navbar) {
-                    top: 4rem !important;
+                    background-color: #EDF0F5 !important;
                 }
             }
             
@@ -157,77 +153,75 @@
         const isDesktop = window.matchMedia('(min-width: 768px)').matches;
 
         if (isDesktop) {
-            // DESKTOP: Render Full-Width Solid Violet Branding Navigation Bar
+            // DESKTOP: Render Left Sidebar matching user's reference image
             if (!isV2Preview) {
-                const desktopNavbarHtml = `
-                    <header data-shell-element="true" class="desktop-navbar fixed top-0 left-0 w-full z-50 h-16 bg-[#532CE6] border-b border-[#4321C4] shadow-[0_4px_24px_rgba(83,44,230,0.25)] flex items-center">
-                        <div class="w-full max-w-7xl mx-auto px-6 flex items-center justify-between">
-                            <!-- Left: RAYDAR Brand -->
-                            <div class="flex items-center gap-6">
-                                <a href="./home_child_safety_v1.html" class="flex items-center gap-3 text-white group">
-                                    <div class="w-10 h-10 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
-                                        <span class="material-symbols-outlined text-[24px] text-white" style="font-variation-settings: 'FILL' 1;">security</span>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <span class="font-black text-xl tracking-tight text-white leading-none">RAYDAR</span>
-                                        <span class="text-[10px] font-semibold text-white/80 uppercase tracking-widest leading-tight mt-0.5">Portail Sécurité</span>
-                                    </div>
-                                </a>
-                            </div>
+                const desktopSidebarHtml = `
+                    <aside data-shell-element="true" class="desktop-sidebar fixed top-0 left-0 bottom-0 h-screen w-[240px] bg-white border-r border-[#E2E8F0] z-40 flex flex-col justify-between p-4 select-none">
+                        <!-- Top: Brand & Menu Links -->
+                        <div class="flex flex-col space-y-6">
+                            <!-- Brand -->
+                            <a href="./home_child_safety_v1.html" class="flex items-center gap-2.5 px-3 py-2 text-[#532CE6] hover:opacity-90 transition-opacity">
+                                <div class="w-8 h-8 rounded-lg bg-[#532CE6]/10 flex items-center justify-center text-[#532CE6]">
+                                    <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">security</span>
+                                </div>
+                                <span class="font-bold text-xl tracking-tight text-[#532CE6]">Gardien</span>
+                            </a>
 
-                            <!-- Center: Navigation Links with White text & icons -->
-                            <nav class="flex items-center gap-2">
-                                <a class="flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-sm font-medium ${activeTab === 'accueil' ? 'bg-white/20 text-white font-bold shadow-sm backdrop-blur-sm' : 'text-white/85 hover:text-white hover:bg-white/10'}" href="./home_child_safety_v1.html">
-                                    <span class="material-symbols-outlined text-[20px] text-white" style="${activeTab === 'accueil' ? 'font-variation-settings: \'FILL\' 1;' : ''}">home</span>
-                                    <span class="text-white">Accueil</span>
+                            <!-- Menu Navigation -->
+                            <nav class="flex flex-col space-y-1.5">
+                                <!-- Accueil -->
+                                <a href="./home_child_safety_v1.html" class="flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm ${activeTab === 'accueil' ? 'bg-[#532CE6] text-white font-bold shadow-sm' : 'text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] font-medium'}">
+                                    <span class="material-symbols-outlined text-[22px] ${activeTab === 'accueil' ? 'text-white' : 'text-[#64748B]'}" style="${activeTab === 'accueil' ? 'font-variation-settings: \'FILL\' 1;' : ''}">home</span>
+                                    <span>Accueil</span>
                                 </a>
-                                
-                                <a class="flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-sm font-medium ${activeTab === 'signalements' ? 'bg-white/20 text-white font-bold shadow-sm backdrop-blur-sm' : 'text-white/85 hover:text-white hover:bg-white/10'}" href="./reports_directory.html">
-                                    <span class="material-symbols-outlined text-[20px] text-white" style="${activeTab === 'signalements' ? 'font-variation-settings: \'FILL\' 1;' : ''}">assignment</span>
-                                    <span class="text-white">Signalements</span>
+
+                                <!-- Signalements -->
+                                <a href="./my_case_dashboard_refined_actions.html" class="flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm ${activeTab === 'signalements' ? 'bg-[#532CE6] text-white font-bold shadow-sm' : 'text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] font-medium'}">
+                                    <span class="material-symbols-outlined text-[22px] ${activeTab === 'signalements' ? 'text-white' : 'text-[#64748B]'}" style="${activeTab === 'signalements' ? 'font-variation-settings: \'FILL\' 1;' : ''}">assignment</span>
+                                    <span>Signalements</span>
                                 </a>
-                                
-                                <a class="relative flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-sm font-medium ${activeTab === 'alerts' ? 'bg-white/20 text-white font-bold shadow-sm backdrop-blur-sm' : 'text-white/85 hover:text-white hover:bg-white/10'}" href="./alert_center.html">
+
+                                <!-- Alertes -->
+                                <a href="./alert_center.html" class="relative flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm ${activeTab === 'alerts' ? 'bg-[#532CE6] text-white font-bold shadow-sm' : 'text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] font-medium'}">
                                     <div class="relative flex items-center justify-center">
-                                        <span class="material-symbols-outlined text-[20px] text-white" style="${activeTab === 'alerts' ? 'font-variation-settings: \'FILL\' 1;' : ''}">notifications_active</span>
-                                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#EF4444] rounded-full ring-2 ring-[#532CE6]"></span>
+                                        <span class="material-symbols-outlined text-[22px] ${activeTab === 'alerts' ? 'text-white' : 'text-[#64748B]'}" style="${activeTab === 'alerts' ? 'font-variation-settings: \'FILL\' 1;' : ''}">notifications</span>
+                                        <span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#EF4444] rounded-full ring-2 ring-white"></span>
                                     </div>
-                                    <span class="text-white">Alertes</span>
+                                    <span>Alertes</span>
                                 </a>
-                                
-                                <a class="flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-sm font-medium ${activeTab === 'profile' ? 'bg-white/20 text-white font-bold shadow-sm backdrop-blur-sm' : 'text-white/85 hover:text-white hover:bg-white/10'}" href="./guardian_profile_updated_my_reports.html">
-                                    <span class="material-symbols-outlined text-[20px] text-white" style="${activeTab === 'profile' ? 'font-variation-settings: \'FILL\' 1;' : ''}">person</span>
-                                    <span class="text-white">Profil</span>
+
+                                <!-- Profil -->
+                                <a href="./guardian_profile_updated_my_reports.html" class="flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm ${activeTab === 'profile' ? 'bg-[#532CE6] text-white font-bold shadow-sm' : 'text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] font-medium'}">
+                                    <span class="material-symbols-outlined text-[22px] ${activeTab === 'profile' ? 'text-white' : 'text-[#64748B]'}" style="${activeTab === 'profile' ? 'font-variation-settings: \'FILL\' 1;' : ''}">person</span>
+                                    <span>Profil</span>
                                 </a>
-                                
-                                <a class="flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-sm font-medium ${activeTab === 'settings' ? 'bg-white/20 text-white font-bold shadow-sm backdrop-blur-sm' : 'text-white/85 hover:text-white hover:bg-white/10'}" href="./emergency_preferences.html">
-                                    <span class="material-symbols-outlined text-[20px] text-white" style="${activeTab === 'settings' ? 'font-variation-settings: \'FILL\' 1;' : ''}">settings</span>
-                                    <span class="text-white">Paramètres</span>
+
+                                <!-- Paramètres -->
+                                <a href="./emergency_preferences.html" class="flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm ${activeTab === 'settings' ? 'bg-[#532CE6] text-white font-bold shadow-sm' : 'text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] font-medium'}">
+                                    <span class="material-symbols-outlined text-[22px] ${activeTab === 'settings' ? 'text-white' : 'text-[#64748B]'}" style="${activeTab === 'settings' ? 'font-variation-settings: \'FILL\' 1;' : ''}">settings</span>
+                                    <span>Paramètres</span>
+                                </a>
+
+                                <!-- Aide -->
+                                <a href="./help_center.html" class="flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm ${activeTab === 'help' ? 'bg-[#532CE6] text-white font-bold shadow-sm' : 'text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] font-medium'}">
+                                    <span class="material-symbols-outlined text-[22px] ${activeTab === 'help' ? 'text-white' : 'text-[#64748B]'}" style="${activeTab === 'help' ? 'font-variation-settings: \'FILL\' 1;' : ''}">help_outline</span>
+                                    <span>Aide</span>
                                 </a>
                             </nav>
-
-                            <!-- Right: Profile Info & Logout in White -->
-                            <div class="flex items-center gap-3">
-                                <a href="./guardian_profile_updated_my_reports.html" class="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 transition-all text-white">
-                                    <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center border border-white/30 text-white font-bold text-xs">
-                                        <span class="material-symbols-outlined text-[18px] text-white">person</span>
-                                    </div>
-                                    <div class="flex flex-col text-left leading-tight hidden lg:flex">
-                                        <span class="text-xs font-bold text-white">Gardien Actif</span>
-                                        <span class="text-[10px] text-white/80">Connecté</span>
-                                    </div>
-                                </a>
-                                <button onclick="handleLogout()" title="Déconnexion" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white/85 hover:text-white hover:bg-white/15 transition-all text-xs font-medium border border-transparent hover:border-white/20">
-                                    <span class="material-symbols-outlined text-[18px] text-white">logout</span>
-                                    <span class="text-white hidden xl:inline">Déconnexion</span>
-                                </button>
-                            </div>
                         </div>
-                    </header>
+
+                        <!-- Bottom: Logout Action -->
+                        <div class="pt-4 border-t border-[#E2E8F0]">
+                            <button onclick="handleLogout()" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-[#64748B] hover:text-[#DC2626] hover:bg-red-50 text-sm font-medium transition-colors">
+                                <span class="material-symbols-outlined text-[22px]">logout</span>
+                                <span>Déconnexion</span>
+                            </button>
+                        </div>
+                    </aside>
                 `;
-                const navbarTemplate = document.createElement('div');
-                navbarTemplate.innerHTML = desktopNavbarHtml.trim();
-                document.body.insertBefore(navbarTemplate.firstChild, document.body.firstChild);
+                const sidebarTemplate = document.createElement('div');
+                sidebarTemplate.innerHTML = desktopSidebarHtml.trim();
+                document.body.insertBefore(sidebarTemplate.firstChild, document.body.firstChild);
             }
         } else {
             // MOBILE: Render Floating Pill-Shaped Bottom Navigation

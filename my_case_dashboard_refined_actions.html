@@ -141,26 +141,26 @@
 </head>
 <body class="font-body-md text-on-surface antialiased min-h-screen bg-background">
 <!-- Top AppBar -->
-<header class="w-full sticky top-0 z-50 bg-white border-b border-[#EAECF0]">
+<header class="w-full sticky top-0 z-30 bg-[#EDF0F5]/90 backdrop-blur-sm">
 <div class="flex items-center justify-between px-container-margin h-16 w-full max-w-screen-xl mx-auto">
-<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] active:scale-95 transition-all text-[#64748B] hover:text-[#0F172A]" onclick="history.back()">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 active:scale-95 transition-all text-[#64748B] hover:text-[#0F172A]" onclick="history.back()">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
-<h1 class="text-base font-bold text-[#0F172A]">Mes Dossiers & Signalements</h1>
-<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] active:scale-95 transition-all text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./alert_center.html'">
+<h1 class="text-base md:text-lg font-bold text-[#0F172A]">My Case Dashboard</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 active:scale-95 transition-all text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./alert_center.html'">
 <span class="material-symbols-outlined">notifications</span>
 </button>
 </div>
 </header>
-<main class="max-w-screen-md mx-auto px-container-margin py-6">
+<main class="max-w-screen-md mx-auto px-container-margin py-4">
 <!-- Toggle Segmented Control -->
-<div class="bg-[#F1F5F9] p-1 rounded-xl flex border border-[#EAECF0] mb-6">
-<button id="tabMissing" class="flex-1 py-2 px-4 rounded-lg font-bold text-xs bg-[#532CE6] text-white shadow-sm transition-all">
-                Enfants Disparus
-            </button>
-<button id="tabFound" class="flex-1 py-2 px-4 rounded-lg font-semibold text-xs text-[#64748B] hover:text-[#0F172A] transition-all">
-                Enfants Trouvés
-            </button>
+<div class="bg-[#E2E8F0]/70 p-1.5 rounded-full md:rounded-2xl flex border border-[#CBD5E1]/50 mb-6 shadow-sm">
+<button id="tabMissing" class="flex-1 py-2.5 px-4 rounded-full md:rounded-xl font-bold text-xs md:text-sm bg-white text-[#0F172A] shadow-sm transition-all">
+    Missing Children
+</button>
+<button id="tabFound" class="flex-1 py-2.5 px-4 rounded-full md:rounded-xl font-medium text-xs md:text-sm text-[#64748B] hover:text-[#0F172A] transition-all">
+    Found Children
+</button>
 </div>
 <!-- Case List -->
 <div class="space-y-4" id="caseListContainer">
@@ -168,8 +168,8 @@
 </div>
 </main>
 <!-- Floating Action Button -->
-<button onclick="window.location.href='./signaler_un_disparu_tape_1.html'" class="fixed bottom-24 right-container-margin w-14 h-14 rounded-full bg-[#532CE6] hover:bg-[#4321C4] text-white shadow-lg flex items-center justify-center active:scale-90 transition-all z-40 group">
-<span class="material-symbols-outlined text-[28px] group-hover:rotate-90 transition-transform duration-300">add</span>
+<button onclick="window.location.href='./signaler_un_disparu_tape_1.html'" class="fixed bottom-6 right-6 md:bottom-10 md:right-10 w-14 h-14 rounded-full bg-[#532CE6] hover:bg-[#4321C4] text-white shadow-xl flex items-center justify-center active:scale-90 transition-all z-40 group">
+<span class="material-symbols-outlined text-[30px] group-hover:rotate-90 transition-transform duration-300">add</span>
 </button>
 <!-- Bottom Navigation Bar -->
 <script>
@@ -216,39 +216,36 @@ async function renderCases() {
 
     container.innerHTML = reports.map(report => {
         const isMissing = report.type === 'missing';
-        const urgencyLabel = report.urgency || (isMissing ? 'En cours' : 'Recherche Famille');
-        const urgencyBg = isMissing ? 'bg-[#FEF2F2] text-[#DC2626] border border-[#DC2626]/20' : 'bg-emerald-50 text-emerald-700 border border-emerald-200';
-        const displayLabel = isMissing ? 'DISPARU' : 'TROUVÉ';
-        const displayColor = isMissing ? 'text-[#DC2626]' : 'text-emerald-700';
+        const displayLabel = isMissing ? 'MISSING' : 'FOUND';
         
         return `
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-[#EAECF0] active:scale-[0.99] transition-all cursor-pointer hover:border-[#532CE6]/30" data-id="${report.id}">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-14 h-14 rounded-full overflow-hidden border border-[#EAECF0] bg-[#F8F9FA] flex-shrink-0">
+            <div class="bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(15,23,42,0.06)] border border-[#E2E8F0] active:scale-[0.99] transition-all cursor-pointer hover:border-[#532CE6]/40" data-id="${report.id}">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-full overflow-hidden border border-[#E2E8F0] bg-[#F8F9FA] flex-shrink-0 shadow-sm">
                             <img alt="${report.name}" class="w-full h-full object-cover" src="${report.photo}" />
                         </div>
                         <div>
-                            <h3 class="font-bold text-sm text-[#0F172A]"><span class="${displayColor} text-xs font-semibold mr-1.5">[${displayLabel}]</span>${report.name} (${report.age} ans)</h3>
-                            <p class="text-xs text-[#64748B] mt-0.5">${report.location} • ${report.date || ''}</p>
+                            <h3 class="font-bold text-sm md:text-base text-[#532CE6]"><span class="mr-1.5 font-bold">${displayLabel}:</span>${report.name} (${report.age} ans)</h3>
+                            <p class="text-xs text-[#64748B] mt-0.5">${report.location} • ${report.date || '2026-09-01'}</p>
                         </div>
                     </div>
-                    <span class="${urgencyBg} px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wider uppercase">${urgencyLabel}</span>
+                    <span class="bg-[#FFEDD5] text-[#C2410C] font-bold text-[10px] tracking-wider uppercase px-3 py-1 rounded-full border border-[#FED7AA]">NOUVEAU</span>
                 </div>
                 <!-- Bottom Action Row -->
-                <div class="flex justify-between items-center pt-3 border-t border-[#EAECF0]">
-                    <div class="flex items-center gap-2">
-                        <button class="w-9 h-9 rounded-full flex items-center justify-center bg-[#F8F9FA] border border-[#EAECF0] hover:bg-[#F5F3FF] hover:border-[#532CE6]/30 hover:text-[#532CE6] transition-all text-[#64748B] edit-btn shadow-sm" data-id="${report.id}">
+                <div class="flex justify-between items-center pt-3 border-t border-[#F1F5F9]">
+                    <div class="flex items-center gap-2.5">
+                        <button class="w-9 h-9 rounded-full flex items-center justify-center bg-[#F5F3FF] hover:bg-[#EDE9FE] transition-all text-[#532CE6] edit-btn shadow-sm" data-id="${report.id}" title="Modifier">
                             <span class="material-symbols-outlined text-[18px]">edit</span>
                         </button>
-                        <button class="w-9 h-9 rounded-full flex items-center justify-center bg-[#F8F9FA] border border-[#EAECF0] hover:bg-[#FEF2F2] hover:border-[#DC2626]/30 hover:text-[#DC2626] transition-all text-[#64748B] relative delete-btn shadow-sm" data-id="${report.id}">
+                        <button class="w-9 h-9 rounded-full flex items-center justify-center bg-[#FEF2F2] hover:bg-[#FEE2E2] transition-all text-[#DC2626] delete-btn shadow-sm" data-id="${report.id}" title="Supprimer">
                             <span class="material-symbols-outlined text-[18px]">delete</span>
                         </button>
-                        <span class="ml-1 text-xs font-medium text-[#64748B]">Suivi actif</span>
+                        <span class="ml-2 text-xs font-bold text-[#532CE6] tracking-wide uppercase">EN COURS</span>
                     </div>
-                    <button class="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#F5F3FF] border border-[#532CE6]/20 hover:bg-[#EDE9FE] transition-all text-[#532CE6] text-xs font-semibold view-progress-btn" data-id="${report.id}">
-                        <span class="material-symbols-outlined text-[16px]">bar_chart</span>
-                        <span>Progression</span>
+                    <button class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#F5F3FF] hover:bg-[#EDE9FE] transition-all text-[#532CE6] text-xs font-bold view-progress-btn" data-id="${report.id}">
+                        <span class="material-symbols-outlined text-[18px]">bar_chart</span>
+                        <span>Progress</span>
                     </button>
                 </div>
             </div>
@@ -306,11 +303,11 @@ function updateTabButtons() {
     const tabFound = document.getElementById('tabFound');
 
     if (currentTab === 'missing') {
-        tabMissing.className = "flex-1 py-2 px-4 rounded-lg font-bold text-xs bg-[#532CE6] text-white shadow-sm transition-all";
-        tabFound.className = "flex-1 py-2 px-4 rounded-lg font-semibold text-xs text-[#64748B] hover:text-[#0F172A] transition-all";
+        tabMissing.className = "flex-1 py-2.5 px-4 rounded-full md:rounded-xl font-bold text-xs md:text-sm bg-white text-[#0F172A] shadow-sm transition-all";
+        tabFound.className = "flex-1 py-2.5 px-4 rounded-full md:rounded-xl font-medium text-xs md:text-sm text-[#64748B] hover:text-[#0F172A] transition-all";
     } else {
-        tabFound.className = "flex-1 py-2 px-4 rounded-lg font-bold text-xs bg-[#532CE6] text-white shadow-sm transition-all";
-        tabMissing.className = "flex-1 py-2 px-4 rounded-lg font-semibold text-xs text-[#64748B] hover:text-[#0F172A] transition-all";
+        tabFound.className = "flex-1 py-2.5 px-4 rounded-full md:rounded-xl font-bold text-xs md:text-sm bg-white text-[#0F172A] shadow-sm transition-all";
+        tabMissing.className = "flex-1 py-2.5 px-4 rounded-full md:rounded-xl font-medium text-xs md:text-sm text-[#64748B] hover:text-[#0F172A] transition-all";
     }
 }
 

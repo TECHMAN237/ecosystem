@@ -199,24 +199,9 @@
         </p>
 </footer>
 <script>
-        // Deterministic hard timeout: THE SPLASH SCREEN MUST NEVER EXCEED 4 SECONDS.
-        // If anything hangs or is delayed, exit splash screen within 3.5 seconds.
+        // Deterministic hard timeout: THE SPLASH SCREEN MUST NEVER EXCEED 3.5 SECONDS.
         window.failsafeRedirect = setTimeout(() => {
-            console.warn("[RAYDAR Splash] Hard failsafe ceiling triggered at 3500ms.");
-            try {
-                let hasToken = false;
-                for (let i = 0; i < localStorage.length; i++) {
-                    const k = localStorage.key(i);
-                    if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) {
-                        hasToken = true;
-                        break;
-                    }
-                }
-                if (hasToken) {
-                    window.location.replace('./home_child_safety_v1.html');
-                    return;
-                }
-            } catch(e) {}
+            console.warn("[RAYDAR Splash] Hard failsafe ceiling triggered at 3500ms. Transitioning to login...");
             window.location.replace('./login_child_safety.html');
         }, 3500);
 </script>
@@ -235,33 +220,15 @@
 
         async function handleIndexRouting() {
             try {
-                // Concurrently run authentication check and a smooth 600ms branding window
-                const authTask = (async () => {
-                    try {
-                        const { data: { session }, error } = await supabase.auth.getSession();
-                        if (error) return null;
-                        return session;
-                    } catch(e) {
-                        return null;
-                    }
-                })();
-
-                const minBrandWait = new Promise(resolve => setTimeout(resolve, 600));
-
-                const [session] = await Promise.all([authTask, minBrandWait]);
+                // Smooth branding splash window (800ms)
+                await new Promise(resolve => setTimeout(resolve, 800));
 
                 if (window.failsafeRedirect) {
                     clearTimeout(window.failsafeRedirect);
                 }
 
-                if (session && localStorage.getItem('is_guest') !== 'true') {
-                    localStorage.removeItem('is_guest');
-                    console.log("[Index Router] Active session confirmed. Routing authenticated user...");
-                    await protectRoute('login');
-                } else {
-                    console.log("[Index Router] No session. Transitioning to login...");
-                    window.location.replace('./login_child_safety.html');
-                }
+                console.log("[Index Router] Splash duration elapsed. Navigating to login...");
+                window.location.replace('./login_child_safety.html');
             } catch (err) {
                 console.warn("[Index Router] Routing fallback:", err);
                 if (window.failsafeRedirect) clearTimeout(window.failsafeRedirect);
