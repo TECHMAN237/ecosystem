@@ -130,13 +130,17 @@
 <!-- Hero Profile Section -->
 <section class="gradient-header bg-gradient-to-r from-[#532CE6] to-[#6C4DFF] text-white pt-6 pb-8 px-container-margin relative overflow-hidden">
 <div class="flex flex-col items-center gap-md relative z-10">
-<div class="relative">
-<div class="w-24 h-24 rounded-full border-4 border-white/40 p-0.5 overflow-hidden shadow-lg bg-white/20">
+<div class="relative group">
+<div class="w-24 h-24 rounded-full border-4 border-white/40 p-0.5 overflow-hidden shadow-lg bg-white/20 relative">
 <img id="profileAvatar" data-user-avatar class="w-full h-full object-cover rounded-full" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='60' fill='%23ECE8FF'/%3E%3Cpath d='M60 28c11.045 0 20 8.955 20 20s-8.955 20-20 20-20-8.955-20-20 8.955-20 20-20zm0 48c18.336 0 34 9.168 34 22v4H26v-4c0-12.832 15.664-22 34-22z' fill='%23532CE6'/%3E%3C/svg%3E"/>
+<div id="heroAvatarLoadingOverlay" class="absolute inset-0 bg-black/60 hidden items-center justify-center rounded-full">
+  <span class="material-symbols-outlined text-white animate-spin text-[26px]">progress_activity</span>
 </div>
-<div class="absolute bottom-0 right-0 bg-white text-[#532CE6] w-7 h-7 rounded-full flex items-center justify-center border-2 border-[#532CE6] shadow-sm">
-<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
 </div>
+<label for="directHeroAvatarInput" class="absolute bottom-0 right-0 bg-white text-[#532CE6] hover:bg-[#F5F3FF] w-8 h-8 rounded-full flex items-center justify-center border-2 border-[#532CE6] shadow-sm cursor-pointer transition-all active:scale-95" title="Modifier la photo de profil">
+<span class="material-symbols-outlined text-[17px]">photo_camera</span>
+<input type="file" id="directHeroAvatarInput" accept="image/*" class="hidden" />
+</label>
 </div>
 <div class="text-center flex flex-col items-center">
 <h2 id="profileName" data-user-name class="font-bold text-xl text-white">Gardien de la Sécurité</h2>
@@ -286,8 +290,11 @@ Accédez à l'historique complet de vos signalements d'enfants disparus et trouv
           <span class="material-symbols-outlined text-white text-[20px]">photo_camera</span>
           <input type="file" id="modalAvatarInput" accept="image/*" class="hidden" />
         </label>
+        <div id="modalAvatarLoadingOverlay" class="absolute inset-0 bg-black/60 hidden items-center justify-center">
+          <span class="material-symbols-outlined text-white animate-spin text-[22px]">progress_activity</span>
+        </div>
       </div>
-      <span class="text-xs text-on-surface-variant">Cliquez sur l'appareil photo pour modifier</span>
+      <span id="avatarStatusNotice" class="text-xs text-on-surface-variant font-medium">Cliquez sur l'appareil photo pour modifier</span>
     </div>
 
     <!-- Edit Fields -->
@@ -367,36 +374,17 @@ Accédez à l'historique complet de vos signalements d'enfants disparus et trouv
 
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
-import { reportService } from "./src/reportService.js";
+import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
+import { protectRoute } from "./src/authService.js";
 
-// Check session on load
-async function checkAuth() {
-    try {
-        if (localStorage.getItem('is_guest') === 'true') {
-            console.log("Guest mode active on Profile.");
-            return;
-        }
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-            console.log("No active session. Redirecting to /login...");
-            window.location.replace('/login');
-        } else {
-            await reportService.syncProfileWithSupabase();
-            renderProfileData();
-        }
-    } catch (err) {
-        console.error("Error checking auth session:", err);
-    }
-}
-checkAuth();
+// Single authoritative route protection (prevents refresh redirect loops)
+await protectRoute('user');
 
-// Listen for auth state changes
-supabase.auth.onAuthStateChange((event, session) => {
-    if (localStorage.getItem('is_guest') === 'true') {
-        return;
-    }
-    if (event === 'SIGNED_OUT' || !session) {
-        console.log("Signed out or session lost. Redirecting to /login...");
+// Listen only for explicit signouts
+supabase.auth.onAuthStateChange((event) => {
+    if (localStorage.getItem('is_guest') === 'true') return;
+    if (event === 'SIGNED_OUT') {
+        console.log("Signed out. Redirecting to /login...");
         window.location.replace('/login');
     }
 });
@@ -416,7 +404,7 @@ if (logoutBtn) {
     });
 }
 
-// Profile Editing Engine
+// Profile Elements
 const profileAvatar = document.getElementById('profileAvatar');
 const profileName = document.getElementById('profileName');
 const profileRole = document.getElementById('profileRole');
@@ -434,6 +422,10 @@ const saveProfileBtn = document.getElementById('saveProfileBtn');
 
 const modalAvatarPreview = document.getElementById('modalAvatarPreview');
 const modalAvatarInput = document.getElementById('modalAvatarInput');
+const directHeroAvatarInput = document.getElementById('directHeroAvatarInput');
+const heroAvatarLoadingOverlay = document.getElementById('heroAvatarLoadingOverlay');
+const modalAvatarLoadingOverlay = document.getElementById('modalAvatarLoadingOverlay');
+const avatarStatusNotice = document.getElementById('avatarStatusNotice');
 
 const editFullName = document.getElementById('editFullName');
 const editUsername = document.getElementById('editUsername');
@@ -441,39 +433,41 @@ const editCountryCode = document.getElementById('editCountryCode');
 const editPhoneNumber = document.getElementById('editPhoneNumber');
 const editCity = document.getElementById('editCity');
 
-let currentProfilePhotoBase64 = "";
+let confirmedPhotoUrl = "";
 
 async function renderProfileData() {
     const profile = await reportService.syncProfileWithSupabase();
     if (!profile) return;
     
-    // Update view
-    if (profile.photo) profileAvatar.src = profile.photo;
-    if (profile.full_name) profileName.textContent = profile.full_name;
-    if (profile.role) profileRole.textContent = profile.role;
+    confirmedPhotoUrl = profile.photo || DEFAULT_AVATAR;
     
-    if (profile.username) detailUsername.textContent = '@' + profile.username;
-    if (profile.phone_number) {
-        detailPhone.textContent = (profile.phone_country_code || '') + ' ' + profile.phone_number;
-    } else {
-        detailPhone.textContent = 'Non renseigné';
+    // Update main view
+    if (profileAvatar) profileAvatar.src = confirmedPhotoUrl;
+    if (profileName && profile.full_name) profileName.textContent = profile.full_name;
+    if (profileRole && profile.role) profileRole.textContent = profile.role;
+    
+    if (detailUsername && profile.username) detailUsername.textContent = '@' + profile.username;
+    if (detailPhone) {
+        if (profile.phone_number) {
+            detailPhone.textContent = (profile.phone_country_code || '+237') + ' ' + profile.phone_number;
+        } else {
+            detailPhone.textContent = 'Non renseigné';
+        }
     }
-    if (profile.city) detailCity.textContent = profile.city;
+    if (detailCity && profile.city) detailCity.textContent = profile.city;
     
     // Populate Modal inputs
-    editFullName.value = profile.full_name || "";
-    editUsername.value = profile.username || "";
-    editCountryCode.value = profile.phone_country_code || "";
-    editPhoneNumber.value = profile.phone_number || "";
-    editCity.value = profile.city || "";
-    if (profile.photo) modalAvatarPreview.src = profile.photo;
-    currentProfilePhotoBase64 = profile.photo || "";
+    if (editFullName) editFullName.value = profile.full_name || "";
+    if (editUsername) editUsername.value = profile.username || "";
+    if (editCountryCode) editCountryCode.value = profile.phone_country_code || "+237";
+    if (editPhoneNumber) editPhoneNumber.value = profile.phone_number || "";
+    if (editCity) editCity.value = profile.city || "";
+    if (modalAvatarPreview) modalAvatarPreview.src = confirmedPhotoUrl;
 }
 
 function openModal() {
     renderProfileData();
     editProfileModal.classList.remove('hidden');
-    // Force transition after microtask
     setTimeout(() => {
         editProfileModal.classList.remove('opacity-0');
         editProfileModal.classList.add('opacity-100');
@@ -488,56 +482,171 @@ function closeModal() {
     }, 300);
 }
 
-editProfileBtn.addEventListener('click', openModal);
-closeModalBtn.addEventListener('click', closeModal);
-cancelModalBtn.addEventListener('click', closeModal);
+if (editProfileBtn) editProfileBtn.addEventListener('click', openModal);
+if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeModal);
 
-// Handle file upload for profile photo
-modalAvatarInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            const base64 = evt.target.result;
-            currentProfilePhotoBase64 = base64;
-            modalAvatarPreview.src = base64;
-        };
-        reader.readAsDataURL(file);
+// Helper to show avatar loading state
+function setAvatarUploading(isUploading, message = "") {
+    if (isUploading) {
+        if (heroAvatarLoadingOverlay) {
+            heroAvatarLoadingOverlay.classList.remove('hidden');
+            heroAvatarLoadingOverlay.classList.add('flex');
+        }
+        if (modalAvatarLoadingOverlay) {
+            modalAvatarLoadingOverlay.classList.remove('hidden');
+            modalAvatarLoadingOverlay.classList.add('flex');
+        }
+        if (avatarStatusNotice) {
+            avatarStatusNotice.textContent = message || "Téléversement en cours...";
+            avatarStatusNotice.className = "text-xs text-primary font-medium";
+        }
+    } else {
+        if (heroAvatarLoadingOverlay) {
+            heroAvatarLoadingOverlay.classList.remove('flex');
+            heroAvatarLoadingOverlay.classList.add('hidden');
+        }
+        if (modalAvatarLoadingOverlay) {
+            modalAvatarLoadingOverlay.classList.remove('flex');
+            modalAvatarLoadingOverlay.classList.add('hidden');
+        }
     }
-});
+}
 
-// Save Profile
-saveProfileBtn.addEventListener('click', async () => {
-    saveProfileBtn.disabled = true;
-    const origText = saveProfileBtn.textContent;
-    saveProfileBtn.textContent = 'Enregistrement...';
+// Optimistic Profile Photo Upload Engine (adheres to Rule 13: zero base64 in DB, instant preview, rollback on error)
+async function handleAvatarSelection(file) {
+    if (!file) return;
 
+    // 1. Format & size validation
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/jpg'];
+    if (!validTypes.includes(file.type.toLowerCase()) && !file.name.match(/\.(jpg|jpeg|png|webp|gif|heic)$/i)) {
+        alert("Veuillez choisir un format d'image valide (JPEG, PNG, WebP).");
+        return;
+    }
+    const maxSize = 5 * 1024 * 1024; // 5 MB
+    if (file.size > maxSize) {
+        alert("L'image est trop volumineuse (maximum 5 Mo).");
+        return;
+    }
+
+    const previousAvatar = confirmedPhotoUrl || profileAvatar?.src || DEFAULT_AVATAR;
+
+    // 2. Immediate Local Preview (FileReader / URL.createObjectURL)
+    let localPreviewUrl = "";
     try {
-        const current = reportService.getProfile();
-        const updated = {
-            full_name: editFullName.value.trim() || current.full_name || "Gardien de la Sécurité",
-            username: editUsername.value.trim().replace(/^@/, "") || current.username || "gardien",
-            phone_country_code: editCountryCode.value.trim() || current.phone_country_code || "+237",
-            phone_number: editPhoneNumber.value.trim() || current.phone_number || "",
-            city: editCity.value.trim() || current.city || "Yaoundé",
-            photo: currentProfilePhotoBase64 || current.photo
-        };
-        
-        await reportService.saveProfile(updated);
-        await renderProfileData();
-        closeModal();
-    } catch (err) {
-        console.error("Error saving profile in UI:", err);
-    } finally {
-        saveProfileBtn.disabled = false;
-        saveProfileBtn.textContent = origText;
+        localPreviewUrl = URL.createObjectURL(file);
+    } catch (e) {
+        localPreviewUrl = await new Promise((res) => {
+            const r = new FileReader();
+            r.onload = () => res(r.result);
+            r.readAsDataURL(file);
+        });
     }
-});
+
+    if (profileAvatar) profileAvatar.src = localPreviewUrl;
+    if (modalAvatarPreview) modalAvatarPreview.src = localPreviewUrl;
+    reportService.updateDOMProfile({ photo: localPreviewUrl });
+
+    // 3. Show uploading state indicator
+    setAvatarUploading(true, "Envoi vers Supabase Storage...");
+
+    // 4. Background Supabase upload to 'avatars' bucket
+    try {
+        console.log("[Avatar Upload] Uploading to Supabase Storage 'avatars' bucket...");
+        const storageUrl = await reportService.uploadFileToSupabaseStorage(file, "avatars");
+
+        if (!storageUrl) {
+            throw new Error("Le serveur n'a pas pu générer l'URL publique de l'avatar.");
+        }
+
+        console.log("[Avatar Upload] Storage success:", storageUrl);
+        confirmedPhotoUrl = storageUrl;
+
+        // 5. Persist canonical public URL in Supabase profile & localStorage
+        await reportService.saveProfile({ photo: storageUrl });
+
+        // Revoke temporary blob URL
+        if (localPreviewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(localPreviewUrl);
+        }
+
+        if (profileAvatar) profileAvatar.src = storageUrl;
+        if (modalAvatarPreview) modalAvatarPreview.src = storageUrl;
+
+        setAvatarUploading(false);
+        if (avatarStatusNotice) {
+            avatarStatusNotice.textContent = "Photo mise à jour avec succès !";
+            avatarStatusNotice.className = "text-xs text-green-600 font-bold";
+            setTimeout(() => {
+                if (avatarStatusNotice) {
+                    avatarStatusNotice.textContent = "Cliquez sur l'appareil photo pour modifier";
+                    avatarStatusNotice.className = "text-xs text-on-surface-variant font-medium";
+                }
+            }, 4000);
+        }
+    } catch (uploadError) {
+        console.error("[Avatar Upload] Error during upload:", uploadError);
+
+        // 6. Rollback to previous confirmed image on failure
+        if (profileAvatar) profileAvatar.src = previousAvatar;
+        if (modalAvatarPreview) modalAvatarPreview.src = previousAvatar;
+        reportService.updateDOMProfile({ photo: previousAvatar });
+
+        setAvatarUploading(false);
+        if (avatarStatusNotice) {
+            avatarStatusNotice.textContent = "Échec de l'envoi. Photo restaurée.";
+            avatarStatusNotice.className = "text-xs text-error font-medium";
+        }
+        alert("Impossible de sauvegarder la photo dans Supabase. Veuillez vérifier votre connexion.");
+    }
+}
+
+// Attach listeners for both avatar pickers
+if (modalAvatarInput) {
+    modalAvatarInput.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (file) handleAvatarSelection(file);
+    });
+}
+if (directHeroAvatarInput) {
+    directHeroAvatarInput.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (file) handleAvatarSelection(file);
+    });
+}
+
+// Save Profile Modal Form
+if (saveProfileBtn) {
+    saveProfileBtn.addEventListener('click', async () => {
+        saveProfileBtn.disabled = true;
+        const origText = saveProfileBtn.textContent;
+        saveProfileBtn.textContent = 'Enregistrement...';
+
+        try {
+            const current = reportService.getProfile();
+            const updated = {
+                full_name: editFullName.value.trim() || current.full_name || "Gardien de la Sécurité",
+                username: editUsername.value.trim().replace(/^@/, "") || current.username || "gardien",
+                phone_country_code: editCountryCode.value.trim() || current.phone_country_code || "+237",
+                phone_number: editPhoneNumber.value.trim() || current.phone_number || "",
+                city: editCity.value.trim() || current.city || "Yaoundé",
+                photo: confirmedPhotoUrl || current.photo
+            };
+            
+            await reportService.saveProfile(updated);
+            await renderProfileData();
+            closeModal();
+        } catch (err) {
+            console.error("Error saving profile in UI:", err);
+            alert("Erreur lors de la mise à jour du profil : " + (err.message || "Réessayez plus tard."));
+        } finally {
+            saveProfileBtn.disabled = false;
+            saveProfileBtn.textContent = origText;
+        }
+    });
+}
 
 // Initial Render
-document.addEventListener('DOMContentLoaded', () => {
-    renderProfileData();
-});
 renderProfileData();
 </script>
 

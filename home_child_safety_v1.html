@@ -352,32 +352,18 @@
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
 import { reportService } from "./src/reportService.js";
+import { protectRoute } from "./src/authService.js";
 
-// Check session on load
-async function checkAuth() {
-    try {
-        if (localStorage.getItem('is_guest') === 'true') {
-            console.log("Guest mode active on Home.");
-            return;
-        }
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-            console.log("No active session. Redirecting to /login...");
-            window.location.replace('/login');
-        }
-    } catch (err) {
-        console.error("Error checking auth session:", err);
-    }
-}
-checkAuth();
+// Single route authority: verify access without flicker or race conditions
+await protectRoute('user');
 
-// Listen for auth state changes
-supabase.auth.onAuthStateChange((event, session) => {
+// Only listen for explicit signout
+supabase.auth.onAuthStateChange((event) => {
     if (localStorage.getItem('is_guest') === 'true') {
         return;
     }
-    if (event === 'SIGNED_OUT' || !session) {
-        console.log("Signed out or session lost. Redirecting to /login...");
+    if (event === 'SIGNED_OUT') {
+        console.log("Signed out. Redirecting to /login...");
         window.location.replace('/login');
     }
 });

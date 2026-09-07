@@ -63,33 +63,7 @@
         window.location.replace('/login');
     };
 
-    // 2b. Session Guard for Private Pages
-    async function enforcePrivatePageProtection() {
-        // Guest mode allows browsing
-        if (localStorage.getItem('is_guest') === 'true') {
-            return;
-        }
-
-        const path = window.location.pathname;
-        const publicPages = ['login', 'sign_up', 'forgot_password', 'reset_password', 'index', 'about_safeguardian', 'help_center', 'privacy_settings'];
-        const isPublic = publicPages.some(p => path.includes(p)) || path === '/' || path === '';
-        if (isPublic) return;
-
-        try {
-            const client = (typeof supabase !== 'undefined' && supabase.auth) 
-                ? supabase 
-                : (window.supabase && window.supabase.auth ? window.supabase : (await import('./supabaseClient.js')).supabase);
-                
-            const { data: { session }, error } = await client.auth.getSession();
-            if (error || !session) {
-                console.log("[Route Guard] No active session on private page. Redirecting to /login...");
-                window.location.replace('/login');
-            }
-        } catch (e) {
-            console.warn("Session check in responsive shell:", e);
-        }
-    }
-    enforcePrivatePageProtection();
+    // 2b. Shell rendering is decoupled from routing guards (handled authoritatively by authService.js)
 
     // 3. Remove hardcoded static bottom navs if present in static HTML
     function removeStaticBottomNavs() {

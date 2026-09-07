@@ -1018,24 +1018,26 @@ export const reportService = {
 
       // Non-blocking update to Supabase profiles table
       try {
-        const { data: { session } } = await withTimeout(supabase.auth.getSession(), 2500, { data: { session: null } });
+        const { data: { session } } = await withTimeout(supabase.auth.getSession(), 3000, { data: { session: null } });
         if (session && session.user) {
           const payload = {
+            user_id: session.user.id,
+            email: session.user.email || '',
             full_name: updated.full_name,
             username: updated.username,
-            phone_country_code: updated.phone_country_code || "",
+            phone_country_code: updated.phone_country_code || "+237",
             phone_number: updated.phone_number || "",
             city: updated.city || "",
-            role: updated.role || "Membre Élite des Gardiens",
+            role: updated.role || "Guardian",
             profile_photo_url: updated.photo || updated.profile_photo_url || DEFAULT_AVATAR,
             updated_at: new Date().toISOString()
           };
 
           withTimeout(
-            supabase.from('profiles').update(payload).eq('user_id', session.user.id),
-            4000,
+            supabase.from('profiles').upsert(payload, { onConflict: 'user_id' }),
+            5000,
             null
-          ).catch(() => {});
+          ).catch((e) => console.warn("Notice saving profile to Supabase:", e));
         }
       } catch (e) {}
 

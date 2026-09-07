@@ -224,55 +224,36 @@
             clearTimeout(window.failsafeRedirect);
         }
 
+        async function handleIndexRouting() {
+            try {
+                // Show brief splash animation (800ms) for smooth branding experience
+                await new Promise(r => setTimeout(r, 800));
+
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session && localStorage.getItem('is_guest') !== 'true') {
+                    console.log("[Index Router] Active session detected. Routing authenticated user...");
+                    await protectRoute('login');
+                } else {
+                    console.log("[Index Router] No session. Transitioning to login...");
+                    window.location.replace('./login_child_safety.html');
+                }
+            } catch (err) {
+                console.warn("[Index Router] Routing fallback:", err);
+                window.location.replace('./login_child_safety.html');
+            }
+        }
+
         if (isOAuthCallback) {
             console.log("[Index Router] Returning from Google OAuth callback...");
-            console.log("[OAuth Diagnostic] URL Hash:", window.location.hash ? "present" : "none");
-            console.log("[OAuth Diagnostic] URL Search:", window.location.search ? "present" : "none");
-
-            // Let Supabase process the OAuth session and route to the appropriate screen
             supabase.auth.onAuthStateChange(async (event, session) => {
-                console.log("=== [AUTH EVENT: " + event + "] ===");
-                console.log("SESSION EXISTS:", !!session);
-                console.log("SESSION USER ID:", session?.user?.id);
-
-                const { data: { user }, error: userError } = await supabase.auth.getUser();
-                const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
-
-                console.log("SESSION:", currentSession?.user?.id);
-                console.log("GET USER:", user?.id);
-                console.log("SESSION ERROR:", sessionError);
-                console.log("USER ERROR:", userError);
-
                 if (event === 'SIGNED_IN' || session) {
                     await protectRoute('login');
                 }
             });
-
-            // Backup check in case session is already initialized
-            setTimeout(async () => {
-                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-                const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-                console.log("=== [BACKUP CHECK getSession / getUser] ===");
-                console.log("SESSION:", session?.user?.id);
-                console.log("GET USER:", user?.id);
-                console.log("SESSION ERROR:", sessionError);
-                console.log("USER ERROR:", userError);
-
-                if (session) {
-                    await protectRoute('login');
-                } else {
-                    console.warn("[Index Router] No session detected after OAuth callback timeout. Redirecting to login.");
-                    window.location.replace('./login_child_safety.html');
-                }
-            }, 800);
+            // Backup check in case onAuthStateChange already fired
+            setTimeout(handleIndexRouting, 1200);
         } else {
-            // Normal public entry: ALWAYS display the Splash animation and transition to the Authentication page
-            // DO NOT automatically redirect to dashboard even if an existing Supabase session exists
-            console.log("[Index Router] Public entry: showing splash and transitioning to Auth page...");
-            setTimeout(() => {
-                window.location.replace('./login_child_safety.html');
-            }, 1200);
+            handleIndexRouting();
         }
     </script>
 </body></html>

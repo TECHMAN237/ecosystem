@@ -44,16 +44,24 @@ function withTimeout(promise, ms = 6000, fallbackVal = null) {
 
 /**
  * Checks if a user has completed the first-login onboarding sequence.
- * Checks both localStorage and Supabase Auth user_metadata.
+ * Triple-check: localStorage -> PostgreSQL profiles table -> Supabase Auth user_metadata.
  */
-export function isOnboardingCompleted(user) {
+export function isOnboardingCompleted(user, profile = null) {
   if (!user || !user.id) return false;
   
   // 1. LocalStorage check (synchronous & instant)
   const localVal = localStorage.getItem(`raydar_onboarding_completed_${user.id}`);
   if (localVal === 'true') return true;
 
-  // 2. Supabase Auth user_metadata check
+  // 2. Profile column in PostgreSQL database
+  if (profile && (profile.onboarding_completed === true || profile.onboarding_completed === 'true')) {
+    try {
+      localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
+    } catch (e) {}
+    return true;
+  }
+
+  // 3. Supabase Auth user_metadata check
   if (user.user_metadata && user.user_metadata.onboarding_completed === true) {
     try {
       localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
@@ -61,12 +69,23 @@ export function isOnboardingCompleted(user) {
     return true;
   }
 
+  // 4. Heuristic: Existing profile with full_name created earlier than 1 minute ago has already onboarded
+  if (profile && profile.full_name && profile.username && profile.created_at) {
+    const ageMs = Date.now() - new Date(profile.created_at).getTime();
+    if (ageMs > 60000) {
+      try {
+        localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
+      } catch (e) {}
+      return true;
+    }
+  }
+
   return false;
 }
 
 /**
  * Marks onboarding as completed for a user.
- * Persists to both localStorage and Supabase Auth user_metadata.
+ * Persists to localStorage, PostgreSQL profiles table, and Supabase Auth user_metadata.
  */
 export async function setOnboardingCompleted(user) {
   if (!user || !user.id) {
@@ -85,6 +104,7 @@ export async function setOnboardingCompleted(user) {
 
   clearAuthCache();
 
+  // Persist to Supabase Auth metadata
   try {
     await withTimeout(supabase.auth.updateUser({
       data: { onboarding_completed: true }
@@ -92,6 +112,20 @@ export async function setOnboardingCompleted(user) {
     console.log("[Auth] Onboarding completed flag saved to Supabase user metadata.");
   } catch (err) {
     console.warn("[Auth] Notice updating onboarding status in Supabase:", err);
+  }
+
+  // Persist to PostgreSQL profiles table
+  try {
+    await withTimeout(
+      supabase
+        .from('profiles')
+        .update({ onboarding_completed: true, updated_at: new Date().toISOString() })
+        .eq('user_id', user.id),
+      4000
+    );
+    console.log("[Auth] Onboarding completed flag saved to PostgreSQL profiles table.");
+  } catch (err) {
+    console.warn("[Auth] Notice updating onboarding status in profiles table:", err);
   }
 }
 
@@ -166,13 +200,13 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       const user = sessionUser;
 
       // Fetch RAYDAR profile for this authenticated user with timeout protection
-      const { data: profile, error: profileError } = await withTimeout(
+      let { data: profile, error: profileError } = await withTimeout(
         supabase
           .from('profiles')
           .select('*')
           .eq('user_id', user.id)
           .maybeSingle(),
-        5000,
+        6000,
         { data: null, error: null }
       );
 
@@ -190,8 +224,38 @@ export async function getAuthAndProfileState(forceRefresh = false) {
         }
       }
 
+      // Self-healing check: If Supabase returned null profile, check local storage
+      if (!profile) {
+        try {
+          const cachedLocal = JSON.parse(localStorage.getItem('user_profile') || '{}');
+          if (cachedLocal && cachedLocal.full_name && (!cachedLocal.user_id || cachedLocal.user_id === user.id)) {
+            console.log("[Auth] Self-healing profile from local cache for user:", user.id);
+            const healingPayload = {
+              user_id: user.id,
+              email: user.email || '',
+              full_name: cachedLocal.full_name,
+              username: cachedLocal.username || `@user_${user.id.substring(0, 8)}`,
+              role: cachedLocal.role || 'Guardian',
+              phone_country_code: cachedLocal.phone_country_code || '+237',
+              phone_number: cachedLocal.phone_number || '',
+              city: cachedLocal.city || '',
+              profile_photo_url: cachedLocal.photo || cachedLocal.profile_photo_url || '',
+              onboarding_completed: true
+            };
+            const { data: healedData } = await supabase
+              .from('profiles')
+              .upsert(healingPayload, { onConflict: 'user_id' })
+              .select()
+              .maybeSingle();
+            if (healedData) profile = healedData;
+          }
+        } catch (e) {
+          console.warn("[Auth] Notice during self-healing check:", e);
+        }
+      }
+
       // Determine if profile exists and has required identity information
-      const hasProfile = profile && (profile.full_name || profile.username);
+      const hasProfile = Boolean(profile && (profile.full_name || profile.username));
 
       if (!hasProfile) {
         const noProfileResult = {
@@ -223,7 +287,7 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       }
 
       // Normal User: Check if first-login onboarding has been completed
-      const onboardingDone = isOnboardingCompleted(user);
+      const onboardingDone = isOnboardingCompleted(user, profile);
       if (!onboardingDone) {
         const onboardingResult = {
           state: AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED,
