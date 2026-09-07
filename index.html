@@ -199,12 +199,26 @@
         </p>
 </footer>
 <script>
-        // Failsafe: if the module script fails to load, resolve, or execute
-        // this standard script will redirect the user to the authentication page after 5 seconds instead of hanging on the splash screen.
+        // Deterministic hard timeout: THE SPLASH SCREEN MUST NEVER EXCEED 4 SECONDS.
+        // If anything hangs or is delayed, exit splash screen within 3.5 seconds.
         window.failsafeRedirect = setTimeout(() => {
-            console.warn("Failsafe redirect triggered: module failed to load.");
-            window.location.href = './login_child_safety.html';
-        }, 5000);
+            console.warn("[RAYDAR Splash] Hard failsafe ceiling triggered at 3500ms.");
+            try {
+                let hasToken = false;
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) {
+                        hasToken = true;
+                        break;
+                    }
+                }
+                if (hasToken) {
+                    window.location.replace('./home_child_safety_v1.html');
+                    return;
+                }
+            } catch(e) {}
+            window.location.replace('./login_child_safety.html');
+        }, 3500);
 </script>
 <script type="importmap">
 {
@@ -217,21 +231,32 @@
         import { supabase } from "./src/supabaseClient.js";
         import { protectRoute } from "./src/authService.js";
 
-        // Check if returning from a Google OAuth callback redirect (has access_token or code in URL)
         const isOAuthCallback = window.location.hash.includes('access_token') || window.location.search.includes('code=');
-
-        if (window.failsafeRedirect) {
-            clearTimeout(window.failsafeRedirect);
-        }
 
         async function handleIndexRouting() {
             try {
-                // Show brief splash animation (800ms) for smooth branding experience
-                await new Promise(r => setTimeout(r, 800));
+                // Concurrently run authentication check and a smooth 600ms branding window
+                const authTask = (async () => {
+                    try {
+                        const { data: { session }, error } = await supabase.auth.getSession();
+                        if (error) return null;
+                        return session;
+                    } catch(e) {
+                        return null;
+                    }
+                })();
 
-                const { data: { session } } = await supabase.auth.getSession();
+                const minBrandWait = new Promise(resolve => setTimeout(resolve, 600));
+
+                const [session] = await Promise.all([authTask, minBrandWait]);
+
+                if (window.failsafeRedirect) {
+                    clearTimeout(window.failsafeRedirect);
+                }
+
                 if (session && localStorage.getItem('is_guest') !== 'true') {
-                    console.log("[Index Router] Active session detected. Routing authenticated user...");
+                    localStorage.removeItem('is_guest');
+                    console.log("[Index Router] Active session confirmed. Routing authenticated user...");
                     await protectRoute('login');
                 } else {
                     console.log("[Index Router] No session. Transitioning to login...");
@@ -239,19 +264,28 @@
                 }
             } catch (err) {
                 console.warn("[Index Router] Routing fallback:", err);
+                if (window.failsafeRedirect) clearTimeout(window.failsafeRedirect);
                 window.location.replace('./login_child_safety.html');
             }
         }
 
         if (isOAuthCallback) {
             console.log("[Index Router] Returning from Google OAuth callback...");
-            supabase.auth.onAuthStateChange(async (event, session) => {
+            let routed = false;
+            const completeOAuth = async () => {
+                if (routed) return;
+                routed = true;
+                if (window.failsafeRedirect) clearTimeout(window.failsafeRedirect);
+                localStorage.removeItem('is_guest');
+                await protectRoute('login');
+            };
+
+            supabase.auth.onAuthStateChange((event, session) => {
                 if (event === 'SIGNED_IN' || session) {
-                    await protectRoute('login');
+                    completeOAuth();
                 }
             });
-            // Backup check in case onAuthStateChange already fired
-            setTimeout(handleIndexRouting, 1200);
+            setTimeout(completeOAuth, 1200);
         } else {
             handleIndexRouting();
         }

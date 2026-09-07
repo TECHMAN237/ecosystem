@@ -339,18 +339,18 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
         // Initialize and check current auth state
         async function initPage() {
             try {
-                // Check role selection
+                // 1. Route guard FIRST: if user already has an established profile, protectRoute immediately sends them to home!
+                const authInfo = await protectRoute('profile_completion');
+
+                // 2. Check role selection for new registration
                 const selectedRole = sessionStorage.getItem('childSafetyAccountType');
                 if (!selectedRole) {
-                    console.warn("No role selected. Redirecting user to Step 2 (Account Type)...");
+                    console.warn("No role selected for new user. Redirecting to Step 2 (Account Type)...");
                     window.location.replace('./account_type_selection_updated_flow.html');
                     return;
                 }
                 const roleBadgeText = document.getElementById('roleBadgeText');
                 if (roleBadgeText) roleBadgeText.textContent = selectedRole;
-
-                // Route guard: only redirect if user already has a complete profile
-                const authInfo = await protectRoute('profile_completion');
 
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
                 const { data: { user }, error: userError } = await supabase.auth.getUser();

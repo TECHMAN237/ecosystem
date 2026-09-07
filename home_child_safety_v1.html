@@ -467,7 +467,11 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
         // Hide Report Missing for Community Member / Volunteer (cannot report missing)
         (function() {
-            const role = sessionStorage.getItem('childSafetyAccountType') || '';
+            let userProfile = null;
+            try {
+                userProfile = JSON.parse(localStorage.getItem('user_profile') || '{}');
+            } catch(e) {}
+            const role = userProfile?.role || sessionStorage.getItem('childSafetyAccountType') || '';
             const restricted = /Community Member|Volunteer Helper|Membre de la Communauté|Bénévole Secouriste/i.test(role);
             if (restricted) {
                 document.querySelectorAll('button').forEach(btn => {
@@ -477,32 +481,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         })();
-    </script>
-
-    <script type="module">
-        import { protectRoute } from "./src/authService.js";
-        import { reportService } from "./src/reportService.js";
-
-        // Route guard for home page
-        await protectRoute('user');
-
-        async function updateHomeUserProfile() {
-            try {
-                const profile = await reportService.syncProfileWithSupabase();
-                if (profile) {
-                    const nameEl = document.getElementById('homeUserName');
-                    if (nameEl && profile.full_name) nameEl.textContent = profile.full_name;
-                    const roleEl = document.getElementById('homeUserRole');
-                    if (roleEl && profile.role) roleEl.textContent = profile.role;
-                    const avatarEl = document.getElementById('homeUserAvatar');
-                    if (avatarEl && profile.photo) avatarEl.src = profile.photo;
-                }
-            } catch(e) {
-                console.error("Home profile sync error:", e);
-            }
-        }
-        document.addEventListener('DOMContentLoaded', updateHomeUserProfile);
-        updateHomeUserProfile();
     </script>
 
     <script>

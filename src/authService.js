@@ -3,9 +3,10 @@
 import { supabase } from "./supabaseClient.js";
 
 export const AuthState = {
-  LOADING: 'LOADING',
+  INITIALIZING: 'INITIALIZING',
   UNAUTHENTICATED: 'UNAUTHENTICATED',
   AUTHENTICATED_NO_PROFILE: 'AUTHENTICATED_NO_PROFILE',
+  AUTHENTICATED_PROFILE_LOADING: 'AUTHENTICATED_PROFILE_LOADING',
   AUTHENTICATED_USER_ONBOARDING_REQUIRED: 'AUTHENTICATED_USER_ONBOARDING_REQUIRED',
   AUTHENTICATED_USER: 'AUTHENTICATED_USER',
   AUTHENTICATED_ADMIN: 'AUTHENTICATED_ADMIN',
@@ -23,7 +24,7 @@ export const DB_ROLES = {
 // In-memory cache & promise deduplication for maximum performance
 let cachedAuthInfo = null;
 let cacheTimestamp = 0;
-const CACHE_TTL_MS = 25000; // 25 seconds TTL for auth & profile data
+const CACHE_TTL_MS = 20000; // 20 seconds TTL for auth & profile data
 let pendingAuthPromise = null;
 
 export function clearAuthCache() {
@@ -33,18 +34,64 @@ export function clearAuthCache() {
 }
 
 /**
- * Executes a promise with an enforced timeout so requests never hang for minutes.
+ * Executes a promise with an enforced timeout so requests never hang.
  */
-function withTimeout(promise, ms = 6000, fallbackVal = null) {
+function withTimeout(promise, ms = 4000, fallbackVal = null) {
+  let timer;
   return Promise.race([
-    promise,
-    new Promise((resolve) => setTimeout(() => resolve(fallbackVal), ms))
+    promise.then((res) => {
+      clearTimeout(timer);
+      return res;
+    }),
+    new Promise((resolve) => {
+      timer = setTimeout(() => {
+        resolve(fallbackVal !== null ? fallbackVal : { isTimeout: true, error: new Error('TIMEOUT'), data: null });
+      }, ms);
+    })
   ]);
 }
 
 /**
+ * Saves current URL as returnUrl and redirects unauthenticated users to login.
+ */
+export function saveReturnUrlAndRedirectToLogin() {
+  try {
+    const path = window.location.pathname;
+    const search = window.location.search;
+    const currentUrl = path + search;
+    const publicPages = ['login', 'sign_up', 'forgot_password', 'reset_password', 'index.html'];
+    const isPublic = publicPages.some(p => path.includes(p)) || path === '/' || path === '';
+    if (!isPublic) {
+      sessionStorage.setItem('raydar_return_url', currentUrl);
+      window.location.replace(`./login_child_safety.html?returnUrl=${encodeURIComponent(currentUrl)}`);
+      return;
+    }
+  } catch(e) {}
+  window.location.replace('./login_child_safety.html');
+}
+
+/**
+ * Retrieves and clears the saved returnUrl after successful authentication.
+ */
+export function getAndClearReturnUrl() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramUrl = urlParams.get('returnUrl');
+    if (paramUrl && !paramUrl.includes('login') && !paramUrl.includes('sign_up')) {
+      sessionStorage.removeItem('raydar_return_url');
+      return decodeURIComponent(paramUrl);
+    }
+    const stored = sessionStorage.getItem('raydar_return_url');
+    if (stored && !stored.includes('login') && !stored.includes('sign_up')) {
+      sessionStorage.removeItem('raydar_return_url');
+      return stored;
+    }
+  } catch (e) {}
+  return null;
+}
+
+/**
  * Checks if a user has completed the first-login onboarding sequence.
- * Triple-check: localStorage -> PostgreSQL profiles table -> Supabase Auth user_metadata.
  */
 export function isOnboardingCompleted(user, profile = null) {
   if (!user || !user.id) return false;
@@ -69,15 +116,12 @@ export function isOnboardingCompleted(user, profile = null) {
     return true;
   }
 
-  // 4. Heuristic: Existing profile with full_name created earlier than 1 minute ago has already onboarded
-  if (profile && profile.full_name && profile.username && profile.created_at) {
-    const ageMs = Date.now() - new Date(profile.created_at).getTime();
-    if (ageMs > 60000) {
-      try {
-        localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
-      } catch (e) {}
-      return true;
-    }
+  // 4. Any user with a valid profile is already established
+  if (profile && (profile.full_name || profile.username)) {
+    try {
+      localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
+    } catch (e) {}
+    return true;
   }
 
   return false;
@@ -108,7 +152,7 @@ export async function setOnboardingCompleted(user) {
   try {
     await withTimeout(supabase.auth.updateUser({
       data: { onboarding_completed: true }
-    }), 4000);
+    }), 3000);
     console.log("[Auth] Onboarding completed flag saved to Supabase user metadata.");
   } catch (err) {
     console.warn("[Auth] Notice updating onboarding status in Supabase:", err);
@@ -121,7 +165,7 @@ export async function setOnboardingCompleted(user) {
         .from('profiles')
         .update({ onboarding_completed: true, updated_at: new Date().toISOString() })
         .eq('user_id', user.id),
-      4000
+      3000
     );
     console.log("[Auth] Onboarding completed flag saved to PostgreSQL profiles table.");
   } catch (err) {
@@ -165,23 +209,26 @@ export async function getAuthAndProfileState(forceRefresh = false) {
 
       const { data: sessionData, error: sessionError } = await withTimeout(
         supabase.auth.getSession(),
-        5000,
+        4000,
         { data: { session: null } }
       );
 
       if (!sessionError && sessionData && sessionData.session) {
         currentSession = sessionData.session;
         sessionUser = sessionData.session.user;
+        // CRITICAL: An authenticated user must NEVER be treated as a guest!
+        localStorage.removeItem('is_guest');
       }
 
       if (!sessionUser) {
         const { data: userData, error: userError } = await withTimeout(
           supabase.auth.getUser(),
-          4000,
+          3000,
           { data: { user: null } }
         );
         if (!userError && userData && userData.user) {
           sessionUser = userData.user;
+          localStorage.removeItem('is_guest');
         }
       }
 
@@ -199,65 +246,98 @@ export async function getAuthAndProfileState(forceRefresh = false) {
 
       const user = sessionUser;
 
-      // Fetch RAYDAR profile for this authenticated user with timeout protection
-      let { data: profile, error: profileError } = await withTimeout(
+      // 1. Check if localStorage already has a verified cached profile for this exact user.id
+      let localProfileForUser = null;
+      try {
+        const rawLocal = localStorage.getItem('user_profile');
+        if (rawLocal) {
+          const parsed = JSON.parse(rawLocal);
+          if (parsed && (parsed.user_id === user.id || (!parsed.user_id && parsed.full_name))) {
+            localProfileForUser = parsed;
+          }
+        }
+      } catch (e) {}
+
+      // 2. Fetch RAYDAR profile for this authenticated user with timeout protection
+      const queryRes = await withTimeout(
         supabase
           .from('profiles')
           .select('*')
           .eq('user_id', user.id)
           .maybeSingle(),
-        6000,
-        { data: null, error: null }
+        4000,
+        { isTimeout: true, data: null, error: null }
       );
 
-      if (profileError) {
-        console.warn("Notice querying profile in Supabase:", profileError.message || profileError);
-        if (profileError.code === 'PGRST303' || profileError.message?.includes('JWT')) {
-          await supabase.auth.signOut().catch(() => {});
-          clearAuthCache();
-          return {
-            state: AuthState.UNAUTHENTICATED,
-            session: null,
-            user: null,
-            profile: null,
-          };
-        }
-      }
+      let profile = queryRes?.data;
+      const profileError = queryRes?.error;
+      const isTimeout = queryRes?.isTimeout;
 
-      // Self-healing check: If Supabase returned null profile, check local storage
-      if (!profile) {
+      if (profile && profile.id) {
+        // Authoritative profile found in PostgreSQL!
         try {
-          const cachedLocal = JSON.parse(localStorage.getItem('user_profile') || '{}');
-          if (cachedLocal && cachedLocal.full_name && (!cachedLocal.user_id || cachedLocal.user_id === user.id)) {
-            console.log("[Auth] Self-healing profile from local cache for user:", user.id);
-            const healingPayload = {
-              user_id: user.id,
-              email: user.email || '',
-              full_name: cachedLocal.full_name,
-              username: cachedLocal.username || `@user_${user.id.substring(0, 8)}`,
-              role: cachedLocal.role || 'Guardian',
-              phone_country_code: cachedLocal.phone_country_code || '+237',
-              phone_number: cachedLocal.phone_number || '',
-              city: cachedLocal.city || '',
-              profile_photo_url: cachedLocal.photo || cachedLocal.profile_photo_url || '',
-              onboarding_completed: true
-            };
+          localStorage.setItem('user_profile', JSON.stringify({ ...profile, user_id: user.id }));
+          localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
+        } catch (e) {}
+      } else if (isTimeout || profileError) {
+        console.warn("[Auth] Profile query delayed or encountered error:", profileError || "Timeout");
+        // CRITICAL: A network timeout or database error MUST NOT be interpreted as "user has no profile"!
+        if (localProfileForUser && (localProfileForUser.full_name || localProfileForUser.username)) {
+          console.log("[Auth] Falling back to verified local profile cache for user:", user.id);
+          profile = localProfileForUser;
+        } else {
+          console.log("[Auth] Using session identity fallback for user:", user.id);
+          profile = {
+            user_id: user.id,
+            email: user.email || '',
+            full_name: user.user_metadata?.full_name || user.user_metadata?.name || (user.email ? user.email.split('@')[0] : 'Gardien'),
+            username: `@user_${user.id.substring(0, 8)}`,
+            role: user.user_metadata?.role || 'Guardian',
+            is_admin: false,
+            onboarding_completed: true
+          };
+          try {
+            localStorage.setItem('user_profile', JSON.stringify(profile));
+          } catch (e) {}
+        }
+      } else if (!profile && !profileError && !isTimeout) {
+        // PostgREST definitively executed and confirmed 0 rows returned
+        // Check if we have a locally saved profile from registration to self-heal
+        if (localProfileForUser && localProfileForUser.full_name) {
+          console.log("[Auth] Self-healing profile from local cache into Supabase for user:", user.id);
+          const healingPayload = {
+            user_id: user.id,
+            email: user.email || '',
+            full_name: localProfileForUser.full_name,
+            username: localProfileForUser.username || `@user_${user.id.substring(0, 8)}`,
+            role: localProfileForUser.role || 'Guardian',
+            phone_country_code: localProfileForUser.phone_country_code || '+237',
+            phone_number: localProfileForUser.phone_number || '',
+            city: localProfileForUser.city || '',
+            profile_photo_url: localProfileForUser.photo || localProfileForUser.profile_photo_url || '',
+            onboarding_completed: true
+          };
+          try {
             const { data: healedData } = await supabase
               .from('profiles')
               .upsert(healingPayload, { onConflict: 'user_id' })
               .select()
               .maybeSingle();
-            if (healedData) profile = healedData;
+            if (healedData) {
+              profile = healedData;
+              localStorage.setItem('user_profile', JSON.stringify({ ...healedData, user_id: user.id }));
+            }
+          } catch (e) {
+            profile = healingPayload;
           }
-        } catch (e) {
-          console.warn("[Auth] Notice during self-healing check:", e);
         }
       }
 
-      // Determine if profile exists and has required identity information
+      // Determine if profile exists
       const hasProfile = Boolean(profile && (profile.full_name || profile.username));
 
       if (!hasProfile) {
+        // Genuinely new user with no profile in database and no profile in local cache
         const noProfileResult = {
           state: AuthState.AUTHENTICATED_NO_PROFILE,
           session: currentSession,
@@ -286,20 +366,7 @@ export async function getAuthAndProfileState(forceRefresh = false) {
         return adminResult;
       }
 
-      // Normal User: Check if first-login onboarding has been completed
-      const onboardingDone = isOnboardingCompleted(user, profile);
-      if (!onboardingDone) {
-        const onboardingResult = {
-          state: AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED,
-          session: currentSession,
-          user,
-          profile,
-        };
-        cachedAuthInfo = onboardingResult;
-        cacheTimestamp = Date.now();
-        return onboardingResult;
-      }
-
+      // Normal User: Registered & authorized
       const userResult = {
         state: AuthState.AUTHENTICATED_USER,
         session: currentSession,
@@ -359,7 +426,7 @@ export async function signInWithGoogle() {
 export async function signOut() {
   clearAuthCache();
   try {
-    await withTimeout(supabase.auth.signOut(), 3000);
+    await withTimeout(supabase.auth.signOut(), 2500);
   } catch (e) {
     console.warn("Supabase signOut notice:", e);
   }
@@ -428,7 +495,8 @@ export async function createRaydarProfile({
     role: validRole,
     is_admin: false, // Critical: Never assign admin to new registrations!
     terms_accepted: true,
-    profile_photo_url: resolvedPhoto
+    profile_photo_url: resolvedPhoto,
+    onboarding_completed: true
   };
 
   console.log("Atomic single upsert to Supabase profiles for user_id:", verifiedUserId);
@@ -439,7 +507,7 @@ export async function createRaydarProfile({
       .upsert(payload, { onConflict: 'user_id' })
       .select()
       .maybeSingle(),
-    6000,
+    5000,
     { data: payload, error: null }
   );
 
@@ -457,7 +525,7 @@ export async function createRaydarProfile({
 
   // Update in-memory auth cache so subsequent getAuthAndProfileState calls are instant (0ms)
   cachedAuthInfo = {
-    state: AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED,
+    state: AuthState.AUTHENTICATED_USER,
     session: currentSession,
     user: sessionUser,
     profile: data || payload,
@@ -468,6 +536,7 @@ export async function createRaydarProfile({
   if (typeof window !== 'undefined') {
     try {
       const localObj = {
+        user_id: verifiedUserId,
         full_name: resolvedFullName,
         username: formattedUsername,
         phone_country_code: phoneCountryCode || '+237',
@@ -475,9 +544,11 @@ export async function createRaydarProfile({
         city: city || '',
         role: validRole,
         photo: resolvedPhoto || undefined,
-        is_admin: false
+        is_admin: false,
+        onboarding_completed: true
       };
       localStorage.setItem("user_profile", JSON.stringify(localObj));
+      localStorage.setItem(`raydar_onboarding_completed_${verifiedUserId}`, 'true');
       if (window.reportService && window.reportService.updateDOMProfile) {
         window.reportService.updateDOMProfile(localObj);
       }
@@ -497,20 +568,25 @@ export async function createRaydarProfile({
  * @param {'public' | 'login' | 'signup_step_1' | 'registration_step' | 'profile_completion' | 'onboarding' | 'user' | 'admin'} routeType 
  */
 export async function protectRoute(routeType) {
-  // Check guest mode bypass for normal user pages
+  // Check guest mode bypass for normal user pages only when unauthenticated
   if (routeType === 'user' && localStorage.getItem('is_guest') === 'true') {
-    console.log("Guest mode active: allowing access to user page.");
-    return { state: AuthState.UNAUTHENTICATED, isGuest: true };
+    const { data: { session } } = await withTimeout(supabase.auth.getSession(), 2000, { data: { session: null } });
+    if (!session) {
+      console.log("Guest mode active: allowing access to user page.");
+      return { state: AuthState.UNAUTHENTICATED, isGuest: true };
+    }
+    // If session actually exists, wipe the guest flag!
+    localStorage.removeItem('is_guest');
   }
 
   const authInfo = await getAuthAndProfileState();
   const { state, session, profile } = authInfo;
   const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1';
 
-  // Protect private pages with supabase.auth.getSession() - if no session, redirect to /login
+  // Protect private pages: if no session and not public, redirect to login with returnUrl
   if (!session && !isPublic) {
     console.log(`[RAYDAR Route Guard] No active session on private route '${routeType}'. Redirecting to /login...`);
-    window.location.replace('/login');
+    saveReturnUrlAndRedirectToLogin();
     return {
       state: AuthState.UNAUTHENTICATED,
       session: null,
@@ -523,21 +599,17 @@ export async function protectRoute(routeType) {
 
   switch (routeType) {
     case 'public':
-      // Public entry routes (Splash, Auth entry) never auto-redirect to protected pages on load
       return authInfo;
 
-    case 'login': // Triggered only when the user explicitly completes login or OAuth callback
+    case 'login': // Triggered after explicit login or OAuth callback
       if (session) {
+        const returnUrl = getAndClearReturnUrl();
         if (state === AuthState.AUTHENTICATED_ADMIN) {
-          window.location.replace('./admin_dashboard.html');
+          window.location.replace(returnUrl || './admin_dashboard.html');
           return authInfo;
         }
         if (state === AuthState.AUTHENTICATED_USER) {
-          window.location.replace('./home_child_safety_v1.html');
-          return authInfo;
-        }
-        if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
-          window.location.replace('./onboarding_community_protection_step_1.html');
+          window.location.replace(returnUrl || './home_child_safety_v1.html');
           return authInfo;
         }
         if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
@@ -557,61 +629,52 @@ export async function protectRoute(routeType) {
           window.location.replace('./home_child_safety_v1.html');
           return authInfo;
         }
-        if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
-          window.location.replace('./onboarding_community_protection_step_1.html');
-          return authInfo;
-        }
         if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
           window.location.replace('./account_type_selection_updated_flow.html');
           return authInfo;
         }
       }
-      // If UNAUTHENTICATED: stay on Step 1 to enter info
       break;
 
     case 'registration_step': // account_type_selection_updated_flow.html
       if (!session) {
-        window.location.replace('/login');
+        saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
+      // CRITICAL: An existing user must NEVER see role/registration selection!
       if (state === AuthState.AUTHENTICATED_ADMIN) {
         window.location.replace('./admin_dashboard.html');
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_USER) {
+        console.log("[Route Guard] Existing registered user visited registration step. Redirecting to home...");
         window.location.replace('./home_child_safety_v1.html');
-        return authInfo;
-      }
-      if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
-        window.location.replace('./onboarding_community_protection_step_1.html');
         return authInfo;
       }
       // If AUTHENTICATED_NO_PROFILE: stay in registration flow
       break;
 
     case 'profile_completion': // basic_information.html
-      if (!session) {
-        window.location.replace('/login');
+      if (!session && !sessionStorage.getItem('signup_email')) {
+        saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
-      if (state === AuthState.AUTHENTICATED_ADMIN) {
+      // CRITICAL: An existing user must NEVER see profile completion again!
+      if (session && state === AuthState.AUTHENTICATED_ADMIN) {
         window.location.replace('./admin_dashboard.html');
         return authInfo;
       }
-      if (state === AuthState.AUTHENTICATED_USER) {
+      if (session && state === AuthState.AUTHENTICATED_USER) {
+        console.log("[Route Guard] Existing registered user visited basic_information. Redirecting to home...");
         window.location.replace('./home_child_safety_v1.html');
-        return authInfo;
-      }
-      if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
-        window.location.replace('./onboarding_community_protection_step_1.html');
         return authInfo;
       }
       // If AUTHENTICATED_NO_PROFILE: stay on basic_information to complete profile!
       break;
 
-    case 'onboarding': // onboarding_community_protection_step_1, onboarding_reporter, onboarding_alerte
+    case 'onboarding': // onboarding flow
       if (!session || state === AuthState.UNAUTHENTICATED) {
-        window.location.replace('/login');
+        saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
@@ -626,41 +689,36 @@ export async function protectRoute(routeType) {
         window.location.replace('./home_child_safety_v1.html');
         return authInfo;
       }
-      // If AUTHENTICATED_USER_ONBOARDING_REQUIRED: allow access to complete onboarding!
       break;
 
-    case 'user': // home_child_safety_v1, reports, alerts, etc.
+    case 'user': // home_child_safety_v1, reports, alerts, case dashboard, etc.
       if (!session || state === AuthState.UNAUTHENTICATED) {
-        window.location.replace('/login');
+        saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
         window.location.replace('./account_type_selection_updated_flow.html');
         return authInfo;
       }
-      if (state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
-        window.location.replace('./onboarding_community_protection_step_1.html');
-        return authInfo;
-      }
-      // If AUTHENTICATED_USER or AUTHENTICATED_ADMIN: allow access
+      // CRITICAL: An existing user navigating to home, clicking 'Accueil' or viewing tabs stays on the page!
+      // NEVER redirect an existing user to registration or onboarding on navigation!
       break;
 
     case 'admin': // admin_dashboard.html
       if (!session || state === AuthState.UNAUTHENTICATED) {
-        window.location.replace('/login');
+        saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
       if (state === AuthState.AUTHENTICATED_NO_PROFILE) {
         window.location.replace('./account_type_selection_updated_flow.html');
         return authInfo;
       }
-      if (state === AuthState.AUTHENTICATED_USER || state === AuthState.AUTHENTICATED_USER_ONBOARDING_REQUIRED) {
+      if (state !== AuthState.AUTHENTICATED_ADMIN) {
         console.warn("Security Alert: Normal user attempted access to admin route. Redirecting to normal app.");
         sessionStorage.setItem('access_denied_message', 'Accès réservé aux administrateurs.');
         window.location.replace('./home_child_safety_v1.html');
         return authInfo;
       }
-      // If AUTHENTICATED_ADMIN: allow access!
       break;
   }
 
@@ -670,7 +728,7 @@ export async function protectRoute(routeType) {
 /**
  * Direct guard for private pages.
  * Protect private pages with supabase.auth.getSession()
- * if no session, redirect to /login.
+ * if no session, redirect to /login with returnUrl.
  */
 export async function protectPrivatePage() {
   if (localStorage.getItem('is_guest') === 'true') {
@@ -679,7 +737,7 @@ export async function protectPrivatePage() {
   const { data: { session }, error } = await supabase.auth.getSession();
   if (error || !session) {
     console.log("[Auth Guard] No active session. Redirecting to /login...");
-    window.location.replace('/login');
+    saveReturnUrlAndRedirectToLogin();
     return null;
   }
   return session;
@@ -698,8 +756,11 @@ if (typeof window !== 'undefined') {
     signOut,
     createRaydarProfile,
     protectRoute,
-    protectPrivatePage
+    protectPrivatePage,
+    saveReturnUrlAndRedirectToLogin,
+    getAndClearReturnUrl
   };
   window.handleLogout = signOut;
   window.protectPrivatePage = protectPrivatePage;
 }
+

@@ -2,6 +2,45 @@
 // Ensures consistent Left Sidebar on Desktop (min-width: 768px) and Bottom Navigation on Mobile (max-width: 767px)
 
 (function () {
+    // 0. Deep Link & Shared Link Gatekeeper:
+    // If opening a protected app route without an authenticated session or guest mode,
+    // immediately prevent content leak and redirect to login while preserving returnUrl.
+    const currentPath = window.location.pathname;
+    const publicPages = [
+        'login', 'login_child_safety', 
+        'sign_up', 'sign_up_child_safety', 
+        'forgot_password', 'reset_password', 
+        'about_safeguardian', 'help_center', 
+        'privacy_settings', 'index.html',
+        'account_type_selection', 'basic_information',
+        'onboarding_community_protection'
+    ];
+    const isPublicPage = publicPages.some(p => currentPath.includes(p)) || currentPath === '/' || currentPath === '';
+
+    if (!isPublicPage && localStorage.getItem('is_guest') !== 'true') {
+        let hasSessionToken = false;
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) {
+                    const item = localStorage.getItem(k);
+                    if (item && item.includes('access_token')) {
+                        hasSessionToken = true;
+                        break;
+                    }
+                }
+            }
+        } catch(e) {}
+
+        if (!hasSessionToken) {
+            console.log("[RAYDAR Shell Guard] Unauthenticated deep-link access detected. Redirecting to login...");
+            const dest = window.location.pathname + window.location.search;
+            sessionStorage.setItem('raydar_return_url', dest);
+            window.location.replace('./login_child_safety.html?returnUrl=' + encodeURIComponent(dest));
+            return;
+        }
+    }
+
     // 1. Inject Styles
     const styleId = 'responsive-shell-styles';
     if (!document.getElementById(styleId)) {

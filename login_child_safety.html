@@ -228,6 +228,9 @@
         import { supabase } from "./src/supabaseClient.js";
         import { signInWithGoogle, protectRoute } from "./src/authService.js";
 
+        // Check if user is already logged in with an active session
+        await protectRoute('login');
+
         const form = document.getElementById('loginForm');
         const errorMsg = document.getElementById('errorMsg');
         const errorText = document.getElementById('errorText');
@@ -385,7 +388,7 @@
                 }
                 
                 console.log('Login successful! Real session confirmed for user:', session.user.id);
-                localStorage.setItem('is_guest', 'false');
+                localStorage.removeItem('is_guest');
                 await protectRoute('login');
             } catch (err) {
                 console.error('Unexpected login error:', err);
