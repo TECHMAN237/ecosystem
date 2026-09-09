@@ -117,14 +117,6 @@ export function isOnboardingCompleted(user, profile = null) {
   const localVal = localStorage.getItem(`raydar_onboarding_completed_${user.id}`);
   if (localVal === 'true') return true;
 
-  // 4. If profile already exists and has both full_name and role, and user has active session
-  if (profile && profile.full_name && profile.role && profile.onboarding_completed !== false) {
-    try {
-      localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
-    } catch (e) {}
-    return true;
-  }
-
   return false;
 }
 
@@ -375,75 +367,35 @@ export async function getAuthAndProfileState(forceRefresh = false) {
         } catch (e) {}
       }
 
-      // Fallback & recovery: check local cache and Supabase Auth user_metadata if profile row not found
-      if (!profile) {
-        try {
-          const rawLocal = localStorage.getItem('user_profile') || localStorage.getItem(`raydar_profile_${user.id}`);
-          let parsed = null;
-          if (rawLocal) {
-            try { parsed = JSON.parse(rawLocal); } catch(e) {}
-          }
-
-          const meta = user.user_metadata || {};
-          const candidateFullName = parsed?.full_name || meta.full_name || meta.name || (user.email ? user.email.split('@')[0] : '');
-          const candidateRole = parsed?.role || meta.role || meta.account_type || 'Guardian';
-          const candidateUsername = parsed?.username || meta.username || `@user_${user.id.substring(0, 8)}`;
-
-          if (candidateFullName) {
-            profile = {
-              user_id: user.id,
-              email: user.email || parsed?.email || '',
-              full_name: candidateFullName,
-              username: candidateUsername,
-              role: mapAccountTypeToDbRole(candidateRole),
-              phone_number: parsed?.phone_number || meta.phone_number || '',
-              phone_country_code: parsed?.phone_country_code || meta.phone_country_code || '+237',
-              city: parsed?.city || meta.city || '',
-              is_admin: parsed?.is_admin === true || meta.is_admin === true,
-              onboarding_completed: true,
-              profile_photo_url: parsed?.photo || parsed?.profile_photo_url || meta.avatar_url || meta.picture || ''
-            };
-
-            // Background auto-heal into Supabase profiles table
-            supabase.from('profiles').upsert(profile, { onConflict: 'user_id' }).then(({ error }) => {
-              if (error) console.warn('[Auth] Background profile auto-heal notice:', error.message || error);
-              else console.log('[Auth] Profile successfully auto-healed in PostgreSQL profiles table');
-            }).catch(() => {});
-          }
-        } catch (e) {
-          console.warn("[Auth] Notice during profile fallback check:", e);
-        }
-      }
-
       // Check if profile exists and is complete in RAYDAR
-      const hasProfileRow = Boolean(profile);
-      const isProfileComplete = Boolean(
-        hasProfileRow && 
-        (profile.full_name || profile.username || user.email)
-      );
-
       let raydarProfileState = 'NONE';
       let registrationState = 'NOT_STARTED';
 
-      if (!hasProfileRow) {
+      if (!profile) {
         raydarProfileState = 'NONE';
         registrationState = 'NOT_STARTED';
-      } else if (!isProfileComplete) {
-        raydarProfileState = 'INCOMPLETE';
-        registrationState = 'IN_PROGRESS';
       } else {
-        raydarProfileState = 'COMPLETE';
-        registrationState = 'COMPLETE';
+        const hasName = Boolean(profile.full_name && profile.full_name.trim());
+        const hasRole = Boolean(profile.role && profile.role.trim());
+        const hasContact = Boolean((profile.phone_number && profile.phone_number.trim()) || (profile.city && profile.city.trim()));
+
+        if (!hasRole) {
+          raydarProfileState = 'INCOMPLETE';
+          registrationState = 'IN_PROGRESS';
+        } else if (!hasContact) {
+          raydarProfileState = 'INCOMPLETE';
+          registrationState = 'IN_PROGRESS';
+        } else if (hasName && hasRole) {
+          raydarProfileState = 'COMPLETE';
+          registrationState = 'COMPLETE';
+        } else {
+          raydarProfileState = 'INCOMPLETE';
+          registrationState = 'IN_PROGRESS';
+        }
       }
 
-      // Check onboarding state: if profile is complete or user is established, mark complete
-      const onboardingDone = isProfileComplete && (
-        profile.onboarding_completed === true || 
-        profile.onboarding_completed === 'true' ||
-        user.user_metadata?.onboarding_completed === true ||
-        localStorage.getItem(`raydar_onboarding_completed_${user.id}`) === 'true' ||
-        Boolean(profile.full_name && profile.role)
-      );
+      // Check onboarding state: strictly evaluate authoritative flags
+      const onboardingDone = raydarProfileState === 'COMPLETE' && isOnboardingCompleted(user, profile);
       const onboardingState = onboardingDone ? 'COMPLETE' : 'NOT_STARTED';
 
       // Determine the next required step for this user
@@ -458,7 +410,7 @@ export async function getAuthAndProfileState(forceRefresh = false) {
         nextRequiredStep = './account_type_selection_updated_flow.html';
       } else if (raydarProfileState === 'INCOMPLETE') {
         resolvedState = AuthState.AUTHENTICATED_PROFILE_INCOMPLETE;
-        nextRequiredStep = './basic_information.html';
+        nextRequiredStep = !profile?.role ? './account_type_selection_updated_flow.html' : './basic_information.html';
       } else if (onboardingState !== 'COMPLETE') {
         resolvedState = AuthState.AUTHENTICATED_ONBOARDING_REQUIRED;
         nextRequiredStep = './onboarding_community_protection_step_1.html';
@@ -760,16 +712,6 @@ export function registerInternalNavIntent(targetUrl = '') {
 
 export function consumeInternalNavIntent() {
   try {
-    const raw = sessionStorage.getItem(INTENT_KEY);
-    if (raw) {
-      sessionStorage.removeItem(INTENT_KEY);
-      const parsed = JSON.parse(raw);
-      const isFresh = parsed && parsed.timestamp && (Date.now() - parsed.timestamp <= INTENT_VALIDITY_WINDOW_MS);
-      if (isFresh) {
-        return { isValid: true, intent: parsed, type: 'INTERNAL' };
-      }
-    }
-
     let isReload = false;
     if (typeof performance !== 'undefined') {
       const navEntries = performance.getEntriesByType('navigation');
@@ -782,26 +724,54 @@ export function consumeInternalNavIntent() {
     const rawReload = sessionStorage.getItem(RELOAD_KEY);
     if (rawReload) {
       sessionStorage.removeItem(RELOAD_KEY);
-      const parsedReload = JSON.parse(rawReload);
-      if (parsedReload && (Date.now() - parsedReload.timestamp <= 10000) && parsedReload.page === window.location.pathname) {
-        isReload = true;
-      }
+      try {
+        const parsedReload = JSON.parse(rawReload);
+        if (parsedReload && (Date.now() - parsedReload.timestamp <= 10000) && parsedReload.page === window.location.pathname) {
+          isReload = true;
+        }
+      } catch (e) {}
     }
     if (isReload) {
-      return { isValid: true, intent: null, type: 'RELOAD' };
+      return { isValid: true, isReload: true, intent: null, type: 'RELOAD' };
+    }
+
+    let isBackForward = false;
+    if (typeof performance !== 'undefined') {
+      const navEntries = performance.getEntriesByType('navigation');
+      if (navEntries && navEntries.length > 0) {
+        isBackForward = navEntries[0].type === 'back_forward';
+      } else if (performance.navigation) {
+        isBackForward = performance.navigation.type === 2;
+      }
+    }
+    const hasActiveSession = typeof window !== 'undefined' && sessionStorage.getItem('raydar_active_session') === 'true';
+    if (isBackForward && hasActiveSession) {
+      return { isValid: true, isBackForward: true, intent: null, type: 'BACK_FORWARD' };
+    }
+
+    const raw = sessionStorage.getItem(INTENT_KEY);
+    if (raw) {
+      sessionStorage.removeItem(INTENT_KEY);
+      const parsed = JSON.parse(raw);
+      const isFresh = parsed && parsed.timestamp && (Date.now() - parsed.timestamp <= INTENT_VALIDITY_WINDOW_MS);
+      if (isFresh) {
+        return { isValid: true, isReload: false, isBackForward: false, intent: parsed, type: 'INTERNAL' };
+      }
     }
   } catch (e) {
     console.warn("Notice evaluating navigation intent:", e);
   }
 
-  return { isValid: false, intent: null, type: 'DIRECT' };
+  return { isValid: false, isReload: false, isBackForward: false, intent: null, type: 'DIRECT' };
 }
 
 /**
  * Guard utility for pages.
  * @param {'public' | 'login' | 'signup_step_1' | 'registration_step' | 'profile_completion' | 'onboarding' | 'user' | 'admin'} routeType 
+ * @param {Object} [options]
+ * @param {boolean} [options.isExplicitLogin]
  */
-export async function protectRoute(routeType) {
+export async function protectRoute(routeType, options = {}) {
   if (routeType === 'user' && localStorage.getItem('is_guest') === 'true') {
     const { data: { session } } = await withTimeout(supabase.auth.getSession(), 2000, { data: { session: null } });
     if (!session) {
@@ -811,16 +781,17 @@ export async function protectRoute(routeType) {
   }
 
   const authInfo = await getAuthAndProfileState();
-  const { state, session, profile } = authInfo;
-  const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1' || routeType === 'registration_step' || routeType === 'profile_completion';
+  const { state, session, profile, raydarProfileState, onboardingState } = authInfo;
+  const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1';
 
-  const hasActiveInAppSession = typeof window !== 'undefined' && sessionStorage.getItem('raydar_active_session') === 'true';
   const navCheck = consumeInternalNavIntent();
-  const isInternalNavValid = navCheck.isValid || hasActiveInAppSession;
-  const navigationType = hasActiveInAppSession ? 'IN_APP_ACTIVE' : navCheck.type;
+  const isAllowedNavigation = navCheck.isReload || navCheck.isBackForward || navCheck.isValid;
 
-  // Direct external link gatekeeper: ONLY apply if there is NO active Supabase session
-  if (!isPublic && !session && !isInternalNavValid) {
+  // Direct external link gatekeeper:
+  // Rule 2: Every direct/external opening of a RAYDAR application link must first display the RAYDAR Login page.
+  // This remains true even if the user has a valid Supabase session.
+  if (!isPublic && !isAllowedNavigation) {
+    sessionStorage.removeItem('raydar_active_session');
     logAuthTrace({
       currentUrl: window.location.pathname + window.location.search,
       destination: './login_child_safety.html',
@@ -832,7 +803,7 @@ export async function protectRoute(routeType) {
       authenticated: Boolean(session),
       userId: session?.user?.id,
       returnUrl: window.location.pathname + window.location.search,
-      redirectReason: 'Direct URL entry detected without active session — explicit login required',
+      redirectReason: 'Direct URL entry detected — explicit login required',
       redirectSourceFunction: 'protectRoute.directEntryGate'
     });
     saveReturnUrlAndRedirectToLogin();
@@ -844,19 +815,15 @@ export async function protectRoute(routeType) {
     };
   }
 
-  if (session && typeof window !== 'undefined') {
-    sessionStorage.setItem('raydar_active_session', 'true');
-  }
-
-  // Protect private pages
+  // Protect private pages if no session exists
   if (!session && !isPublic) {
     logAuthTrace({
       currentUrl: window.location.pathname + window.location.search,
       destination: './login_child_safety.html',
-      navigationType: navigationType,
+      navigationType: navCheck.type,
       internalIntent: Boolean(navCheck.intent),
       intentTimestamp: navCheck.intent?.timestamp,
-      intentValid: isInternalNavValid,
+      intentValid: isAllowedNavigation,
       supabaseSession: false,
       authenticated: false,
       userId: null,
@@ -873,65 +840,43 @@ export async function protectRoute(routeType) {
     };
   }
 
+  if (session && typeof window !== 'undefined') {
+    sessionStorage.setItem('raydar_active_session', 'true');
+  }
+
   switch (routeType) {
     case 'public':
       return authInfo;
 
     case 'login': {
-      if (session) {
+      // Direct opening of login page must show the login form (never auto-redirect).
+      // Only redirect if arriving via OAuth callback or explicit login submission.
+      const isOAuthCallback = typeof window !== 'undefined' && (
+        window.location.hash.includes('access_token') || 
+        window.location.search.includes('code=')
+      );
+      const isExplicitLogin = options && options.isExplicitLogin === true;
+
+      if (session && (isOAuthCallback || isExplicitLogin)) {
         const dest = await resolveAuthDestination();
         window.location.replace(dest);
         return authInfo;
       }
-      break;
+      return authInfo;
     }
 
     case 'signup_step_1':
-      logAuthStateTrace({
-        provider: authInfo.provider,
-        authEvent: 'PAGE_INIT',
-        authUserId: session?.user?.id,
-        raydarProfile: authInfo.raydarProfileState,
-        registration: authInfo.registrationState,
-        onboarding: authInfo.onboardingState,
-        currentFlow: 'SIGNUP',
-        currentPage: 'sign_up_child_safety.html',
-        decision: 'ALLOW',
-        redirect: 'NONE',
-        reason: 'Signup Step 1 stays until user action'
-      });
       return authInfo;
 
     case 'registration_step':
-      logAuthStateTrace({
-        provider: authInfo.provider,
-        authEvent: 'PAGE_INIT',
-        authUserId: session?.user?.id,
-        raydarProfile: authInfo.raydarProfileState,
-        registration: 'IN_PROGRESS',
-        onboarding: authInfo.onboardingState,
-        currentFlow: authInfo.provider === 'google' ? 'GOOGLE_FIRST_LOGIN' : 'SIGNUP',
-        currentPage: 'account_type_selection_updated_flow.html',
-        decision: 'ALLOW',
-        redirect: 'NONE',
-        reason: 'Registration Step 2 stays until user action'
-      });
-      return authInfo;
-
     case 'profile_completion':
-      logAuthStateTrace({
-        provider: authInfo.provider,
-        authEvent: 'PAGE_INIT',
-        authUserId: session?.user?.id,
-        raydarProfile: authInfo.raydarProfileState,
-        registration: 'IN_PROGRESS',
-        onboarding: authInfo.onboardingState,
-        currentFlow: authInfo.provider === 'google' ? 'GOOGLE_FIRST_LOGIN' : 'SIGNUP',
-        currentPage: 'basic_information.html',
-        decision: 'ALLOW',
-        redirect: 'NONE',
-        reason: 'Registration Step 3 stays until user action'
-      });
+      // Rule 4: Existing user with complete profile & onboarding must not see registration again
+      if (raydarProfileState === 'COMPLETE' && onboardingState === 'COMPLETE') {
+        const dest = state === AuthState.AUTHENTICATED_ADMIN ? './admin_dashboard.html' : './home_child_safety_v1.html';
+        registerInternalNavIntent(dest);
+        window.location.replace(dest);
+        return authInfo;
+      }
       return authInfo;
 
     case 'onboarding':
@@ -939,24 +884,35 @@ export async function protectRoute(routeType) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
-      logAuthStateTrace({
-        provider: authInfo.provider,
-        authEvent: 'PAGE_INIT',
-        authUserId: session.user.id,
-        raydarProfile: authInfo.raydarProfileState,
-        registration: 'COMPLETE',
-        onboarding: 'IN_PROGRESS',
-        currentFlow: 'ONBOARDING',
-        currentPage: window.location.pathname,
-        decision: 'ALLOW',
-        redirect: 'NONE',
-        reason: 'Onboarding in progress — user will proceed explicitly'
-      });
+      // Rule 4: Existing user with complete profile & onboarding must not see onboarding again
+      if (raydarProfileState === 'COMPLETE' && onboardingState === 'COMPLETE') {
+        const dest = state === AuthState.AUTHENTICATED_ADMIN ? './admin_dashboard.html' : './home_child_safety_v1.html';
+        registerInternalNavIntent(dest);
+        window.location.replace(dest);
+        return authInfo;
+      }
       return authInfo;
 
     case 'user':
       if (!session || state === AuthState.UNAUTHENTICATED) {
         saveReturnUrlAndRedirectToLogin();
+        return authInfo;
+      }
+      // Handle incomplete users navigating to user routes
+      if (raydarProfileState === 'NONE') {
+        registerInternalNavIntent('./account_type_selection_updated_flow.html');
+        window.location.replace('./account_type_selection_updated_flow.html');
+        return authInfo;
+      }
+      if (raydarProfileState === 'INCOMPLETE') {
+        const dest = !profile?.role ? './account_type_selection_updated_flow.html' : './basic_information.html';
+        registerInternalNavIntent(dest);
+        window.location.replace(dest);
+        return authInfo;
+      }
+      if (onboardingState !== 'COMPLETE') {
+        registerInternalNavIntent('./onboarding_community_protection_step_1.html');
+        window.location.replace('./onboarding_community_protection_step_1.html');
         return authInfo;
       }
       return authInfo;
@@ -973,7 +929,7 @@ export async function protectRoute(routeType) {
         window.location.replace('./home_child_safety_v1.html');
         return authInfo;
       }
-      break;
+      return authInfo;
   }
 
   return authInfo;

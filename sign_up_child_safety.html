@@ -287,7 +287,7 @@ J'accepte les <a class="text-primary font-bold hover:underline" href="./privacy_
 </script>
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
-import { protectRoute, logAuthFlowTrace } from "./src/authService.js";
+import { protectRoute, logAuthFlowTrace, registerInternalNavIntent } from "./src/authService.js";
 
 const form = document.getElementById('signupForm');
 const errorMsg = document.getElementById('errorMsg');
@@ -538,6 +538,7 @@ form.addEventListener('submit', async (e) => {
         });
 
         // EXPLICIT USER-TRIGGERED NAVIGATION TO STEP 2
+        registerInternalNavIntent('./account_type_selection_updated_flow.html');
         window.location.href = './account_type_selection_updated_flow.html';
 
     } catch (err) {

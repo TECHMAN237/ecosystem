@@ -197,7 +197,7 @@
         });
     </script>
 <script type="module">
-import { protectRoute, setOnboardingCompleted } from "./src/authService.js";
+import { protectRoute, setOnboardingCompleted, registerInternalNavIntent } from "./src/authService.js";
 
 let currentUser = null;
 try {
@@ -214,11 +214,13 @@ window.handleFinishOnboarding = async function() {
         btn.classList.add('opacity-80', 'cursor-wait');
     }
     await setOnboardingCompleted(currentUser);
+    registerInternalNavIntent('./success_account_created.html');
     window.location.replace('./success_account_created.html');
 };
 
 window.handleSkipOnboarding = async function() {
     await setOnboardingCompleted(currentUser);
+    registerInternalNavIntent('./home_child_safety_v1.html');
     window.location.replace('./home_child_safety_v1.html');
 };
 </script>

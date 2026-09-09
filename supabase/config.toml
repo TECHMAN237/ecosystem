@@ -1,0 +1,53 @@
+# Supabase Project Configuration for RAYDAR Child Safety Platform
+# Official Backend: https://ifpbdythbhlgqymsaxtz.supabase.co
+# Project Reference: ifpbdythbhlgqymsaxtz
+
+project_id = "ifpbdythbhlgqymsaxtz"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[db.pooler]
+enabled = false
+port = 54329
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+[storage]
+enabled = true
+file_size_limit = "10MiB"
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://localhost:3000"]
+jwt_expiry = 3600
+enable_signup = true
+
+[functions.create-missing-report]
+verify_jwt = false
+
+[functions.create-found-report]
+verify_jwt = false
+
+[functions.matching-engine]
+verify_jwt = false
+
+[functions.ai-analysis]
+verify_jwt = false
+
+[functions.broadcast-alert]
+verify_jwt = false
+
+[functions.admin-action]
+verify_jwt = false

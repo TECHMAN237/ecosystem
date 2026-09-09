@@ -316,7 +316,7 @@ form.addEventListener('submit', async (e) => {
         console.log('Login successful! Resolving profile and role-based route...');
         localStorage.removeItem('is_guest');
         sessionStorage.setItem('raydar_active_session', 'true');
-        await protectRoute('login');
+        await protectRoute('login', { isExplicitLogin: true });
     } catch (err) {
         console.error('Unexpected login error:', err);
         showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");

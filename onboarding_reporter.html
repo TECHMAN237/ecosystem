@@ -208,7 +208,7 @@
 <div class="w-2.5 h-2.5 rounded-full bg-[#E2E8F0]"></div>
 </div>
 <!-- Next Button -->
-<button class="bg-[#532CE6] hover:bg-[#4321c4] text-white font-bold text-sm px-6 py-3 rounded-xl flex items-center gap-2 shadow-sm active:scale-98 transition-all" onclick="window.location.href='./onboarding_alerte.html'">
+<button class="bg-[#532CE6] hover:bg-[#4321c4] text-white font-bold text-sm px-6 py-3 rounded-xl flex items-center gap-2 shadow-sm active:scale-98 transition-all" onclick="registerInternalNavIntent('./onboarding_alerte.html'); window.location.href='./onboarding_alerte.html'">
 <span>Suivant</span>
 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
 </button>
@@ -229,7 +229,7 @@
         });
     </script>
 <script type="module">
-import { protectRoute, setOnboardingCompleted } from "./src/authService.js";
+import { protectRoute, setOnboardingCompleted, registerInternalNavIntent } from "./src/authService.js";
 
 let currentUser = null;
 try {
@@ -241,6 +241,7 @@ try {
 
 window.handleSkipOnboarding = async function() {
     await setOnboardingCompleted(currentUser);
+    registerInternalNavIntent('./home_child_safety_v1.html');
     window.location.replace('./home_child_safety_v1.html');
 };
 </script>

@@ -178,7 +178,7 @@
 <div class="w-2.5 h-2 rounded-full bg-[#E2E8F0]"></div>
 </div>
 <!-- Primary Action Button -->
-<button class="w-full bg-[#532CE6] hover:bg-[#4321c4] text-white font-bold text-sm py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 active:scale-98 transition-all shadow-sm" onclick="window.location.href='./onboarding_reporter.html'">
+<button class="w-full bg-[#532CE6] hover:bg-[#4321c4] text-white font-bold text-sm py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 active:scale-98 transition-all shadow-sm" onclick="registerInternalNavIntent('./onboarding_reporter.html'); window.location.href='./onboarding_reporter.html'">
 <span>Suivant</span>
 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
 </button>
@@ -189,7 +189,7 @@
 <div class="fixed -bottom-20 -left-20 w-64 h-64 bg-primary opacity-[0.03] rounded-full blur-3xl"></div>
 <div class="fixed -top-20 -right-20 w-80 h-80 bg-surface-tint opacity-[0.05] rounded-full blur-3xl"></div>
 <script type="module">
-import { protectRoute, setOnboardingCompleted } from "./src/authService.js";
+import { protectRoute, setOnboardingCompleted, registerInternalNavIntent } from "./src/authService.js";
 
 let currentUser = null;
 try {
@@ -201,6 +201,7 @@ try {
 
 window.handleSkipOnboarding = async function() {
     await setOnboardingCompleted(currentUser);
+    registerInternalNavIntent('./home_child_safety_v1.html');
     window.location.replace('./home_child_safety_v1.html');
 };
 </script>

@@ -413,7 +413,7 @@
                     reason: 'Valid credentials provided — resolving login destination'
                 });
 
-                await protectRoute('login');
+                await protectRoute('login', { isExplicitLogin: true });
             } catch (err) {
                 console.error('Unexpected login error:', err);
                 showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");

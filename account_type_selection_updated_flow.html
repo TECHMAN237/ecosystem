@@ -240,7 +240,7 @@
 </script>
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
-import { protectRoute, logAuthFlowTrace } from "./src/authService.js";
+import { protectRoute, logAuthFlowTrace, registerInternalNavIntent } from "./src/authService.js";
 
 // Check route: stay on Step 2
 await protectRoute('registration_step');
@@ -347,6 +347,7 @@ continueBtn.addEventListener('click', (e) => {
         reason: `Role selected (${role}) — advancing explicitly to Step 3`
     });
 
+    registerInternalNavIntent('./basic_information.html');
     window.location.href = './basic_information.html';
 });
 </script>
