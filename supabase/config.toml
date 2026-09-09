@@ -51,3 +51,6 @@ verify_jwt = false
 
 [functions.admin-action]
 verify_jwt = false
+
+[functions.email-verification]
+verify_jwt = false
