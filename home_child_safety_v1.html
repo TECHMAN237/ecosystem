@@ -364,7 +364,9 @@ function renderReportCards(reportsList) {
             const isFound = report.type === 'found' || report.status === 'Trouvé';
             const badgeText = isFound ? 'Trouvé' : (report.urgency || 'Urgent');
             const badgeClass = isFound ? 'bg-green-100 text-green-700' : 'bg-error-container text-error';
-            const fallbackPhoto = reportService.getDefaultChildPortrait(report.gender || '', index, isFound);
+            const fallbackPhoto = typeof reportService.getDefaultChildPortrait === 'function'
+              ? reportService.getDefaultChildPortrait(report.gender || '', index, isFound)
+              : (reportService.NEUTRAL_CHILD_PHOTO_PLACEHOLDER || '');
             const photoSrc = report.photo || fallbackPhoto;
             const childDisplayName = (report.name || report.child_full_name || report.childName || '').trim() || (isFound ? 'Enfant trouvé' : 'Enfant disparu');
             const locText = report.location || report.last_seen_location || report.found_location || 'Localisation inconnue';

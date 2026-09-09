@@ -352,8 +352,6 @@ function generateUUID() {
 
 let _inMemoryMissing = null;
 let _inMemoryFound = null;
-let lastReportsSyncTime = 0;
-let pendingReportsSyncPromise = null;
 
 function safeSetLocalStorage(key, value) {
   if (typeof window === "undefined") return;
@@ -456,6 +454,8 @@ function mergeReports(localList, remoteList) {
 export const reportService = {
   DEFAULT_AVATAR,
   NEUTRAL_CHILD_PHOTO_PLACEHOLDER,
+  AFRICAN_CHILD_PORTRAITS,
+  getDefaultChildPortrait,
 
   // Fast synchronous accessor for instant UI rendering with 0ms delay
   getCachedRecentReports(limit = 4) {
