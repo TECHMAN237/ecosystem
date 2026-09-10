@@ -183,14 +183,14 @@ export function isRaydarEmailVerified(user, profile = null) {
     return true;
   }
 
-  // 3. LocalStorage cache for this user
+  // 3. LocalStorage cache for THIS user ID
   try {
     const localVal = localStorage.getItem(`raydar_email_verified_${user.id}`);
     if (localVal === 'true') return true;
   } catch (e) {}
 
   // 4. RETURNING USER RECOGNITION:
-  // An established user who already has a complete profile (full_name, role) AND has completed onboarding
+  // An established user who already has a complete profile (full_name, role) AND has completed onboarding in PostgreSQL
   // is definitively verified! They cannot be trapped in an unverified state.
   const hasOnboarded = isOnboardingCompleted(user, profile);
   const hasCompleteProfile = Boolean(
@@ -222,12 +222,11 @@ export async function saveRoleSelection(role, user = null) {
     sessionStorage.setItem('signup_role', validRole);
   } catch (e) {}
 
-  // 2. Local Storage (keyed to user if present, or global draft)
+  // 2. Local Storage (strictly keyed to user if present)
   try {
     if (user && user.id) {
       localStorage.setItem(`raydar_selected_role_${user.id}`, role);
     }
-    localStorage.setItem('raydar_draft_selected_role', role);
   } catch (e) {}
 
   // 3. Supabase Auth user_metadata
@@ -292,22 +291,30 @@ export async function sendEmailVerificationCode(email, userId = null) {
     if (!error && data && data.success) {
       return data;
     }
+    if (error) {
+      console.warn("[RAYDAR Auth] Edge function send-code error:", error);
+    }
   } catch (edgeErr) {
     console.warn("Notice: Edge function email-verification fallback to local API:", edgeErr);
   }
 
   // 2. Fallback to server API endpoint (/api/auth/send-verification-code)
-  const baseUrl = (typeof window !== 'undefined' && window.location?.origin) ? window.location.origin : 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/auth/send-verification-code`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: cleanEmail, userId })
-  });
-  const json = await res.json();
-  if (!res.ok && !json.error) {
-    throw new Error(`Erreur serveur (${res.status})`);
+  try {
+    const baseUrl = (typeof window !== 'undefined' && window.location?.origin) ? window.location.origin : 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/auth/send-verification-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: cleanEmail, userId })
+    });
+    if (res.ok) {
+      const json = await res.json();
+      return json;
+    }
+  } catch (localErr) {
+    console.warn("[RAYDAR Auth] Local API send-verification-code notice:", localErr);
   }
-  return json;
+
+  throw new Error("Impossible d'envoyer le code de vérification. Veuillez vérifier votre connexion ou réessayer.");
 }
 
 /**
@@ -340,22 +347,30 @@ export async function verifyEmailVerificationCode(email, code, userId = null) {
     if (!error && data && (data.success || data.verified)) {
       return data;
     }
+    if (data && data.error) {
+      return { success: false, verified: false, error: data.error };
+    }
   } catch (edgeErr) {
     console.warn("Notice: Edge function verify-code fallback:", edgeErr);
   }
 
   // 3. Fallback to server API endpoint (/api/auth/verify-code)
-  const baseUrl = (typeof window !== 'undefined' && window.location?.origin) ? window.location.origin : 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/auth/verify-code`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: cleanEmail, code: cleanCode, userId })
-  });
-  const json = await res.json();
-  if (!res.ok && !json.error) {
-    throw new Error(`Erreur serveur (${res.status})`);
+  try {
+    const baseUrl = (typeof window !== 'undefined' && window.location?.origin) ? window.location.origin : 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/auth/verify-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: cleanEmail, code: cleanCode, userId })
+    });
+    if (res.ok) {
+      const json = await res.json();
+      return json;
+    }
+  } catch (localErr) {
+    console.warn("[RAYDAR Auth] Local API verify-code notice:", localErr);
   }
-  return json;
+
+  return { success: false, verified: false, error: "Code de vérification incorrect ou expiré." };
 }
 
 /**
