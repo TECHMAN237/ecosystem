@@ -2,10 +2,12 @@
 // Ensures consistent Left Sidebar on Desktop (min-width: 768px) and Bottom Navigation on Mobile (max-width: 767px)
 import { protectRoute, signOut } from "./authService.js";
 
-// Enforce route protection on all authenticated shell pages
-protectRoute('user').catch(err => console.warn('[SHELL] Route protection notice:', err));
-
-(function () {
+// Enforce authoritative blocking route protection on all authenticated shell pages
+const authInfo = await protectRoute('user');
+if (!authInfo || authInfo.state === 'UNAUTHENTICATED') {
+    // protectRoute already redirects to login_child_safety.html; stop shell execution
+    console.log('[SHELL] Unauthenticated direct entry intercepted by protectRoute');
+} else {
     // ResponsiveShell focuses on rendering desktop sidebar, mobile bottom navigation, and profile drawer.
     // Routing guards are centralized authoritatively in src/authService.js (protectRoute).
 
@@ -259,3 +261,4 @@ protectRoute('user').catch(err => console.warn('[SHELL] Route protection notice:
         mediaQuery.addListener(renderShell);
     }
 })();
+}

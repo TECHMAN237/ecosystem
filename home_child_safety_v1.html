@@ -318,8 +318,12 @@ import { supabase } from "./src/supabaseClient.js";
 import { reportService } from "./src/reportService.js";
 import { protectRoute } from "./src/authService.js";
 
-// Non-blocking route protection
-protectRoute('user').catch(err => console.warn('[AUTH] protectRoute check notice:', err));
+// Authoritative blocking route protection
+const authInfo = await protectRoute('user');
+if (!authInfo || authInfo.state === 'UNAUTHENTICATED') {
+    // Redirection to login is handled by protectRoute; halt page execution
+    throw new Error('[AUTH] Unauthenticated direct access blocked');
+}
 
 // Only listen for explicit signout
 supabase.auth.onAuthStateChange((event) => {

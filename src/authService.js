@@ -848,6 +848,16 @@ export async function resolveInitialAuthDestination({ maxWaitMs = 2500 } = {}) {
       }
     }
 
+    const navCheck = consumeInternalNavIntent();
+    const hasActiveSession = typeof window !== 'undefined' && sessionStorage.getItem('raydar_active_session') === 'true';
+    const isAllowedNavigation = navCheck.isReload || navCheck.isBackForward || (navCheck.isValid && hasActiveSession);
+
+    // DIRECT ENTRY RULE: Direct opening of domain/splash must strictly land on Login!
+    // It must NEVER automatically authenticate, bypass to Home, or leak profile details.
+    if (!isAllowedNavigation) {
+      return './login_child_safety.html';
+    }
+
     const authStatePromise = getAuthAndProfileState(false);
     const authInfo = await withTimeout(authStatePromise, maxWaitMs, null);
 
@@ -1081,11 +1091,16 @@ const INTENT_KEY = 'raydar_internal_nav_intent';
 const RELOAD_KEY = 'raydar_reload_intent';
 const INTENT_VALIDITY_WINDOW_MS = 30000; // 30 seconds window
 
+export function resetNavCheckResult() {
+  currentNavCheckResult = null;
+}
+
 export function registerInternalNavIntent(targetUrl = '') {
+  currentNavCheckResult = null;
   try {
     const payload = {
       timestamp: Date.now(),
-      source: window.location.pathname + window.location.search,
+      source: (typeof window !== 'undefined' ? window.location.pathname + window.location.search : ''),
       target: targetUrl,
       nonce: 'nav_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now()
     };
