@@ -517,7 +517,7 @@ form.addEventListener('submit', async (e) => {
             return;
         }
 
-        // 4. Successful new user registration -> save Step 1 draft and advance to Step 2
+        // 4. Successful new user registration -> save Step 1 draft and advance to Email Verification
         sessionStorage.setItem('signup_fullname', fullname);
         sessionStorage.setItem('signup_email', email);
         sessionStorage.setItem('signup_password', password);
@@ -533,13 +533,13 @@ form.addEventListener('submit', async (e) => {
             email: email,
             action: 'USER_CONTINUE',
             decision: 'ALLOW',
-            redirect: './account_type_selection_updated_flow.html',
-            reason: 'Step 1 complete — user explicitly continues to Step 2'
+            redirect: './email_verification.html',
+            reason: 'Step 1 complete — user advances to RAYDAR email verification'
         });
 
-        // EXPLICIT USER-TRIGGERED NAVIGATION TO STEP 2
-        registerInternalNavIntent('./account_type_selection_updated_flow.html');
-        window.location.href = './account_type_selection_updated_flow.html';
+        // EXPLICIT USER-TRIGGERED NAVIGATION TO EMAIL VERIFICATION
+        registerInternalNavIntent('./email_verification.html');
+        window.location.href = './email_verification.html';
 
     } catch (err) {
         console.error('Unexpected signup error:', err);

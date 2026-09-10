@@ -388,12 +388,20 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                 const authInfo = await protectRoute('profile_completion');
 
                 // 2. Check role selection for new registration
-                const selectedRole = sessionStorage.getItem('childSafetyAccountType');
+                const userCandidate = authInfo?.user;
+                const selectedRole = sessionStorage.getItem('childSafetyAccountType') ||
+                                     (authInfo?.profile?.role && authInfo.profile.role !== 'NONE' ? authInfo.profile.role : null) ||
+                                     userCandidate?.user_metadata?.selected_role ||
+                                     userCandidate?.user_metadata?.role ||
+                                     (userCandidate?.id ? localStorage.getItem(`raydar_selected_role_${userCandidate.id}`) : null) ||
+                                     localStorage.getItem('raydar_draft_selected_role');
+
                 if (!selectedRole) {
                     console.warn("No role selected for new user. Redirecting to Step 2 (Account Type)...");
                     window.location.replace('./account_type_selection_updated_flow.html');
                     return;
                 }
+                sessionStorage.setItem('childSafetyAccountType', selectedRole);
                 const roleBadgeText = document.getElementById('roleBadgeText');
                 if (roleBadgeText) roleBadgeText.textContent = selectedRole;
 
@@ -657,8 +665,6 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                 console.error('Registration/Profile completion error detail:', err);
                 showError(err.message || "Une erreur inattendue est survenue lors de l'enregistrement. Veuillez vérifier vos informations et réessayer.");
                 isSubmitting = false;
-                setLoading(false);
-            }
                 setLoading(false);
             }
         });

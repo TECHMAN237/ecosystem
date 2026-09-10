@@ -30,8 +30,10 @@ serve(async (req) => {
         );
       }
 
-      // Generate a secure 6-digit verification code
-      const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+      // Generate a cryptographically secure 6-digit verification code
+      const array = new Uint32Array(1);
+      crypto.getRandomValues(array);
+      const generatedCode = (100000 + (array[0] % 900000)).toString();
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes
 
       // Invalidate previous unverified codes for this email
@@ -52,18 +54,22 @@ serve(async (req) => {
 
       if (insertErr) {
         console.error("Error storing verification code:", insertErr);
-        // Fallback gracefully
       }
 
-      console.log(`[RAYDAR Auth] Verification code for ${email}: ${generatedCode}`);
+      console.log(`[RAYDAR Auth Server] Authoritative verification code generated for ${email}`);
+
+      const responsePayload: Record<string, any> = {
+        success: true,
+        message: "Code de vérification généré et envoyé."
+      };
+
+      // Only expose debug hint in explicit local sandbox mode
+      if (Deno.env.get("RAYDAR_DEBUG_AUTH") === "true") {
+        responsePayload.debug_code = generatedCode;
+      }
 
       return new Response(
-        JSON.stringify({
-          success: true,
-          message: "Code de vérification généré.",
-          // In production this is sent via email; for development/testing we provide debug hint
-          debug_code: generatedCode
-        }),
+        JSON.stringify(responsePayload),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

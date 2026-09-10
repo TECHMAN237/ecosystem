@@ -199,9 +199,9 @@
         </p>
 </footer>
 <script>
-        // Deterministic hard timeout: THE SPLASH SCREEN MUST NEVER EXCEED 3.5 SECONDS.
+        // Deterministic hard timeout failsafe: SPLASH SCREEN NEVER EXCEEDS 3.5 SECONDS.
         window.failsafeRedirect = setTimeout(() => {
-            console.warn("[RAYDAR Splash] Hard failsafe ceiling triggered at 3500ms. Transitioning to login...");
+            console.warn("[RAYDAR Splash] Hard failsafe ceiling triggered at 3500ms. Transitioning...");
             window.location.replace('./login_child_safety.html');
         }, 3500);
 </script>
@@ -214,47 +214,38 @@
 </script>
 <script type="module">
         import { supabase } from "./src/supabaseClient.js";
-        import { protectRoute } from "./src/authService.js";
+        import { resolveInitialAuthDestination, resolveAuthDestination, registerInternalNavIntent } from "./src/authService.js";
 
-        const isOAuthCallback = window.location.hash.includes('access_token') || window.location.search.includes('code=');
+        const isOAuthCallback = window.location.hash.includes('access_token') || 
+                                window.location.search.includes('code=') ||
+                                window.location.hash.includes('error_description');
 
-        async function handleIndexRouting() {
+        async function handleSplashAndRouting() {
             try {
-                // Smooth branding splash window (800ms)
-                await new Promise(resolve => setTimeout(resolve, 800));
+                // Run visual branding timer and auth resolution in parallel
+                const visualMinTimer = new Promise(resolve => setTimeout(resolve, 1000));
+                const destinationPromise = isOAuthCallback 
+                    ? resolveAuthDestination() 
+                    : resolveInitialAuthDestination({ maxWaitMs: 2200 });
+
+                const [_, destination] = await Promise.all([visualMinTimer, destinationPromise]);
 
                 if (window.failsafeRedirect) {
                     clearTimeout(window.failsafeRedirect);
                 }
 
-                console.log("[Index Router] Splash duration elapsed. Navigating to login...");
-                window.location.replace('./login_child_safety.html');
+                const target = destination || './login_child_safety.html';
+                console.log("[RAYDAR Splash] Routing resolved to:", target);
+                registerInternalNavIntent(target);
+                window.location.replace(target);
             } catch (err) {
-                console.warn("[Index Router] Routing fallback:", err);
+                console.warn("[RAYDAR Splash] Routing fallback:", err);
                 if (window.failsafeRedirect) clearTimeout(window.failsafeRedirect);
+                registerInternalNavIntent('./login_child_safety.html');
                 window.location.replace('./login_child_safety.html');
             }
         }
 
-        if (isOAuthCallback) {
-            console.log("[Index Router] Returning from Google OAuth callback...");
-            let routed = false;
-            const completeOAuth = async () => {
-                if (routed) return;
-                routed = true;
-                if (window.failsafeRedirect) clearTimeout(window.failsafeRedirect);
-                localStorage.removeItem('is_guest');
-                await protectRoute('login');
-            };
-
-            supabase.auth.onAuthStateChange((event, session) => {
-                if (event === 'SIGNED_IN' || session) {
-                    completeOAuth();
-                }
-            });
-            setTimeout(completeOAuth, 1200);
-        } else {
-            handleIndexRouting();
-        }
-    </script>
+        handleSplashAndRouting();
+</script>
 </body></html>

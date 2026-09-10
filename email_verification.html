@@ -154,7 +154,7 @@
     </script>
     <script type="module">
         import { supabase } from "./src/supabaseClient.js";
-        import { protectRoute, logAuthFlowTrace, registerInternalNavIntent, signOut } from "./src/authService.js";
+        import { protectRoute, logAuthFlowTrace, registerInternalNavIntent, signOut, setRaydarEmailVerified, resolveAuthDestination } from "./src/authService.js";
 
         const targetEmailDisplay = document.getElementById('targetEmailDisplay');
         const verificationBadge = document.getElementById('verificationBadge');
@@ -336,6 +336,9 @@
 
                 const data = await res.json();
                 if (data.success && data.verified) {
+                    if (currentUser) {
+                        await setRaydarEmailVerified(currentUser);
+                    }
                     logAuthFlowTrace({
                         currentPage: 'email_verification.html',
                         flow: 'REGISTRATION',
@@ -364,19 +367,29 @@
             sendVerificationCode();
         });
 
-        // Explicit Continue to Role (Mandatory user-triggered action)
-        btnContinueToRole.addEventListener('click', () => {
-            logAuthFlowTrace({
-                currentPage: 'email_verification.html',
-                flow: 'REGISTRATION',
-                action: 'USER_CONTINUE_TO_ROLE',
-                decision: 'ALLOW',
-                redirect: './account_type_selection_updated_flow.html',
-                reason: 'User explicitly advances to Role Selection after verified email'
-            });
+        // Explicit Continue after email verification (Mandatory user-triggered action)
+        btnContinueToRole.addEventListener('click', async () => {
+            btnContinueToRole.disabled = true;
+            try {
+                const dest = await resolveAuthDestination();
+                const target = (dest && !dest.includes('email_verification')) ? dest : './account_type_selection_updated_flow.html';
 
-            registerInternalNavIntent('./account_type_selection_updated_flow.html');
-            window.location.href = './account_type_selection_updated_flow.html';
+                logAuthFlowTrace({
+                    currentPage: 'email_verification.html',
+                    flow: 'REGISTRATION',
+                    action: 'USER_CONTINUE_AFTER_VERIFICATION',
+                    decision: 'ALLOW',
+                    redirect: target,
+                    reason: 'User explicitly advances after verified email'
+                });
+
+                registerInternalNavIntent(target);
+                window.location.href = target;
+            } catch (err) {
+                console.warn("Notice resolving next destination after verification:", err);
+                registerInternalNavIntent('./account_type_selection_updated_flow.html');
+                window.location.href = './account_type_selection_updated_flow.html';
+            }
         });
 
         // Sign out button

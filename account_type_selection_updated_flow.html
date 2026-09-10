@@ -240,7 +240,7 @@
 </script>
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
-import { protectRoute, logAuthFlowTrace, registerInternalNavIntent } from "./src/authService.js";
+import { protectRoute, logAuthFlowTrace, registerInternalNavIntent, saveRoleSelection } from "./src/authService.js";
 
 // Check route: stay on Step 2
 await protectRoute('registration_step');
@@ -253,11 +253,13 @@ const errorText = document.getElementById('errorText');
 const subtitleText = document.getElementById('subtitleText');
 
 let isOAuthUser = false;
+let currentSessionUser = null;
 
 // Check if user is authenticated with Google
 try {
     const { data: { session } } = await supabase.auth.getSession();
     if (session && session.user) {
+        currentSessionUser = session.user;
         isOAuthUser = true;
         sessionStorage.setItem('signup_is_google', 'true');
         const googleName = session.user.user_metadata?.full_name || session.user.user_metadata?.name || '';
@@ -275,8 +277,11 @@ try {
     console.warn("Session check notice on Step 2:", e);
 }
 
-// Restore previously selected role if user navigated back from Step 3
-const savedRole = sessionStorage.getItem('childSafetyAccountType');
+// Restore previously selected role if user navigated back or returned
+const savedRole = sessionStorage.getItem('childSafetyAccountType') || 
+                  (currentSessionUser?.id ? localStorage.getItem(`raydar_selected_role_${currentSessionUser.id}`) : null) ||
+                  currentSessionUser?.user_metadata?.selected_role ||
+                  currentSessionUser?.user_metadata?.role;
 if (savedRole) {
     document.querySelectorAll('.account-card').forEach(card => {
         const cardRole = card.querySelector('h3')?.innerText?.trim() || '';
@@ -314,7 +319,7 @@ function setLoading(isLoading) {
     }
 }
 
-continueBtn.addEventListener('click', (e) => {
+continueBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     
     if (errorMsg) errorMsg.classList.add('hidden');
@@ -336,6 +341,12 @@ continueBtn.addEventListener('click', (e) => {
     }
     
     setLoading(true);
+
+    try {
+        await saveRoleSelection(role, currentSessionUser);
+    } catch (err) {
+        console.warn("Notice saving role selection:", err);
+    }
     
     logAuthFlowTrace({
         currentPage: 'account_type_selection_updated_flow.html',
