@@ -264,10 +264,7 @@
                 const data = await authSendCode(currentEmail, currentUser?.id);
 
                 if (data.success) {
-                    let msg = `Un code de vérification a été envoyé à ${currentEmail}.`;
-                    if (data.debug_code) {
-                        msg += ` (Code de test : ${data.debug_code})`;
-                    }
+                    const msg = `Un code de vérification a été envoyé à ${currentEmail}.`;
                     showAlert('info', msg);
                     startResendCountdown(30);
                 } else {
