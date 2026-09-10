@@ -154,7 +154,7 @@
     </script>
     <script type="module">
         import { supabase } from "./src/supabaseClient.js";
-        import { protectRoute, logAuthFlowTrace, registerInternalNavIntent, signOut, setRaydarEmailVerified, resolveAuthDestination } from "./src/authService.js";
+        import { protectRoute, logAuthFlowTrace, registerInternalNavIntent, signOut, setRaydarEmailVerified, resolveAuthDestination, sendEmailVerificationCode as authSendCode, verifyEmailVerificationCode as authVerifyCode } from "./src/authService.js";
 
         const targetEmailDisplay = document.getElementById('targetEmailDisplay');
         const verificationBadge = document.getElementById('verificationBadge');
@@ -261,13 +261,8 @@
             btnResend.classList.add('opacity-50', 'pointer-events-none');
 
             try {
-                const res = await fetch('/api/auth/send-verification-code', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentEmail, userId: currentUser?.id })
-                });
+                const data = await authSendCode(currentEmail, currentUser?.id);
 
-                const data = await res.json();
                 if (data.success) {
                     let msg = `Un code de vérification a été envoyé à ${currentEmail}.`;
                     if (data.debug_code) {
@@ -281,7 +276,7 @@
                     btnResend.classList.remove('opacity-50', 'pointer-events-none');
                 }
             } catch (err) {
-                showAlert('error', "Erreur réseau lors de l'envoi du code.");
+                showAlert('error', "Erreur lors de l'envoi du code. Veuillez réessayer.");
                 btnResend.disabled = false;
                 btnResend.classList.remove('opacity-50', 'pointer-events-none');
             }
@@ -328,14 +323,9 @@
             verifyBtnIcon.classList.add('animate-spin');
 
             try {
-                const res = await fetch('/api/auth/verify-code', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentEmail, code, userId: currentUser?.id })
-                });
+                const data = await authVerifyCode(currentEmail, code, currentUser?.id);
 
-                const data = await res.json();
-                if (data.success && data.verified) {
+                if (data.success && (data.verified !== false)) {
                     if (currentUser) {
                         await setRaydarEmailVerified(currentUser);
                     }
@@ -353,7 +343,7 @@
                     showAlert('error', data.error || 'Code de vérification invalide ou expiré.');
                 }
             } catch (err) {
-                showAlert('error', 'Erreur de connexion au serveur de vérification.');
+                showAlert('error', 'Code de vérification incorrect ou expiré.');
             } finally {
                 btnVerify.disabled = false;
                 verifyBtnText.textContent = 'Vérifier le code';
