@@ -142,13 +142,7 @@
 <h1 class="text-lg font-bold text-[#0F172A]">Signalement Rapide</h1>
 </div>
 <div class="flex items-center gap-2">
-<a class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-[#EAECF0] text-[#532CE6] rounded-xl font-bold text-xs hover:bg-[#F5F3FF] active:scale-95 transition-all shadow-sm" href="./login_child_safety.html">
-    <span class="material-symbols-outlined text-[16px]">login</span>
-    <span>Se connecter</span>
-</a>
-<button class="font-semibold text-xs text-[#64748B] px-3 py-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors" onclick="handleSkipOnboarding()">
-    Passer
-</button>
+  <span class="text-xs font-bold uppercase tracking-wider text-[#532CE6] bg-[#532CE6]/10 px-3 py-1 rounded-full">Étape 2 sur 3</span>
 </div>
 </header>
 <!-- Main Content: Central Illustration -->
@@ -208,7 +202,7 @@
 <div class="w-2.5 h-2.5 rounded-full bg-[#E2E8F0]"></div>
 </div>
 <!-- Next Button -->
-<button class="bg-[#532CE6] hover:bg-[#4321c4] text-white font-bold text-sm px-6 py-3 rounded-xl flex items-center gap-2 shadow-sm active:scale-98 transition-all" onclick="registerInternalNavIntent('./onboarding_alerte.html'); window.location.href='./onboarding_alerte.html'">
+<button id="nextStepBtn" class="bg-[#532CE6] hover:bg-[#4321c4] text-white font-bold text-sm px-6 py-3 rounded-xl flex items-center gap-2 shadow-sm active:scale-98 transition-all" onclick="handleNextStep()">
 <span>Suivant</span>
 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
 </button>
@@ -229,7 +223,7 @@
         });
     </script>
 <script type="module">
-import { protectRoute, setOnboardingCompleted, registerInternalNavIntent } from "./src/authService.js";
+import { protectRoute, setOnboardingCompleted, saveOnboardingStep, registerInternalNavIntent } from "./src/authService.js";
 
 let currentUser = null;
 try {
@@ -239,10 +233,16 @@ try {
     console.warn("Route protect notice:", e);
 }
 
-window.handleSkipOnboarding = async function() {
-    await setOnboardingCompleted(currentUser);
-    registerInternalNavIntent('./home_child_safety_v1.html');
-    window.location.replace('./home_child_safety_v1.html');
+window.handleNextStep = async function() {
+    const btn = document.getElementById('nextStepBtn');
+    if (btn) btn.disabled = true;
+    try {
+        await saveOnboardingStep(3, currentUser);
+    } catch (e) {
+        console.warn("Notice saving onboarding step:", e);
+    }
+    registerInternalNavIntent('./onboarding_alerte.html');
+    window.location.href = './onboarding_alerte.html';
 };
 </script>
 </body></html>

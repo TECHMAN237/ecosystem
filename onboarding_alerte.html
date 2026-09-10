@@ -120,13 +120,7 @@
 <h1 class="text-lg font-bold text-[#0F172A]">Alertes</h1>
 </div>
 <div class="flex items-center gap-2">
-<a class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-[#EAECF0] text-[#532CE6] rounded-xl font-bold text-xs hover:bg-[#F5F3FF] active:scale-95 transition-all shadow-sm" href="./login_child_safety.html">
-    <span class="material-symbols-outlined text-[16px]">login</span>
-    <span>Se connecter</span>
-</a>
-<button class="font-semibold text-xs text-[#64748B] px-3 py-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors" onclick="handleSkipOnboarding()">
-    Passer
-</button>
+  <span class="text-xs font-bold uppercase tracking-wider text-[#532CE6] bg-[#532CE6]/10 px-3 py-1 rounded-full">Étape 3 sur 3</span>
 </div>
 </header>
 <!-- Main Content: Stylized Map Illustration -->
@@ -216,12 +210,6 @@ window.handleFinishOnboarding = async function() {
     await setOnboardingCompleted(currentUser);
     registerInternalNavIntent('./success_account_created.html');
     window.location.replace('./success_account_created.html');
-};
-
-window.handleSkipOnboarding = async function() {
-    await setOnboardingCompleted(currentUser);
-    registerInternalNavIntent('./home_child_safety_v1.html');
-    window.location.replace('./home_child_safety_v1.html');
 };
 </script>
 </body></html>

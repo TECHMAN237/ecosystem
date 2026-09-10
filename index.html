@@ -216,9 +216,18 @@
         import { supabase } from "./src/supabaseClient.js";
         import { resolveInitialAuthDestination, resolveAuthDestination, registerInternalNavIntent } from "./src/authService.js";
 
-        const isOAuthCallback = window.location.hash.includes('access_token') || 
-                                window.location.search.includes('code=') ||
-                                window.location.hash.includes('error_description');
+        const isRecovery = window.location.hash.includes('type=recovery') || 
+                           window.location.search.includes('type=recovery');
+        if (isRecovery) {
+            if (window.failsafeRedirect) clearTimeout(window.failsafeRedirect);
+            window.location.replace('./reset_password.html' + window.location.hash);
+        }
+
+        const isOAuthCallback = !isRecovery && (
+            (window.location.hash.includes('access_token') && !window.location.hash.includes('type=recovery')) || 
+            (window.location.search.includes('code=') && !window.location.search.includes('type=recovery')) ||
+            window.location.hash.includes('error_description')
+        );
 
         async function handleSplashAndRouting() {
             try {

@@ -375,7 +375,7 @@ Accédez à l'historique complet de vos signalements d'enfants disparus et trouv
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
 import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
-import { protectRoute } from "./src/authService.js";
+import { protectRoute, signOut } from "./src/authService.js";
 
 // Single authoritative route protection (prevents refresh redirect loops)
 await protectRoute('user');
@@ -384,8 +384,8 @@ await protectRoute('user');
 supabase.auth.onAuthStateChange((event) => {
     if (localStorage.getItem('is_guest') === 'true') return;
     if (event === 'SIGNED_OUT') {
-        console.log("Signed out. Redirecting to /login...");
-        window.location.replace('/login');
+        console.log("Signed out. Redirecting to login...");
+        window.location.replace('./login_child_safety.html');
     }
 });
 
@@ -393,14 +393,7 @@ const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', async (e) => {
         e.preventDefault();
-        try {
-            await supabase.auth.signOut();
-            console.log('Successfully signed out!');
-            window.location.href = './login_child_safety.html';
-        } catch (err) {
-            console.error('Logout error:', err);
-            window.location.href = './login_child_safety.html';
-        }
+        await signOut();
     });
 }
 

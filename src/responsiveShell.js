@@ -1,5 +1,9 @@
 // Responsive Shell for Child Safety / SafeGuardian
 // Ensures consistent Left Sidebar on Desktop (min-width: 768px) and Bottom Navigation on Mobile (max-width: 767px)
+import { protectRoute, signOut } from "./authService.js";
+
+// Enforce route protection on all authenticated shell pages
+protectRoute('user').catch(err => console.warn('[SHELL] Route protection notice:', err));
 
 (function () {
     // ResponsiveShell focuses on rendering desktop sidebar, mobile bottom navigation, and profile drawer.
@@ -46,20 +50,9 @@
         document.head.appendChild(styleEl);
     }
 
-    // 2. Global Logout Handler
+    // 2. Global Logout Handler using central Supabase signOut
     window.handleLogout = async function () {
-        try {
-            if (typeof supabase !== 'undefined' && supabase.auth) {
-                await supabase.auth.signOut();
-            } else if (window.supabase && window.supabase.auth) {
-                await window.supabase.auth.signOut();
-            }
-        } catch (e) {
-            console.error("Logout error:", e);
-        }
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.replace('./login_child_safety.html');
+        await signOut();
     };
 
     // 2b. Shell rendering is decoupled from routing guards (handled authoritatively by authService.js)

@@ -228,8 +228,17 @@
         import { supabase } from "./src/supabaseClient.js";
         import { signInWithGoogle, protectRoute, logAuthFlowTrace } from "./src/authService.js";
 
+        // If URL contains recovery token, redirect directly to reset_password.html
+        const isRecovery = window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
+        if (isRecovery) {
+            window.location.replace('./reset_password.html' + window.location.hash);
+        }
+
         // If the user arrived via OAuth callback with access token or auth code, resolve login immediately
-        const isOAuthCallback = window.location.hash.includes('access_token') || window.location.search.includes('code=');
+        const isOAuthCallback = !isRecovery && (
+            (window.location.hash.includes('access_token') && !window.location.hash.includes('type=recovery')) || 
+            (window.location.search.includes('code=') && !window.location.search.includes('type=recovery'))
+        );
         if (isOAuthCallback) {
             logAuthFlowTrace({
                 currentPage: 'login_child_safety.html',
@@ -282,14 +291,24 @@
         try {
             const urlParams = new URLSearchParams(window.location.search);
             const isRegistered = urlParams.get('registered') === 'true';
-            const emailParam = urlParams.get('email') || sessionStorage.getItem('signup_success_email');
+            const isReset = urlParams.get('reset') === 'true' || !!sessionStorage.getItem('reset_success_email');
+            const emailParam = urlParams.get('email') || sessionStorage.getItem('reset_success_email') || sessionStorage.getItem('signup_success_email');
             const customSuccessMsg = sessionStorage.getItem('signup_success_message');
 
             if (emailParam && emailInput) {
                 emailInput.value = decodeURIComponent(emailParam);
             }
 
-            if (isRegistered || emailParam || customSuccessMsg) {
+            if (isReset) {
+                showSuccess("Votre mot de passe a été mis à jour avec succès. Connectez-vous avec votre nouveau mot de passe.");
+                if (passwordInput) {
+                    setTimeout(() => passwordInput.focus(), 250);
+                }
+                sessionStorage.removeItem('reset_success_email');
+                if (window.history && window.history.replaceState) {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            } else if (isRegistered || emailParam || customSuccessMsg) {
                 const msg = customSuccessMsg || "Compte créé avec succès ! Connectez-vous avec vos identifiants.";
                 showSuccess(msg);
 

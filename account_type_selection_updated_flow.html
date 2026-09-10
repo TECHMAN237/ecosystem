@@ -330,7 +330,7 @@ continueBtn.addEventListener('click', async (e) => {
         return;
     }
 
-    if (!isOAuthUser) {
+    if (!currentSessionUser && !isOAuthUser) {
         const fullname = sessionStorage.getItem('signup_fullname') || '';
         const email = sessionStorage.getItem('signup_email') || '';
         const password = sessionStorage.getItem('signup_password') || '';

@@ -125,15 +125,10 @@
 
 </head>
 <body class="bg-[#F8F9FA] text-[#0F172A] font-body-md antialiased min-h-screen flex flex-col overflow-x-hidden">
-<!-- Top Navigation / Login & Skip -->
+<!-- Top Header / Progress Indicator -->
 <header class="flex items-center justify-between px-6 py-4 sticky top-0 z-10 bg-[#F8F9FA]/90 backdrop-blur-md max-w-xl mx-auto w-full">
-<a class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-[#EAECF0] text-[#532CE6] rounded-xl font-bold text-xs hover:bg-[#F5F3FF] active:scale-95 transition-all shadow-sm" href="./login_child_safety.html">
-    <span class="material-symbols-outlined text-[16px]">login</span>
-    <span>Se connecter</span>
-</a>
-<button class="font-semibold text-xs text-[#64748B] px-3 py-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors" onclick="handleSkipOnboarding()">
-    Passer
-</button>
+  <span class="text-xs font-bold uppercase tracking-wider text-[#532CE6] bg-[#532CE6]/10 px-3 py-1 rounded-full">Étape 1 sur 3</span>
+  <span class="text-xs font-semibold text-[#64748B]">RAYDAR Onboarding</span>
 </header>
 <main class="flex-1 flex flex-col px-6 max-w-xl mx-auto w-full pb-8">
 <!-- Step Indicator Header -->
@@ -178,7 +173,7 @@
 <div class="w-2.5 h-2 rounded-full bg-[#E2E8F0]"></div>
 </div>
 <!-- Primary Action Button -->
-<button class="w-full bg-[#532CE6] hover:bg-[#4321c4] text-white font-bold text-sm py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 active:scale-98 transition-all shadow-sm" onclick="registerInternalNavIntent('./onboarding_reporter.html'); window.location.href='./onboarding_reporter.html'">
+<button id="nextStepBtn" class="w-full bg-[#532CE6] hover:bg-[#4321c4] text-white font-bold text-sm py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 active:scale-98 transition-all shadow-sm" onclick="handleNextStep()">
 <span>Suivant</span>
 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
 </button>
@@ -189,7 +184,7 @@
 <div class="fixed -bottom-20 -left-20 w-64 h-64 bg-primary opacity-[0.03] rounded-full blur-3xl"></div>
 <div class="fixed -top-20 -right-20 w-80 h-80 bg-surface-tint opacity-[0.05] rounded-full blur-3xl"></div>
 <script type="module">
-import { protectRoute, setOnboardingCompleted, registerInternalNavIntent } from "./src/authService.js";
+import { protectRoute, setOnboardingCompleted, saveOnboardingStep, registerInternalNavIntent } from "./src/authService.js";
 
 let currentUser = null;
 try {
@@ -199,10 +194,16 @@ try {
     console.warn("Route protect notice:", e);
 }
 
-window.handleSkipOnboarding = async function() {
-    await setOnboardingCompleted(currentUser);
-    registerInternalNavIntent('./home_child_safety_v1.html');
-    window.location.replace('./home_child_safety_v1.html');
+window.handleNextStep = async function() {
+    const btn = document.getElementById('nextStepBtn');
+    if (btn) btn.disabled = true;
+    try {
+        await saveOnboardingStep(2, currentUser);
+    } catch (e) {
+        console.warn("Notice saving onboarding step:", e);
+    }
+    registerInternalNavIntent('./onboarding_reporter.html');
+    window.location.href = './onboarding_reporter.html';
 };
 </script>
 </body></html>
