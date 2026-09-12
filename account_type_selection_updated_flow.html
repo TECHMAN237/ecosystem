@@ -228,7 +228,7 @@
         }
 
         window.handleStepBack = function() {
-            window.location.href = './sign_up_child_safety.html';
+            window.location.href = './email_verification.html';
         };
     </script>
 <script type="importmap">
@@ -333,7 +333,6 @@ continueBtn.addEventListener('click', async (e) => {
     if (!currentSessionUser && !isOAuthUser) {
         const fullname = sessionStorage.getItem('signup_fullname') || '';
         const email = sessionStorage.getItem('signup_email') || '';
-        const password = sessionStorage.getItem('signup_password') || '';
         if (!email || !fullname) {
             showError('Les informations de l\'étape 1 sont manquantes. Veuillez revenir à l\'étape 1.');
             return;

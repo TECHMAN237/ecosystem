@@ -218,7 +218,7 @@ J'accepte les <a class="text-primary font-bold hover:underline" href="./privacy_
 </div>
 <!-- Primary Action -->
 <button id="submitBtn" class="w-full h-14 sm:h-16 bg-primary text-on-primary font-bold text-[17px] sm:text-lg rounded-full shadow-[0_8px_25px_rgba(108,77,255,0.35)] hover:shadow-[0_12px_32px_rgba(108,77,255,0.48)] hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 px-6 cursor-pointer tracking-wide" type="submit">
-<span id="btnText">Créer un compte</span>
+<span id="btnText">Suivant</span>
 <span class="material-symbols-outlined text-[22px]" data-icon="arrow_forward" id="btnIcon">arrow_forward</span>
 </button>
 </form>
@@ -287,7 +287,7 @@ J'accepte les <a class="text-primary font-bold hover:underline" href="./privacy_
 </script>
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
-import { protectRoute, logAuthFlowTrace, registerInternalNavIntent } from "./src/authService.js";
+import { protectRoute, logAuthFlowTrace, registerInternalNavIntent, sendEmailVerificationCode } from "./src/authService.js";
 
 const form = document.getElementById('signupForm');
 const errorMsg = document.getElementById('errorMsg');
@@ -307,19 +307,15 @@ sessionStorage.setItem('raydar_auth_flow', 'SIGNUP');
 // Route guard: log trace and verify no automatic redirection
 await protectRoute('signup_step_1');
 
-// Restore any draft Step 1 values if returning from Step 2
+// Restore any draft Step 1 values if returning from Step 2 (never password)
 try {
     const draftName = sessionStorage.getItem('signup_fullname');
     const draftEmail = sessionStorage.getItem('signup_email');
-    const draftPass = sessionStorage.getItem('signup_password');
     if (draftName && document.getElementById('fullname')) {
         document.getElementById('fullname').value = draftName;
     }
     if (draftEmail && document.getElementById('email')) {
         document.getElementById('email').value = draftEmail;
-    }
-    if (draftPass && document.getElementById('password')) {
-        document.getElementById('password').value = draftPass;
     }
 } catch (e) {}
 
@@ -378,14 +374,14 @@ function showConfirmation(msg) {
 function setLoading(isLoading) {
     if (isLoading) {
         submitBtn.disabled = true;
-        if (btnText) btnText.textContent = 'Vérification en cours...';
+        if (btnText) btnText.textContent = 'Envoi en cours...';
         if (btnIcon) {
             btnIcon.textContent = 'pending';
             btnIcon.classList.add('animate-spin');
         }
     } else {
         submitBtn.disabled = false;
-        if (btnText) btnText.textContent = 'Créer un compte';
+        if (btnText) btnText.textContent = 'Suivant';
         if (btnIcon) {
             btnIcon.textContent = 'arrow_forward';
             btnIcon.classList.remove('animate-spin');
@@ -438,7 +434,7 @@ form.addEventListener('submit', async (e) => {
             reason: 'Attempting account creation / checking if account exists'
         });
 
-        // Call Supabase Auth signUp to check if email exists or create user
+        // Call Supabase Auth signUp to create the account or send confirmation
         const { data: authData, error: authErr } = await supabase.auth.signUp({
             email,
             password,
@@ -500,30 +496,19 @@ form.addEventListener('submit', async (e) => {
             return;
         }
 
-        // 3. Check if email confirmation is required before login
-        if (authData && authData.user && !authData.session) {
-            logAuthFlowTrace({
-                currentPage: 'sign_up_child_safety.html',
-                flow: 'SIGNUP',
-                step: '1',
-                email: email,
-                action: 'CONFIRMATION_REQUIRED',
-                decision: 'SHOW_CONFIRMATION_NOTICE',
-                redirect: 'NONE',
-                reason: 'Supabase email confirmation enabled'
-            });
-            showConfirmation("Veuillez vérifier votre boîte de réception pour confirmer votre compte avant de vous connecter.");
-            setLoading(false);
-            return;
-        }
-
-        // 4. Successful new user registration -> save Step 1 draft and advance to Email Verification
+        // 3. Save Step 1 draft in sessionStorage (NEVER password)
         sessionStorage.setItem('signup_fullname', fullname);
         sessionStorage.setItem('signup_email', email);
-        sessionStorage.setItem('signup_password', password);
         sessionStorage.setItem('signup_terms_accepted', 'true');
         if (authData?.user?.id) {
             sessionStorage.setItem('signup_user_id', authData.user.id);
+        }
+
+        // 4. Send authoritative email verification code
+        try {
+            await sendEmailVerificationCode(email, authData?.user?.id);
+        } catch (codeErr) {
+            console.warn("Notice triggering initial verification code dispatch:", codeErr);
         }
 
         logAuthFlowTrace({

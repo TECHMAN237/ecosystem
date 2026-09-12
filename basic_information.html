@@ -280,7 +280,7 @@
 </div>
 </button>
 <button id="continueBtn" class="flex items-center justify-center bg-primary text-on-primary rounded-full px-xl py-md shadow-lg hover:opacity-95 active:scale-95 transition-all duration-200" type="button">
-<span id="btnText" class="font-label-bold text-label-bold mr-xs uppercase tracking-wide">Créer un compte</span>
+<span id="btnText" class="font-label-bold text-label-bold mr-xs uppercase tracking-wide">Créer le compte</span>
 <span id="btnIcon" class="material-symbols-outlined">chevron_right</span>
 </button>
 </nav>
@@ -372,7 +372,7 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
             } else {
                 continueBtn.disabled = false;
                 if (btnText) {
-                    btnText.textContent = isOAuthUser ? 'FINALISER MON PROFIL' : 'CRÉER UN COMPTE';
+                    btnText.textContent = 'CRÉER LE COMPTE';
                 }
                 if (btnIcon) {
                     btnIcon.textContent = 'chevron_right';
@@ -423,7 +423,7 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                     
                     if (passwordSection) passwordSection.classList.add('hidden');
                     if (googleAuthNotice) googleAuthNotice.classList.remove('hidden');
-                    if (btnText) btnText.textContent = 'FINALISER MON PROFIL';
+                    if (btnText) btnText.textContent = 'CRÉER LE COMPTE';
 
                     const emailInput = document.getElementById('email');
                     if (emailInput) {
@@ -444,14 +444,9 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                     isOAuthUser = false;
                     const storedName = sessionStorage.getItem('signup_fullname');
                     const storedEmail = sessionStorage.getItem('signup_email');
-                    const storedPassword = sessionStorage.getItem('signup_password');
 
                     if (storedName) document.getElementById('fullname').value = storedName;
                     if (storedEmail) document.getElementById('email').value = storedEmail;
-                    if (storedPassword) {
-                        document.getElementById('password').value = storedPassword;
-                        document.getElementById('confirm_password').value = storedPassword;
-                    }
                 }
 
                 // Restore any draft Step 3 fields
@@ -640,7 +635,6 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                 // Clear temporary registration cache
                 sessionStorage.removeItem('signup_fullname');
                 sessionStorage.removeItem('signup_email');
-                sessionStorage.removeItem('signup_password');
                 sessionStorage.removeItem('signup_username');
                 sessionStorage.removeItem('signup_city');
                 sessionStorage.removeItem('signup_phone_number');

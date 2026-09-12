@@ -323,8 +323,17 @@
                 const data = await authVerifyCode(currentEmail, code, currentUser?.id);
 
                 if (data.success && (data.verified !== false)) {
+                    sessionStorage.setItem('raydar_email_verified', 'true');
                     if (currentUser) {
                         await setRaydarEmailVerified(currentUser);
+                    } else {
+                        try {
+                            const { data: sessionData } = await supabase.auth.getSession();
+                            if (sessionData?.session?.user) {
+                                currentUser = sessionData.session.user;
+                                await setRaydarEmailVerified(currentUser);
+                            }
+                        } catch (e) {}
                     }
                     logAuthFlowTrace({
                         currentPage: 'email_verification.html',
