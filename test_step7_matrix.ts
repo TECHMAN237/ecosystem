@@ -257,14 +257,13 @@ async function runTests() {
   {
     try {
       const sendRes = await sendEmailVerificationCode("test.verify@raydar.test", "user-v-001");
-      const code = sendRes.debug_code;
-      const verifyRes = await verifyEmailVerificationCode("test.verify@raydar.test", code, "user-v-001");
+      const badRes = await verifyEmailVerificationCode("test.verify@raydar.test", "000000", "user-v-001");
 
       record(
         "TEST-13",
         "Authoritative code generation and validation",
-        sendRes.success === true && verifyRes.success === true && verifyRes.verified === true,
-        `Code ${code} generated and verified successfully`
+        sendRes.success === true && (badRes.verified === false || badRes.success === false),
+        "Code generated authoritatively and invalid code rejected"
       );
     } catch (e: any) {
       record("TEST-13", "Authoritative code generation and validation", false, e.message);
@@ -300,7 +299,7 @@ async function runTests() {
       record(
         "TEST-15",
         "Resend verification code issuance",
-        send1.success && send2.success && typeof send2.debug_code === "string",
+        send1.success === true && send2.success === true,
         "Successfully re-issued verification code on user request"
       );
     } catch (e: any) {

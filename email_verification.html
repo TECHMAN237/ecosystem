@@ -154,7 +154,7 @@
     </script>
     <script type="module">
         import { supabase } from "./src/supabaseClient.js";
-        import { protectRoute, logAuthFlowTrace, registerInternalNavIntent, signOut, setRaydarEmailVerified, resolveAuthDestination, sendEmailVerificationCode as authSendCode, verifyEmailVerificationCode as authVerifyCode } from "./src/authService.js";
+        import { protectRoute, logAuthFlowTrace, registerInternalNavIntent, signOut, setRaydarEmailVerified, resolveAuthDestination, getAuthAndProfileState, sendEmailVerificationCode as authSendCode, verifyEmailVerificationCode as authVerifyCode } from "./src/authService.js";
 
         const targetEmailDisplay = document.getElementById('targetEmailDisplay');
         const verificationBadge = document.getElementById('verificationBadge');
@@ -367,8 +367,19 @@
         btnContinueToRole.addEventListener('click', async () => {
             btnContinueToRole.disabled = true;
             try {
-                const dest = await resolveAuthDestination();
-                const target = (dest && !dest.includes('email_verification')) ? dest : './account_type_selection_updated_flow.html';
+                const state = await getAuthAndProfileState(true);
+                let target = './account_type_selection_updated_flow.html';
+
+                // Check exact profile & onboarding completion
+                if (state.onboardingState === 'COMPLETE' && state.raydarProfileState === 'COMPLETE') {
+                    target = state.state === 'AUTHENTICATED_ADMIN' ? './admin_dashboard.html' : './home_child_safety_v1.html';
+                } else if (state.raydarProfileState === 'COMPLETE') {
+                    target = './success_account_created.html';
+                } else if (state.raydarProfileState === 'INCOMPLETE') {
+                    target = './basic_information.html';
+                } else {
+                    target = './account_type_selection_updated_flow.html';
+                }
 
                 logAuthFlowTrace({
                     currentPage: 'email_verification.html',
@@ -376,7 +387,7 @@
                     action: 'USER_CONTINUE_AFTER_VERIFICATION',
                     decision: 'ALLOW',
                     redirect: target,
-                    reason: 'User explicitly advances after verified email'
+                    reason: 'User explicitly advances after verified email to: ' + target
                 });
 
                 registerInternalNavIntent(target);

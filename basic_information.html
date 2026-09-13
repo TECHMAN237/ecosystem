@@ -648,12 +648,12 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                     userId: targetUser.id,
                     action: 'USER_CONFIRM',
                     decision: 'CREATE_ACCOUNT_SUCCESS',
-                    redirect: './onboarding_community_protection_step_1.html',
-                    reason: 'Profile created successfully — user advances explicitly to onboarding'
+                    redirect: './success_account_created.html',
+                    reason: 'Profile created successfully — user advances explicitly to Create Account screen'
                 });
 
-                registerInternalNavIntent('./onboarding_community_protection_step_1.html');
-                window.location.replace('./onboarding_community_protection_step_1.html');
+                registerInternalNavIntent('./success_account_created.html');
+                window.location.replace('./success_account_created.html');
 
             } catch (err) {
                 console.error('Registration/Profile completion error detail:', err);

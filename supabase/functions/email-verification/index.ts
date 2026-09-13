@@ -220,6 +220,24 @@ serve(async (req) => {
       const deliveryResult = await dispatchEmail(cleanEmail, generatedCode);
       console.log(`[RAYDAR Auth Server] Verification code generated for ${cleanEmail}. Delivery: ${deliveryResult.provider} (${deliveryResult.delivered ? 'Success' : 'Pending'})`);
 
+      // Also trigger Supabase Auth native OTP delivery as core fallback
+      if (!deliveryResult.delivered) {
+        try {
+          const { error: nativeOtpErr } = await supabase.auth.signInWithOtp({
+            email: cleanEmail,
+            options: { shouldCreateUser: false }
+          });
+          if (!nativeOtpErr) {
+            deliveryResult.delivered = true;
+            deliveryResult.provider = "Supabase Auth OTP";
+          }
+        } catch (nativeErr: any) {
+          console.warn("[RAYDAR Auth] Native OTP delivery notice:", nativeErr?.message);
+        }
+      }
+
+      console.log(`[RAYDAR Auth Server] Verification code generated for ${cleanEmail}. Delivery: ${deliveryResult.provider} (${deliveryResult.delivered ? 'Success' : 'Pending'})`);
+
       const responsePayload: Record<string, any> = {
         success: true,
         message: `Code de vérification envoyé à ${cleanEmail}.`,
@@ -227,12 +245,6 @@ serve(async (req) => {
         provider: deliveryResult.provider,
         expires_at: expiresAt
       };
-
-      // Expose debug_code in development sandbox or when external SMTP is not yet wired
-      const isDebugAllowed = Deno.env.get("RAYDAR_DEBUG_AUTH") === "true" || !deliveryResult.delivered;
-      if (isDebugAllowed) {
-        responsePayload.debug_code = generatedCode;
-      }
 
       return new Response(
         JSON.stringify(responsePayload),

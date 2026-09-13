@@ -296,7 +296,33 @@ export async function sendEmailVerificationCode(email, userId = null) {
   if (!email) throw new Error("Email requis");
   const cleanEmail = email.trim().toLowerCase();
 
-  // 1. Try Supabase Edge Function (Primary backend execution)
+  // 1. Authoritative Native Supabase Auth OTP Email Delivery
+  // In Supabase Auth, signInWithOtp with shouldCreateUser: false delivers a REAL 6-digit verification code to any email address.
+  try {
+    const { error: otpErr } = await supabase.auth.signInWithOtp({
+      email: cleanEmail,
+      options: { shouldCreateUser: false }
+    });
+    if (!otpErr) {
+      console.log("[RAYDAR Auth] Real OTP code dispatched via Supabase Auth to:", cleanEmail);
+    } else {
+      console.warn("[RAYDAR Auth] Supabase signInWithOtp notice:", otpErr.message);
+    }
+  } catch (otpErr) {
+    console.warn("[RAYDAR Auth] Supabase signInWithOtp error:", otpErr);
+  }
+
+  // 2. Also trigger Supabase Auth signup resend for newly registered unconfirmed accounts
+  try {
+    await supabase.auth.resend({
+      type: 'signup',
+      email: cleanEmail
+    });
+  } catch (resendErr) {
+    // Expected if user is already confirmed or signed up via OAuth
+  }
+
+  // 3. Try Supabase Edge Function (Primary backend execution for custom SMTP / Resend / Brevo)
   try {
     const { data, error } = await supabase.functions.invoke('email-verification', {
       body: { action: 'send-code', email: cleanEmail, user_id: userId }
@@ -311,17 +337,7 @@ export async function sendEmailVerificationCode(email, userId = null) {
     console.warn("Notice: Edge function email-verification fallback to local API:", edgeErr);
   }
 
-  // 2. Also trigger Supabase Auth signup resend
-  try {
-    await supabase.auth.resend({
-      type: 'signup',
-      email: cleanEmail
-    });
-  } catch (resendErr) {
-    console.warn("Notice: Supabase auth resend notice:", resendErr);
-  }
-
-  // 3. Fallback to server API endpoint (/api/auth/send-verification-code)
+  // 4. Server API endpoint (/api/auth/send-verification-code)
   try {
     const baseUrl = (typeof window !== 'undefined' && window.location?.origin) ? window.location.origin : 'http://localhost:3000';
     const res = await fetch(`${baseUrl}/api/auth/send-verification-code`, {
@@ -342,14 +358,44 @@ export async function sendEmailVerificationCode(email, userId = null) {
 
 /**
  * Authoritatively validates a submitted 6-digit email verification code.
- * Follows Rule #2 & #3: Invokes Supabase Edge Function / RPC / Server API.
+ * Follows Rule #2 & #3: Invokes Supabase Auth verifyOtp, Edge Function / RPC / Server API.
  */
 export async function verifyEmailVerificationCode(email, code, userId = null) {
   if (!email || !code) throw new Error("Email et code requis");
   const cleanEmail = email.trim().toLowerCase();
   const cleanCode = code.trim();
 
-  // 1. Try Supabase RPC rpc_verify_email_code if available
+  // 1. Validate against Supabase Auth verifyOtp type 'email' (from signInWithOtp)
+  try {
+    const { data: otpData, error: otpErr } = await supabase.auth.verifyOtp({
+      email: cleanEmail,
+      token: cleanCode,
+      type: 'email'
+    });
+    if (!otpErr && otpData && otpData.user) {
+      await setRaydarEmailVerified(otpData.user);
+      return { success: true, verified: true, user: otpData.user, session: otpData.session };
+    }
+  } catch (otpErr) {
+    console.warn("Notice: Supabase verifyOtp type email notice:", otpErr);
+  }
+
+  // 2. Validate against Supabase Auth verifyOtp type 'signup' (from signUp)
+  try {
+    const { data: otpData, error: otpErr } = await supabase.auth.verifyOtp({
+      email: cleanEmail,
+      token: cleanCode,
+      type: 'signup'
+    });
+    if (!otpErr && otpData && otpData.user) {
+      await setRaydarEmailVerified(otpData.user);
+      return { success: true, verified: true, user: otpData.user, session: otpData.session };
+    }
+  } catch (otpErr) {
+    console.warn("Notice: Supabase verifyOtp type signup notice:", otpErr);
+  }
+
+  // 3. Try Supabase RPC rpc_verify_email_code if available
   try {
     const { data: rpcData, error: rpcErr } = await supabase.rpc('rpc_verify_email_code', {
       p_email: cleanEmail,
@@ -362,22 +408,7 @@ export async function verifyEmailVerificationCode(email, code, userId = null) {
     console.warn("Notice: rpc_verify_email_code fallback:", rpcErr);
   }
 
-  // 2. Try Supabase Auth verifyOtp
-  try {
-    const { data: otpData, error: otpErr } = await supabase.auth.verifyOtp({
-      email: cleanEmail,
-      token: cleanCode,
-      type: 'signup'
-    });
-    if (!otpErr && otpData && otpData.user) {
-      await setRaydarEmailVerified(otpData.user);
-      return { success: true, verified: true, user: otpData.user, session: otpData.session };
-    }
-  } catch (otpErr) {
-    console.warn("Notice: Supabase verifyOtp notice:", otpErr);
-  }
-
-  // 3. Try Supabase Edge Function
+  // 4. Try Supabase Edge Function 'email-verification'
   try {
     const { data, error } = await supabase.functions.invoke('email-verification', {
       body: { action: 'verify-code', email: cleanEmail, code: cleanCode, user_id: userId }
@@ -392,7 +423,7 @@ export async function verifyEmailVerificationCode(email, code, userId = null) {
     console.warn("Notice: Edge function verify-code fallback:", edgeErr);
   }
 
-  // 4. Fallback to server API endpoint (/api/auth/verify-code)
+  // 5. Fallback to server API endpoint (/api/auth/verify-code)
   try {
     const baseUrl = (typeof window !== 'undefined' && window.location?.origin) ? window.location.origin : 'http://localhost:3000';
     const res = await fetch(`${baseUrl}/api/auth/verify-code`, {
@@ -402,7 +433,12 @@ export async function verifyEmailVerificationCode(email, code, userId = null) {
     });
     if (res.ok) {
       const json = await res.json();
-      return json;
+      if (json.success && json.verified) {
+        return json;
+      }
+      if (json.error) {
+        return { success: false, verified: false, error: json.error };
+      }
     }
   } catch (localErr) {
     console.warn("[RAYDAR Auth] Local API verify-code notice:", localErr);
@@ -1428,11 +1464,14 @@ export async function protectRoute(routeType, options = {}) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
-      // If already verified, advance to next required step or Home
+      // If already verified, advance to next required step in the registration flow
       if (isEmailVerified) {
-        const dest = (authInfo.nextRequiredStep && !authInfo.nextRequiredStep.includes('email_verification'))
-          ? authInfo.nextRequiredStep
-          : (state === AuthState.AUTHENTICATED_ADMIN ? './admin_dashboard.html' : './home_child_safety_v1.html');
+        let dest = './account_type_selection_updated_flow.html';
+        if (onboardingState === 'COMPLETE' && raydarProfileState === 'COMPLETE') {
+          dest = state === AuthState.AUTHENTICATED_ADMIN ? './admin_dashboard.html' : './home_child_safety_v1.html';
+        } else if (authInfo.nextRequiredStep && !authInfo.nextRequiredStep.includes('email_verification')) {
+          dest = authInfo.nextRequiredStep;
+        }
         registerInternalNavIntent(dest);
         window.location.replace(dest);
         return authInfo;
