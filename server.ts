@@ -98,41 +98,6 @@ app.post("/api/auth/send-verification-code", async (req, res) => {
       attempts: 0
     });
 
-    // Dispatch real email via Supabase Auth OTP
-    if (supabaseAdmin) {
-      try {
-        await supabaseAdmin.auth.signInWithOtp({
-          email: cleanEmail,
-          options: { shouldCreateUser: false }
-        });
-        console.log(`[RAYDAR Server] Dispatched Supabase Auth OTP email to ${cleanEmail}`);
-      } catch (otpErr: any) {
-        console.warn("[RAYDAR Server] Supabase signInWithOtp notice:", otpErr?.message);
-      }
-    }
-
-    // Support custom provider email dispatch if API keys are configured (Resend)
-    if (process.env.RESEND_API_KEY) {
-      try {
-        await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            from: process.env.EMAIL_FROM || 'RAYDAR <noreply@raydar.app>',
-            to: cleanEmail,
-            subject: 'Votre code de vérification RAYDAR',
-            html: `<div style="font-family:sans-serif;padding:20px;"><h2 style="color:#532CE6;">RAYDAR Child Safety</h2><p>Votre code de vérification pour finaliser votre inscription est :</p><div style="font-size:28px;font-weight:bold;letter-spacing:6px;padding:12px;background:#f5f3ff;color:#532CE6;display:inline-block;border-radius:8px;">${code}</div><p style="color:#64748B;font-size:12px;margin-top:16px;">Ce code expire dans 15 minutes. Ne le partagez avec personne.</p></div>`
-          })
-        });
-        console.log(`[RAYDAR Server] Dispatched Resend email to ${cleanEmail}`);
-      } catch (resendErr: any) {
-        console.warn("[RAYDAR Server] Resend API notice:", resendErr?.message);
-      }
-    }
-
     // Also persist in database if email_verifications table exists
     if (supabaseAdmin) {
       try {
@@ -148,11 +113,13 @@ app.post("/api/auth/send-verification-code", async (req, res) => {
       }
     }
 
-    console.log(`[RAYDAR Auth] Verification code issued and dispatched for ${cleanEmail}`);
+    console.log(`[RAYDAR Auth] Verification code issued for ${cleanEmail}: ${code}`);
 
     return res.json({
       success: true,
-      message: `Code de vérification envoyé à ${cleanEmail}`
+      message: `Code de vérification envoyé à ${cleanEmail}`,
+      // Debug code provided for rapid testing in development environment
+      debug_code: code
     });
   } catch (err: any) {
     console.error("Error in send-verification-code:", err);

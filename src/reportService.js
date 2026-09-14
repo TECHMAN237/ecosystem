@@ -1368,36 +1368,25 @@ export const reportService = {
   getProfile() {
     if (typeof window === "undefined") return {};
     try {
+      const defaultProfile = {
+        full_name: "Gardien de la Sécurité",
+        role: "Membre Élite des Gardiens",
+        username: "gardien_securite",
+        phone_country_code: "+237",
+        phone_number: "677123456",
+        city: "Yaoundé",
+        photo: DEFAULT_AVATAR
+      };
       const stored = localStorage.getItem("user_profile");
       if (!stored) {
-        return {
-          full_name: "",
-          role: "",
-          username: "",
-          phone_country_code: "+237",
-          phone_number: "",
-          city: "",
-          photo: DEFAULT_AVATAR
-        };
+        localStorage.setItem("user_profile", JSON.stringify(defaultProfile));
+        return defaultProfile;
       }
       const parsed = JSON.parse(stored);
-      // Clean up legacy mock profile if it was stored previously
-      if (parsed.full_name === "Gardien de la Sécurité" && parsed.username === "gardien_securite") {
-        localStorage.removeItem("user_profile");
-        return {
-          full_name: "",
-          role: "",
-          username: "",
-          phone_country_code: "+237",
-          phone_number: "",
-          city: "",
-          photo: DEFAULT_AVATAR
-        };
-      }
       if (!parsed.photo || parsed.photo.includes('unsplash.com')) {
         parsed.photo = DEFAULT_AVATAR;
       }
-      return parsed;
+      return { ...defaultProfile, ...parsed };
     } catch (e) {
       return {};
     }

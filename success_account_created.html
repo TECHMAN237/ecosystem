@@ -174,8 +174,8 @@ To publish Missing Child reports or register children under your care, guardian 
 <span>Complete Guardian Verification</span>
 </button>
 </div>
-<button id="goHomeBtn" class="w-full h-[56px] bg-primary text-on-primary rounded-full font-headline-md flex items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(108,77,255,0.2)] hover:opacity-90 active:scale-[0.98] transition-all" onclick="handleContinueToOnboarding()">
-<span>Continuer vers l'onboarding</span>
+<button id="goHomeBtn" class="w-full h-[56px] bg-primary text-on-primary rounded-full font-headline-md flex items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(108,77,255,0.2)] hover:opacity-90 active:scale-[0.98] transition-all" onclick="handleCompleteAndGoHome()">
+<span>Accéder à l'accueil</span>
 <span class="material-symbols-outlined">arrow_forward</span>
 </button>
 </div>
@@ -278,14 +278,15 @@ try {
     console.warn("Route protect notice:", e);
 }
 
-window.handleContinueToOnboarding = function() {
+window.handleCompleteAndGoHome = async function() {
     const btn = document.getElementById('goHomeBtn');
     if (btn) {
         btn.disabled = true;
         btn.classList.add('opacity-80', 'cursor-wait');
     }
-    registerInternalNavIntent('./onboarding_community_protection_step_1.html');
-    window.location.replace('./onboarding_community_protection_step_1.html');
+    await setOnboardingCompleted(currentUser);
+    registerInternalNavIntent('./home_child_safety_v1.html');
+    window.location.replace('./home_child_safety_v1.html');
 };
 </script>
 </body></html>

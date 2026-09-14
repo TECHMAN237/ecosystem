@@ -165,13 +165,6 @@ export function getAndClearReturnUrl() {
  *    email verification has already occurred in the past and MUST NOT be requested again.
  */
 export function isRaydarEmailVerified(user, profile = null) {
-  // In-session verification flag (user verified in current registration flow)
-  try {
-    if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('raydar_email_verified') === 'true') {
-      return true;
-    }
-  } catch (e) {}
-
   if (!user || !user.id) return false;
 
   // 1. PostgreSQL profiles table check (Primary source of truth)
@@ -257,12 +250,6 @@ export async function saveRoleSelection(role, user = null) {
  * Marks RAYDAR email verification as complete.
  */
 export async function setRaydarEmailVerified(user) {
-  try {
-    if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.setItem('raydar_email_verified', 'true');
-    }
-  } catch (e) {}
-
   if (!user || !user.id) return;
 
   try {
@@ -296,33 +283,7 @@ export async function sendEmailVerificationCode(email, userId = null) {
   if (!email) throw new Error("Email requis");
   const cleanEmail = email.trim().toLowerCase();
 
-  // 1. Authoritative Native Supabase Auth OTP Email Delivery
-  // In Supabase Auth, signInWithOtp with shouldCreateUser: false delivers a REAL 6-digit verification code to any email address.
-  try {
-    const { error: otpErr } = await supabase.auth.signInWithOtp({
-      email: cleanEmail,
-      options: { shouldCreateUser: false }
-    });
-    if (!otpErr) {
-      console.log("[RAYDAR Auth] Real OTP code dispatched via Supabase Auth to:", cleanEmail);
-    } else {
-      console.warn("[RAYDAR Auth] Supabase signInWithOtp notice:", otpErr.message);
-    }
-  } catch (otpErr) {
-    console.warn("[RAYDAR Auth] Supabase signInWithOtp error:", otpErr);
-  }
-
-  // 2. Also trigger Supabase Auth signup resend for newly registered unconfirmed accounts
-  try {
-    await supabase.auth.resend({
-      type: 'signup',
-      email: cleanEmail
-    });
-  } catch (resendErr) {
-    // Expected if user is already confirmed or signed up via OAuth
-  }
-
-  // 3. Try Supabase Edge Function (Primary backend execution for custom SMTP / Resend / Brevo)
+  // 1. Try Supabase Edge Function (Primary backend execution)
   try {
     const { data, error } = await supabase.functions.invoke('email-verification', {
       body: { action: 'send-code', email: cleanEmail, user_id: userId }
@@ -337,7 +298,7 @@ export async function sendEmailVerificationCode(email, userId = null) {
     console.warn("Notice: Edge function email-verification fallback to local API:", edgeErr);
   }
 
-  // 4. Server API endpoint (/api/auth/send-verification-code)
+  // 2. Fallback to server API endpoint (/api/auth/send-verification-code)
   try {
     const baseUrl = (typeof window !== 'undefined' && window.location?.origin) ? window.location.origin : 'http://localhost:3000';
     const res = await fetch(`${baseUrl}/api/auth/send-verification-code`, {
@@ -353,49 +314,19 @@ export async function sendEmailVerificationCode(email, userId = null) {
     console.warn("[RAYDAR Auth] Local API send-verification-code notice:", localErr);
   }
 
-  return { success: true, message: "Code de vérification envoyé à " + cleanEmail };
+  throw new Error("Impossible d'envoyer le code de vérification. Veuillez vérifier votre connexion ou réessayer.");
 }
 
 /**
  * Authoritatively validates a submitted 6-digit email verification code.
- * Follows Rule #2 & #3: Invokes Supabase Auth verifyOtp, Edge Function / RPC / Server API.
+ * Follows Rule #2 & #3: Invokes Supabase Edge Function / RPC / Server API.
  */
 export async function verifyEmailVerificationCode(email, code, userId = null) {
   if (!email || !code) throw new Error("Email et code requis");
   const cleanEmail = email.trim().toLowerCase();
   const cleanCode = code.trim();
 
-  // 1. Validate against Supabase Auth verifyOtp type 'email' (from signInWithOtp)
-  try {
-    const { data: otpData, error: otpErr } = await supabase.auth.verifyOtp({
-      email: cleanEmail,
-      token: cleanCode,
-      type: 'email'
-    });
-    if (!otpErr && otpData && otpData.user) {
-      await setRaydarEmailVerified(otpData.user);
-      return { success: true, verified: true, user: otpData.user, session: otpData.session };
-    }
-  } catch (otpErr) {
-    console.warn("Notice: Supabase verifyOtp type email notice:", otpErr);
-  }
-
-  // 2. Validate against Supabase Auth verifyOtp type 'signup' (from signUp)
-  try {
-    const { data: otpData, error: otpErr } = await supabase.auth.verifyOtp({
-      email: cleanEmail,
-      token: cleanCode,
-      type: 'signup'
-    });
-    if (!otpErr && otpData && otpData.user) {
-      await setRaydarEmailVerified(otpData.user);
-      return { success: true, verified: true, user: otpData.user, session: otpData.session };
-    }
-  } catch (otpErr) {
-    console.warn("Notice: Supabase verifyOtp type signup notice:", otpErr);
-  }
-
-  // 3. Try Supabase RPC rpc_verify_email_code if available
+  // 1. Try Supabase RPC rpc_verify_email_code if available
   try {
     const { data: rpcData, error: rpcErr } = await supabase.rpc('rpc_verify_email_code', {
       p_email: cleanEmail,
@@ -408,7 +339,7 @@ export async function verifyEmailVerificationCode(email, code, userId = null) {
     console.warn("Notice: rpc_verify_email_code fallback:", rpcErr);
   }
 
-  // 4. Try Supabase Edge Function 'email-verification'
+  // 2. Try Supabase Edge Function
   try {
     const { data, error } = await supabase.functions.invoke('email-verification', {
       body: { action: 'verify-code', email: cleanEmail, code: cleanCode, user_id: userId }
@@ -423,7 +354,7 @@ export async function verifyEmailVerificationCode(email, code, userId = null) {
     console.warn("Notice: Edge function verify-code fallback:", edgeErr);
   }
 
-  // 5. Fallback to server API endpoint (/api/auth/verify-code)
+  // 3. Fallback to server API endpoint (/api/auth/verify-code)
   try {
     const baseUrl = (typeof window !== 'undefined' && window.location?.origin) ? window.location.origin : 'http://localhost:3000';
     const res = await fetch(`${baseUrl}/api/auth/verify-code`, {
@@ -433,12 +364,7 @@ export async function verifyEmailVerificationCode(email, code, userId = null) {
     });
     if (res.ok) {
       const json = await res.json();
-      if (json.success && json.verified) {
-        return json;
-      }
-      if (json.error) {
-        return { success: false, verified: false, error: json.error };
-      }
+      return json;
     }
   } catch (localErr) {
     console.warn("[RAYDAR Auth] Local API verify-code notice:", localErr);
@@ -790,10 +716,10 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       // Fallback cache check: check localStorage user_profile if offline or network delay
       if (!profile && typeof window !== 'undefined') {
         try {
-          const cachedProfileStr = localStorage.getItem(`raydar_profile_${user.id}`);
+          const cachedProfileStr = localStorage.getItem(`raydar_profile_${user.id}`) || localStorage.getItem('user_profile');
           if (cachedProfileStr) {
             const parsed = JSON.parse(cachedProfileStr);
-            if (parsed && parsed.user_id === user.id) {
+            if (parsed && (parsed.user_id === user.id || parsed.email === user.email)) {
               profile = parsed;
             }
           }
@@ -813,7 +739,8 @@ export async function getAuthAndProfileState(forceRefresh = false) {
         (user.user_metadata?.role && user.user_metadata.role.trim() && user.user_metadata.role !== 'NONE' ? user.user_metadata.role.trim() : null) ||
         (user.user_metadata?.selected_role && user.user_metadata.selected_role.trim() ? user.user_metadata.selected_role.trim() : null) ||
         (typeof window !== 'undefined' && sessionStorage.getItem('childSafetyAccountType') ? sessionStorage.getItem('childSafetyAccountType').trim() : null) ||
-        (typeof window !== 'undefined' && localStorage.getItem(`raydar_selected_role_${user.id}`) ? localStorage.getItem(`raydar_selected_role_${user.id}`).trim() : null)
+        (typeof window !== 'undefined' && localStorage.getItem(`raydar_selected_role_${user.id}`) ? localStorage.getItem(`raydar_selected_role_${user.id}`).trim() : null) ||
+        (typeof window !== 'undefined' && localStorage.getItem('raydar_draft_selected_role') ? localStorage.getItem('raydar_draft_selected_role').trim() : null)
       ) || null;
 
       // Check RAYDAR Profile & Registration State
@@ -1362,12 +1289,7 @@ export async function protectRoute(routeType, options = {}) {
 
   const authInfo = await getAuthAndProfileState();
   const { state, session, profile, raydarProfileState, onboardingState, isEmailVerified } = authInfo;
-  const hasDraftSignup = typeof window !== 'undefined' && Boolean(sessionStorage.getItem('signup_email'));
-  const isRegistrationStep = routeType === 'signup_step_1' || 
-                             routeType === 'email_verification' || 
-                             routeType === 'registration_step' || 
-                             routeType === 'profile_completion';
-  const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1' || (isRegistrationStep && hasDraftSignup);
+  const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1';
 
   const navCheck = consumeInternalNavIntent();
   const isAllowedNavigation = navCheck.isReload || navCheck.isBackForward || navCheck.isValid;
@@ -1460,18 +1382,15 @@ export async function protectRoute(routeType, options = {}) {
       return authInfo;
 
     case 'email_verification':
-      if (!session && !hasDraftSignup) {
+      if (!session) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
-      // If already verified, advance to next required step in the registration flow
+      // If already verified, advance to next required step or Home
       if (isEmailVerified) {
-        let dest = './account_type_selection_updated_flow.html';
-        if (onboardingState === 'COMPLETE' && raydarProfileState === 'COMPLETE') {
-          dest = state === AuthState.AUTHENTICATED_ADMIN ? './admin_dashboard.html' : './home_child_safety_v1.html';
-        } else if (authInfo.nextRequiredStep && !authInfo.nextRequiredStep.includes('email_verification')) {
-          dest = authInfo.nextRequiredStep;
-        }
+        const dest = (authInfo.nextRequiredStep && !authInfo.nextRequiredStep.includes('email_verification'))
+          ? authInfo.nextRequiredStep
+          : (state === AuthState.AUTHENTICATED_ADMIN ? './admin_dashboard.html' : './home_child_safety_v1.html');
         registerInternalNavIntent(dest);
         window.location.replace(dest);
         return authInfo;
@@ -1480,7 +1399,7 @@ export async function protectRoute(routeType, options = {}) {
 
     case 'registration_step':
     case 'profile_completion':
-      if (!session && !hasDraftSignup) {
+      if (!session) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
