@@ -479,6 +479,14 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
 
         let isSubmitting = false;
 
+        const basicInfoForm = document.getElementById('basicInfoForm');
+        if (basicInfoForm) {
+            basicInfoForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                continueBtn.click();
+            });
+        }
+
         continueBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             if (isSubmitting) return;
