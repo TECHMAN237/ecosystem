@@ -126,9 +126,19 @@ export const formDraftState = {
         try { data.birthCertificate = typeof bc === 'string' ? JSON.parse(bc) : bc; } catch(e) { data.birthCertificate = bc; }
       }
 
-      const guard = inMemoryMissingDraft.guardianshipDoc || data.guardianshipDoc || localStorage.getItem('draft_missing_guard');
-      if (guard) {
-        try { data.guardianshipDoc = typeof guard === 'string' ? JSON.parse(guard) : guard; } catch(e) { data.guardianshipDoc = guard; }
+      const fam = inMemoryMissingDraft.familyPhoto || data.familyPhoto || localStorage.getItem('draft_missing_family');
+      if (fam) {
+        try { data.familyPhoto = typeof fam === 'string' ? JSON.parse(fam) : fam; } catch(e) { data.familyPhoto = fam; }
+      }
+
+      const hosp = inMemoryMissingDraft.hospitalRecord || data.hospitalRecord || localStorage.getItem('draft_missing_hosp');
+      if (hosp) {
+        try { data.hospitalRecord = typeof hosp === 'string' ? JSON.parse(hosp) : hosp; } catch(e) { data.hospitalRecord = hosp; }
+      }
+
+      const other = inMemoryMissingDraft.otherDoc || data.otherDoc || localStorage.getItem('draft_missing_other');
+      if (other) {
+        try { data.otherDoc = typeof other === 'string' ? JSON.parse(other) : other; } catch(e) { data.otherDoc = other; }
       }
 
       console.log('[REPORT TRACE] getMissingDraft retrieved:', {
@@ -136,7 +146,8 @@ export const formDraftState = {
         hasPhoto: !!data.photo,
         photoLength: data.photo ? data.photo.length : 0,
         age: data.age,
-        location: data.location
+        location: data.location,
+        hasBirthCert: !!data.birthCertificate
       });
 
       return data;
@@ -210,12 +221,30 @@ export const formDraftState = {
         }
       }
 
-      if (fields.guardianshipDoc !== undefined) {
-        if (fields.guardianshipDoc) {
-          const guardVal = typeof fields.guardianshipDoc === 'object' ? JSON.stringify(fields.guardianshipDoc) : fields.guardianshipDoc;
-          try { localStorage.setItem('draft_missing_guard', guardVal); } catch(e){}
+      if (fields.familyPhoto !== undefined) {
+        if (fields.familyPhoto) {
+          const val = typeof fields.familyPhoto === 'object' ? JSON.stringify(fields.familyPhoto) : fields.familyPhoto;
+          try { localStorage.setItem('draft_missing_family', val); } catch(e){}
         } else {
-          localStorage.removeItem('draft_missing_guard');
+          localStorage.removeItem('draft_missing_family');
+        }
+      }
+
+      if (fields.hospitalRecord !== undefined) {
+        if (fields.hospitalRecord) {
+          const val = typeof fields.hospitalRecord === 'object' ? JSON.stringify(fields.hospitalRecord) : fields.hospitalRecord;
+          try { localStorage.setItem('draft_missing_hosp', val); } catch(e){}
+        } else {
+          localStorage.removeItem('draft_missing_hosp');
+        }
+      }
+
+      if (fields.otherDoc !== undefined) {
+        if (fields.otherDoc) {
+          const val = typeof fields.otherDoc === 'object' ? JSON.stringify(fields.otherDoc) : fields.otherDoc;
+          try { localStorage.setItem('draft_missing_other', val); } catch(e){}
+        } else {
+          localStorage.removeItem('draft_missing_other');
         }
       }
 
@@ -236,6 +265,9 @@ export const formDraftState = {
       localStorage.removeItem('draft_missing_photo');
       localStorage.removeItem('draft_missing_bc');
       localStorage.removeItem('draft_missing_guard');
+      localStorage.removeItem('draft_missing_family');
+      localStorage.removeItem('draft_missing_hosp');
+      localStorage.removeItem('draft_missing_other');
       sessionStorage.removeItem('pending_report_data');
       sessionStorage.removeItem('pending_report_photo');
     } catch (e) {}

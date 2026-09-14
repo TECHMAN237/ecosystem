@@ -715,11 +715,9 @@ export const reportService = {
   },
 
   async getSupabaseReporterUuid() {
-    if (cachedCurrentUserId) return cachedCurrentUserId;
     try {
       const { data: { session } } = await withTimeout(supabase.auth.getSession(), 3000, { data: { session: null } });
-      if (session && session.user && session.user.id) {
-        cachedCurrentUserId = session.user.id;
+      if (session && session.user && session.user.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(session.user.id)) {
         return session.user.id;
       }
     } catch (e) {}
@@ -954,28 +952,38 @@ export const reportService = {
       }
       console.log('[REPORT TRACE] Final photo URL for missing report:', photoUrl ? photoUrl.substring(0, 60) + '...' : 'NONE');
 
-      // Fast PARALLEL upload of supporting documents with timeout protection
-      let docUrlsText = "";
-      const docKeys = ['birthCertificate', 'guardianshipDoc', 'schoolDoc', 'familyPhoto', 'hospitalRecord'];
-      const uploadTasks = docKeys
-        .filter(dk => reportData[dk])
-        .map(async (dk) => {
-          const docItem = reportData[dk];
-          const docData = typeof docItem === 'object' && docItem.dataUrl ? docItem.dataUrl : docItem;
-          if (typeof docData === 'string' && (docData.startsWith("data:") || docData.startsWith("http"))) {
-            const upUrl = await this.uploadFileToSupabaseStorage(docData, "avatars", `docs-${dk}`, dbId);
-            if (upUrl) return ` [${dk}: ${upUrl}]`;
-          }
-          return '';
-        });
+      // Upload verification documents in parallel
+      let birthCertUrl = null;
+      let familyPhotoUrl = null;
+      let healthRecordUrl = null;
+      let otherDocUrl = null;
 
-      if (uploadTasks.length > 0) {
-        const uploadResults = await Promise.allSettled(uploadTasks);
-        docUrlsText = uploadResults
-          .filter(r => r.status === 'fulfilled' && r.value)
-          .map(r => r.value)
-          .join('');
-      }
+      const uploadDocItem = async (docItem, folderName) => {
+        if (!docItem) return null;
+        const docData = typeof docItem === 'object' && docItem.dataUrl ? docItem.dataUrl : docItem;
+        if (typeof docData === 'string' && (docData.startsWith("data:") || docData.startsWith("blob:") || docData.startsWith("http"))) {
+          return await this.uploadFileToSupabaseStorage(docData, "avatars", folderName, dbId);
+        }
+        return null;
+      };
+
+      const [bcResult, famResult, hospResult, othResult] = await Promise.allSettled([
+        uploadDocItem(reportData.birthCertificate, 'missing-birth-certificates'),
+        uploadDocItem(reportData.familyPhoto, 'missing-family-photos'),
+        uploadDocItem(reportData.hospitalRecord, 'missing-health-records'),
+        uploadDocItem(reportData.otherDoc, 'missing-other-docs')
+      ]);
+
+      if (bcResult.status === 'fulfilled' && bcResult.value) birthCertUrl = bcResult.value;
+      if (famResult.status === 'fulfilled' && famResult.value) familyPhotoUrl = famResult.value;
+      if (hospResult.status === 'fulfilled' && hospResult.value) healthRecordUrl = hospResult.value;
+      if (othResult.status === 'fulfilled' && othResult.value) otherDocUrl = othResult.value;
+
+      let docUrlsText = "";
+      if (birthCertUrl) docUrlsText += ` [Acte de naissance: ${birthCertUrl}]`;
+      if (familyPhotoUrl) docUrlsText += ` [Photo famille: ${familyPhotoUrl}]`;
+      if (healthRecordUrl) docUrlsText += ` [Carnet santé: ${healthRecordUrl}]`;
+      if (otherDocUrl) docUrlsText += ` [Autre doc: ${otherDocUrl}]`;
 
       const currentId = await this.getCurrentUserId();
       const supabaseReporterId = await this.getSupabaseReporterUuid();
@@ -988,7 +996,11 @@ export const reportService = {
         createdAt: new Date().toISOString(),
         type: "missing",
         ...reportData,
-        photo: photoUrl
+        photo: photoUrl,
+        birthCertificateUrl: birthCertUrl,
+        familyPhotoUrl: familyPhotoUrl,
+        healthRecordUrl: healthRecordUrl,
+        otherDocumentUrl: otherDocUrl
       };
 
       // 1. Invoke Supabase Edge Function with fast non-blocking timeout
@@ -996,6 +1008,7 @@ export const reportService = {
         await withTimeout(
           supabase.functions.invoke('create-missing-report', {
             body: {
+              id: dbId,
               name: newReport.name,
               age: newReport.age,
               gender: newReport.gender,
@@ -1007,20 +1020,24 @@ export const reportService = {
               notes: (newReport.notes || '') + docUrlsText,
               relationship: newReport.relationship,
               photoUrl: photoUrl,
+              birthCertificateUrl: birthCertUrl,
+              familyPhotoUrl: familyPhotoUrl,
+              healthRecordUrl: healthRecordUrl,
+              otherDocumentUrl: otherDocUrl,
               isPublic: true
             }
           }),
-          3000,
+          3500,
           null
         );
       } catch (fErr) {
         console.log("[REPORT TRACE] Edge Function notice:", fErr);
       }
 
-      // 2. Direct PostgreSQL persistence with timeout protection
+      // 2. Direct PostgreSQL persistence with timeout protection (upsert by id)
       const incidentDesc = (reportData.notes || reportData.physicalDescription || "Signalement de disparition de l'enfant") + docUrlsText;
       const { error: insertErr } = await withTimeout(
-        supabase.from('missing_reports').insert([{
+        supabase.from('missing_reports').upsert([{
           id: dbId,
           reporter_id: supabaseReporterId,
           child_full_name: newReport.name,
@@ -1035,9 +1052,13 @@ export const reportService = {
           emergency_contact_name: newReport.relationship || "Parent / Gardien",
           emergency_contact_phone: "677000000",
           child_photo_url: newReport.photo,
+          birth_certificate_url: birthCertUrl,
+          family_photo_url: familyPhotoUrl,
+          health_record_url: healthRecordUrl,
+          other_document_url: otherDocUrl,
           status: "Published",
           is_public: true
-        }]),
+        }], { onConflict: 'id' }),
         6000,
         { error: null }
       );

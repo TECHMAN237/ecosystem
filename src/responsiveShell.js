@@ -128,7 +128,7 @@ function renderShell() {
                             </a>
 
                             <!-- Signalements -->
-                            <a href="./my_case_dashboard_refined_actions.html" class="flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm ${activeTab === 'signalements' ? 'bg-[#532CE6] text-white font-bold shadow-sm' : 'text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] font-medium'}">
+                            <a href="./reports_directory.html" class="flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all text-sm ${activeTab === 'signalements' ? 'bg-[#532CE6] text-white font-bold shadow-sm' : 'text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] font-medium'}">
                                 <span class="material-symbols-outlined text-[22px] ${activeTab === 'signalements' ? 'text-white' : 'text-[#64748B]'}" style="${activeTab === 'signalements' ? 'font-variation-settings: \'FILL\' 1;' : ''}">assignment</span>
                                 <span>Signalements</span>
                             </a>

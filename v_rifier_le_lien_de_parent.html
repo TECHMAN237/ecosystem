@@ -177,7 +177,7 @@
 <div class="bg-primary-container/10 border-l-4 border-primary p-lg rounded-r-lg mb-xl custom-shadow flex gap-md items-start">
 <span class="material-symbols-outlined text-primary">info</span>
 <p class="font-body-md text-body-md text-on-primary-fixed-variant">
-                Vos documents seront uniquement utilisés à des fins de vérification et resteront privés.
+                Vos documents seront uniquement utilisés à des fins de vérification et resteront confidentiels.
             </p>
 </div>
 <!-- Document Sections -->
@@ -186,12 +186,12 @@
 <div>
 <h3 class="font-label-bold text-label-bold text-primary uppercase tracking-wider mb-md flex items-center gap-xs">
 <span class="material-symbols-outlined text-[16px]">verified</span>
-                    Obligatoire
+                    Document Principal (Obligatoire)
                 </h3>
 <!-- Error Banner -->
 <div id="errorBanner" class="hidden bg-error-container text-on-error-container p-md rounded-lg text-sm flex items-center gap-sm mb-md shadow-sm">
     <span class="material-symbols-outlined text-[20px] text-error">error</span>
-    <span class="font-medium">Veuillez télécharger l'acte de naissance ou le document de tutelle avant de soumettre.</span>
+    <span class="font-medium">Veuillez télécharger l'acte de naissance de l'enfant pour continuer.</span>
 </div>
 
 <div class="space-y-md">
@@ -200,59 +200,28 @@
 <div class="flex justify-between items-start mb-md">
 <div>
 <h4 class="font-headline-md text-headline-md text-on-surface">Acte de naissance de l'enfant</h4>
-<p class="font-body-md text-body-md text-on-surface-variant">Document officiel attestant la filiation</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Document officiel attestant la filiation (Format image ou PDF)</p>
 </div>
 <span class="bg-error-container text-on-error-container text-label-sm font-label-sm px-sm py-base rounded-full">Requis</span>
 </div>
 <div id="birthCertificateContainer" class="relative group border-2 border-dashed border-outline-variant rounded-lg p-xl flex flex-col items-center justify-center bg-surface-container-low/50 hover:bg-surface-container-low transition-all">
 <span class="material-symbols-outlined text-primary text-[48px] mb-md opacity-60">upload_file</span>
 <button type="button" class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all pointer-events-none">
-                                Upload
-                            </button>
+    Télécharger l'acte de naissance
+</button>
 <input id="inputBirthCertificate" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
 </div>
 </div>
-<!-- School ID -->
-<div class="bg-surface-container-lowest p-lg rounded-lg custom-shadow border border-outline-variant/30">
-<div class="flex justify-between items-center mb-md">
-<div>
-<h4 class="font-headline-md text-headline-md text-on-surface">Certificat de scolarité</h4>
-<p class="font-body-md text-body-md text-on-surface-variant">Preuve d'inscription scolaire en cours</p>
 </div>
 </div>
-<div id="schoolContainer" class="relative group border-2 border-dashed border-outline-variant rounded-lg p-xl flex flex-col items-center justify-center bg-surface-container-low/50 hover:bg-surface-container-low transition-all">
-<span class="material-symbols-outlined text-primary text-[48px] mb-md opacity-60">school</span>
-<button type="button" class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all pointer-events-none">
-Upload
-</button>
-<input id="inputSchoolDoc" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
-</div>
-</div>
-<!-- Legal Guardianship -->
-<div class="bg-surface-container-lowest p-lg rounded-lg custom-shadow border border-outline-variant/30">
-<div class="flex justify-between items-start mb-md">
-<div>
-<h4 class="font-headline-md text-headline-md text-on-surface">Document de tutelle légale</h4>
-<p class="font-body-md text-body-md text-on-surface-variant">Décision de justice ou acte notarié</p>
-</div>
-</div>
-<div id="guardianshipContainer" class="relative group border-2 border-dashed border-outline-variant rounded-lg p-xl flex flex-col items-center justify-center bg-surface-container-low/50 hover:bg-surface-container-low transition-all">
-<span class="material-symbols-outlined text-primary text-[48px] mb-md opacity-60">gavel</span>
-<button type="button" class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all pointer-events-none">
-Upload
-</button>
-<input id="inputGuardianship" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
-</div>
-</div>
-</div>
-</div>
+
 <!-- OPTIONAL SECTION -->
 <div>
 <h3 class="font-label-bold text-label-bold text-outline uppercase tracking-wider mb-md flex items-center gap-xs">
 <span class="material-symbols-outlined text-[16px]">add_circle</span>
-Optionnel
+Documents complémentaires (Optionnels)
 </h3>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
 <!-- Family Photo -->
 <div id="familyPhotoCard" class="bg-surface-container-lowest p-md rounded-lg custom-shadow border border-outline-variant/20 flex flex-col items-center text-center relative">
 <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center mb-md">
@@ -261,20 +230,34 @@ Optionnel
 <h4 class="font-label-bold text-label-bold text-on-surface mb-xs">Photo de famille</h4>
 <p class="font-label-sm text-label-sm text-on-surface-variant mb-md px-md">Aide à l'identification visuelle</p>
 <div id="familyPhotoContainer" class="w-full relative">
-<button type="button" class="w-full py-base border border-primary text-primary rounded-full font-label-bold text-label-bold hover:bg-primary/5 transition-all pointer-events-none">Upload</button>
+<button type="button" class="w-full py-base border border-primary text-primary rounded-full font-label-bold text-label-bold hover:bg-primary/5 transition-all pointer-events-none">Ajouter</button>
 <input id="inputFamilyPhoto" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept="image/*"/>
 </div>
 </div>
-<!-- Hospital Record -->
+
+<!-- Hospital / Health Record -->
 <div id="hospitalRecordCard" class="bg-surface-container-lowest p-md rounded-lg custom-shadow border border-outline-variant/20 flex flex-col items-center text-center relative">
 <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center mb-md">
 <span class="material-symbols-outlined text-secondary">medical_services</span>
 </div>
 <h4 class="font-label-bold text-label-bold text-on-surface mb-xs">Carnet de santé</h4>
-<p class="font-label-sm text-label-sm text-on-surface-variant mb-md px-md">Informations médicales cruciales</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-md px-md">Informations médicales</p>
 <div id="hospitalRecordContainer" class="w-full relative">
-<button type="button" class="w-full py-base border border-primary text-primary rounded-full font-label-bold text-label-bold hover:bg-primary/5 transition-all pointer-events-none">Upload</button>
+<button type="button" class="w-full py-base border border-primary text-primary rounded-full font-label-bold text-label-bold hover:bg-primary/5 transition-all pointer-events-none">Ajouter</button>
 <input id="inputHospitalRecord" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
+</div>
+</div>
+
+<!-- Other Document -->
+<div id="otherDocCard" class="bg-surface-container-lowest p-md rounded-lg custom-shadow border border-outline-variant/20 flex flex-col items-center text-center relative">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center mb-md">
+<span class="material-symbols-outlined text-secondary">description</span>
+</div>
+<h4 class="font-label-bold text-label-bold text-on-surface mb-xs">Autre document</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-md px-md">Attestation, certificat ou pièce</p>
+<div id="otherDocContainer" class="w-full relative">
+<button type="button" class="w-full py-base border border-primary text-primary rounded-full font-label-bold text-label-bold hover:bg-primary/5 transition-all pointer-events-none">Ajouter</button>
+<input id="inputOtherDoc" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
 </div>
 </div>
 </div>
@@ -302,10 +285,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorBanner = document.getElementById('errorBanner');
 
     const bcContainer = document.getElementById('birthCertificateContainer');
-    const schoolContainer = document.getElementById('schoolContainer');
-    const guardContainer = document.getElementById('guardianshipContainer');
     const familyContainer = document.getElementById('familyPhotoContainer');
     const hospitalContainer = document.getElementById('hospitalRecordContainer');
+    const otherContainer = document.getElementById('otherDocContainer');
 
     function renderDocUploaded(container, iconName, docName, docSize, onRemove) {
         if (!container) return;
@@ -331,57 +313,41 @@ document.addEventListener('DOMContentLoaded', () => {
         bcContainer.innerHTML = `
             <span class="material-symbols-outlined text-primary text-[48px] mb-md opacity-60">upload_file</span>
             <button type="button" class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all pointer-events-none">
-                Upload
+                Télécharger l'acte de naissance
             </button>
             <input id="inputBirthCertificate" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
         `;
         document.getElementById('inputBirthCertificate')?.addEventListener('change', (e) => handleFileUpload(e, 'birthCertificate', bcContainer, 'verified', resetBC));
     }
 
-    // 2. School Doc
-    function resetSchool() {
-        if (!schoolContainer) return;
-        schoolContainer.innerHTML = `
-            <span class="material-symbols-outlined text-primary text-[48px] mb-md opacity-60">school</span>
-            <button type="button" class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all pointer-events-none">
-                Upload
-            </button>
-            <input id="inputSchoolDoc" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
-        `;
-        document.getElementById('inputSchoolDoc')?.addEventListener('change', (e) => handleFileUpload(e, 'schoolDoc', schoolContainer, 'school', resetSchool));
-    }
-
-    // 3. Legal Guardianship
-    function resetGuard() {
-        if (!guardContainer) return;
-        guardContainer.innerHTML = `
-            <span class="material-symbols-outlined text-primary text-[48px] mb-md opacity-60">gavel</span>
-            <button type="button" class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all pointer-events-none">
-                Upload
-            </button>
-            <input id="inputGuardianship" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
-        `;
-        document.getElementById('inputGuardianship')?.addEventListener('change', (e) => handleFileUpload(e, 'guardianshipDoc', guardContainer, 'gavel', resetGuard));
-    }
-
-    // 4. Family Photo
+    // 2. Family Photo
     function resetFamily() {
         if (!familyContainer) return;
         familyContainer.innerHTML = `
-            <button type="button" class="w-full py-base border border-primary text-primary rounded-full font-label-bold text-label-bold hover:bg-primary/5 transition-all pointer-events-none">Upload</button>
+            <button type="button" class="w-full py-base border border-primary text-primary rounded-full font-label-bold text-label-bold hover:bg-primary/5 transition-all pointer-events-none">Ajouter</button>
             <input id="inputFamilyPhoto" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept="image/*"/>
         `;
         document.getElementById('inputFamilyPhoto')?.addEventListener('change', (e) => handleFileUpload(e, 'familyPhoto', familyContainer, 'family_history', resetFamily));
     }
 
-    // 5. Hospital Record
+    // 3. Hospital Record
     function resetHospital() {
         if (!hospitalContainer) return;
         hospitalContainer.innerHTML = `
-            <button type="button" class="w-full py-base border border-primary text-primary rounded-full font-label-bold text-label-bold hover:bg-primary/5 transition-all pointer-events-none">Upload</button>
+            <button type="button" class="w-full py-base border border-primary text-primary rounded-full font-label-bold text-label-bold hover:bg-primary/5 transition-all pointer-events-none">Ajouter</button>
             <input id="inputHospitalRecord" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
         `;
         document.getElementById('inputHospitalRecord')?.addEventListener('change', (e) => handleFileUpload(e, 'hospitalRecord', hospitalContainer, 'medical_services', resetHospital));
+    }
+
+    // 4. Other Doc
+    function resetOther() {
+        if (!otherContainer) return;
+        otherContainer.innerHTML = `
+            <button type="button" class="w-full py-base border border-primary text-primary rounded-full font-label-bold text-label-bold hover:bg-primary/5 transition-all pointer-events-none">Ajouter</button>
+            <input id="inputOtherDoc" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept=".pdf,image/*"/>
+        `;
+        document.getElementById('inputOtherDoc')?.addEventListener('change', (e) => handleFileUpload(e, 'otherDoc', otherContainer, 'description', resetOther));
     }
 
     function handleFileUpload(e, draftKey, container, iconName, resetFn) {
@@ -404,10 +370,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Bind initial listeners
     document.getElementById('inputBirthCertificate')?.addEventListener('change', (e) => handleFileUpload(e, 'birthCertificate', bcContainer, 'verified', resetBC));
-    document.getElementById('inputSchoolDoc')?.addEventListener('change', (e) => handleFileUpload(e, 'schoolDoc', schoolContainer, 'school', resetSchool));
-    document.getElementById('inputGuardianship')?.addEventListener('change', (e) => handleFileUpload(e, 'guardianshipDoc', guardContainer, 'gavel', resetGuard));
     document.getElementById('inputFamilyPhoto')?.addEventListener('change', (e) => handleFileUpload(e, 'familyPhoto', familyContainer, 'family_history', resetFamily));
     document.getElementById('inputHospitalRecord')?.addEventListener('change', (e) => handleFileUpload(e, 'hospitalRecord', hospitalContainer, 'medical_services', resetHospital));
+    document.getElementById('inputOtherDoc')?.addEventListener('change', (e) => handleFileUpload(e, 'otherDoc', otherContainer, 'description', resetOther));
 
     // Restore existing draft and populate summary card
     async function restoreStep2Draft() {
@@ -438,22 +403,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 resetBC();
             });
         }
-        if (draft.schoolDoc) {
-            const name = typeof draft.schoolDoc === 'object' ? draft.schoolDoc.name : 'certificat_scolarite.pdf';
-            const size = typeof draft.schoolDoc === 'object' ? draft.schoolDoc.size : '180.0';
-            renderDocUploaded(schoolContainer, 'school', name, size, () => {
-                formDraftState.updateMissingDraft({ schoolDoc: null });
-                resetSchool();
-            });
-        }
-        if (draft.guardianshipDoc) {
-            const name = typeof draft.guardianshipDoc === 'object' ? draft.guardianshipDoc.name : 'tutelle_legale.pdf';
-            const size = typeof draft.guardianshipDoc === 'object' ? draft.guardianshipDoc.size : '210.0';
-            renderDocUploaded(guardContainer, 'gavel', name, size, () => {
-                formDraftState.updateMissingDraft({ guardianshipDoc: null });
-                resetGuard();
-            });
-        }
         if (draft.familyPhoto) {
             const name = typeof draft.familyPhoto === 'object' ? draft.familyPhoto.name : 'photo_famille.jpg';
             const size = typeof draft.familyPhoto === 'object' ? draft.familyPhoto.size : '320.0';
@@ -470,6 +419,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 resetHospital();
             });
         }
+        if (draft.otherDoc) {
+            const name = typeof draft.otherDoc === 'object' ? draft.otherDoc.name : 'document.pdf';
+            const size = typeof draft.otherDoc === 'object' ? draft.otherDoc.size : '120.0';
+            renderDocUploaded(otherContainer, 'description', name, size, () => {
+                formDraftState.updateMissingDraft({ otherDoc: null });
+                resetOther();
+            });
+        }
     }
     restoreStep2Draft();
 
@@ -479,13 +436,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const finalPhoto = currentDraft.photo || (photoInSummary && !photoInSummary.includes(window.location.host) ? photoInSummary : null) || (photoInSummary && photoInSummary.startsWith('data:') ? photoInSummary : null);
         console.log('[REPORT TRACE] Handling missing report final submission. Photo present:', !!finalPhoto, 'Length:', finalPhoto ? finalPhoto.length : 0);
 
-        const hasDocInUI = document.querySelector('.btn-remove-doc') !== null;
-        const hasAnyDoc = currentDraft.birthCertificate || currentDraft.guardianshipDoc || currentDraft.schoolDoc || currentDraft.familyPhoto || currentDraft.hospitalRecord || hasDocInUI;
+        const hasBirthCertInUI = document.querySelector('#birthCertificateContainer .btn-remove-doc') !== null;
+        const hasBirthCert = !!(currentDraft.birthCertificate || hasBirthCertInUI);
 
-        if (!hasAnyDoc) {
-            if (errorBanner) errorBanner.classList.remove('hidden');
+        // Strict validation: Acte de naissance is mandatory
+        if (!hasBirthCert) {
+            if (errorBanner) {
+                errorBanner.classList.remove('hidden');
+                errorBanner.querySelector('span:last-child').textContent = "Veuillez télécharger l'acte de naissance de l'enfant pour continuer.";
+            }
             btn.innerHTML = '<span>Soumettre le signalement</span><span class="material-symbols-outlined">send</span>';
             btn.style.opacity = "1";
+            btn.disabled = false;
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
@@ -509,10 +471,9 @@ document.addEventListener('DOMContentLoaded', () => {
             notes: currentDraft.notes || "",
             photo: finalPhoto || null,
             birthCertificate: currentDraft.birthCertificate || (document.querySelector('#birthCertificateContainer .btn-remove-doc') ? { name: "acte_naissance.pdf", size: "240.0", dataUrl: "" } : null),
-            guardianshipDoc: currentDraft.guardianshipDoc || (document.querySelector('#guardianshipContainer .btn-remove-doc') ? { name: "tutelle.pdf", size: "200.0", dataUrl: "" } : null),
-            schoolDoc: currentDraft.schoolDoc || (document.querySelector('#schoolContainer .btn-remove-doc') ? { name: "scolarite.pdf", size: "180.0", dataUrl: "" } : null),
             familyPhoto: currentDraft.familyPhoto || (document.querySelector('#familyPhotoContainer .btn-remove-doc') ? { name: "famille.jpg", size: "300.0", dataUrl: "" } : null),
-            hospitalRecord: currentDraft.hospitalRecord || (document.querySelector('#hospitalRecordContainer .btn-remove-doc') ? { name: "sante.pdf", size: "150.0", dataUrl: "" } : null)
+            hospitalRecord: currentDraft.hospitalRecord || (document.querySelector('#hospitalRecordContainer .btn-remove-doc') ? { name: "sante.pdf", size: "150.0", dataUrl: "" } : null),
+            otherDoc: currentDraft.otherDoc || (document.querySelector('#otherDocContainer .btn-remove-doc') ? { name: "autre_document.pdf", size: "120.0", dataUrl: "" } : null)
         };
 
         // Create the missing report (with unique Supabase Storage upload + DB insert + real-time sync)

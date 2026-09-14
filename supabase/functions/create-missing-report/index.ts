@@ -7,6 +7,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { getSupabaseAdmin, getSupabaseUserClient } from "../_shared/supabaseClient.ts";
 
 interface MissingReportPayload {
+  id?: string;
   name: string;
   age?: number | string;
   gender?: string;
@@ -19,6 +20,10 @@ interface MissingReportPayload {
   relationship?: string;
   emergencyPhone?: string;
   photoUrl?: string;
+  birthCertificateUrl?: string;
+  familyPhotoUrl?: string;
+  healthRecordUrl?: string;
+  otherDocumentUrl?: string;
   documentUrls?: string[];
   isPublic?: boolean;
 }
@@ -51,7 +56,7 @@ serve(async (req) => {
       );
     }
 
-    const reportId = crypto.randomUUID();
+    const reportId = payload.id || crypto.randomUUID();
     const incidentDesc = (payload.notes || payload.physicalDescription || "Signalement de disparition") +
       (payload.documentUrls && payload.documentUrls.length > 0 ? ` [Documents: ${payload.documentUrls.join(', ')}]` : '');
 
@@ -60,7 +65,7 @@ serve(async (req) => {
       reporter_id: reporterId,
       child_full_name: payload.name.trim(),
       child_age: payload.age ? Number(payload.age) : null,
-      child_gender: payload.gender || 'non_specifie',
+      child_gender: payload.gender || 'garcon',
       last_seen_location: payload.location.trim(),
       last_seen_date: payload.date || new Date().toISOString().split('T')[0],
       last_seen_time: payload.time || new Date().toTimeString().split(' ')[0],
@@ -70,13 +75,17 @@ serve(async (req) => {
       emergency_contact_name: payload.relationship || "Parent / Tuteur",
       emergency_contact_phone: payload.emergencyPhone || "677000000",
       child_photo_url: payload.photoUrl || null,
+      birth_certificate_url: payload.birthCertificateUrl || null,
+      family_photo_url: payload.familyPhotoUrl || null,
+      health_record_url: payload.healthRecordUrl || null,
+      other_document_url: payload.otherDocumentUrl || null,
       status: "Published",
       is_public: payload.isPublic !== false
     };
 
     const { data, error } = await supabaseAdmin
       .from('missing_reports')
-      .insert([newRow])
+      .upsert([newRow], { onConflict: 'id' })
       .select()
       .single();
 
