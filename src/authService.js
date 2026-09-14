@@ -167,7 +167,16 @@ export function getAndClearReturnUrl() {
 export function isRaydarEmailVerified(user, profile = null) {
   if (!user || !user.id) return false;
 
-  // 1. PostgreSQL profiles table check (Primary source of truth)
+  // 1. Google OAuth accounts are verified directly by Google authentication
+  const provider = user.app_metadata?.provider || (user.identities && user.identities[0]?.provider);
+  if (provider === 'google' || user.email_confirmed_at != null) {
+    try {
+      localStorage.setItem(`raydar_email_verified_${user.id}`, 'true');
+    } catch (e) {}
+    return true;
+  }
+
+  // 2. PostgreSQL profiles table check (Primary source of truth)
   if (profile && (profile.is_verified === true || profile.is_verified === 'true' || profile.email_verified_at != null)) {
     try {
       localStorage.setItem(`raydar_email_verified_${user.id}`, 'true');
@@ -175,7 +184,7 @@ export function isRaydarEmailVerified(user, profile = null) {
     return true;
   }
 
-  // 2. Supabase Auth user_metadata raydar_verified flag
+  // 3. Supabase Auth user_metadata raydar_verified flag
   if (user.user_metadata && (user.user_metadata.raydar_verified === true || user.user_metadata.raydar_email_verified === true)) {
     try {
       localStorage.setItem(`raydar_email_verified_${user.id}`, 'true');
@@ -183,13 +192,13 @@ export function isRaydarEmailVerified(user, profile = null) {
     return true;
   }
 
-  // 3. LocalStorage cache for THIS user ID
+  // 4. LocalStorage cache for THIS user ID
   try {
     const localVal = localStorage.getItem(`raydar_email_verified_${user.id}`);
     if (localVal === 'true') return true;
   } catch (e) {}
 
-  // 4. RETURNING USER RECOGNITION:
+  // 5. RETURNING USER RECOGNITION:
   // An established user who already has a complete profile (full_name, role) AND has completed onboarding in PostgreSQL
   // is definitively verified! They cannot be trapped in an unverified state.
   const hasOnboarded = isOnboardingCompleted(user, profile);
@@ -816,23 +825,17 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       let nextRequiredStep = './home_child_safety_v1.html';
       let resolvedState = AuthState.AUTHENTICATED_USER;
 
-      if (!emailVerified) {
-        // Step 1: Mandatory RAYDAR Email Verification
-        // Applies to Google First Login and unverified email registrations.
-        resolvedState = AuthState.AUTHENTICATED_EMAIL_UNVERIFIED;
-        nextRequiredStep = './email_verification.html';
-      } else if (raydarProfileState === 'NONE' && !resolvedRole) {
-        // Step 2: Role Selection
-        // Email is verified, but user has not selected their role yet.
+      if (!resolvedRole || (raydarProfileState === 'NONE' && !resolvedRole)) {
+        // Step 1: Role Selection (for new Google users or unselected roles)
         resolvedState = AuthState.AUTHENTICATED_NO_ROLE;
         nextRequiredStep = './account_type_selection_updated_flow.html';
       } else if (raydarProfileState !== 'COMPLETE') {
-        // Step 3: Personal Information (Profile Completion Form)
-        // Mandatory for Google users: email is verified, role is selected, but personal details/profile must be submitted.
+        // Step 2: Personal Information (Profile Completion Form)
+        // Role is selected, but personal details/profile must be completed.
         resolvedState = AuthState.AUTHENTICATED_PROFILE_INCOMPLETE;
         nextRequiredStep = './basic_information.html';
       } else if (onboardingState !== 'COMPLETE') {
-        // Step 4: Community Protection Onboarding sequence (Steps 1, 2, or 3)
+        // Step 3: Community Protection Onboarding sequence (Steps 1, 2, or 3)
         resolvedState = AuthState.AUTHENTICATED_ONBOARDING_REQUIRED;
         if (currentOnboardingStep === 2) {
           nextRequiredStep = './onboarding_reporter.html';
@@ -842,7 +845,7 @@ export async function getAuthAndProfileState(forceRefresh = false) {
           nextRequiredStep = './onboarding_community_protection_step_1.html';
         }
       } else {
-        // Step 5: Fully Completed User -> Home or Admin Dashboard
+        // Step 4: Fully Completed User -> Home or Admin Dashboard
         const isAdmin = profile?.is_admin === true || 
                         String(profile?.role).toLowerCase() === 'admin' ||
                         String(profile?.role).toLowerCase() === 'administrator';
@@ -1435,12 +1438,6 @@ export async function protectRoute(routeType, options = {}) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
       }
-      // If email not verified, must verify first
-      if (!isEmailVerified) {
-        registerInternalNavIntent('./email_verification.html');
-        window.location.replace('./email_verification.html');
-        return authInfo;
-      }
       // If user profile is already complete, do not allow re-entering registration forms
       if (raydarProfileState === 'COMPLETE') {
         const dest = (onboardingState === 'COMPLETE')
@@ -1458,12 +1455,6 @@ export async function protectRoute(routeType, options = {}) {
       }
       if (!session || state === AuthState.UNAUTHENTICATED) {
         saveReturnUrlAndRedirectToLogin();
-        return authInfo;
-      }
-      // If email not verified, must verify first
-      if (!isEmailVerified) {
-        registerInternalNavIntent('./email_verification.html');
-        window.location.replace('./email_verification.html');
         return authInfo;
       }
       // If profile is not complete, must finish profile first
@@ -1487,8 +1478,8 @@ export async function protectRoute(routeType, options = {}) {
         return authInfo;
       }
       // Handle incomplete users navigating to protected user routes
-      if (raydarProfileState !== 'COMPLETE' || onboardingState !== 'COMPLETE' || !isEmailVerified) {
-        const dest = authInfo.nextRequiredStep || './email_verification.html';
+      if (raydarProfileState !== 'COMPLETE' || onboardingState !== 'COMPLETE') {
+        const dest = authInfo.nextRequiredStep || './account_type_selection_updated_flow.html';
         registerInternalNavIntent(dest);
         window.location.replace(dest);
         return authInfo;

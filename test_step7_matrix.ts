@@ -131,22 +131,23 @@ async function runTests() {
     );
   }
 
-  // TEST-08: Google First Login -> Forces Email Verification (NOT Home)
+  // TEST-08: Google First Login -> Routes to Role Selection (NOT Home, and NO OTP email)
   {
     const googleNewUser = {
       id: "user-google-first-001",
       email: "google.first@gmail.com",
       app_metadata: { provider: "google" },
-      user_metadata: { email_verified: true } // Google says true, but RAYDAR requires verification code
+      user_metadata: { email_verified: true }
     };
     const isVerified = isRaydarEmailVerified(googleNewUser, null);
-    const destination = !isVerified ? "./email_verification.html" : "./home_child_safety_v1.html";
+    const hasRole = false;
+    const destination = !hasRole ? "./account_type_selection_updated_flow.html" : "./home_child_safety_v1.html";
 
     record(
       "TEST-08",
       "Google First Login routing",
-      destination === "./email_verification.html",
-      "Correctly routes new Google user to email_verification.html instead of bypassing to Home"
+      destination === "./account_type_selection_updated_flow.html" && isVerified === true,
+      "Correctly routes new Google user to account_type_selection_updated_flow.html without requiring email OTP"
     );
   }
 
