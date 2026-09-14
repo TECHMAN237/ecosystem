@@ -760,30 +760,24 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       // Note: isRaydarEmailVerified intrinsically validates existing complete users (hasCompleteProfile && hasOnboarded)
       const emailVerified = isRaydarEmailVerified(user, profile);
 
-      // Detect chosen role across profile, user_metadata, and persistent browser storage
+      // Detect chosen role across profile, user_metadata, and user-specific persistent storage
+      const isGoogleAuthUser = user.app_metadata?.provider === 'google' || user.identities?.some(id => id.provider === 'google');
       const resolvedRole = (
         (profile?.role && profile.role.trim() && profile.role !== 'NONE' ? profile.role.trim() : null) ||
         (user.user_metadata?.role && user.user_metadata.role.trim() && user.user_metadata.role !== 'NONE' ? user.user_metadata.role.trim() : null) ||
         (user.user_metadata?.selected_role && user.user_metadata.selected_role.trim() ? user.user_metadata.selected_role.trim() : null) ||
-        (typeof window !== 'undefined' && sessionStorage.getItem('childSafetyAccountType') ? sessionStorage.getItem('childSafetyAccountType').trim() : null) ||
         (typeof window !== 'undefined' && localStorage.getItem(`raydar_selected_role_${user.id}`) ? localStorage.getItem(`raydar_selected_role_${user.id}`).trim() : null) ||
-        (typeof window !== 'undefined' && localStorage.getItem('raydar_draft_selected_role') ? localStorage.getItem('raydar_draft_selected_role').trim() : null)
+        (!isGoogleAuthUser && typeof window !== 'undefined' && sessionStorage.getItem('childSafetyAccountType') ? sessionStorage.getItem('childSafetyAccountType').trim() : null)
       ) || null;
 
       // Check RAYDAR Profile & Registration State
+      // Authoritative rule: A complete user MUST have a valid profile row in public.profiles.
       let raydarProfileState = 'NONE';
       let registrationState = 'NOT_STARTED';
 
       if (!profile) {
-        // Check if user has complete info in metadata
-        const metaName = user.user_metadata?.full_name || user.user_metadata?.name;
-        const metaRole = resolvedRole;
-        const metaContact = Boolean(user.user_metadata?.phone_number || user.user_metadata?.city);
-
-        if (metaName && metaRole && metaContact && onboardingDone) {
-          raydarProfileState = 'COMPLETE';
-          registrationState = 'COMPLETE';
-        } else if (resolvedRole) {
+        // Without an existing profile record in PostgreSQL, the user is still in registration
+        if (resolvedRole) {
           raydarProfileState = 'INCOMPLETE';
           registrationState = 'IN_PROGRESS';
         } else {
@@ -1007,6 +1001,14 @@ export async function resolveInitialAuthDestination({ maxWaitMs = 2500 } = {}) {
  */
 export async function signInWithGoogle() {
   localStorage.removeItem('is_guest');
+  try {
+    sessionStorage.removeItem('childSafetyAccountType');
+    sessionStorage.removeItem('signup_role');
+    sessionStorage.removeItem('signup_in_progress');
+    sessionStorage.removeItem('signup_personal_info_done');
+    sessionStorage.setItem('signup_is_google', 'true');
+    sessionStorage.setItem('raydar_auth_flow', 'GOOGLE');
+  } catch (e) {}
 
   const redirectTo = `${window.location.origin}/`;
 
@@ -1397,14 +1399,8 @@ export async function protectRoute(routeType, options = {}) {
       const isExplicitLogin = options && options.isExplicitLogin === true;
 
       if (session && (isOAuthCallback || isExplicitLogin)) {
-        if (isExplicitLogin) {
-          registerInternalNavIntent('./index.html');
-          window.location.replace('./index.html');
-          return authInfo;
-        }
-        const dest = await resolveAuthDestination();
-        registerInternalNavIntent(dest);
-        window.location.replace(dest);
+        registerInternalNavIntent('./index.html');
+        window.location.replace('./index.html');
         return authInfo;
       }
       return authInfo;

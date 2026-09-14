@@ -219,14 +219,14 @@
 </div>
 </div>
 </div>
-<!-- Email Address (Optional) -->
+<!-- Email Address (Read-only from Step 1 / Google Auth) -->
 <div class="space-y-xs">
 <div class="flex justify-between items-center ml-xs">
 <label class="font-label-bold text-label-bold text-on-surface">Adresse e-mail</label>
-<span class="text-[10px] font-label-bold text-outline uppercase tracking-wider">Optionnel</span>
+<span class="text-[10px] font-label-bold text-outline uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">lock</span> Identifiant</span>
 </div>
 <div class="relative group form-input-glow transition-all rounded-lg">
-<input id="email" class="w-full h-[56px] px-lg bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-on-surface focus:border-primary focus:ring-0 transition-all placeholder:text-outline" placeholder="email@example.com" type="email"/>
+<input id="email" class="w-full h-[56px] px-lg bg-surface-container-low border border-outline-variant rounded-lg font-body-md text-on-surface opacity-80 cursor-not-allowed focus:ring-0 transition-all placeholder:text-outline" placeholder="email@example.com" type="email" readonly/>
 </div>
 </div>
 <!-- City -->
@@ -447,7 +447,12 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                     const storedPassword = sessionStorage.getItem('signup_password');
 
                     if (storedName) document.getElementById('fullname').value = storedName;
-                    if (storedEmail) document.getElementById('email').value = storedEmail;
+                    const emailField = document.getElementById('email');
+                    if (emailField) {
+                        emailField.value = storedEmail || '';
+                        emailField.readOnly = true;
+                        emailField.classList.add('bg-surface-container-low', 'opacity-80', 'cursor-not-allowed');
+                    }
                     if (storedPassword) {
                         document.getElementById('password').value = storedPassword;
                         document.getElementById('confirm_password').value = storedPassword;
@@ -529,7 +534,8 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                 // Store personal details in draft sessionStorage and advance to Onboarding 1.
                 // The account will be authoritatively created at Onboarding 3 when clicking "Créer le compte".
                 if (!targetUser) {
-                    const finalEmail = emailInput || sessionStorage.getItem('signup_email') || '';
+                    // Enforce strict email consistency: The email entered during Step 1 is authoritative and cannot be replaced
+                    const finalEmail = (sessionStorage.getItem('signup_email') || emailInput || '').trim();
                     const finalName = fullname || sessionStorage.getItem('signup_fullname') || '';
 
                     if (!finalEmail) {
