@@ -419,25 +419,23 @@ export function isDemoPhoto(url) {
 
 function mergeReports(localList, remoteList) {
   const map = new Map();
-  // Remote reports from Supabase DB
-  (remoteList || []).forEach(r => {
+  // 1. Add local reports (demo fallback, cached items)
+  (localList || []).forEach(r => {
     if (r && r.id) map.set(r.id, r);
   });
-  // Local reports
-  (localList || []).forEach(r => {
+  // 2. Authoritative remote reports from Supabase PostgreSQL (Source of Truth)
+  (remoteList || []).forEach(r => {
     if (r && r.id) {
       if (!map.has(r.id)) {
         map.set(r.id, r);
       } else {
-        const existing = map.get(r.id);
-        // CRITICAL: If local report has a REAL user photo (e.g. data: or user uploaded storage url),
-        // and remote report has no photo or has a demo image, the user's real photo MUST ALWAYS WIN!
-        if (r.photo && (!existing.photo || isDemoPhoto(existing.photo))) {
-          console.log('[REPORT TRACE] Protecting real user photo from remote demo overwrite for report:', r.id);
-          map.set(r.id, { ...existing, ...r, photo: r.photo });
-        } else {
-          map.set(r.id, { ...existing, ...r });
-        }
+        const local = map.get(r.id);
+        const photo = (r.photo && !isDemoPhoto(r.photo)) ? r.photo : (local.photo || r.photo);
+        map.set(r.id, {
+          ...local,
+          ...r,
+          photo
+        });
       }
     }
   });
@@ -490,8 +488,8 @@ export const reportService = {
   async getRecentRealReports(limit = 4) {
     try {
       const [missingRes, foundRes] = await Promise.allSettled([
-        withTimeout(supabase.from('missing_reports').select('*').order('created_at', { ascending: false }).limit(limit * 2), 3500, { data: [] }),
-        withTimeout(supabase.from('found_reports').select('*').order('created_at', { ascending: false }).limit(limit * 2), 3500, { data: [] })
+        withTimeout(supabase.from('missing_reports').select('*').order('created_at', { ascending: false }).limit(limit * 2), 6000, { data: [] }),
+        withTimeout(supabase.from('found_reports').select('*').order('created_at', { ascending: false }).limit(limit * 2), 6000, { data: [] })
       ]);
 
       const realReports = [];
@@ -587,8 +585,8 @@ export const reportService = {
     if (!id) return null;
     try {
       const [missingRes, foundRes] = await Promise.allSettled([
-        withTimeout(supabase.from('missing_reports').select('*').eq('id', id).maybeSingle(), 3500, { data: null }),
-        withTimeout(supabase.from('found_reports').select('*').eq('id', id).maybeSingle(), 3500, { data: null })
+        withTimeout(supabase.from('missing_reports').select('*').eq('id', id).maybeSingle(), 6000, { data: null }),
+        withTimeout(supabase.from('found_reports').select('*').eq('id', id).maybeSingle(), 6000, { data: null })
       ]);
 
       if (missingRes.status === 'fulfilled' && missingRes.value?.data) {
@@ -687,12 +685,12 @@ export const reportService = {
     }
   },
 
-  async fetchMissingReports(force = false) {
+  async fetchMissingReports(force = true) {
     await this.syncReportsFromSupabase(force);
     return this.getMissingReports();
   },
 
-  async fetchFoundReports(force = false) {
+  async fetchFoundReports(force = true) {
     await this.syncReportsFromSupabase(force);
     return this.getFoundReports();
   },
@@ -862,10 +860,11 @@ export const reportService = {
             clothingDescription: row.clothing_description,
             photo: row.child_photo_url || null,
             status: row.status || (isFound ? 'Trouvé' : 'Published'),
-            urgency: isFound ? 'Recherche Famille' : 'Nouveau',
+            urgency: isFound ? 'Recherche Famille' : (row.status === 'Urgent' ? 'Urgent' : 'Nouveau'),
             currentSafeLocation: currentSafeLocation,
             gps: gps,
             isPublic: row.is_public !== false,
+            created_at: row.created_at || new Date().toISOString(),
             createdAt: row.created_at || new Date().toISOString(),
             type: isFound ? 'found' : 'missing'
           };
@@ -908,6 +907,7 @@ export const reportService = {
             currentSafeLocation: currentSafeLocation,
             gps: gps,
             isPublic: row.is_public !== false,
+            created_at: row.created_at || new Date().toISOString(),
             createdAt: row.created_at || new Date().toISOString(),
             type: 'found'
           };
