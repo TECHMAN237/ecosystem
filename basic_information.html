@@ -280,7 +280,7 @@
 </div>
 </button>
 <button id="continueBtn" class="flex items-center justify-center bg-primary text-on-primary rounded-full px-xl py-md shadow-lg hover:opacity-95 active:scale-95 transition-all duration-200" type="button">
-<span id="btnText" class="font-label-bold text-label-bold mr-xs uppercase tracking-wide">Créer un compte</span>
+<span id="btnText" class="font-label-bold text-label-bold mr-xs uppercase tracking-wide">Continuer</span>
 <span id="btnIcon" class="material-symbols-outlined">chevron_right</span>
 </button>
 </nav>
@@ -364,7 +364,7 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
             const btnIcon = document.getElementById('btnIcon');
             if (isLoading) {
                 continueBtn.disabled = true;
-                if (btnText) btnText.textContent = 'CRÉATION DU COMPTE...';
+                if (btnText) btnText.textContent = 'ENREGISTREMENT...';
                 if (btnIcon) {
                     btnIcon.textContent = 'pending';
                     btnIcon.classList.add('animate-spin');
@@ -372,7 +372,7 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
             } else {
                 continueBtn.disabled = false;
                 if (btnText) {
-                    btnText.textContent = isOAuthUser ? 'FINALISER MON PROFIL' : 'CRÉER UN COMPTE';
+                    btnText.textContent = 'CONTINUER';
                 }
                 if (btnIcon) {
                     btnIcon.textContent = 'chevron_right';
@@ -525,102 +525,47 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                     }
                 }
 
-                // If user was not already authenticated (e.g. draft registration), sign up via Supabase Auth
+                // If user is proceeding through the normal signup flow (unauthenticated draft):
+                // Store personal details in draft sessionStorage and advance to Onboarding 1.
+                // The account will be authoritatively created at Onboarding 3 when clicking "Créer le compte".
                 if (!targetUser) {
-                    const password = document.getElementById('password')?.value || sessionStorage.getItem('signup_password') || '';
-                    const email = emailInput || sessionStorage.getItem('signup_email') || '';
-                    const terms = sessionStorage.getItem('signup_terms_accepted') === 'true';
+                    const finalEmail = emailInput || sessionStorage.getItem('signup_email') || '';
+                    const finalName = fullname || sessionStorage.getItem('signup_fullname') || '';
 
-                    if (!email) {
+                    if (!finalEmail) {
                         showError('Adresse e-mail requise. Veuillez vérifier vos informations ou vous reconnecter.');
                         isSubmitting = false;
                         setLoading(false);
                         return;
                     }
-                    if (!password || password.length < 6) {
-                        showError('Le mot de passe doit comporter au moins 6 caractères.');
-                        isSubmitting = false;
-                        setLoading(false);
-                        return;
-                    }
 
-                    console.log('Registering Supabase Auth account for email:', email);
-                    const { data: authData, error: authErr } = await supabase.auth.signUp({
-                        email,
-                        password,
-                        options: {
-                            data: {
-                                full_name: fullname,
-                                terms_accepted: terms
-                            }
-                        }
+                    sessionStorage.setItem('signup_fullname', finalName);
+                    sessionStorage.setItem('signup_email', finalEmail);
+                    sessionStorage.setItem('signup_username', username);
+                    sessionStorage.setItem('signup_phone_country_code', countrycode);
+                    sessionStorage.setItem('signup_phone_number', phonenumber);
+                    sessionStorage.setItem('signup_city', city);
+                    sessionStorage.setItem('signup_personal_info_done', 'true');
+
+                    logAuthFlowTrace({
+                        currentPage: 'basic_information.html',
+                        flow: 'SIGNUP',
+                        step: '3',
+                        email: finalEmail,
+                        action: 'USER_CONTINUE',
+                        decision: 'ADVANCE_TO_ONBOARDING',
+                        redirect: './onboarding_community_protection_step_1.html',
+                        reason: 'Personal info saved in draft — advancing to Onboarding Page 1'
                     });
 
-                    if (authErr) {
-                        const errLower = (authErr.message || '').toLowerCase();
-                        const isAlreadyRegistered = errLower.includes('already registered') || 
-                                                   errLower.includes('already exists') || 
-                                                   errLower.includes('email_exists') ||
-                                                   authErr.status === 422;
-
-                        if (isAlreadyRegistered) {
-                            logAuthFlowTrace({
-                                currentPage: 'basic_information.html',
-                                flow: 'SIGNUP',
-                                step: '3',
-                                email: email,
-                                action: 'USER_SUBMIT',
-                                decision: 'STOP_SIGNUP',
-                                redirect: 'NONE',
-                                reason: 'ACCOUNT_ALREADY_EXISTS'
-                            });
-                            showExistingAccountAlert(email);
-                            isSubmitting = false;
-                            setLoading(false);
-                            return;
-                        }
-
-                        showError(authErr.message || "Erreur lors de la création du compte.");
-                        isSubmitting = false;
-                        setLoading(false);
-                        return;
-                    }
-
-                    // Check if user already exists (identities array empty)
-                    if (authData && authData.user && Array.isArray(authData.user.identities) && authData.user.identities.length === 0) {
-                        logAuthFlowTrace({
-                            currentPage: 'basic_information.html',
-                            flow: 'SIGNUP',
-                            step: '3',
-                            email: email,
-                            action: 'USER_SUBMIT',
-                            decision: 'STOP_SIGNUP',
-                            redirect: 'NONE',
-                            reason: 'ACCOUNT_ALREADY_EXISTS (identities array empty)'
-                        });
-                        showExistingAccountAlert(email);
-                        isSubmitting = false;
-                        setLoading(false);
-                        return;
-                    }
-
-                    if (!authData || !authData.session) {
-                        showError("Veuillez vérifier votre boîte de réception pour confirmer votre compte avant de vous connecter.");
-                        isSubmitting = false;
-                        setLoading(false);
-                        return;
-                    }
-
-                    targetUser = authData.user;
+                    registerInternalNavIntent('./onboarding_community_protection_step_1.html');
+                    window.location.replace('./onboarding_community_protection_step_1.html');
+                    return;
                 }
 
-                if (!targetUser || !targetUser.id) {
-                    throw new Error("Impossible de vérifier votre compte d'authentification. Veuillez réessayer.");
-                }
-
+                // If user is already authenticated (e.g. Google user completing profile):
                 const photo = targetUser.user_metadata?.avatar_url || targetUser.user_metadata?.picture || '';
 
-                // Execute profile creation/update with verified Supabase Auth user ID
                 const createdProfile = await createRaydarProfile({
                     userId: targetUser.id,
                     email: targetUser.email || emailInput,
@@ -636,15 +581,6 @@ import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
                 if (!createdProfile) {
                     throw new Error("Erreur de confirmation de l'enregistrement du profil.");
                 }
-
-                // Clear temporary registration cache
-                sessionStorage.removeItem('signup_fullname');
-                sessionStorage.removeItem('signup_email');
-                sessionStorage.removeItem('signup_password');
-                sessionStorage.removeItem('signup_username');
-                sessionStorage.removeItem('signup_city');
-                sessionStorage.removeItem('signup_phone_number');
-                sessionStorage.removeItem('childSafetyAccountType');
 
                 logAuthFlowTrace({
                     currentPage: 'basic_information.html',

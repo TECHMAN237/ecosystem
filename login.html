@@ -154,6 +154,11 @@
 </header>
 <!-- Form Elements -->
 <form id="loginForm" class="space-y-lg">
+<!-- Success Message Banner -->
+<div id="successMsg" class="hidden bg-emerald-50 text-emerald-800 border border-emerald-200 p-md rounded-lg text-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-[20px] text-emerald-600">check_circle</span>
+<span id="successText" class="font-medium"></span>
+</div>
 <!-- Error Message Banner -->
 <div id="errorMsg" class="hidden bg-error-container text-on-error-container p-md rounded-lg text-sm flex items-center gap-sm">
 <span class="material-symbols-outlined text-[20px]">error</span>
@@ -259,12 +264,55 @@ import { signInWithGoogle, protectRoute, AuthState } from "./src/authService.js"
 const form = document.getElementById('loginForm');
 const errorMsg = document.getElementById('errorMsg');
 const errorText = document.getElementById('errorText');
+const successMsg = document.getElementById('successMsg');
+const successText = document.getElementById('successText');
 const submitBtn = document.getElementById('submitBtn');
 const btnText = document.getElementById('btnText');
 const googleBtn = document.getElementById('googleBtn');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
 
 // Route guard: if user is already authenticated, route them according to their role/profile
 await protectRoute('login');
+
+// Check for registration success message or URL params
+try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isRegistered = urlParams.get('registered') === 'true';
+    const emailParam = urlParams.get('email');
+    const customSuccessMsg = sessionStorage.getItem('signup_success_message');
+    const savedEmail = sessionStorage.getItem('signup_success_email');
+
+    if (savedEmail && emailInput) {
+        emailInput.value = savedEmail;
+    } else if (emailParam && emailInput) {
+        emailInput.value = decodeURIComponent(emailParam);
+    }
+
+    if (isRegistered || customSuccessMsg) {
+        const msg = customSuccessMsg || "Votre compte a été créé avec succès ! Veuillez vous connecter avec vos identifiants.";
+        showSuccess(msg);
+        if (emailInput && emailInput.value && passwordInput) {
+            setTimeout(() => { passwordInput.focus(); }, 200);
+        }
+        sessionStorage.removeItem('signup_success_message');
+        sessionStorage.removeItem('signup_success_email');
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+} catch (e) {
+    console.warn("Notice checking registration redirect:", e);
+}
+
+function showSuccess(msg) {
+    if (errorMsg) errorMsg.classList.add('hidden');
+    if (successText) successText.textContent = msg;
+    if (successMsg) {
+        successMsg.classList.remove('hidden');
+        successMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
 
 if (googleBtn) {
     googleBtn.addEventListener('click', async () => {
@@ -325,6 +373,7 @@ form.addEventListener('submit', async (e) => {
 });
 
 function showError(msg) {
+    if (successMsg) successMsg.classList.add('hidden');
     errorText.textContent = msg;
     errorMsg.classList.remove('hidden');
     errorMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });

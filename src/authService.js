@@ -209,6 +209,24 @@ export function isRaydarEmailVerified(user, profile = null) {
 }
 
 /**
+ * Checks if the user is currently proceeding through the normal sign-up flow (non-Google).
+ * In this flow, user credentials and details are collected in draft storage across pages
+ * without email verification until final submission at Onboarding 3.
+ */
+export function isNormalSignupInProgress() {
+  if (typeof window === 'undefined') return false;
+  try {
+    const isGoogle = sessionStorage.getItem('signup_is_google') === 'true';
+    if (isGoogle) return false;
+    const hasEmail = Boolean(sessionStorage.getItem('signup_email'));
+    const inProgress = sessionStorage.getItem('signup_in_progress') === 'true';
+    return hasEmail || inProgress;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
  * Persists the selected role across storage mechanisms (sessionStorage, localStorage, Supabase user_metadata)
  * so that an incomplete registration never loses the selected role upon reload or new tab.
  */
@@ -1290,13 +1308,18 @@ export async function protectRoute(routeType, options = {}) {
   const authInfo = await getAuthAndProfileState();
   const { state, session, profile, raydarProfileState, onboardingState, isEmailVerified } = authInfo;
   const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1';
+  const isNormalSignup = isNormalSignupInProgress() && (
+    routeType === 'registration_step' || 
+    routeType === 'profile_completion' || 
+    routeType === 'onboarding'
+  );
 
   const navCheck = consumeInternalNavIntent();
-  const isAllowedNavigation = navCheck.isReload || navCheck.isBackForward || navCheck.isValid;
+  const isAllowedNavigation = navCheck.isReload || navCheck.isBackForward || navCheck.isValid || isNormalSignup;
 
   // Direct external link gatekeeper:
   // Direct/external opening of a protected RAYDAR link must first display the login page.
-  if (!isPublic && !isAllowedNavigation) {
+  if (!isPublic && !isNormalSignup && !isAllowedNavigation) {
     sessionStorage.removeItem('raydar_active_session');
     logAuthTrace({
       currentUrl: window.location.pathname + window.location.search,
@@ -1321,8 +1344,8 @@ export async function protectRoute(routeType, options = {}) {
     };
   }
 
-  // Protect private pages if no session exists
-  if (!session && !isPublic) {
+  // Protect private pages if no session exists (unless running the in-progress normal signup draft)
+  if (!session && !isPublic && !isNormalSignup) {
     logAuthTrace({
       currentUrl: window.location.pathname + window.location.search,
       destination: './login_child_safety.html',
@@ -1371,7 +1394,13 @@ export async function protectRoute(routeType, options = {}) {
       const isExplicitLogin = options && options.isExplicitLogin === true;
 
       if (session && (isOAuthCallback || isExplicitLogin)) {
+        if (isExplicitLogin) {
+          registerInternalNavIntent('./index.html');
+          window.location.replace('./index.html');
+          return authInfo;
+        }
         const dest = await resolveAuthDestination();
+        registerInternalNavIntent(dest);
         window.location.replace(dest);
         return authInfo;
       }
@@ -1399,6 +1428,9 @@ export async function protectRoute(routeType, options = {}) {
 
     case 'registration_step':
     case 'profile_completion':
+      if (isNormalSignup) {
+        return authInfo;
+      }
       if (!session) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;
@@ -1421,6 +1453,9 @@ export async function protectRoute(routeType, options = {}) {
       return authInfo;
 
     case 'onboarding':
+      if (isNormalSignup) {
+        return authInfo;
+      }
       if (!session || state === AuthState.UNAUTHENTICATED) {
         saveReturnUrlAndRedirectToLogin();
         return authInfo;

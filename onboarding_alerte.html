@@ -176,7 +176,7 @@
 </div>
 <!-- Action Button -->
 <button id="getStartedBtn" class="w-full bg-[#532CE6] hover:bg-[#4321c4] text-white rounded-xl py-3.5 px-6 font-bold text-sm shadow-sm flex items-center justify-center gap-2 active:scale-98 transition-all" onclick="handleFinishOnboarding()">
-    <span>Commencer</span>
+    <span id="btnText">Créer le compte</span>
     <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
 </button>
 </div>
@@ -191,7 +191,8 @@
         });
     </script>
 <script type="module">
-import { protectRoute, setOnboardingCompleted, registerInternalNavIntent } from "./src/authService.js";
+import { supabase } from "./src/supabaseClient.js";
+import { protectRoute, setOnboardingCompleted, registerInternalNavIntent, createRaydarProfile, logAuthFlowTrace } from "./src/authService.js";
 
 let currentUser = null;
 try {
@@ -203,13 +204,129 @@ try {
 
 window.handleFinishOnboarding = async function() {
     const btn = document.getElementById('getStartedBtn');
+    const btnText = document.getElementById('btnText');
     if (btn) {
         btn.disabled = true;
         btn.classList.add('opacity-80', 'cursor-wait');
+        if (btnText) btnText.textContent = "Création du compte...";
     }
-    await setOnboardingCompleted(currentUser);
-    registerInternalNavIntent('./success_account_created.html');
-    window.location.replace('./success_account_created.html');
+
+    try {
+        // Case 1: Google User (already authenticated with active session)
+        if (currentUser && currentUser.id) {
+            await setOnboardingCompleted(currentUser);
+            sessionStorage.setItem('signup_success_message', "Votre compte a été configuré avec succès ! Vous pouvez maintenant vous connecter.");
+            sessionStorage.setItem('signup_success_email', currentUser.email || '');
+            sessionStorage.removeItem('signup_in_progress');
+            sessionStorage.removeItem('raydar_auth_flow');
+            await supabase.auth.signOut();
+            registerInternalNavIntent('./login_child_safety.html?registered=true');
+            window.location.replace('./login_child_safety.html?registered=true');
+            return;
+        }
+
+        // Case 2: Normal Signup flow (unauthenticated draft)
+        const email = sessionStorage.getItem('signup_email');
+        const password = sessionStorage.getItem('signup_password');
+        const fullname = sessionStorage.getItem('signup_fullname');
+        const role = sessionStorage.getItem('childSafetyAccountType') || 'PARENT';
+        const username = sessionStorage.getItem('signup_username') || '';
+        const countrycode = sessionStorage.getItem('signup_phone_country_code') || '+33';
+        const phonenumber = sessionStorage.getItem('signup_phone_number') || '';
+        const city = sessionStorage.getItem('signup_city') || '';
+
+        if (!email || !password) {
+            alert("Informations d'inscription incomplètes. Veuillez recommencer le formulaire d'inscription.");
+            window.location.href = './sign_up_child_safety.html';
+            return;
+        }
+
+        // Actually create the Supabase Auth account now!
+        const { data: authData, error: authErr } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: fullname,
+                    terms_accepted: true,
+                    selected_role: role
+                }
+            }
+        });
+
+        if (authErr) {
+            console.error("Error creating Supabase user:", authErr);
+            alert(authErr.message || "Erreur lors de la création du compte.");
+            if (btn) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-80', 'cursor-wait');
+                if (btnText) btnText.textContent = "Créer le compte";
+            }
+            return;
+        }
+
+        const newUser = authData?.user;
+        if (newUser && newUser.id) {
+            try {
+                await createRaydarProfile({
+                    userId: newUser.id,
+                    email: email,
+                    fullName: fullname,
+                    username: username,
+                    phoneCountryCode: countrycode,
+                    phoneNumber: phonenumber,
+                    city: city,
+                    role: role
+                });
+                await setOnboardingCompleted(newUser);
+            } catch (profErr) {
+                console.warn("Notice setting profile / onboarding:", profErr);
+            }
+        }
+
+        // Clean up draft from sessionStorage
+        sessionStorage.removeItem('signup_fullname');
+        sessionStorage.removeItem('signup_email');
+        sessionStorage.removeItem('signup_password');
+        sessionStorage.removeItem('signup_username');
+        sessionStorage.removeItem('signup_city');
+        sessionStorage.removeItem('signup_phone_number');
+        sessionStorage.removeItem('signup_phone_country_code');
+        sessionStorage.removeItem('childSafetyAccountType');
+        sessionStorage.removeItem('signup_in_progress');
+        sessionStorage.removeItem('signup_personal_info_done');
+        sessionStorage.removeItem('raydar_auth_flow');
+
+        // Set success message for Login page
+        sessionStorage.setItem('signup_success_message', "Votre compte a été créé avec succès ! Vous pouvez maintenant vous connecter.");
+        sessionStorage.setItem('signup_success_email', email);
+
+        // Sign out intermediate session if any, so user explicitly logs in
+        await supabase.auth.signOut();
+
+        logAuthFlowTrace({
+            currentPage: 'onboarding_alerte.html',
+            flow: 'SIGNUP',
+            step: 'ONBOARDING_3',
+            email: email,
+            action: 'CREATE_ACCOUNT',
+            decision: 'REDIRECT_TO_LOGIN',
+            redirect: './login_child_safety.html?registered=true',
+            reason: 'Account successfully created at Onboarding 3 — redirecting to login with success message'
+        });
+
+        registerInternalNavIntent('./login_child_safety.html?registered=true');
+        window.location.replace('./login_child_safety.html?registered=true');
+
+    } catch (err) {
+        console.error("Error during account creation:", err);
+        alert(err.message || "Une erreur inattendue est survenue.");
+        if (btn) {
+            btn.disabled = false;
+            btn.classList.remove('opacity-80', 'cursor-wait');
+            if (btnText) btnText.textContent = "Créer le compte";
+        }
+    }
 };
 </script>
 </body></html>

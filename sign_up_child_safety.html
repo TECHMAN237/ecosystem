@@ -218,7 +218,7 @@ J'accepte les <a class="text-primary font-bold hover:underline" href="./privacy_
 </div>
 <!-- Primary Action -->
 <button id="submitBtn" class="w-full h-14 sm:h-16 bg-primary text-on-primary font-bold text-[17px] sm:text-lg rounded-full shadow-[0_8px_25px_rgba(108,77,255,0.35)] hover:shadow-[0_12px_32px_rgba(108,77,255,0.48)] hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 px-6 cursor-pointer tracking-wide" type="submit">
-<span id="btnText">Créer un compte</span>
+<span id="btnText">Suivant</span>
 <span class="material-symbols-outlined text-[22px]" data-icon="arrow_forward" id="btnIcon">arrow_forward</span>
 </button>
 </form>
@@ -378,14 +378,14 @@ function showConfirmation(msg) {
 function setLoading(isLoading) {
     if (isLoading) {
         submitBtn.disabled = true;
-        if (btnText) btnText.textContent = 'Vérification en cours...';
+        if (btnText) btnText.textContent = 'Chargement...';
         if (btnIcon) {
             btnIcon.textContent = 'pending';
             btnIcon.classList.add('animate-spin');
         }
     } else {
         submitBtn.disabled = false;
-        if (btnText) btnText.textContent = 'Créer un compte';
+        if (btnText) btnText.textContent = 'Suivant';
         if (btnIcon) {
             btnIcon.textContent = 'arrow_forward';
             btnIcon.classList.remove('animate-spin');
@@ -433,117 +433,27 @@ form.addEventListener('submit', async (e) => {
             step: '1',
             email: email,
             action: 'SUBMIT_STEP_1',
-            decision: 'CHECK_EXISTING_USER',
-            redirect: 'NONE',
-            reason: 'Attempting account creation / checking if account exists'
+            decision: 'STORE_DRAFT_AND_ADVANCE',
+            redirect: './account_type_selection_updated_flow.html',
+            reason: 'Step 1 complete — advancing to role selection without email verification'
         });
 
-        // Call Supabase Auth signUp to check if email exists or create user
-        const { data: authData, error: authErr } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    full_name: fullname,
-                    terms_accepted: terms
-                }
-            }
-        });
-
-        // 1. Check if Supabase explicitly returned an "already registered" error
-        if (authErr) {
-            const errLower = (authErr.message || '').toLowerCase();
-            const isAlreadyRegistered = errLower.includes('already registered') || 
-                                       errLower.includes('already exists') || 
-                                       errLower.includes('email_exists') ||
-                                       authErr.status === 422;
-
-            if (isAlreadyRegistered) {
-                logAuthFlowTrace({
-                    currentPage: 'sign_up_child_safety.html',
-                    flow: 'SIGNUP',
-                    step: '1',
-                    email: email,
-                    action: 'USER_SUBMIT',
-                    decision: 'STOP_SIGNUP',
-                    redirect: 'NONE',
-                    reason: 'ACCOUNT_ALREADY_EXISTS'
-                });
-                showExistingAccountAlert(email);
-                setLoading(false);
-                return;
-            }
-
-            if (errLower.includes('rate limit')) {
-                showError("Trop de tentatives récentes. Veuillez patienter quelques instants.");
-            } else {
-                showError(authErr.message || "Erreur lors de l'inscription.");
-            }
-            setLoading(false);
-            return;
-        }
-
-        // 2. Check if user already exists with identities length === 0 (Supabase pattern for existing emails)
-        if (authData && authData.user && Array.isArray(authData.user.identities) && authData.user.identities.length === 0) {
-            logAuthFlowTrace({
-                currentPage: 'sign_up_child_safety.html',
-                flow: 'SIGNUP',
-                step: '1',
-                email: email,
-                action: 'USER_SUBMIT',
-                decision: 'STOP_SIGNUP',
-                redirect: 'NONE',
-                reason: 'ACCOUNT_ALREADY_EXISTS (identities array empty)'
-            });
-            showExistingAccountAlert(email);
-            setLoading(false);
-            return;
-        }
-
-        // 3. Check if email confirmation is required before login
-        if (authData && authData.user && !authData.session) {
-            logAuthFlowTrace({
-                currentPage: 'sign_up_child_safety.html',
-                flow: 'SIGNUP',
-                step: '1',
-                email: email,
-                action: 'CONFIRMATION_REQUIRED',
-                decision: 'SHOW_CONFIRMATION_NOTICE',
-                redirect: 'NONE',
-                reason: 'Supabase email confirmation enabled'
-            });
-            showConfirmation("Veuillez vérifier votre boîte de réception pour confirmer votre compte avant de vous connecter.");
-            setLoading(false);
-            return;
-        }
-
-        // 4. Successful new user registration -> save Step 1 draft and advance to Email Verification
+        // Save Step 1 draft and advance to Role Selection
         sessionStorage.setItem('signup_fullname', fullname);
         sessionStorage.setItem('signup_email', email);
         sessionStorage.setItem('signup_password', password);
         sessionStorage.setItem('signup_terms_accepted', 'true');
-        if (authData?.user?.id) {
-            sessionStorage.setItem('signup_user_id', authData.user.id);
-        }
+        sessionStorage.setItem('signup_in_progress', 'true');
+        sessionStorage.setItem('signup_is_google', 'false');
+        sessionStorage.setItem('raydar_auth_flow', 'SIGNUP');
 
-        logAuthFlowTrace({
-            currentPage: 'sign_up_child_safety.html',
-            flow: 'SIGNUP',
-            step: '1',
-            email: email,
-            action: 'USER_CONTINUE',
-            decision: 'ALLOW',
-            redirect: './email_verification.html',
-            reason: 'Step 1 complete — user advances to RAYDAR email verification'
-        });
-
-        // EXPLICIT USER-TRIGGERED NAVIGATION TO EMAIL VERIFICATION
-        registerInternalNavIntent('./email_verification.html');
-        window.location.href = './email_verification.html';
+        // EXPLICIT USER-TRIGGERED NAVIGATION TO ROLE SELECTION
+        registerInternalNavIntent('./account_type_selection_updated_flow.html');
+        window.location.href = './account_type_selection_updated_flow.html';
 
     } catch (err) {
         console.error('Unexpected signup error:', err);
-        showError(err.message || 'Une erreur inattendue est survenue lors de l\'inscription.');
+        showError(err.message || 'Une erreur inattendue est survenue.');
         setLoading(false);
     }
 });
