@@ -718,24 +718,280 @@ export const reportService = {
       if (session && session.user && session.user.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(session.user.id)) {
         return session.user.id;
       }
+      const { data: { user } } = await withTimeout(supabase.auth.getUser(), 2000, { data: { user: null } });
+      if (user && user.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id)) {
+        return user.id;
+      }
     } catch (e) {}
     return null;
   },
 
-  // Upload file or image directly to Supabase Storage with fast compression and timeout protection
+  // Authoritative resolver for current authenticated user's UUID matching auth.uid()
+  async getAuthenticatedUserId() {
+    try {
+      const { data: { session } } = await withTimeout(supabase.auth.getSession(), 3000, { data: { session: null } });
+      if (session?.user?.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(session.user.id)) {
+        return session.user.id;
+      }
+      const { data: { user } } = await withTimeout(supabase.auth.getUser(), 2000, { data: { user: null } });
+      if (user?.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id)) {
+        return user.id;
+      }
+    } catch (e) {}
+    return null;
+  },
+
+  // Authoritative Missing Report child photo upload:
+  // - Target bucket: 'missing-reports'
+  // - Storage path begins with {auth.uid()}/filename
+  // - Uploads actual binary Blob file (image/jpeg, image/png, image/webp)
+  // - ZERO base64 fallback in database
+  // - Returns Supabase Storage public URL
+  async uploadMissingReportPhoto(fileOrBase64, customFilename = null) {
+    if (!fileOrBase64) return null;
+
+    // If it's already a valid Supabase Storage public URL for missing-reports, return as-is
+    if (typeof fileOrBase64 === 'string' && fileOrBase64.includes('/storage/v1/object/public/missing-reports/')) {
+      return fileOrBase64;
+    }
+
+    console.log('[STORAGE] Starting Missing Report photo upload to bucket "missing-reports"...');
+    try {
+      // 1. Get authenticated user UUID required for {auth.uid()}/ path in RLS
+      const authUid = await this.getAuthenticatedUserId();
+      if (!authUid) {
+        console.warn('[STORAGE] Cannot upload to missing-reports: User is not authenticated (auth.uid() required)');
+        return null;
+      }
+
+      // 2. Client-side compression if image data
+      let optimized = fileOrBase64;
+      if (typeof window !== 'undefined') {
+        try {
+          optimized = await compressImage(fileOrBase64, 1200, 0.85);
+        } catch (compErr) {
+          console.warn('[STORAGE] Notice during image compression:', compErr);
+          optimized = fileOrBase64;
+        }
+      }
+
+      // 3. Convert input to actual binary Blob with valid image content-type
+      let blob = null;
+      let fileExt = 'jpg';
+      let contentType = 'image/jpeg';
+
+      if (typeof optimized === 'string' && optimized.startsWith('data:')) {
+        const mimeMatch = optimized.match(/^data:([^;]+);base64,/);
+        if (mimeMatch && mimeMatch[1]) {
+          const rawMime = mimeMatch[1].toLowerCase();
+          if (rawMime.includes('png')) {
+            contentType = 'image/png';
+            fileExt = 'png';
+          } else if (rawMime.includes('webp')) {
+            contentType = 'image/webp';
+            fileExt = 'webp';
+          } else {
+            contentType = 'image/jpeg';
+            fileExt = 'jpg';
+          }
+        }
+        const res = await fetch(optimized);
+        blob = await res.blob();
+      } else if (optimized instanceof File || optimized instanceof Blob) {
+        blob = optimized;
+        const rawType = (optimized.type || '').toLowerCase();
+        if (rawType.includes('png')) {
+          contentType = 'image/png';
+          fileExt = 'png';
+        } else if (rawType.includes('webp')) {
+          contentType = 'image/webp';
+          fileExt = 'webp';
+        } else {
+          contentType = 'image/jpeg';
+          fileExt = 'jpg';
+        }
+      }
+
+      if (!blob) {
+        console.warn('[STORAGE] Failed to create binary blob for child photo');
+        return null;
+      }
+
+      // 4. Construct storage path strictly beginning with {auth.uid()}/filename
+      const filename = customFilename 
+        ? `${customFilename.replace(/[^a-zA-Z0-9_-]/g, '_')}.${fileExt}`
+        : `child_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+      const filePath = `${authUid}/${filename}`;
+      console.log(`[STORAGE] Uploading binary file to missing-reports at path: ${filePath}`);
+
+      // 5. Upload real binary file to Supabase Storage bucket 'missing-reports'
+      const { data: uploadData, error: uploadErr } = await withTimeout(
+        supabase.storage
+          .from('missing-reports')
+          .upload(filePath, blob, {
+            contentType,
+            cacheControl: '3600',
+            upsert: true
+          }),
+        10000,
+        { data: null, error: { message: 'Storage upload timeout after 10s' } }
+      );
+
+      if (uploadErr) {
+        console.error('[STORAGE] Upload to missing-reports failed:', uploadErr.message || uploadErr);
+        return null; // Strict rule: ZERO base64 fallback
+      }
+
+      // 6. Retrieve public storage URL
+      const { data: publicUrlData } = supabase.storage
+        .from('missing-reports')
+        .getPublicUrl(filePath);
+
+      const storageUrl = publicUrlData?.publicUrl || null;
+      console.log('[STORAGE] Missing report photo successfully uploaded. Supabase Storage URL:', storageUrl);
+      return storageUrl;
+    } catch (err) {
+      console.error('[STORAGE] Error in uploadMissingReportPhoto:', err);
+      return null; // Strict rule: ZERO base64 fallback
+    }
+  },
+
+  // Authoritative Report Evidence upload:
+  // - Target bucket: 'report-evidence'
+  // - Storage path begins with {auth.uid()}/filename
+  // - Uploads actual binary Blob file (application/pdf, image/jpeg, image/png, image/webp)
+  // - Returns Supabase Storage URL reference
+  async uploadReportEvidence(docItem, originalName = null, docType = 'doc') {
+    if (!docItem) return null;
+
+    // If already a Supabase Storage URL reference to report-evidence, return as-is
+    if (typeof docItem === 'string' && 
+        (docItem.includes('/storage/v1/object/public/report-evidence/') || 
+         docItem.includes('/storage/v1/object/authenticated/report-evidence/'))) {
+      return docItem;
+    }
+
+    console.log(`[STORAGE] Starting evidence document upload (${docType}) to bucket "report-evidence"...`);
+    try {
+      const authUid = await this.getAuthenticatedUserId();
+      if (!authUid) {
+        console.warn('[STORAGE] Cannot upload to report-evidence: User is not authenticated (auth.uid() required)');
+        return null;
+      }
+
+      let dataToConvert = docItem;
+      if (typeof docItem === 'object' && docItem.dataUrl) {
+        dataToConvert = docItem.dataUrl;
+        if (!originalName && docItem.name) originalName = docItem.name;
+      }
+
+      let blob = null;
+      let fileExt = 'pdf';
+      let contentType = 'application/pdf';
+
+      if (typeof dataToConvert === 'string' && dataToConvert.startsWith('data:')) {
+        const mimeMatch = dataToConvert.match(/^data:([^;]+);base64,/);
+        if (mimeMatch && mimeMatch[1]) {
+          const rawMime = mimeMatch[1].toLowerCase();
+          if (rawMime.includes('pdf')) {
+            contentType = 'application/pdf';
+            fileExt = 'pdf';
+          } else if (rawMime.includes('png')) {
+            contentType = 'image/png';
+            fileExt = 'png';
+          } else if (rawMime.includes('webp')) {
+            contentType = 'image/webp';
+            fileExt = 'webp';
+          } else {
+            contentType = 'image/jpeg';
+            fileExt = 'jpg';
+          }
+        }
+        const res = await fetch(dataToConvert);
+        blob = await res.blob();
+      } else if (dataToConvert instanceof File || dataToConvert instanceof Blob) {
+        blob = dataToConvert;
+        const rawType = (dataToConvert.type || '').toLowerCase();
+        if (rawType.includes('pdf')) {
+          contentType = 'application/pdf';
+          fileExt = 'pdf';
+        } else if (rawType.includes('png')) {
+          contentType = 'image/png';
+          fileExt = 'png';
+        } else if (rawType.includes('webp')) {
+          contentType = 'image/webp';
+          fileExt = 'webp';
+        } else {
+          contentType = 'image/jpeg';
+          fileExt = 'jpg';
+        }
+      }
+
+      if (!blob) {
+        console.warn('[STORAGE] Failed to create binary blob for evidence document');
+        return null;
+      }
+
+      const safeName = originalName 
+        ? originalName.replace(/[^a-zA-Z0-9._-]/g, '_')
+        : `${docType}_${Date.now()}.${fileExt}`;
+      const filename = `${docType}_${Date.now()}_${safeName}`;
+      const filePath = `${authUid}/${filename}`;
+      console.log(`[STORAGE] Uploading evidence file to report-evidence at path: ${filePath}`);
+
+      const { data: uploadData, error: uploadErr } = await withTimeout(
+        supabase.storage
+          .from('report-evidence')
+          .upload(filePath, blob, {
+            contentType,
+            cacheControl: '3600',
+            upsert: true
+          }),
+        10000,
+        { data: null, error: { message: 'Storage evidence upload timeout after 10s' } }
+      );
+
+      if (uploadErr) {
+        console.error('[STORAGE] Upload to report-evidence failed:', uploadErr.message || uploadErr);
+        return null;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('report-evidence')
+        .getPublicUrl(filePath);
+
+      const storageUrl = publicUrlData?.publicUrl || filePath;
+      console.log('[STORAGE] Evidence document uploaded. Storage reference:', storageUrl);
+      return storageUrl;
+    } catch (err) {
+      console.error('[STORAGE] Error in uploadReportEvidence:', err);
+      return null;
+    }
+  },
+
+  // General upload dispatcher for compatibility across features
   async uploadFileToSupabaseStorage(fileOrBase64, bucketName = "avatars", reportType = "reports", reportId = null) {
     if (!fileOrBase64) return null;
-    console.log(`[REPORT TRACE] uploadFileToSupabaseStorage starting for type: ${reportType}, bucket: ${bucketName}...`);
-    try {
-      // 1. Client-side downscaling & compression to prevent multi-megabyte hanging uploads
-      const optimized = await compressImage(fileOrBase64, 1200, 0.82);
 
+    if (bucketName === "missing-reports") {
+      return await this.uploadMissingReportPhoto(fileOrBase64);
+    }
+    if (bucketName === "report-evidence") {
+      return await this.uploadReportEvidence(fileOrBase64, null, reportType);
+    }
+
+    console.log(`[STORAGE] uploadFileToSupabaseStorage starting for bucket: ${bucketName}, reportType: ${reportType}...`);
+    try {
+      const authUid = await this.getAuthenticatedUserId();
+      const folder = authUid || 'public';
+      
+      const optimized = await compressImage(fileOrBase64, 1000, 0.82);
       let blob;
       let fileExt = "jpg";
       let contentType = "image/jpeg";
 
       if (typeof optimized === "string" && optimized.startsWith("data:")) {
-        const mimeMatch = optimized.match(/data:(.*?);base64,/);
+        const mimeMatch = optimized.match(/^data:([^;]+);base64,/);
         if (mimeMatch && mimeMatch[1]) {
           contentType = mimeMatch[1];
           if (contentType.includes("png")) fileExt = "png";
@@ -754,45 +1010,35 @@ export const reportService = {
       }
 
       if (blob) {
-        const currentUid = await this.getCurrentUserId();
-        const folder = currentUid || 'public';
         const rId = reportId || generateUUID();
-        const filePath = `${reportType}/${folder}/${rId}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
-        console.log(`[REPORT TRACE] Target storage path: ${filePath}`);
+        const filePath = `${folder}/${rId}_${Date.now()}.${fileExt}`;
+        console.log(`[STORAGE] Target storage path in ${bucketName}: ${filePath}`);
 
-        // Try upload to Supabase Storage bucket
-        try {
-          const uploadResult = await withTimeout(
-            supabase.storage
-              .from("avatars")
-              .upload(filePath, blob, { contentType, upsert: true }),
-            8000,
-            { error: { message: "Storage upload timeout" }, data: null }
-          );
+        const uploadResult = await withTimeout(
+          supabase.storage
+            .from(bucketName)
+            .upload(filePath, blob, { contentType, upsert: true }),
+          8000,
+          { error: { message: "Storage upload timeout" }, data: null }
+        );
 
-          if (uploadResult && !uploadResult.error && uploadResult.data) {
-            const { data: publicData } = supabase.storage
-              .from("avatars")
-              .getPublicUrl(filePath);
-            if (publicData && publicData.publicUrl) {
-              console.log("[REPORT TRACE] Storage public URL verified:", publicData.publicUrl);
-              return publicData.publicUrl;
-            }
-          } else {
-            console.warn("[REPORT TRACE] Notice uploading to storage bucket:", uploadResult?.error?.message);
+        if (uploadResult && !uploadResult.error && uploadResult.data) {
+          const { data: publicData } = supabase.storage
+            .from(bucketName)
+            .getPublicUrl(filePath);
+          if (publicData?.publicUrl) {
+            console.log(`[STORAGE] Storage public URL verified in ${bucketName}:`, publicData.publicUrl);
+            return publicData.publicUrl;
           }
-        } catch (uploadErr) {
-          console.warn("[REPORT TRACE] Storage upload error notice:", uploadErr?.message || uploadErr);
+        } else {
+          console.warn(`[STORAGE] Notice uploading to ${bucketName}:`, uploadResult?.error?.message);
         }
       }
 
-      // CRITICAL: If storage upload fails (e.g. bucket not configured or network error), 
-      // return the REAL optimized user image string. ZERO DATA LOSS. NEVER return a demo avatar!
-      console.log("[REPORT TRACE] Preserving real user photo data string (zero data loss, no demo replacement)");
-      return typeof optimized === "string" ? optimized : (typeof fileOrBase64 === "string" ? fileOrBase64 : null);
+      return null;
     } catch (err) {
-      console.warn("[REPORT TRACE] Storage upload exception:", err);
-      return typeof fileOrBase64 === "string" ? fileOrBase64 : null;
+      console.warn(`[STORAGE] Storage upload exception in ${bucketName}:`, err);
+      return null;
     }
   },
 
@@ -943,35 +1189,43 @@ export const reportService = {
     const dbId = generateUUID();
     console.log('[REPORT TRACE] createMissingReport started with ID:', dbId, 'Name:', reportData.name);
     try {
-      let photoUrl = reportData.photo || reportData.childPhoto;
-      if (photoUrl && (photoUrl.startsWith("data:") || photoUrl.startsWith("blob:") || photoUrl instanceof File || photoUrl instanceof Blob)) {
-        photoUrl = await this.uploadFileToSupabaseStorage(photoUrl, "avatars", "missing-reports", dbId);
+      // 1. Upload child photo to missing-reports bucket (Storage path: {auth.uid()}/filename)
+      let photoUrl = reportData.photo || reportData.childPhoto || reportData.child_photo_url;
+      if (photoUrl) {
+        if (typeof photoUrl === 'string' && photoUrl.includes('/storage/v1/object/public/missing-reports/')) {
+          console.log('[STORAGE] Photo is already an uploaded Supabase Storage URL:', photoUrl);
+        } else if (typeof photoUrl === 'string' && photoUrl.startsWith('http') && !photoUrl.startsWith('blob:') && !photoUrl.startsWith('data:')) {
+          console.log('[STORAGE] Photo is a remote URL:', photoUrl);
+        } else {
+          // Real binary file upload to missing-reports bucket
+          photoUrl = await this.uploadMissingReportPhoto(photoUrl, `child_${dbId}`);
+        }
       }
-      if (!photoUrl) {
+
+      // CRITICAL: Strict requirement - ZERO remaining base64 fallback in database for child_photo_url
+      if (typeof photoUrl === 'string' && photoUrl.startsWith('data:')) {
+        console.warn('[STORAGE] Disallowed base64 detected for child_photo_url. Zero base64 rule applied.');
         photoUrl = null;
       }
-      console.log('[REPORT TRACE] Final photo URL for missing report:', photoUrl ? photoUrl.substring(0, 60) + '...' : 'NONE');
+      console.log('[REPORT TRACE] Verified child_photo_url for missing report:', photoUrl ? photoUrl.substring(0, 70) + '...' : 'NONE');
 
-      // Upload verification documents in parallel
+      // 2. Upload verification documents/evidence to report-evidence bucket (Storage path: {auth.uid()}/filename)
       let birthCertUrl = null;
       let familyPhotoUrl = null;
       let healthRecordUrl = null;
       let otherDocUrl = null;
 
-      const uploadDocItem = async (docItem, folderName) => {
+      const uploadDocItem = async (docItem, docType) => {
         if (!docItem) return null;
-        const docData = typeof docItem === 'object' && docItem.dataUrl ? docItem.dataUrl : docItem;
-        if (typeof docData === 'string' && (docData.startsWith("data:") || docData.startsWith("blob:") || docData.startsWith("http"))) {
-          return await this.uploadFileToSupabaseStorage(docData, "avatars", folderName, dbId);
-        }
-        return null;
+        const originalName = typeof docItem === 'object' && docItem.name ? docItem.name : null;
+        return await this.uploadReportEvidence(docItem, originalName, docType);
       };
 
       const [bcResult, famResult, hospResult, othResult] = await Promise.allSettled([
-        uploadDocItem(reportData.birthCertificate, 'missing-birth-certificates'),
-        uploadDocItem(reportData.familyPhoto, 'missing-family-photos'),
-        uploadDocItem(reportData.hospitalRecord, 'missing-health-records'),
-        uploadDocItem(reportData.otherDoc, 'missing-other-docs')
+        uploadDocItem(reportData.birthCertificate, 'birth_certificate'),
+        uploadDocItem(reportData.familyPhoto, 'family_photo'),
+        uploadDocItem(reportData.hospitalRecord, 'health_record'),
+        uploadDocItem(reportData.otherDoc, 'other_document')
       ]);
 
       if (bcResult.status === 'fulfilled' && bcResult.value) birthCertUrl = bcResult.value;
@@ -997,6 +1251,7 @@ export const reportService = {
         type: "missing",
         ...reportData,
         photo: photoUrl,
+        child_photo_url: photoUrl,
         birthCertificateUrl: birthCertUrl,
         familyPhotoUrl: familyPhotoUrl,
         healthRecordUrl: healthRecordUrl,
@@ -1051,7 +1306,7 @@ export const reportService = {
           incident_description: incidentDesc,
           emergency_contact_name: newReport.relationship || "Parent / Gardien",
           emergency_contact_phone: "677000000",
-          child_photo_url: newReport.photo,
+          child_photo_url: photoUrl,
           birth_certificate_url: birthCertUrl,
           family_photo_url: familyPhotoUrl,
           health_record_url: healthRecordUrl,

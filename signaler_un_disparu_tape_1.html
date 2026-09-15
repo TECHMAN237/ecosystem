@@ -278,7 +278,7 @@
 
 <script type="module">
 import { formDraftState } from './src/formDraftState.js';
-import { compressImage } from './src/reportService.js';
+import { compressImage, reportService } from './src/reportService.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('fileInput');
@@ -330,14 +330,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderPhotoPreview(tempUrl);
             } catch (err) {}
 
-            // Compress and save to draft state
+            // Compress image
+            let compressed = null;
             try {
-                const compressed = await compressImage(file, 1000, 0.82);
+                compressed = await compressImage(file, 1200, 0.85);
                 console.log('[REPORT TRACE] Compressed photo string length:', compressed.length);
+            } catch (cErr) {
+                console.warn('[REPORT TRACE] Compression fallback:', cErr);
+            }
+
+            // Upload directly to Supabase Storage missing-reports bucket ({auth.uid()}/filename)
+            try {
+                const storageUrl = await reportService.uploadMissingReportPhoto(file);
+                if (storageUrl) {
+                    console.log('[REPORT TRACE] Missing report photo uploaded to Supabase Storage:', storageUrl);
+                    formDraftState.updateMissingDraft({ photo: storageUrl, child_photo_url: storageUrl });
+                    renderPhotoPreview(storageUrl);
+                    return;
+                }
+            } catch (uploadErr) {
+                console.warn('[REPORT TRACE] Notice during direct upload in step 1:', uploadErr);
+            }
+
+            // Fallback: store compressed image in draft so createMissingReport can upload it upon final submission
+            if (compressed) {
                 formDraftState.updateMissingDraft({ photo: compressed });
                 renderPhotoPreview(compressed);
-            } catch (cErr) {
-                console.warn('[REPORT TRACE] Compression fallback to FileReader:', cErr);
+            } else {
                 const reader = new FileReader();
                 reader.onload = function(evt) {
                     const rawBase64 = evt.target.result;
