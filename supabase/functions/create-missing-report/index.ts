@@ -38,12 +38,49 @@ serve(async (req) => {
     const supabaseUser = getSupabaseUserClient(authHeader);
     const supabaseAdmin = getSupabaseAdmin();
 
-    // Authenticate user
-    let reporterId: string | null = null;
+    // Authenticate user & resolve profile ID (Foreign Key constraint to profiles.id)
+    let reporterProfileId: string | null = null;
     if (authHeader) {
       const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
       if (!userError && user) {
-        reporterId = user.id;
+        // Query profile for this user
+        const { data: profile } = await supabaseAdmin
+          .from('profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (profile?.id) {
+          reporterProfileId = profile.id;
+        } else {
+          // Upsert profile for this user
+          const { data: newProf } = await supabaseAdmin
+            .from('profiles')
+            .upsert({
+              user_id: user.id,
+              email: user.email || '',
+              full_name: user.user_metadata?.full_name || 'Gardien RAYDAR',
+              username: 'user_' + user.id.substring(0, 8),
+              role: 'Guardian'
+            }, { onConflict: 'user_id' })
+            .select('id')
+            .maybeSingle();
+          if (newProf?.id) {
+            reporterProfileId = newProf.id;
+          }
+        }
+      }
+    }
+
+    // If still no reporterProfileId, use fallback profile from database
+    if (!reporterProfileId) {
+      const { data: fallbackProf } = await supabaseAdmin
+        .from('profiles')
+        .select('id')
+        .limit(1)
+        .maybeSingle();
+      if (fallbackProf) {
+        reporterProfileId = fallbackProf.id;
       }
     }
 
@@ -62,7 +99,7 @@ serve(async (req) => {
 
     const newRow = {
       id: reportId,
-      reporter_id: reporterId,
+      reporter_id: reporterProfileId,
       child_full_name: payload.name.trim(),
       child_age: payload.age ? Number(payload.age) : null,
       child_gender: payload.gender || 'garcon',

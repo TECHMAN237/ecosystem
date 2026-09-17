@@ -259,7 +259,14 @@
 </script>
 <script type="module">
 import { supabase } from "./src/supabaseClient.js";
-import { signInWithGoogle, protectRoute, AuthState } from "./src/authService.js";
+import { 
+    signInWithGoogle, 
+    protectRoute, 
+    AuthState,
+    resolveAuthDestination, 
+    clearAuthCache, 
+    registerInternalNavIntent 
+} from "./src/authService.js";
 
 const form = document.getElementById('loginForm');
 const errorMsg = document.getElementById('errorMsg');
@@ -364,7 +371,20 @@ form.addEventListener('submit', async (e) => {
         console.log('Login successful! Resolving profile and role-based route...');
         localStorage.removeItem('is_guest');
         sessionStorage.setItem('raydar_active_session', 'true');
-        await protectRoute('login', { isExplicitLogin: true });
+        clearAuthCache();
+        let dest = await resolveAuthDestination();
+        if (!dest || dest.includes('login')) {
+            dest = './home_child_safety_v1.html';
+        }
+        console.log('[LOGIN] Destination resolved to:', dest);
+        registerInternalNavIntent(dest);
+        window.location.replace(dest);
+
+        setTimeout(() => {
+            if (window.location.pathname.includes('login')) {
+                setLoading(false);
+            }
+        }, 4000);
     } catch (err) {
         console.error('Unexpected login error:', err);
         showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");

@@ -29,12 +29,24 @@ serve(async (req) => {
     const supabaseAdmin = getSupabaseAdmin();
 
     let reporterId: string | null = null;
+    let reporterProfileId: string | null = null;
     if (authHeader) {
       const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
       if (!userError && user) {
         reporterId = user.id;
+        // Resolve profiles.id from user_id (auth.uid() -> profiles.user_id -> profiles.id)
+        const { data: profile } = await supabaseAdmin
+          .from('profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (profile?.id) {
+          reporterProfileId = profile.id;
+        }
       }
     }
+
+    const finalReporterId = reporterProfileId || reporterId;
 
     const payload: FoundReportPayload = await req.json();
 
@@ -45,21 +57,41 @@ serve(async (req) => {
       );
     }
 
+    // Resolve a valid profiles.id
+    if (!finalReporterId) {
+      const { data: fallbackProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('id')
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (fallbackProfile?.id) {
+        reporterProfileId = fallbackProfile.id;
+      }
+    }
+
+    const effectiveReporterId = reporterProfileId || finalReporterId;
+
     const reportId = crypto.randomUUID();
     const cleanName = payload.name?.trim() || "Enfant trouvé (Identité en cours)";
-    const physicalDesc = `[TROUVÉ] ${payload.physicalDescription || ''} | Lieu sûr: ${payload.currentSafeLocation || 'Poste de police / Centre de protection'} | GPS: ${payload.gps || ''}`;
+    const safeLoc = payload.currentSafeLocation || 'Poste de police / Centre de protection';
+    const physicalDesc = `[TROUVÉ] ${payload.physicalDescription || ''} | Lieu sûr: ${safeLoc} | GPS: ${payload.gps || ''}`;
+    const circumstances = payload.physicalDescription || "Enfant trouvé en attente d'identification";
     
     // Insert into found_reports
     const foundRow = {
       id: reportId,
-      reporter_id: reporterId,
+      reporter_id: effectiveReporterId,
       child_full_name: cleanName,
       child_gender: payload.gender || 'non_specifie',
+      estimated_age: payload.age ? Number(payload.age) : null,
       found_location: payload.location.trim(),
       found_date: payload.date || new Date().toISOString().split('T')[0],
       found_time: payload.time || new Date().toTimeString().split(' ')[0],
       physical_description: physicalDesc,
       clothing_description: payload.clothingDescription || '',
+      current_location_of_child: safeLoc,
+      circumstances_description: circumstances,
       child_photo_url: payload.photoUrl || null,
       status: "Published",
       is_public: payload.isPublic !== false
@@ -75,10 +107,10 @@ serve(async (req) => {
       console.error("Insert into found_reports error:", foundErr);
     }
 
-    // Also mirror to missing_reports with status 'Trouvé' for unified directory search & matching
+    // Also mirror to missing_reports with status 'Published' and [TROUVÉ] tag for unified directory search & matching
     const mirroredRow = {
       id: reportId,
-      reporter_id: reporterId,
+      reporter_id: effectiveReporterId,
       child_full_name: cleanName,
       child_age: payload.age ? Number(payload.age) : null,
       child_gender: payload.gender || 'non_specifie',
@@ -87,11 +119,11 @@ serve(async (req) => {
       last_seen_time: payload.time || new Date().toTimeString().split(' ')[0],
       physical_description: physicalDesc,
       clothing_description: payload.clothingDescription || '',
-      incident_description: `Enfant retrouvé en sécurité à ${payload.currentSafeLocation || payload.location}`,
+      incident_description: `[TROUVÉ] Enfant retrouvé en sécurité à ${safeLoc}`,
       emergency_contact_name: "Centre de Protection / Découvreur",
       emergency_contact_phone: "677000000",
       child_photo_url: payload.photoUrl || null,
-      status: "Trouvé",
+      status: "Published",
       is_public: payload.isPublic !== false
     };
 

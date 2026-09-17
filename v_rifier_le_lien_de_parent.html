@@ -279,6 +279,7 @@ Documents complémentaires (Optionnels)
 <script type="module">
 import { reportService } from './src/reportService.js';
 import { formDraftState } from './src/formDraftState.js';
+import { registerInternalNavIntent } from './src/authService.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = document.getElementById('btnSubmit');
@@ -478,17 +479,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Create the missing report (with unique Supabase Storage upload + DB insert + real-time sync)
         console.log('[REPORT TRACE] Submitting finalReport to reportService.createMissingReport:', finalReport.name, 'Photo:', finalReport.photo ? finalReport.photo.substring(0, 50) + '...' : 'NONE');
-        const savedReport = await reportService.createMissingReport(finalReport);
-        console.log('[REPORT TRACE] Saved missing report result:', savedReport);
+        try {
+            const savedReport = await reportService.createMissingReport(finalReport);
+            console.log('[REPORT TRACE] Saved missing report result:', savedReport);
 
-        // Clear draft only after successful submission
-        formDraftState.clearMissingDraft();
+            if (savedReport && savedReport.id) {
+                // Clear draft only after successful submission
+                formDraftState.clearMissingDraft();
 
-        btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Signalement Envoyé!';
-        btn.classList.replace('bg-primary', 'bg-green-600');
-        setTimeout(() => {
-            window.location.href = './report_under_review_missing_child.html';
-        }, 800);
+                btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Signalement Envoyé!';
+                btn.classList.replace('bg-primary', 'bg-green-600');
+                setTimeout(() => {
+                    registerInternalNavIntent('./report_under_review_missing_child.html');
+                    window.location.href = './report_under_review_missing_child.html';
+                }, 800);
+            } else {
+                throw new Error("L'enregistrement du signalement n'a pas pu être confirmé par la base de données.");
+            }
+        } catch (submitError) {
+            console.error('[REPORT TRACE] Submission error:', submitError);
+            btn.innerHTML = '<span>Soumettre le signalement</span><span class="material-symbols-outlined">send</span>';
+            btn.style.opacity = "1";
+            btn.disabled = false;
+            if (errorBanner) {
+                errorBanner.classList.remove('hidden');
+                const textSpan = errorBanner.querySelector('span:last-child');
+                if (textSpan) {
+                    textSpan.textContent = submitError.message || "Erreur lors de l'enregistrement du signalement. Veuillez réessayer.";
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
     }
 
     if (submitBtn) {

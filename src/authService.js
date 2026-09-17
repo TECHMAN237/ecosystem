@@ -415,6 +415,17 @@ export function isOnboardingCompleted(user, profile = null) {
       } catch (e) {}
       return true;
     }
+    // An established user who already has a complete profile (full_name and valid role) is complete
+    const hasCompleteProfileData = Boolean(
+      profile.full_name && profile.full_name.trim() &&
+      profile.role && profile.role.trim() && profile.role !== 'NONE'
+    );
+    if (hasCompleteProfileData) {
+      try {
+        localStorage.setItem(`raydar_onboarding_completed_${user.id}`, 'true');
+      } catch (e) {}
+      return true;
+    }
     // If profile explicitly exists and onboarding_completed is false, database is authoritative
     if ((profile.onboarding_completed === false || profile.onboarding_completed === 'false') && (profile.account_completed === false || profile.account_completed === 'false')) {
       try {
@@ -628,19 +639,24 @@ redirect source function: ${redirectSourceFunction || 'protectRoute'}`);
  */
 export async function getAuthAndProfileState(forceRefresh = false) {
   const now = Date.now();
-  if (!forceRefresh && cachedAuthInfo && (now - cacheTimestamp < CACHE_TTL_MS)) {
-    return cachedAuthInfo;
-  }
-
-  if (pendingAuthPromise) {
-    return pendingAuthPromise;
+  if (forceRefresh) {
+    cachedAuthInfo = null;
+    cacheTimestamp = 0;
+    pendingAuthPromise = null;
+  } else {
+    if (cachedAuthInfo && (now - cacheTimestamp < CACHE_TTL_MS)) {
+      return cachedAuthInfo;
+    }
+    if (pendingAuthPromise) {
+      return pendingAuthPromise;
+    }
   }
 
   pendingAuthPromise = (async () => {
     try {
       // 0. Ensure Supabase auth initialization has finished reading from storage
       if (authInitPromise && !isAuthInitialized) {
-        await withTimeout(authInitPromise, 1500, null);
+        await withTimeout(authInitPromise, 2500, null);
       }
 
       let sessionUser = null;
@@ -649,7 +665,7 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       // 1. Get Supabase Auth Session
       const { data: sessionData, error: sessionError } = await withTimeout(
         supabase.auth.getSession(),
-        2500,
+        4000,
         { data: { session: null } }
       );
 
@@ -663,7 +679,7 @@ export async function getAuthAndProfileState(forceRefresh = false) {
       if (!sessionUser) {
         const { data: userData, error: userError } = await withTimeout(
           supabase.auth.getUser(),
-          2000,
+          3000,
           { data: { user: null } }
         );
         if (!userError && userData && userData.user) {
@@ -720,7 +736,7 @@ export async function getAuthAndProfileState(forceRefresh = false) {
           .select('*')
           .eq('user_id', user.id)
           .maybeSingle(),
-        2500,
+        6000,
         { isTimeout: true, data: null, error: null }
       );
 
@@ -731,7 +747,7 @@ export async function getAuthAndProfileState(forceRefresh = false) {
         try {
           const emailQueryRes = await withTimeout(
             supabase.from('profiles').select('*').eq('email', user.email).maybeSingle(),
-            2000,
+            3000,
             { data: null }
           );
           if (emailQueryRes?.data) {
@@ -789,7 +805,7 @@ export async function getAuthAndProfileState(forceRefresh = false) {
         const hasRole = Boolean(profile.role && profile.role.trim() && profile.role !== 'NONE');
         const hasContact = Boolean((profile.phone_number && profile.phone_number.trim()) || (profile.city && profile.city.trim()));
 
-        if (hasName && hasRole && (hasContact || onboardingDone)) {
+        if (hasName && hasRole) {
           raydarProfileState = 'COMPLETE';
           registrationState = 'COMPLETE';
         } else if (hasRole || resolvedRole) {
@@ -1287,6 +1303,11 @@ export function consumeInternalNavIntent() {
         return currentNavCheckResult;
       }
     }
+
+    if (hasActiveSession) {
+      currentNavCheckResult = { isValid: true, isReload: false, isBackForward: false, intent: { source: 'active_session' }, type: 'INTERNAL' };
+      return currentNavCheckResult;
+    }
   } catch (e) {
     console.warn("Notice evaluating navigation intent:", e);
   }
@@ -1302,6 +1323,9 @@ export function consumeInternalNavIntent() {
  * @param {boolean} [options.isExplicitLogin]
  */
 export async function protectRoute(routeType, options = {}) {
+  const isExplicitLogin = options && options.isExplicitLogin === true;
+  const forceRefresh = isExplicitLogin || options?.forceRefresh === true;
+
   if (routeType === 'user' && localStorage.getItem('is_guest') === 'true') {
     const { data: { session } } = await withTimeout(supabase.auth.getSession(), 2000, { data: { session: null } });
     if (!session) {
@@ -1310,7 +1334,7 @@ export async function protectRoute(routeType, options = {}) {
     localStorage.removeItem('is_guest');
   }
 
-  const authInfo = await getAuthAndProfileState();
+  const authInfo = await getAuthAndProfileState(forceRefresh);
   const { state, session, profile, raydarProfileState, onboardingState, isEmailVerified } = authInfo;
   const isPublic = routeType === 'public' || routeType === 'login' || routeType === 'signup_step_1';
   const isNormalSignup = isNormalSignupInProgress() && (
@@ -1319,8 +1343,9 @@ export async function protectRoute(routeType, options = {}) {
     routeType === 'onboarding'
   );
 
+  const hasActiveSession = typeof window !== 'undefined' && sessionStorage.getItem('raydar_active_session') === 'true';
   const navCheck = consumeInternalNavIntent();
-  const isAllowedNavigation = navCheck.isReload || navCheck.isBackForward || navCheck.isValid || isNormalSignup;
+  const isAllowedNavigation = navCheck.isReload || navCheck.isBackForward || navCheck.isValid || hasActiveSession || isNormalSignup;
 
   // Direct external link gatekeeper:
   // Direct/external opening of a protected RAYDAR link must first display the login page.
@@ -1396,11 +1421,16 @@ export async function protectRoute(routeType, options = {}) {
         (window.location.hash.includes('access_token') && !window.location.hash.includes('type=recovery')) || 
         (window.location.search.includes('code=') && !window.location.search.includes('type=recovery'))
       );
-      const isExplicitLogin = options && options.isExplicitLogin === true;
 
-      if (session && (isOAuthCallback || isExplicitLogin)) {
-        registerInternalNavIntent('./index.html');
-        window.location.replace('./index.html');
+      if ((session || isExplicitLogin) && (isOAuthCallback || isExplicitLogin)) {
+        sessionStorage.setItem('raydar_active_session', 'true');
+        clearAuthCache();
+        let dest = await resolveAuthDestination();
+        if (!dest || dest === './login_child_safety.html' || dest === './login.html') {
+          dest = './home_child_safety_v1.html';
+        }
+        registerInternalNavIntent(dest);
+        window.location.replace(dest);
         return authInfo;
       }
       return authInfo;

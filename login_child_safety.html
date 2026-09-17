@@ -226,7 +226,14 @@
     </script>
     <script type="module">
         import { supabase } from "./src/supabaseClient.js";
-        import { signInWithGoogle, protectRoute, logAuthFlowTrace } from "./src/authService.js";
+        import { 
+            signInWithGoogle, 
+            protectRoute, 
+            logAuthFlowTrace, 
+            resolveAuthDestination, 
+            clearAuthCache, 
+            registerInternalNavIntent 
+        } from "./src/authService.js";
 
         // If URL contains recovery token, redirect directly to reset_password.html
         const isRecovery = window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
@@ -432,7 +439,20 @@
                     reason: 'Valid credentials provided — resolving login destination'
                 });
 
-                await protectRoute('login', { isExplicitLogin: true });
+                clearAuthCache();
+                let dest = await resolveAuthDestination();
+                if (!dest || dest.includes('login')) {
+                    dest = './home_child_safety_v1.html';
+                }
+                console.log('[LOGIN] Destination resolved to:', dest);
+                registerInternalNavIntent(dest);
+                window.location.replace(dest);
+
+                setTimeout(() => {
+                    if (window.location.pathname.includes('login')) {
+                        setLoading(false);
+                    }
+                }, 4000);
             } catch (err) {
                 console.error('Unexpected login error:', err);
                 showError("Ce compte n'existe pas ou le mot de passe est incorrect. Veuillez vérifier vos identifiants ou créer un compte.");

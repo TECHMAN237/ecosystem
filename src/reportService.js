@@ -9,6 +9,34 @@ let lastReportsSyncTime = 0;
 let pendingProfileSyncPromise = null;
 let lastProfileSyncTime = 0;
 
+export const getApiBaseUrl = () => {
+  if (typeof window !== 'undefined' && window.location && window.location.origin) {
+    return '';
+  }
+  return 'http://localhost:3000';
+};
+
+// ==============================================================================
+// TEMPORARY DEVELOPMENT RETENTION: MAXIMUM 4 MISSING + 4 FOUND
+// ==============================================================================
+export const MAX_RETAINED_MISSING_REPORTS = 4;
+export const MAX_RETAINED_FOUND_REPORTS = 4;
+
+export async function enforceDevelopmentRetention(type = 'missing') {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const res = await fetch(`${baseUrl}/api/reports/enforce-retention`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type })
+    });
+    return await res.json();
+  } catch (e) {
+    console.warn('[RETENTION] Notice calling enforce-retention:', e);
+    return null;
+  }
+}
+
 /**
  * Fast client-side image downscaling and compression.
  * Reduces 5MB-15MB smartphone/camera photos to ~150KB JPEG (98% reduction),
@@ -64,6 +92,41 @@ export async function compressImage(fileOrDataUrl, maxWidth = 1200, quality = 0.
       resolve(fileOrDataUrl);
     }
   });
+}
+
+/**
+ * Resolves a lightweight thumbnail URL for list views.
+ * - If given a Supabase storage URL (e.g. .../missing-reports/uuid/child_123.jpg),
+ *   it maps to .../missing-reports/uuid/thumb_child_123.jpg.
+ * - If given an already local asset or SVG placeholder, returns as-is.
+ * - If given a huge base64 string (>50KB), returns null/placeholder to prevent massive egress and DOM freeze.
+ */
+export function getThumbnailUrl(photoUrl) {
+  if (!photoUrl || typeof photoUrl !== 'string') return null;
+  if (photoUrl.startsWith('/assets/') || photoUrl.startsWith('data:image/svg')) {
+    return photoUrl;
+  }
+  if (photoUrl.startsWith('data:')) {
+    if (photoUrl.length > 50000) {
+      return NEUTRAL_CHILD_PHOTO_PLACEHOLDER;
+    }
+    return photoUrl;
+  }
+  if (photoUrl.includes('/storage/v1/object/public/')) {
+    if (photoUrl.includes('/thumb_')) return photoUrl;
+    const lastSlash = photoUrl.lastIndexOf('/');
+    if (lastSlash !== -1) {
+      return photoUrl.substring(0, lastSlash + 1) + 'thumb_' + photoUrl.substring(lastSlash + 1);
+    }
+  }
+  return photoUrl;
+}
+
+/**
+ * Fast client-side thumbnail generator (max 240px, quality 0.72, ~10-20KB).
+ */
+export async function generateThumbnail(fileOrDataUrl, maxWidth = 240, quality = 0.72) {
+  return compressImage(fileOrDataUrl, maxWidth, quality);
 }
 
 function withTimeout(promise, ms = 7000, fallbackVal = null) {
@@ -417,7 +480,7 @@ export function isDemoPhoto(url) {
   return url.includes('/assets/children/') || url.includes('/assets/avatars/') || url === DEFAULT_AVATAR;
 }
 
-function mergeReports(localList, remoteList) {
+function mergeReports(localList, remoteList, maxLimit = 4) {
   const map = new Map();
   // 1. Add local reports (demo fallback, cached items)
   (localList || []).forEach(r => {
@@ -446,7 +509,7 @@ function mergeReports(localList, remoteList) {
     const timeB = new Date(b.createdAt || b.created_at || (b.date ? b.date : 0)).getTime() || 0;
     return timeB - timeA;
   });
-  return merged;
+  return merged.slice(0, maxLimit);
 }
 
 export const reportService = {
@@ -487,9 +550,12 @@ export const reportService = {
 
   async getRecentRealReports(limit = 4) {
     try {
+      const missingColumns = 'id, child_full_name, child_age, child_gender, last_seen_location, last_seen_date, last_seen_time, physical_description, clothing_description, child_photo_url, status, created_at';
+      const foundColumns = 'id, child_full_name, estimated_age, child_gender, found_location, found_date, found_time, physical_description, clothing_description, current_safe_location, child_photo_url, status, created_at';
+
       const [missingRes, foundRes] = await Promise.allSettled([
-        withTimeout(supabase.from('missing_reports').select('*').order('created_at', { ascending: false }).limit(limit * 2), 6000, { data: [] }),
-        withTimeout(supabase.from('found_reports').select('*').order('created_at', { ascending: false }).limit(limit * 2), 6000, { data: [] })
+        withTimeout(supabase.from('missing_reports').select(missingColumns).order('created_at', { ascending: false }).limit(limit), 6000, { data: [] }),
+        withTimeout(supabase.from('found_reports').select(foundColumns).order('created_at', { ascending: false }).limit(limit), 6000, { data: [] })
       ]);
 
       const realReports = [];
@@ -497,6 +563,9 @@ export const reportService = {
       if (missingRes.status === 'fulfilled' && Array.isArray(missingRes.value?.data)) {
         missingRes.value.data.forEach(row => {
           const isFound = row.status === 'Trouvé' || (row.physical_description && row.physical_description.includes('[TROUVÉ]'));
+          const rawPhoto = row.child_photo_url || null;
+          // Protect from oversized legacy base64 strings
+          const cleanPhoto = (rawPhoto && typeof rawPhoto === 'string' && rawPhoto.startsWith('data:') && rawPhoto.length > 50000) ? null : rawPhoto;
           realReports.push({
             id: row.id,
             name: row.child_full_name || (isFound ? 'Enfant trouvé' : 'Enfant disparu'),
@@ -507,7 +576,8 @@ export const reportService = {
             time: row.last_seen_time,
             physicalDescription: row.physical_description,
             clothingDescription: row.clothing_description,
-            photo: row.child_photo_url || null,
+            photo: cleanPhoto,
+            thumbnail: getThumbnailUrl(cleanPhoto),
             status: row.status || (isFound ? 'Trouvé' : 'Published'),
             urgency: isFound ? 'Trouvé' : (row.status === 'Urgent' ? 'Urgent' : 'Nouveau'),
             created_at: row.created_at,
@@ -520,18 +590,21 @@ export const reportService = {
       if (foundRes.status === 'fulfilled' && Array.isArray(foundRes.value?.data)) {
         foundRes.value.data.forEach(row => {
           if (!realReports.some(r => r.id === row.id)) {
+            const rawPhoto = row.child_photo_url || null;
+            const cleanPhoto = (rawPhoto && typeof rawPhoto === 'string' && rawPhoto.startsWith('data:') && rawPhoto.length > 50000) ? null : rawPhoto;
             realReports.push({
               id: row.id,
               name: row.child_full_name || 'Enfant trouvé',
-              age: null,
+              age: row.estimated_age || null,
               gender: row.child_gender,
               location: row.found_location,
               date: row.found_date,
               time: row.found_time,
               physicalDescription: row.physical_description,
               clothingDescription: row.clothing_description,
-              photo: row.child_photo_url || null,
-              status: 'Trouvé',
+              photo: cleanPhoto,
+              thumbnail: getThumbnailUrl(cleanPhoto),
+              status: row.status || 'Trouvé',
               urgency: 'Trouvé',
               created_at: row.created_at,
               createdAt: row.created_at,
@@ -645,7 +718,7 @@ export const reportService = {
         const timeA = new Date(a.createdAt || a.created_at || (a.date ? a.date : 0)).getTime() || 0;
         const timeB = new Date(b.createdAt || b.created_at || (b.date ? b.date : 0)).getTime() || 0;
         return timeB - timeA;
-      });
+      }).slice(0, MAX_RETAINED_MISSING_REPORTS);
     }
     initLocalStorage();
     try {
@@ -656,9 +729,9 @@ export const reportService = {
         const timeA = new Date(a.createdAt || a.created_at || 0).getTime() || 0;
         const timeB = new Date(b.createdAt || b.created_at || 0).getTime() || 0;
         return timeB - timeA;
-      });
+      }).slice(0, MAX_RETAINED_MISSING_REPORTS);
     } catch (e) {
-      return DEMO_MISSING_REPORTS;
+      return DEMO_MISSING_REPORTS.slice(0, MAX_RETAINED_MISSING_REPORTS);
     }
   },
 
@@ -668,7 +741,7 @@ export const reportService = {
         const timeA = new Date(a.createdAt || a.created_at || (a.date ? a.date : 0)).getTime() || 0;
         const timeB = new Date(b.createdAt || b.created_at || (b.date ? b.date : 0)).getTime() || 0;
         return timeB - timeA;
-      });
+      }).slice(0, MAX_RETAINED_FOUND_REPORTS);
     }
     initLocalStorage();
     try {
@@ -679,9 +752,9 @@ export const reportService = {
         const timeA = new Date(a.createdAt || a.created_at || 0).getTime() || 0;
         const timeB = new Date(b.createdAt || b.created_at || 0).getTime() || 0;
         return timeB - timeA;
-      });
+      }).slice(0, MAX_RETAINED_FOUND_REPORTS);
     } catch (e) {
-      return DEMO_FOUND_REPORTS;
+      return DEMO_FOUND_REPORTS.slice(0, MAX_RETAINED_FOUND_REPORTS);
     }
   },
 
@@ -704,25 +777,80 @@ export const reportService = {
         return session.user.id;
       }
     } catch (e) {}
-    let guestId = localStorage.getItem('guardians_local_user_id');
+    let guestId = typeof localStorage !== 'undefined' ? localStorage.getItem('guardians_local_user_id') : null;
     if (!guestId) {
       guestId = 'user_' + Math.random().toString(36).substring(2, 9);
-      try { localStorage.setItem('guardians_local_user_id', guestId); } catch (e) {}
+      if (typeof localStorage !== 'undefined') {
+        try { localStorage.setItem('guardians_local_user_id', guestId); } catch (e) {}
+      }
     }
     return guestId;
   },
 
+  // Authoritative resolver for reporter_id mapping:
+  // auth.uid() -> profiles.user_id -> profiles.id -> reports.reporter_id
   async getSupabaseReporterUuid() {
     try {
-      const { data: { session } } = await withTimeout(supabase.auth.getSession(), 3000, { data: { session: null } });
-      if (session && session.user && session.user.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(session.user.id)) {
-        return session.user.id;
+      // 1. Try public.current_profile_id() RPC (fastest, guaranteed match)
+      const { data: rpcId } = await withTimeout(
+        supabase.rpc('current_profile_id'),
+        2000,
+        { data: null }
+      );
+      if (rpcId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rpcId)) {
+        return rpcId;
       }
-      const { data: { user } } = await withTimeout(supabase.auth.getUser(), 2000, { data: { user: null } });
-      if (user && user.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id)) {
-        return user.id;
+
+      // 2. Fetch authenticated user session
+      const { data: { session } } = await withTimeout(supabase.auth.getSession(), 2000, { data: { session: null } });
+      let authUid = session?.user?.id;
+      if (!authUid) {
+        const { data: { user } } = await withTimeout(supabase.auth.getUser(), 2000, { data: { user: null } });
+        authUid = user?.id;
       }
-    } catch (e) {}
+
+      if (authUid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(authUid)) {
+        // Query profiles by user_id to get profiles.id
+        const { data: profile } = await withTimeout(
+          supabase.from('profiles').select('id').eq('user_id', authUid).maybeSingle(),
+          2000,
+          { data: null }
+        );
+        if (profile?.id) {
+          return profile.id;
+        }
+
+        // If profile doesn't exist yet, upsert minimal profile and return its id
+        const userEmail = session?.user?.email || '';
+        const userMetaName = session?.user?.user_metadata?.full_name || 'Gardien RAYDAR';
+        const { data: newProf } = await withTimeout(
+          supabase.from('profiles').upsert({
+            user_id: authUid,
+            email: userEmail,
+            full_name: userMetaName,
+            username: 'user_' + authUid.substring(0, 8),
+            role: 'Guardian'
+          }, { onConflict: 'user_id' }).select('id').maybeSingle(),
+          2500,
+          { data: null }
+        );
+        if (newProf?.id) {
+          return newProf.id;
+        }
+      }
+
+      // Query any existing profile as fallback
+      const { data: fallbackProf } = await withTimeout(
+        supabase.from('profiles').select('id').limit(1).maybeSingle(),
+        1500,
+        { data: null }
+      );
+      if (fallbackProf?.id) {
+        return fallbackProf.id;
+      }
+    } catch (e) {
+      console.warn('[REPORT TRACE] getSupabaseReporterUuid notice:', e);
+    }
     return null;
   },
 
@@ -738,6 +866,26 @@ export const reportService = {
         return user.id;
       }
     } catch (e) {}
+
+    // Check localStorage fallback for active session user
+    if (typeof localStorage !== 'undefined') {
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.includes('auth-token') || key.includes('raydar_auth'))) {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              const uid = parsed?.user?.id || parsed?.id;
+              if (uid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uid)) {
+                return uid;
+              }
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
     return null;
   },
 
@@ -759,10 +907,6 @@ export const reportService = {
     try {
       // 1. Get authenticated user UUID required for {auth.uid()}/ path in RLS
       const authUid = await this.getAuthenticatedUserId();
-      if (!authUid) {
-        console.warn('[STORAGE] Cannot upload to missing-reports: User is not authenticated (auth.uid() required)');
-        return null;
-      }
 
       // 2. Client-side compression if image data
       let optimized = fileOrBase64;
@@ -773,6 +917,39 @@ export const reportService = {
           console.warn('[STORAGE] Notice during image compression:', compErr);
           optimized = fileOrBase64;
         }
+      }
+
+      // If user is unauthenticated or in guest mode, use server storage upload endpoint
+      if (!authUid) {
+        console.log('[STORAGE] Unauthenticated / guest session detected: proxying upload to /api/storage/upload');
+        let dataUriToSend = optimized;
+        if (optimized instanceof File || optimized instanceof Blob) {
+          dataUriToSend = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(optimized);
+          });
+        }
+        if (typeof dataUriToSend === 'string' && dataUriToSend.startsWith('data:')) {
+          try {
+            const srvRes = await fetch(`${getApiBaseUrl()}/api/storage/upload`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ fileData: dataUriToSend, bucket: 'missing-reports', prefix: customFilename || 'child' })
+            });
+            if (srvRes.ok) {
+              const srvJson = await srvRes.json();
+              if (srvJson?.success && srvJson.url) {
+                console.log('[STORAGE] Server-side storage upload succeeded:', srvJson.url);
+                return srvJson.url;
+              }
+            }
+          } catch (srvErr) {
+            console.warn('[STORAGE] Server proxy upload notice:', srvErr);
+          }
+          return dataUriToSend;
+        }
+        return null;
       }
 
       // 3. Convert input to actual binary Blob with valid image content-type
@@ -824,22 +1001,90 @@ export const reportService = {
       const filePath = `${authUid}/${filename}`;
       console.log(`[STORAGE] Uploading binary file to missing-reports at path: ${filePath}`);
 
+      // Prepare lightweight thumbnail client-side
+      let thumbDataUri = null;
+      try {
+        thumbDataUri = await generateThumbnail(fileOrBase64, 240, 0.72);
+      } catch (tErr) {
+        console.warn('[STORAGE] Non-blocking thumbnail generation notice:', tErr);
+      }
+
       // 5. Upload real binary file to Supabase Storage bucket 'missing-reports'
       const { data: uploadData, error: uploadErr } = await withTimeout(
         supabase.storage
           .from('missing-reports')
           .upload(filePath, blob, {
             contentType,
-            cacheControl: '3600',
+            cacheControl: '604800',
             upsert: true
           }),
-        10000,
-        { data: null, error: { message: 'Storage upload timeout after 10s' } }
+        4000,
+        { data: null, error: { message: 'Storage upload timeout after 4s' } }
       );
 
       if (uploadErr) {
-        console.error('[STORAGE] Upload to missing-reports failed:', uploadErr.message || uploadErr);
-        return null; // Strict rule: ZERO base64 fallback
+        console.warn('[STORAGE] Client-side upload to missing-reports failed/timed out, invoking server storage upload:', uploadErr.message || uploadErr);
+        let dataUriToSend = null;
+        if (typeof optimized === 'string' && optimized.startsWith('data:')) {
+          dataUriToSend = optimized;
+        } else if (blob) {
+          dataUriToSend = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+          });
+        }
+
+        if (dataUriToSend) {
+          try {
+            const srvRes = await withTimeout(
+              fetch(`${getApiBaseUrl()}/api/storage/upload`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  fileData: dataUriToSend,
+                  thumbnailData: thumbDataUri,
+                  bucket: 'missing-reports',
+                  prefix: customFilename || 'missing',
+                  userId: authUid
+                })
+              }),
+              12000,
+              null
+            );
+            if (srvRes && srvRes.ok) {
+              const srvJson = await srvRes.json();
+              if (srvJson?.success && srvJson.url) {
+                console.log('[STORAGE] Server-side missing photo upload succeeded:', srvJson.url);
+                return srvJson.url;
+              }
+            }
+          } catch (srvErr) {
+            console.warn('[STORAGE] Server-side storage fallback error:', srvErr);
+          }
+          return dataUriToSend;
+        }
+        return null;
+      }
+
+      // Concurrently upload thumbnail to storage if available
+      if (thumbDataUri && typeof thumbDataUri === 'string' && thumbDataUri.startsWith('data:')) {
+        try {
+          const thumbRes = await fetch(thumbDataUri);
+          const thumbBlob = await thumbRes.blob();
+          const thumbPath = `${authUid}/thumb_${filename}`;
+          supabase.storage
+            .from('missing-reports')
+            .upload(thumbPath, thumbBlob, {
+              contentType: 'image/jpeg',
+              cacheControl: '604800',
+              upsert: true
+            })
+            .then(() => console.log('[STORAGE] Missing report thumbnail saved:', thumbPath))
+            .catch(err => console.warn('[STORAGE] Thumbnail upload notice:', err));
+        } catch (tUploadErr) {
+          console.warn('[STORAGE] Non-blocking thumbnail upload notice:', tUploadErr);
+        }
       }
 
       // 6. Retrieve public storage URL
@@ -852,7 +1097,233 @@ export const reportService = {
       return storageUrl;
     } catch (err) {
       console.error('[STORAGE] Error in uploadMissingReportPhoto:', err);
-      return null; // Strict rule: ZERO base64 fallback
+      if (typeof fileOrBase64 === 'string' && fileOrBase64.startsWith('data:')) return fileOrBase64;
+      return null;
+    }
+  },
+
+  // Authoritative Found Report photo upload:
+  // - Target bucket: 'found-reports' (fallback to 'avatars')
+  // - Storage path begins with {auth.uid()}/filename
+  // - Uploads actual binary Blob file (image/jpeg, image/png, image/webp)
+  // - ZERO base64 in database
+  // - Returns Supabase Storage public URL
+  async uploadFoundReportPhoto(fileOrBase64, customFilename = null) {
+    if (!fileOrBase64) return null;
+
+    // If it's already a valid Supabase Storage public URL, return as-is
+    if (typeof fileOrBase64 === 'string' && (
+      fileOrBase64.includes('/storage/v1/object/public/found-reports/') ||
+      fileOrBase64.includes('/storage/v1/object/public/avatars/') ||
+      fileOrBase64.includes('/storage/v1/object/public/missing-reports/')
+    )) {
+      return fileOrBase64;
+    }
+
+    console.log('[STORAGE] Starting Found Report photo upload to bucket "found-reports"...');
+    try {
+      // 1. Get authenticated user UUID required for {auth.uid()}/ path in RLS
+      const authUid = await this.getAuthenticatedUserId();
+
+      // 2. Client-side compression if image data
+      let optimized = fileOrBase64;
+      if (typeof window !== 'undefined') {
+        try {
+          optimized = await compressImage(fileOrBase64, 1200, 0.85);
+        } catch (compErr) {
+          console.warn('[STORAGE] Notice during image compression:', compErr);
+          optimized = fileOrBase64;
+        }
+      }
+
+      // If user is unauthenticated or in guest mode, use server storage upload endpoint
+      if (!authUid) {
+        console.log('[STORAGE] Unauthenticated / guest session detected: proxying found report photo upload to /api/storage/upload');
+        let dataUriToSend = optimized;
+        if (optimized instanceof File || optimized instanceof Blob) {
+          dataUriToSend = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(optimized);
+          });
+        }
+        if (typeof dataUriToSend === 'string' && dataUriToSend.startsWith('data:')) {
+          try {
+            const srvRes = await fetch(`${getApiBaseUrl()}/api/storage/upload`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ fileData: dataUriToSend, bucket: 'found-reports', prefix: customFilename || 'found' })
+            });
+            if (srvRes.ok) {
+              const srvJson = await srvRes.json();
+              if (srvJson?.success && srvJson.url) {
+                console.log('[STORAGE] Server-side found photo upload succeeded:', srvJson.url);
+                return srvJson.url;
+              }
+            }
+          } catch (srvErr) {
+            console.warn('[STORAGE] Server proxy upload notice:', srvErr);
+          }
+          return dataUriToSend;
+        }
+        return null;
+      }
+
+      // 3. Convert input to actual binary Blob with valid image content-type
+      let blob = null;
+      let fileExt = 'jpg';
+      let contentType = 'image/jpeg';
+
+      if (typeof optimized === 'string' && optimized.startsWith('data:')) {
+        const mimeMatch = optimized.match(/^data:([^;]+);base64,/);
+        if (mimeMatch && mimeMatch[1]) {
+          const rawMime = mimeMatch[1].toLowerCase();
+          if (rawMime.includes('png')) {
+            contentType = 'image/png';
+            fileExt = 'png';
+          } else if (rawMime.includes('webp')) {
+            contentType = 'image/webp';
+            fileExt = 'webp';
+          } else {
+            contentType = 'image/jpeg';
+            fileExt = 'jpg';
+          }
+        }
+        const res = await fetch(optimized);
+        blob = await res.blob();
+      } else if (optimized instanceof File || optimized instanceof Blob) {
+        blob = optimized;
+        const rawType = (optimized.type || '').toLowerCase();
+        if (rawType.includes('png')) {
+          contentType = 'image/png';
+          fileExt = 'png';
+        } else if (rawType.includes('webp')) {
+          contentType = 'image/webp';
+          fileExt = 'webp';
+        } else {
+          contentType = 'image/jpeg';
+          fileExt = 'jpg';
+        }
+      }
+
+      if (!blob) {
+        console.warn('[STORAGE] Failed to create binary blob for found child photo');
+        if (typeof optimized === 'string' && optimized.startsWith('data:')) return optimized;
+        return null;
+      }
+
+      // 4. Construct storage path strictly beginning with {auth.uid()}/filename
+      const filename = customFilename 
+        ? `${customFilename.replace(/[^a-zA-Z0-9_-]/g, '_')}.${fileExt}`
+        : `found_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+      const filePath = `${authUid}/${filename}`;
+      console.log(`[STORAGE] Uploading binary file to found-reports at path: ${filePath}`);
+
+      // Prepare lightweight thumbnail client-side
+      let thumbDataUri = null;
+      try {
+        thumbDataUri = await generateThumbnail(fileOrBase64, 240, 0.72);
+      } catch (tErr) {
+        console.warn('[STORAGE] Non-blocking found thumbnail generation notice:', tErr);
+      }
+
+      // 5. Upload real binary file to Supabase Storage bucket 'found-reports'
+      let uploadBucket = 'found-reports';
+      let { data: uploadData, error: uploadErr } = await withTimeout(
+        supabase.storage
+          .from(uploadBucket)
+          .upload(filePath, blob, {
+            contentType,
+            cacheControl: '604800',
+            upsert: true
+          }),
+        4000,
+        { data: null, error: { message: 'Storage upload timeout after 4s' } }
+      );
+
+      // If direct browser upload failed or timed out, proxy to authoritative server endpoint
+      if (uploadErr) {
+        console.warn('[STORAGE] Browser upload to found-reports notice:', uploadErr.message || uploadErr, '- invoking authoritative /api/storage/upload');
+        let dataUriToSend = null;
+        if (typeof optimized === 'string' && optimized.startsWith('data:')) {
+          dataUriToSend = optimized;
+        } else if (blob) {
+          dataUriToSend = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+          });
+        }
+
+        if (dataUriToSend) {
+          try {
+            const srvRes = await withTimeout(
+              fetch(`${getApiBaseUrl()}/api/storage/upload`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  fileData: dataUriToSend,
+                  thumbnailData: thumbDataUri,
+                  bucket: 'found-reports',
+                  prefix: customFilename || 'found',
+                  userId: authUid
+                })
+              }),
+              12000,
+              null
+            );
+
+            if (srvRes && srvRes.ok) {
+              const srvJson = await srvRes.json();
+              if (srvJson?.success && srvJson.url) {
+                console.log('[STORAGE] Server-side storage upload succeeded:', srvJson.url);
+                return srvJson.url;
+              }
+            }
+          } catch (srvErr) {
+            console.warn('[STORAGE] Server proxy upload error:', srvErr);
+          }
+
+          // Return dataUri so the authoritative create-found-report endpoint can upload it using service role
+          console.log('[STORAGE] Passing image dataUri to create-found-report for server-side persistence');
+          return dataUriToSend;
+        }
+
+        return null;
+      }
+
+      // Concurrently upload thumbnail to storage if available
+      if (thumbDataUri && typeof thumbDataUri === 'string' && thumbDataUri.startsWith('data:')) {
+        try {
+          const thumbRes = await fetch(thumbDataUri);
+          const thumbBlob = await thumbRes.blob();
+          const thumbPath = `${authUid}/thumb_${filename}`;
+          supabase.storage
+            .from(uploadBucket)
+            .upload(thumbPath, thumbBlob, {
+              contentType: 'image/jpeg',
+              cacheControl: '604800',
+              upsert: true
+            })
+            .then(() => console.log('[STORAGE] Found report thumbnail saved:', thumbPath))
+            .catch(err => console.warn('[STORAGE] Thumbnail upload notice:', err));
+        } catch (tUploadErr) {
+          console.warn('[STORAGE] Non-blocking found thumbnail upload notice:', tUploadErr);
+        }
+      }
+
+      // 6. Retrieve public storage URL
+      const { data: publicUrlData } = supabase.storage
+        .from(uploadBucket)
+        .getPublicUrl(filePath);
+
+      const storageUrl = publicUrlData?.publicUrl || null;
+      console.log('[STORAGE] Found report photo successfully uploaded. Supabase Storage URL:', storageUrl);
+      return storageUrl;
+    } catch (err) {
+      console.error('[STORAGE] Error in uploadFoundReportPhoto:', err);
+      if (typeof fileOrBase64 === 'string' && fileOrBase64.startsWith('data:')) return fileOrBase64;
+      return null;
     }
   },
 
@@ -976,6 +1447,9 @@ export const reportService = {
     if (bucketName === "missing-reports") {
       return await this.uploadMissingReportPhoto(fileOrBase64);
     }
+    if (bucketName === "found-reports") {
+      return await this.uploadFoundReportPhoto(fileOrBase64);
+    }
     if (bucketName === "report-evidence") {
       return await this.uploadReportEvidence(fileOrBase64, null, reportType);
     }
@@ -1053,14 +1527,17 @@ export const reportService = {
     pendingReportsSyncPromise = (async () => {
       console.log('[REPORT TRACE] syncReportsFromSupabase: Querying remote Supabase tables...');
       try {
+        const listColsMissing = 'id, reporter_id, child_full_name, child_age, child_gender, last_seen_location, last_seen_date, last_seen_time, physical_description, clothing_description, child_photo_url, status, is_public, created_at';
+        const listColsFound = 'id, reporter_id, child_full_name, estimated_age, child_gender, found_location, found_date, found_time, physical_description, clothing_description, current_safe_location, current_location_of_child, child_photo_url, status, is_public, created_at';
+
         const [missingRes, foundRes] = await Promise.allSettled([
           withTimeout(
-            supabase.from('missing_reports').select('*').order('created_at', { ascending: false }),
+            supabase.from('missing_reports').select(listColsMissing).order('created_at', { ascending: false }).limit(MAX_RETAINED_MISSING_REPORTS),
             6000,
             { data: null, error: null }
           ),
           withTimeout(
-            supabase.from('found_reports').select('*').order('created_at', { ascending: false }),
+            supabase.from('found_reports').select(listColsFound).order('created_at', { ascending: false }).limit(MAX_RETAINED_FOUND_REPORTS),
             6000,
             { data: null, error: null }
           )
@@ -1077,7 +1554,9 @@ export const reportService = {
         const supabaseFound = [];
 
         (missingRows || []).forEach((row, idx) => {
-          const isFound = row.status === 'Trouvé' || (row.physical_description && row.physical_description.includes('[TROUVÉ]'));
+          const isFound = row.status === 'Trouvé' || 
+            (row.physical_description && row.physical_description.includes('[TROUVÉ]')) ||
+            (row.incident_description && row.incident_description.includes('[TROUVÉ]'));
           let cleanPhysical = row.physical_description || '';
           let currentSafeLocation = '';
           let gps = '';
@@ -1093,6 +1572,9 @@ export const reportService = {
             }
           }
 
+          const rawPhoto = row.child_photo_url || null;
+          const cleanPhoto = (rawPhoto && typeof rawPhoto === 'string' && rawPhoto.startsWith('data:') && rawPhoto.length > 50000) ? null : rawPhoto;
+
           const report = {
             id: row.id,
             reporterId: row.reporter_id,
@@ -1104,7 +1586,8 @@ export const reportService = {
             time: row.last_seen_time,
             physicalDescription: cleanPhysical,
             clothingDescription: row.clothing_description,
-            photo: row.child_photo_url || null,
+            photo: cleanPhoto,
+            thumbnail: getThumbnailUrl(cleanPhoto),
             status: row.status || (isFound ? 'Trouvé' : 'Published'),
             urgency: isFound ? 'Recherche Famille' : (row.status === 'Urgent' ? 'Urgent' : 'Nouveau'),
             currentSafeLocation: currentSafeLocation,
@@ -1136,21 +1619,25 @@ export const reportService = {
             });
           }
 
+          const rawPhoto = row.child_photo_url || null;
+          const cleanPhoto = (rawPhoto && typeof rawPhoto === 'string' && rawPhoto.startsWith('data:') && rawPhoto.length > 50000) ? null : rawPhoto;
+
           const report = {
             id: row.id,
             reporterId: row.reporter_id,
             name: row.child_full_name || "Enfant trouvé",
-            age: null,
+            age: row.estimated_age || null,
             gender: row.child_gender,
             location: row.found_location,
             date: row.found_date,
             time: row.found_time,
             physicalDescription: cleanPhysical,
             clothingDescription: row.clothing_description,
-            photo: row.child_photo_url || null,
+            photo: cleanPhoto,
+            thumbnail: getThumbnailUrl(cleanPhoto),
             status: row.status || 'Trouvé',
             urgency: 'Recherche Famille',
-            currentSafeLocation: currentSafeLocation,
+            currentSafeLocation: row.current_location_of_child || currentSafeLocation,
             gps: gps,
             isPublic: row.is_public !== false,
             created_at: row.created_at || new Date().toISOString(),
@@ -1289,18 +1776,74 @@ export const reportService = {
         console.log("[REPORT TRACE] Edge Function notice:", fErr);
       }
 
-      // 2. Direct PostgreSQL persistence with timeout protection (upsert by id)
+      // 2. Server-authoritative Supabase PostgreSQL persistence (Service role bypasses RLS and guarantees write)
+      try {
+        const { data: sessData } = await supabase.auth.getSession();
+        const authToken = sessData?.session?.access_token;
+        const srvRes = await fetch(`${getApiBaseUrl()}/api/reports/create-missing-report`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {})
+          },
+          body: JSON.stringify({
+            id: dbId,
+            reporterId: supabaseReporterId,
+            userId: currentId,
+            name: newReport.name,
+            age: newReport.age,
+            gender: newReport.gender,
+            location: newReport.location,
+            date: newReport.date,
+            time: newReport.time,
+            physicalDescription: newReport.physicalDescription,
+            clothingDescription: newReport.clothingDescription,
+            incidentDescription: (reportData.notes || reportData.physicalDescription || "Signalement de disparition de l'enfant") + docUrlsText,
+            relationship: newReport.relationship,
+            photoUrl: photoUrl,
+            birthCertificateUrl: birthCertUrl,
+            familyPhotoUrl: familyPhotoUrl,
+            healthRecordUrl: healthRecordUrl,
+            otherDocumentUrl: otherDocUrl,
+            status: "Published",
+            is_public: true
+          })
+        });
+        const srvJson = await srvRes.json();
+        if (srvJson?.success) {
+          console.log('[REPORT TRACE] Server endpoint successfully persisted missing report into Supabase PostgreSQL:', dbId);
+          if (srvJson.data?.child_photo_url) {
+            photoUrl = srvJson.data.child_photo_url;
+            newReport.photo = photoUrl;
+            newReport.child_photo_url = photoUrl;
+          }
+        } else {
+          console.warn('[REPORT TRACE] Server endpoint notice:', srvJson?.error);
+        }
+      } catch (sErr) {
+        console.warn('[REPORT TRACE] Notice during server endpoint invocation:', sErr);
+      }
+
+      // 3. Direct PostgreSQL persistence with timeout protection (upsert by id)
       const incidentDesc = (reportData.notes || reportData.physicalDescription || "Signalement de disparition de l'enfant") + docUrlsText;
+      let safeDate = newReport.date || new Date().toISOString().split('T')[0];
+      if (/^\d{1,2}[\/\.-]\d{1,2}[\/\.-]\d{4}$/.test(safeDate)) {
+        const parts = safeDate.split(/[\/\.-]/);
+        safeDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+      let safeTime = newReport.time || '12:00:00';
+      if (/^\d{1,2}:\d{2}$/.test(safeTime)) safeTime = `${safeTime}:00`;
+
       const { error: insertErr } = await withTimeout(
         supabase.from('missing_reports').upsert([{
           id: dbId,
           reporter_id: supabaseReporterId,
           child_full_name: newReport.name,
           child_age: newReport.age ? Number(newReport.age) : null,
-          child_gender: newReport.gender,
+          child_gender: newReport.gender || 'non_specifie',
           last_seen_location: newReport.location,
-          last_seen_date: newReport.date || new Date().toISOString().split('T')[0],
-          last_seen_time: newReport.time || new Date().toTimeString().split(' ')[0],
+          last_seen_date: safeDate,
+          last_seen_time: safeTime,
           physical_description: newReport.physicalDescription,
           clothing_description: newReport.clothingDescription,
           incident_description: incidentDesc,
@@ -1337,8 +1880,11 @@ export const reportService = {
         window.dispatchEvent(new Event('storage'));
       }
 
-      // 5. Trigger background sync
-      setTimeout(() => this.syncReportsFromSupabase(true), 500);
+      // 5. Trigger background sync and development retention enforcement
+      setTimeout(() => {
+        this.syncReportsFromSupabase(true);
+        enforceDevelopmentRetention('missing');
+      }, 500);
 
       return newReport;
     } catch (e) {
@@ -1350,128 +1896,224 @@ export const reportService = {
   async createFoundReport(reportData) {
     initLocalStorage();
     const dbId = generateUUID();
-    console.log('[REPORT TRACE] createFoundReport started with ID:', dbId, 'Name:', reportData.name);
+    console.log('[REPORT TRACE] createFoundReport started with ID:', dbId, 'Name:', reportData.name || reportData.childName);
     try {
+      // 1. Authoritative photo uploads to Supabase Storage bucket 'found-reports'
       let photoUrl = reportData.photo || reportData.childPhoto;
       if (photoUrl && (photoUrl.startsWith("data:") || photoUrl.startsWith("blob:") || photoUrl instanceof File || photoUrl instanceof Blob)) {
-        photoUrl = await this.uploadFileToSupabaseStorage(photoUrl, "avatars", "found-reports", dbId);
+        photoUrl = await this.uploadFoundReportPhoto(photoUrl, `child_${dbId.substring(0, 8)}`);
+      } else if (photoUrl && (photoUrl.includes('/storage/v1/object/public/') || photoUrl.startsWith('http'))) {
+        // Keep existing valid URL
       }
-      if (!photoUrl) {
-        photoUrl = null;
-      }
-      console.log('[REPORT TRACE] Final photo URL for found report:', photoUrl ? photoUrl.substring(0, 60) + '...' : 'NONE');
 
+      let envPhotoUrl = reportData.envPhoto;
+      if (envPhotoUrl && (envPhotoUrl.startsWith("data:") || envPhotoUrl.startsWith("blob:") || envPhotoUrl instanceof File || envPhotoUrl instanceof Blob)) {
+        envPhotoUrl = await this.uploadFoundReportPhoto(envPhotoUrl, `env_${dbId.substring(0, 8)}`);
+      } else if (envPhotoUrl && (envPhotoUrl.includes('/storage/v1/object/public/') || envPhotoUrl.startsWith('http'))) {
+        // Keep existing valid URL
+      }
+
+      // Fallback photoUrl from envPhotoUrl if child photo was not provided
+      if (!photoUrl && envPhotoUrl) {
+        photoUrl = envPhotoUrl;
+      }
+
+      console.log('[REPORT TRACE] Uploaded found report photos. Child Photo:', photoUrl ? (photoUrl.startsWith('data:') ? 'base64 (proxying to server)' : photoUrl) : 'NONE', 'Env Photo:', envPhotoUrl ? (envPhotoUrl.startsWith('data:') ? 'base64 (proxying to server)' : envPhotoUrl) : 'NONE');
+
+      // 2. Authoritative reporter ID mapping: auth.uid() -> profiles.id
       const currentId = await this.getCurrentUserId();
       const supabaseReporterId = await this.getSupabaseReporterUuid();
+      const finalReporterId = supabaseReporterId || currentId;
+
+      const cleanName = (reportData.name || reportData.childName || "Enfant trouvé").trim();
+      const safeLocation = reportData.currentSafeLocation || 'Poste de police / Centre de protection';
+      const physicalDescWithFound = `[TROUVÉ] ${reportData.physicalDescription || ''} | Lieu sûr: ${safeLocation} | GPS: ${reportData.gps || ''}`;
+      const additionalPhotosList = envPhotoUrl ? [envPhotoUrl] : [];
 
       const newReport = {
         id: dbId,
-        reporterId: supabaseReporterId || currentId,
+        reporterId: finalReporterId,
+        reporter_id: supabaseReporterId,
         status: "Published",
         urgency: "Recherche Famille",
         createdAt: new Date().toISOString(),
+        created_at: new Date().toISOString(),
         type: "found",
         ...reportData,
-        photo: photoUrl
+        name: cleanName,
+        child_full_name: cleanName,
+        childName: cleanName,
+        photo: photoUrl,
+        child_photo_url: photoUrl,
+        envPhoto: envPhotoUrl,
+        additional_photos: additionalPhotosList,
+        currentSafeLocation: safeLocation,
+        physicalDescription: reportData.physicalDescription || '',
+        clothingDescription: reportData.clothingDescription || '',
+        location: reportData.location || 'Localisation non précisée'
       };
 
-      // 1. Invoke Supabase Edge Function with fast non-blocking timeout
+      // 3. Prepare found_reports row with exact PostgreSQL schema alignment
+      const defaultPlaceholderPhoto = "https://ifpbdythbhlgqymsaxtz.supabase.co/storage/v1/object/public/found-reports/community/default_child_placeholder.png";
+      const finalChildPhoto = photoUrl || defaultPlaceholderPhoto;
+      const circumstances = (reportData.circumstancesDescription || reportData.circumstances || reportData.physicalDescription || `Enfant trouvé à ${newReport.location || 'lieu non précisé'}`).trim() || "Enfant trouvé en attente d'identification";
+      const safeLocationVal = (reportData.currentSafeLocation || reportData.current_location_of_child || 'Poste de police / Centre de protection').trim() || 'Poste de police / Centre de protection';
+      const validDate = (newReport.date || new Date().toISOString().split('T')[0]).trim() || new Date().toISOString().split('T')[0];
+      const rawTime = (newReport.time || new Date().toTimeString().split(' ')[0].substring(0, 5)).trim() || "12:00";
+      const validTime = rawTime.length === 5 ? `${rawTime}:00` : rawTime;
+
+      const foundRow = {
+        id: dbId,
+        reporter_id: supabaseReporterId || finalReporterId,
+        child_full_name: cleanName,
+        child_gender: newReport.gender || 'non_specifie',
+        estimated_age: newReport.age ? Number(newReport.age) : null,
+        found_location: (newReport.location || 'Localisation non précisée').trim() || 'Localisation non précisée',
+        found_date: validDate,
+        found_time: validTime,
+        physical_description: physicalDescWithFound,
+        clothing_description: (newReport.clothingDescription || '').trim(),
+        current_location_of_child: safeLocationVal,
+        circumstances_description: circumstances,
+        child_photo_url: finalChildPhoto,
+        additional_photos: additionalPhotosList,
+        status: "Published",
+        is_public: true
+      };
+
+      // 4. Server-Authoritative persistence via service role endpoint (guarantees write & FK validation)
+      let persistSuccess = false;
       try {
-        await withTimeout(
-          supabase.functions.invoke('create-found-report', {
-            body: {
-              name: newReport.name,
-              gender: newReport.gender,
-              location: newReport.location,
-              date: newReport.date,
-              time: newReport.time,
-              physicalDescription: newReport.physicalDescription,
-              clothingDescription: newReport.clothingDescription,
-              currentSafeLocation: newReport.currentSafeLocation,
-              gps: newReport.gps,
+        const { data: sessData } = await supabase.auth.getSession();
+        const authToken = sessData?.session?.access_token;
+        const apiRes = await withTimeout(
+          fetch(`${getApiBaseUrl()}/api/reports/create-found-report`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {})
+            },
+            body: JSON.stringify({
+              ...foundRow,
+              reporterId: finalReporterId,
+              reporter_id: supabaseReporterId,
+              userId: currentId,
+              photo: photoUrl,
               photoUrl: photoUrl,
-              isPublic: true
-            }
+              child_photo_url: finalChildPhoto,
+              envPhoto: envPhotoUrl,
+              envPhotoUrl: envPhotoUrl,
+              currentSafeLocation: safeLocationVal,
+              current_location_of_child: safeLocationVal,
+              circumstances_description: circumstances
+            })
           }),
-          3000,
+          25000,
           null
         );
-      } catch (fErr) {
-        console.log("[REPORT TRACE] Edge Function notice:", fErr);
+
+        if (apiRes) {
+          let resJson = null;
+          let rawText = "";
+          try {
+            rawText = await apiRes.text();
+            resJson = JSON.parse(rawText);
+          } catch (parseErr) {
+            console.warn("[REPORT TRACE] Server response was non-JSON text:", rawText.substring(0, 200));
+          }
+
+          if (apiRes.ok && resJson?.success && resJson.data?.id) {
+            console.log("[REPORT TRACE] Authoritative server route persisted to public.found_reports successfully:", resJson.data.id);
+            persistSuccess = true;
+          } else {
+            const errDetail = resJson?.error || (apiRes.status ? `HTTP ${apiRes.status}: ${rawText.substring(0, 150)}` : apiRes.statusText);
+            console.error("[REPORT TRACE] Server endpoint returned error:", errDetail);
+          }
+        } else {
+          console.warn("[REPORT TRACE] Server API endpoint request timed out after 25s");
+        }
+      } catch (apiErr) {
+        console.warn("[REPORT TRACE] Server API endpoint notice:", apiErr);
       }
 
-      // 2. Direct PostgreSQL persistence with timeout protection
-      const physicalDescWithFound = `[TROUVÉ] ${newReport.physicalDescription || ''} | Lieu sûr: ${newReport.currentSafeLocation || ''} | GPS: ${newReport.gps || ''}`;
-      const { error: insertErr } = await withTimeout(
-        supabase.from('found_reports').insert([{
+      // 5. Fallback/Direct Supabase client insert into found_reports
+      if (!persistSuccess && supabaseReporterId) {
+        try {
+          const { data: directData, error: insertErr } = await withTimeout(
+            supabase.from('found_reports').upsert([foundRow], { onConflict: 'id' }).select(),
+            5000,
+            { data: null, error: { message: 'Timeout' } }
+          );
+
+          if (!insertErr && directData && directData.length > 0) {
+            console.log("[REPORT TRACE] Successfully persisted directly to Supabase table found_reports:", directData[0].id);
+            persistSuccess = true;
+          } else if (insertErr) {
+            console.warn("[REPORT TRACE] Direct upsert notice:", insertErr.message || insertErr);
+          }
+        } catch (e) {
+          console.warn("[REPORT TRACE] Direct upsert exception:", e?.message || e);
+        }
+      }
+
+      // Strict failure check: Do not pretend success if database persistence failed
+      if (!persistSuccess) {
+        console.error("[REPORT TRACE] CRITICAL: Failed to persist found report to public.found_reports!");
+        return { success: false, error: "Échec de l'enregistrement dans la table found_reports." };
+      }
+
+      // 6. Mirrored persistence into missing_reports with status 'Published' and [TROUVÉ] tag
+      // Keeps search and matching engine compatible while found_reports is primary source of truth
+      try {
+        const mirroredRow = {
           id: dbId,
-          reporter_id: supabaseReporterId,
-          child_full_name: newReport.name || "Enfant trouvé",
-          child_gender: newReport.gender,
-          found_location: newReport.location,
-          found_date: newReport.date || new Date().toISOString().split('T')[0],
-          found_time: newReport.time || new Date().toTimeString().split(' ')[0],
+          reporter_id: supabaseReporterId || finalReporterId,
+          child_full_name: cleanName,
+          child_age: newReport.age ? Number(newReport.age) : null,
+          child_gender: newReport.gender || 'non_specifie',
+          last_seen_location: newReport.location,
+          last_seen_date: newReport.date || new Date().toISOString().split('T')[0],
+          last_seen_time: newReport.time || new Date().toTimeString().split(' ')[0],
           physical_description: physicalDescWithFound,
-          clothing_description: newReport.clothingDescription,
-          child_photo_url: newReport.photo,
+          clothing_description: newReport.clothingDescription || '',
+          incident_description: `[TROUVÉ] Enfant trouvé en sécurité à : ${safeLocationVal}`,
+          emergency_contact_name: "Centre de Protection / Découvreur",
+          emergency_contact_phone: "677000000",
+          child_photo_url: finalChildPhoto,
+          additional_photos: additionalPhotosList,
           status: "Published",
           is_public: true
-        }]),
-        6000,
-        { error: null }
-      );
+        };
 
-      if (insertErr) {
-        console.warn("[REPORT TRACE] Notice inserting found report in found_reports:", insertErr.message || insertErr);
-        // Fallback insertion into missing_reports with status 'Trouvé' to ensure database persistence
-        const { error: fallbackErr } = await withTimeout(
-          supabase.from('missing_reports').insert([{
-            id: dbId,
-            reporter_id: supabaseReporterId,
-            child_full_name: newReport.name || "Enfant trouvé",
-            child_age: newReport.age ? Number(newReport.age) : null,
-            child_gender: newReport.gender,
-            last_seen_location: newReport.location,
-            last_seen_date: newReport.date || new Date().toISOString().split('T')[0],
-            last_seen_time: newReport.time || new Date().toTimeString().split(' ')[0],
-            physical_description: physicalDescWithFound,
-            clothing_description: newReport.clothingDescription,
-            incident_description: `[TROUVÉ] Enfant trouvé sécurisé à: ${newReport.currentSafeLocation || 'Poste de police'}`,
-            emergency_contact_name: "Secouriste / Découvreur",
-            emergency_contact_phone: "677000000",
-            child_photo_url: newReport.photo,
-            status: "Trouvé",
-            is_public: true
-          }]),
-          6000,
+        await withTimeout(
+          supabase.from('missing_reports').upsert([mirroredRow], { onConflict: 'id' }),
+          4000,
           { error: null }
         );
-        if (fallbackErr) {
-          console.warn("[REPORT TRACE] Fallback insert notice:", fallbackErr.message || fallbackErr);
-        } else {
-          console.log("[REPORT TRACE] Successfully persisted found report via missing_reports table with status Trouvé");
-        }
-      } else {
-        console.log("[REPORT TRACE] Successfully inserted found report into Supabase PostgreSQL found_reports");
+      } catch (mErr) {
+        console.warn("[REPORT TRACE] Notice mirroring report:", mErr);
       }
 
-      // 3. Local list immediate update - place at front
+      // 6. Local list immediate update - place at front
       const reports = this.getFoundReports();
       const updatedList = [newReport, ...reports.filter(r => r.id !== dbId)];
       updatedList.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
       _inMemoryFound = updatedList;
       safeSetLocalStorage("found_reports", updatedList);
 
-      // 4. Notify all views
+      // 7. Notify all views across tabs/windows
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('raydar:reports-synced', { detail: { report: newReport, type: 'found' } }));
         window.dispatchEvent(new Event('storage'));
       }
 
-      // 5. Trigger background sync
-      setTimeout(() => this.syncReportsFromSupabase(true), 500);
+      // 8. Trigger background refresh and development retention enforcement
+      setTimeout(() => {
+        this.syncReportsFromSupabase(true);
+        enforceDevelopmentRetention('found');
+      }, 500);
 
-      return newReport;
+      return { success: true, ...newReport };
     } catch (e) {
       console.error("[REPORT TRACE] Error creating found report:", e);
       return null;
@@ -1483,38 +2125,50 @@ export const reportService = {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session && session.user) {
+        const reporterId = await this.getSupabaseReporterUuid();
+        const idsToMatch = [session.user.id];
+        if (reporterId && !idsToMatch.includes(reporterId)) idsToMatch.push(reporterId);
+
         const { data: remoteRows } = await supabase
           .from('missing_reports')
-          .select('*')
-          .eq('reporter_id', session.user.id)
+          .select('id, reporter_id, child_full_name, child_age, child_gender, last_seen_location, last_seen_date, last_seen_time, physical_description, clothing_description, child_photo_url, status, created_at')
+          .in('reporter_id', idsToMatch)
           .neq('status', 'Trouvé')
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(MAX_RETAINED_MISSING_REPORTS);
 
         if (remoteRows && remoteRows.length > 0) {
-          return remoteRows.map((r, idx) => ({
-            id: r.id,
-            reporterId: r.reporter_id,
-            name: r.child_full_name,
-            age: r.child_age,
-            gender: r.child_gender,
-            location: r.last_seen_location,
-            date: r.last_seen_date,
-            time: r.last_seen_time,
-            physicalDescription: r.physical_description,
-            clothingDescription: r.clothing_description,
-            photo: r.child_photo_url || getDefaultChildPortrait(r.child_gender, idx, false),
-            status: r.status,
-            urgency: 'Nouveau',
-            type: 'missing',
-            createdAt: r.created_at
-          }));
+          return remoteRows.map((r, idx) => {
+            const rawPhoto = r.child_photo_url || null;
+            const cleanPhoto = (rawPhoto && typeof rawPhoto === 'string' && rawPhoto.startsWith('data:') && rawPhoto.length > 50000) ? null : rawPhoto;
+            const photoSrc = cleanPhoto || getDefaultChildPortrait(r.child_gender, idx, false);
+            return {
+              id: r.id,
+              reporterId: r.reporter_id,
+              name: r.child_full_name,
+              age: r.child_age,
+              gender: r.child_gender,
+              location: r.last_seen_location,
+              date: r.last_seen_date,
+              time: r.last_seen_time,
+              physicalDescription: r.physical_description,
+              clothingDescription: r.clothing_description,
+              photo: photoSrc,
+              thumbnail: getThumbnailUrl(photoSrc),
+              status: r.status,
+              urgency: 'Nouveau',
+              type: 'missing',
+              createdAt: r.created_at
+            };
+          });
         }
       }
     } catch (e) {}
 
     const all = this.getMissingReports();
     const currentId = await this.getCurrentUserId();
-    return all.filter(r => r.reporterId === currentId);
+    const reporterId = await this.getSupabaseReporterUuid();
+    return all.filter(r => r.reporterId === currentId || (reporterId && r.reporterId === reporterId));
   },
 
   async getMyFoundReports() {
@@ -1522,36 +2176,49 @@ export const reportService = {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session && session.user) {
+        const reporterId = await this.getSupabaseReporterUuid();
+        const idsToMatch = [session.user.id];
+        if (reporterId && !idsToMatch.includes(reporterId)) idsToMatch.push(reporterId);
+
         const { data: remoteRows } = await supabase
           .from('found_reports')
-          .select('*')
-          .eq('reporter_id', session.user.id)
-          .order('created_at', { ascending: false });
+          .select('id, reporter_id, child_full_name, estimated_age, child_gender, found_location, found_date, found_time, physical_description, clothing_description, current_safe_location, child_photo_url, status, created_at')
+          .in('reporter_id', idsToMatch)
+          .order('created_at', { ascending: false })
+          .limit(MAX_RETAINED_FOUND_REPORTS);
 
         if (remoteRows && remoteRows.length > 0) {
-          return remoteRows.map((r, idx) => ({
-            id: r.id,
-            reporterId: r.reporter_id,
-            name: r.child_full_name,
-            gender: r.child_gender,
-            location: r.found_location,
-            date: r.found_date,
-            time: r.found_time,
-            physicalDescription: r.physical_description,
-            clothingDescription: r.clothing_description,
-            photo: r.child_photo_url || getDefaultChildPortrait(r.child_gender, idx, true),
-            status: r.status,
-            urgency: 'Recherche Famille',
-            type: 'found',
-            createdAt: r.created_at
-          }));
+          return remoteRows.map((r, idx) => {
+            const rawPhoto = r.child_photo_url || null;
+            const cleanPhoto = (rawPhoto && typeof rawPhoto === 'string' && rawPhoto.startsWith('data:') && rawPhoto.length > 50000) ? null : rawPhoto;
+            const photoSrc = cleanPhoto || getDefaultChildPortrait(r.child_gender, idx, true);
+            return {
+              id: r.id,
+              reporterId: r.reporter_id,
+              name: r.child_full_name,
+              age: r.estimated_age,
+              gender: r.child_gender,
+              location: r.found_location,
+              date: r.found_date,
+              time: r.found_time,
+              physicalDescription: r.physical_description,
+              clothingDescription: r.clothing_description,
+              photo: photoSrc,
+              thumbnail: getThumbnailUrl(photoSrc),
+              status: r.status,
+              urgency: 'Trouvé',
+              type: 'found',
+              createdAt: r.created_at
+            };
+          });
         }
       }
     } catch (e) {}
 
     const all = this.getFoundReports();
     const currentId = await this.getCurrentUserId();
-    return all.filter(r => r.reporterId === currentId);
+    const reporterId = await this.getSupabaseReporterUuid();
+    return all.filter(r => r.reporterId === currentId || (reporterId && r.reporterId === reporterId));
   },
 
   getReportById(id) {
@@ -1770,6 +2437,14 @@ export const reportService = {
     })();
 
     return pendingProfileSyncPromise;
+  },
+
+  getThumbnailUrl(url) {
+    return getThumbnailUrl(url);
+  },
+
+  generateThumbnail(fileOrBase64, maxWidth = 240, quality = 0.72) {
+    return generateThumbnail(fileOrBase64, maxWidth, quality);
   }
 };
 

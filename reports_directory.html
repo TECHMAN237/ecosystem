@@ -218,13 +218,15 @@
                     }
 
                     const genderLabel = (report.gender || "").toLowerCase() === 'fille' ? 'Fille' : 'Garçon';
+                    const photoSrc = report.photo || '/assets/children/child-01.webp';
+                    const thumbUrl = report.thumbnail || (typeof reportService.getThumbnailUrl === 'function' ? reportService.getThumbnailUrl(photoSrc) : photoSrc) || photoSrc;
 
                     return `
                         <div class="report-card bg-white rounded-2xl p-4 flex gap-4 items-center border border-[#EAECF0] shadow-sm hover:shadow-md hover:border-[#532CE6]/30 hover:-translate-y-0.5 transition-all duration-300 relative cursor-pointer" 
                              data-id="${report.id}">
                             <div class="w-24 h-28 rounded-xl border border-[#EAECF0] p-1 flex-shrink-0 relative bg-[#F8F9FA]">
                                 <div class="w-full h-full rounded-lg overflow-hidden bg-[#F1F5F9]">
-                                    <img alt="${report.name}" class="w-full h-full object-cover object-center" src="${report.photo || '/assets/children/child-01.webp'}" onerror="this.onerror=null; this.src='/assets/children/child-01.webp';" />
+                                    <img alt="${report.name}" loading="lazy" decoding="async" class="w-full h-full object-cover object-center" src="${thumbUrl}" onerror="if (this.src !== '${photoSrc}') { this.src = '${photoSrc}'; } else { this.onerror = null; this.src = '/assets/children/child-01.webp'; }" />
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0 py-0.5 flex flex-col justify-between h-28">
@@ -269,17 +271,17 @@
                 });
             }
 
-            // Initial immediate render from cache
-            renderReports(reportService.getMissingReports());
+            // Initial immediate render from cache (Strict max 4 for development retention)
+            renderReports((reportService.getMissingReports() || []).slice(0, 4));
 
             // Asynchronous fetch from Supabase
             async function refreshMissing() {
                 const query = searchInput ? searchInput.value.trim() : '';
                 if (query) {
-                    const filtered = reportService.searchReports(query, false);
+                    const filtered = (reportService.searchReports(query, false) || []).slice(0, 4);
                     renderReports(filtered);
                 } else {
-                    const missingReports = await reportService.fetchMissingReports();
+                    const missingReports = (await reportService.fetchMissingReports() || []).slice(0, 4);
                     renderReports(missingReports);
                 }
             }

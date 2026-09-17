@@ -244,7 +244,7 @@
 </main>
 
 <script type="module">
-import { reportService } from './src/reportService.js';
+import { reportService, compressImage } from './src/reportService.js';
 import { formDraftState } from './src/formDraftState.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -303,35 +303,53 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('inputPhotoEnv')?.addEventListener('change', handleEnvPhoto);
     }
 
-    function handleChildPhoto(e) {
+    async function handleChildPhoto(e) {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const url = evt.target.result;
-                formDraftState.updateFoundDraft({ childPhoto: url, photo: url });
-                renderImageCard(cardChild, url, "Photo enfant téléchargée", () => {
-                    formDraftState.updateFoundDraft({ childPhoto: null });
+            try {
+                const compressed = await compressImage(file, 1200, 0.82);
+                formDraftState.updateFoundDraft({ childPhoto: compressed, photo: compressed });
+                renderImageCard(cardChild, compressed, "Photo enfant téléchargée", () => {
+                    formDraftState.updateFoundDraft({ childPhoto: null, photo: null });
                     resetChildCard();
                 });
-            };
-            reader.readAsDataURL(file);
+            } catch (err) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const url = evt.target.result;
+                    formDraftState.updateFoundDraft({ childPhoto: url, photo: url });
+                    renderImageCard(cardChild, url, "Photo enfant téléchargée", () => {
+                        formDraftState.updateFoundDraft({ childPhoto: null, photo: null });
+                        resetChildCard();
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
         }
     }
 
-    function handleEnvPhoto(e) {
+    async function handleEnvPhoto(e) {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const url = evt.target.result;
-                formDraftState.updateFoundDraft({ envPhoto: url });
-                renderImageCard(cardEnv, url, "Photo environnement téléchargée", () => {
+            try {
+                const compressed = await compressImage(file, 1200, 0.82);
+                formDraftState.updateFoundDraft({ envPhoto: compressed });
+                renderImageCard(cardEnv, compressed, "Photo environnement téléchargée", () => {
                     formDraftState.updateFoundDraft({ envPhoto: null });
                     resetEnvCard();
                 });
-            };
-            reader.readAsDataURL(file);
+            } catch (err) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const url = evt.target.result;
+                    formDraftState.updateFoundDraft({ envPhoto: url });
+                    renderImageCard(cardEnv, url, "Photo environnement téléchargée", () => {
+                        formDraftState.updateFoundDraft({ envPhoto: null });
+                        resetEnvCard();
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
         }
     }
 
@@ -418,24 +436,37 @@ document.addEventListener('DOMContentLoaded', () => {
             location: currentDraft.location || 'Localisation non précisée',
             date: currentDraft.date || new Date().toISOString().split('T')[0],
             time: currentDraft.time || new Date().toTimeString().split(' ')[0].substring(0, 5),
-            physicalDescription: currentDraft.physicalDescription || '',
+            physicalDescription: currentDraft.physicalDescription || currentDraft.clothingDescription || 'Enfant trouvé en sécurité',
             clothingDescription: currentDraft.clothingDescription || '',
             currentSafeLocation: safeLocationSelect ? safeLocationSelect.value : 'Poste de Police',
+            circumstancesDescription: currentDraft.circumstancesDescription || currentDraft.physicalDescription || `Enfant trouvé à ${currentDraft.location || 'lieu non précisé'} et mis en sécurité`,
             gps: currentDraft.gps || '',
             photo: childPhotoVal,
             envPhoto: envPhotoVal
         };
 
         const savedReport = await reportService.createFoundReport(finalReport);
-        console.log("Saved found report from multi-step workflow:", savedReport);
+        console.log("[REPORT TRACE] Saved found report result:", savedReport);
 
-        formDraftState.clearFoundDraft();
-
-        btnSubmit.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Envoyé!';
-        btnSubmit.classList.replace('bg-primary', 'bg-green-600');
-        setTimeout(() => {
-            window.location.href = './report_under_review_missing_child.html';
-        }, 800);
+        if (savedReport && savedReport.success !== false) {
+            formDraftState.clearFoundDraft();
+            btnSubmit.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Signalement Envoyé!';
+            btnSubmit.classList.replace('bg-primary', 'bg-green-600');
+            setTimeout(() => {
+                window.location.href = './report_under_review_missing_child.html';
+            }, 800);
+        } else {
+            btnSubmit.innerHTML = '<span class="material-symbols-outlined">send</span> Soumettre le signalement';
+            btnSubmit.style.opacity = '1';
+            btnSubmit.disabled = false;
+            if (errorBanner) {
+                errorBanner.classList.remove('hidden');
+                const msgSpan = errorBanner.querySelector('span:last-child');
+                if (msgSpan) {
+                    msgSpan.textContent = "Erreur lors de l'enregistrement du signalement. Veuillez vérifier votre connexion et réessayer.";
+                }
+            }
+        }
     });
 });
 </script>
