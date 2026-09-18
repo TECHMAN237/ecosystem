@@ -204,7 +204,28 @@
                     return;
                 }
 
-                container.innerHTML = reports.map((report, idx) => {
+                // Clear empty state message if present
+                const emptyState = container.querySelector('.bg-white.text-center');
+                if (emptyState) {
+                    container.innerHTML = '';
+                }
+
+                const currentCardMap = new Map();
+                container.querySelectorAll('.report-card').forEach(card => {
+                    const id = card.getAttribute('data-id');
+                    if (id) currentCardMap.set(id, card);
+                });
+
+                const targetIds = new Set(reports.map(r => r.id));
+
+                // Remove cards not in target list
+                currentCardMap.forEach((card, id) => {
+                    if (!targetIds.has(id)) {
+                        card.remove();
+                    }
+                });
+
+                reports.forEach((report, idx) => {
                     const labelAge = report.age ? `, ${report.age} ans` : '';
                     let badgeClass = 'bg-[#F5F3FF] text-[#532CE6] border border-[#532CE6]/20';
                     let badgeLabel = 'Recherche';
@@ -219,32 +240,35 @@
 
                     const genderLabel = (report.gender || "").toLowerCase() === 'fille' ? 'Fille' : 'Garçon';
                     const fallbackPhoto = typeof reportService.getDefaultChildPortrait === 'function'
-                        ? reportService.getDefaultChildPortrait(report.gender || '', idx, false)
+                        ? reportService.getDefaultChildPortrait(report.gender || '', report.id || idx, false)
                         : '/assets/children/child-01.webp';
                     const photoSrc = report.photo || fallbackPhoto;
                     const thumbUrl = report.thumbnail || (typeof reportService.getThumbnailUrl === 'function' ? reportService.getThumbnailUrl(photoSrc) : photoSrc) || fallbackPhoto;
 
-                    return `
-                        <div class="report-card bg-white rounded-2xl p-4 flex gap-4 items-center border border-[#EAECF0] shadow-sm hover:shadow-md hover:border-[#532CE6]/30 hover:-translate-y-0.5 transition-all duration-300 relative cursor-pointer" 
-                             data-id="${report.id}">
+                    let card = currentCardMap.get(report.id);
+                    if (!card) {
+                        card = document.createElement('div');
+                        card.className = 'report-card bg-white rounded-2xl p-4 flex gap-4 items-center border border-[#EAECF0] shadow-sm hover:shadow-md hover:border-[#532CE6]/30 hover:-translate-y-0.5 transition-all duration-300 relative cursor-pointer';
+                        card.setAttribute('data-id', report.id);
+                        card.innerHTML = `
                             <div class="w-24 h-28 rounded-xl border border-[#EAECF0] p-1 flex-shrink-0 relative bg-[#F8F9FA]">
                                 <div class="w-full h-full rounded-lg overflow-hidden bg-[#F1F5F9]">
-                                    <img alt="${report.name}" loading="lazy" decoding="async" class="w-full h-full object-cover object-center" src="${thumbUrl}" onerror="this.onerror = null; this.src = '${fallbackPhoto}';" />
+                                    <img alt="${report.name}" class="w-full h-full object-cover object-center" src="${thumbUrl}" onerror="this.onerror = null; this.src = '${fallbackPhoto}';" />
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0 py-0.5 flex flex-col justify-between h-28">
                                 <div>
                                     <div class="flex items-center justify-between gap-2 mb-1.5">
-                                        <h3 class="font-bold text-[17px] text-[#0F172A] leading-tight tracking-tight truncate">${report.name}${labelAge}</h3>
-                                        <span class="${badgeClass} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">${badgeLabel}</span>
+                                        <h3 class="card-name font-bold text-[17px] text-[#0F172A] leading-tight tracking-tight truncate">${report.name}${labelAge}</h3>
+                                        <span class="card-badge ${badgeClass} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">${badgeLabel}</span>
                                     </div>
-                                    <p class="text-xs text-[#64748B] flex items-center gap-1 mb-1">
+                                    <p class="card-location text-xs text-[#64748B] flex items-center gap-1 mb-1">
                                         <span class="material-symbols-outlined text-[15px] text-[#532CE6]" style="font-variation-settings: 'FILL' 1;">location_on</span>
-                                        ${report.location}
+                                        <span class="location-val">${report.location}</span>
                                     </p>
-                                    <p class="text-[11px] text-[#94A3B8] flex items-center gap-1">
+                                    <p class="card-time text-[11px] text-[#94A3B8] flex items-center gap-1">
                                         <span class="material-symbols-outlined text-[14px]">schedule</span>
-                                        ${report.date} • ${report.time || '12:00'}
+                                        <span class="time-val">${report.date} • ${report.time || '12:00'}</span>
                                     </p>
                                 </div>
                                 <div class="flex items-center gap-2 mt-auto w-full overflow-hidden flex-nowrap">
@@ -257,20 +281,31 @@
                                 </div>
                             </div>
                             <span class="material-symbols-outlined text-[#94A3B8] mr-1" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
-                        </div>
-                    `;
-                }).join('');
-
-                // Bind click listeners
-                container.querySelectorAll('.report-card').forEach(card => {
-                    card.addEventListener('click', () => {
-                        const id = card.getAttribute('data-id');
-                        const report = reportService.getReportById(id);
-                        if (report) {
-                            sessionStorage.setItem('current_view_report', JSON.stringify(report));
-                            window.location.href = `./report_details.html?id=${encodeURIComponent(id)}`;
+                        `;
+                        card.addEventListener('click', () => {
+                            const r = reportService.getReportById(report.id);
+                            if (r) {
+                                sessionStorage.setItem('current_view_report', JSON.stringify(r));
+                                window.location.href = `./report_details.html?id=${encodeURIComponent(report.id)}`;
+                            }
+                        });
+                        container.appendChild(card);
+                    } else {
+                        // Update dynamic text and badge in place without touching the img node
+                        const nameEl = card.querySelector('.card-name');
+                        if (nameEl) nameEl.textContent = `${report.name}${labelAge}`;
+                        const badgeEl = card.querySelector('.card-badge');
+                        if (badgeEl) {
+                            badgeEl.className = `card-badge ${badgeClass} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0`;
+                            badgeEl.textContent = badgeLabel;
                         }
-                    });
+                        const locEl = card.querySelector('.location-val');
+                        if (locEl) locEl.textContent = report.location;
+                        const timeEl = card.querySelector('.time-val');
+                        if (timeEl) timeEl.textContent = `${report.date} • ${report.time || '12:00'}`;
+
+                        container.appendChild(card);
+                    }
                 });
             }
 
@@ -296,8 +331,14 @@
                 refreshMissing();
             });
 
-            window.addEventListener('raydar:reports-synced', () => refreshMissing());
-            window.addEventListener('storage', () => refreshMissing());
+            window.addEventListener('raydar:reports-synced', (e) => {
+                const reports = (e?.detail?.missing || reportService.getMissingReports() || []).slice(0, 4);
+                renderReports(reports);
+            });
+            window.addEventListener('storage', () => {
+                const reports = (reportService.getMissingReports() || []).slice(0, 4);
+                renderReports(reports);
+            });
         }
 
         if (document.readyState === 'loading') {

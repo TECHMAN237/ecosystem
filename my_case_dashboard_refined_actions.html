@@ -214,25 +214,50 @@ async function renderCases() {
         return;
     }
 
-    container.innerHTML = reports.map((report, idx) => {
+    // Clear empty state message if present
+    const emptyState = container.querySelector('.bg-white.text-center');
+    if (emptyState) {
+        container.innerHTML = '';
+    }
+
+    const currentCardMap = new Map();
+    container.querySelectorAll('.case-card').forEach(card => {
+        const id = card.getAttribute('data-id');
+        if (id) currentCardMap.set(id, card);
+    });
+
+    const targetIds = new Set(reports.map(r => r.id));
+
+    // Remove cards not in target list
+    currentCardMap.forEach((card, id) => {
+        if (!targetIds.has(id)) {
+            card.remove();
+        }
+    });
+
+    reports.forEach((report, idx) => {
         const isMissing = report.type === 'missing';
         const displayLabel = isMissing ? 'MISSING' : 'FOUND';
         const fallbackPhoto = typeof reportService.getDefaultChildPortrait === 'function'
-            ? reportService.getDefaultChildPortrait(report.gender || '', idx, !isMissing)
+            ? reportService.getDefaultChildPortrait(report.gender || '', report.id || idx, !isMissing)
             : (isMissing ? '/assets/children/child-01.webp' : '/assets/children/child-02.webp');
         const photoSrc = report.photo || fallbackPhoto;
         const thumbUrl = report.thumbnail || (typeof reportService.getThumbnailUrl === 'function' ? reportService.getThumbnailUrl(photoSrc) : photoSrc) || fallbackPhoto;
         
-        return `
-            <div class="bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(15,23,42,0.06)] border border-[#E2E8F0] active:scale-[0.99] transition-all cursor-pointer hover:border-[#532CE6]/40" data-id="${report.id}">
+        let card = currentCardMap.get(report.id);
+        if (!card) {
+            card = document.createElement('div');
+            card.className = 'case-card bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(15,23,42,0.06)] border border-[#E2E8F0] active:scale-[0.99] transition-all cursor-pointer hover:border-[#532CE6]/40';
+            card.setAttribute('data-id', report.id);
+            card.innerHTML = `
                 <div class="flex justify-between items-start mb-4">
                     <div class="flex items-center gap-4">
                         <div class="w-14 h-14 rounded-full overflow-hidden border border-[#E2E8F0] bg-[#F8F9FA] flex-shrink-0 shadow-sm">
-                            <img alt="${report.name}" loading="lazy" decoding="async" class="w-full h-full object-cover" src="${thumbUrl}" onerror="this.onerror = null; this.src = '${fallbackPhoto}';" />
+                            <img alt="${report.name}" class="w-full h-full object-cover" src="${thumbUrl}" onerror="this.onerror = null; this.src = '${fallbackPhoto}';" />
                         </div>
                         <div>
-                            <h3 class="font-bold text-sm md:text-base text-[#532CE6]"><span class="mr-1.5 font-bold">${displayLabel}:</span>${report.name} (${report.age} ans)</h3>
-                            <p class="text-xs text-[#64748B] mt-0.5">${report.location} • ${report.date || '2026-09-01'}</p>
+                            <h3 class="card-title font-bold text-sm md:text-base text-[#532CE6]"><span class="mr-1.5 font-bold">${displayLabel}:</span>${report.name} (${report.age} ans)</h3>
+                            <p class="card-loc text-xs text-[#64748B] mt-0.5">${report.location} • ${report.date || '2026-09-01'}</p>
                         </div>
                     </div>
                     <span class="bg-[#FFEDD5] text-[#C2410C] font-bold text-[10px] tracking-wider uppercase px-3 py-1 rounded-full border border-[#FED7AA]">NOUVEAU</span>
@@ -253,53 +278,60 @@ async function renderCases() {
                         <span>Progress</span>
                     </button>
                 </div>
-            </div>
-        `;
-    }).join('');
+            `;
 
-    // Bind item click to details
-    container.querySelectorAll('[data-id]').forEach(card => {
-        card.addEventListener('click', (e) => {
-            if (e.target.closest('button')) return;
-            const id = card.getAttribute('data-id');
-            const report = reportService.getReportById(id);
-            if (report) {
-                sessionStorage.setItem('current_view_report', JSON.stringify(report));
-                window.location.href = './report_details.html';
-            }
-        });
-    });
-
-    // Bind edit button
-    container.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const id = btn.getAttribute('data-id');
-            const report = reportService.getReportById(id);
-            if (report) {
-                sessionStorage.setItem('current_view_report', JSON.stringify(report));
-                window.location.href = './report_details.html';
-            }
-        });
-    });
-
-    // Bind delete button
-    container.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const id = btn.getAttribute('data-id');
-            if (confirm("Voulez-vous vraiment supprimer ce signalement ?")) {
-                let success = false;
-                if (currentTab === 'missing') {
-                    success = reportService.deleteMissingReport(id);
-                } else {
-                    success = reportService.deleteFoundReport(id);
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('button')) return;
+                const id = card.getAttribute('data-id');
+                const r = reportService.getReportById(id);
+                if (r) {
+                    sessionStorage.setItem('current_view_report', JSON.stringify(r));
+                    window.location.href = isMissing ? './report_details.html' : './found_report_details.html';
                 }
-                if (success) {
-                    renderCases();
-                }
+            });
+
+            const editBtn = card.querySelector('.edit-btn');
+            if (editBtn) {
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = card.getAttribute('data-id');
+                    const r = reportService.getReportById(id);
+                    if (r) {
+                        sessionStorage.setItem('current_view_report', JSON.stringify(r));
+                        window.location.href = isMissing ? './report_details.html' : './found_report_details.html';
+                    }
+                });
             }
-        });
+
+            const deleteBtn = card.querySelector('.delete-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const id = card.getAttribute('data-id');
+                    if (confirm("Voulez-vous vraiment supprimer ce signalement ?")) {
+                        let success = false;
+                        if (currentTab === 'missing') {
+                            success = reportService.deleteMissingReport(id);
+                        } else {
+                            success = reportService.deleteFoundReport(id);
+                        }
+                        if (success) {
+                            await renderCases();
+                        }
+                    }
+                });
+            }
+
+            container.appendChild(card);
+        } else {
+            // Update card title & location text in place
+            const titleEl = card.querySelector('.card-title');
+            if (titleEl) titleEl.innerHTML = `<span class="mr-1.5 font-bold">${displayLabel}:</span>${report.name} (${report.age} ans)`;
+            const locEl = card.querySelector('.card-loc');
+            if (locEl) locEl.textContent = `${report.location} • ${report.date || '2026-09-01'}`;
+
+            container.appendChild(card);
+        }
     });
 }
 

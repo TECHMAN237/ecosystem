@@ -363,33 +363,66 @@ function renderReportCards(reportsList) {
     const carousel = document.getElementById('recentMissingCarousel');
     if (!carousel) return;
 
-    if (reportsList && reportsList.length > 0) {
-        carousel.innerHTML = reportsList.map((report, index) => {
-            const isFound = report.type === 'found' || report.status === 'Trouvé';
-            const badgeText = isFound ? 'Trouvé' : (report.urgency || 'Urgent');
-            const badgeClass = isFound ? 'bg-green-100 text-green-700' : 'bg-error-container text-error';
-            const fallbackPhoto = typeof reportService.getDefaultChildPortrait === 'function'
-              ? reportService.getDefaultChildPortrait(report.gender || '', index, isFound)
-              : (reportService.NEUTRAL_CHILD_PHOTO_PLACEHOLDER || '');
-            const photoSrc = report.photo || fallbackPhoto;
-            const thumbUrl = report.thumbnail || (typeof reportService.getThumbnailUrl === 'function' ? reportService.getThumbnailUrl(photoSrc) : photoSrc) || fallbackPhoto;
-            const childDisplayName = (report.name || report.child_full_name || report.childName || '').trim() || (isFound ? 'Enfant trouvé' : 'Enfant disparu');
-            const locText = report.location || report.last_seen_location || report.found_location || 'Localisation inconnue';
+    if (!reportsList || reportsList.length === 0) {
+        carousel.innerHTML = `
+        <div class="w-full py-8 text-center text-on-surface-variant text-sm flex flex-col items-center justify-center">
+            <span class="material-symbols-outlined text-3xl mb-1 text-outline">search_off</span>
+            <p>Aucun signalement actif.</p>
+        </div>`;
+        return;
+    }
 
-            return `
-            <div class="flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 shadow-[0_6px_24px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.02)] border border-outline-variant/20 flex gap-3.5 items-center hover:shadow-[0_12px_32px_rgba(83,44,230,0.06)] hover:-translate-y-0.5 transition-all duration-300">
+    // Clear empty state message if present
+    const emptyState = carousel.querySelector('.w-full.py-8.text-center');
+    if (emptyState) {
+        carousel.innerHTML = '';
+    }
+
+    const currentCardMap = new Map();
+    carousel.querySelectorAll('.home-report-card').forEach(card => {
+        const id = card.getAttribute('data-id');
+        if (id) currentCardMap.set(id, card);
+    });
+
+    const targetIds = new Set(reportsList.map(r => r.id));
+
+    // Remove cards not in target list
+    currentCardMap.forEach((card, id) => {
+        if (!targetIds.has(id)) {
+            card.remove();
+        }
+    });
+
+    reportsList.forEach((report, index) => {
+        const isFound = report.type === 'found' || report.status === 'Trouvé';
+        const badgeText = isFound ? 'Trouvé' : (report.urgency || 'Urgent');
+        const badgeClass = isFound ? 'bg-green-100 text-green-700' : 'bg-error-container text-error';
+        const fallbackPhoto = typeof reportService.getDefaultChildPortrait === 'function'
+          ? reportService.getDefaultChildPortrait(report.gender || '', report.id || index, isFound)
+          : (reportService.NEUTRAL_CHILD_PHOTO_PLACEHOLDER || '');
+        const photoSrc = report.photo || fallbackPhoto;
+        const thumbUrl = report.thumbnail || (typeof reportService.getThumbnailUrl === 'function' ? reportService.getThumbnailUrl(photoSrc) : photoSrc) || fallbackPhoto;
+        const childDisplayName = (report.name || report.child_full_name || report.childName || '').trim() || (isFound ? 'Enfant trouvé' : 'Enfant disparu');
+        const locText = report.location || report.last_seen_location || report.found_location || 'Localisation inconnue';
+
+        let card = currentCardMap.get(report.id);
+        if (!card) {
+            card = document.createElement('div');
+            card.className = 'home-report-card flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 shadow-[0_6px_24px_rgba(0,0,0,0.02),0_1px_2px_rgba(0,0,0,0.02)] border border-outline-variant/20 flex gap-3.5 items-center hover:shadow-[0_12px_32px_rgba(83,44,230,0.06)] hover:-translate-y-0.5 transition-all duration-300';
+            card.setAttribute('data-id', report.id);
+            card.innerHTML = `
               <div class="w-[96px] h-[112px] rounded-[14px] overflow-hidden flex-shrink-0 bg-surface-container-high relative shadow-inner">
-                <img alt="${childDisplayName}" loading="lazy" decoding="async" class="w-full h-full object-cover" src="${thumbUrl}" onerror="this.onerror = null; this.src = '${fallbackPhoto}';" />
+                <img alt="${childDisplayName}" class="w-full h-full object-cover" src="${thumbUrl}" onerror="this.onerror = null; this.src = '${fallbackPhoto}';" />
               </div>
               <div class="flex-1 flex flex-col h-full justify-between py-0.5 min-w-0">
                 <div>
-                  <h3 class="font-bold text-[16px] text-on-surface leading-snug mb-0.5 truncate">${childDisplayName}</h3>
-                  <p class="text-xs text-on-surface-variant flex items-center gap-1 mb-1.5 truncate">
+                  <h3 class="card-name font-bold text-[16px] text-on-surface leading-snug mb-0.5 truncate">${childDisplayName}</h3>
+                  <p class="card-loc text-xs text-on-surface-variant flex items-center gap-1 mb-1.5 truncate">
                     <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
-                    ${locText}
+                    <span class="loc-val">${locText}</span>
                   </p>
                   <div class="mb-2">
-                    <span class="${badgeClass} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">${badgeText}</span>
+                    <span class="card-badge ${badgeClass} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">${badgeText}</span>
                   </div>
                 </div>
                 <button class="view-details-btn w-full py-2 px-3 bg-[#F4F6F9] border border-[#E2E8F0] text-primary rounded-full font-bold text-[11px] flex items-center justify-between shadow-[0_1px_2px_rgba(15,23,42,0.04)] hover:bg-[#EAEFF5] hover:border-[#CBD5E1] active:scale-98 transition-all" 
@@ -398,27 +431,30 @@ function renderReportCards(reportsList) {
                   <span class="material-symbols-outlined text-[14px]">chevron_right</span>
                 </button>
               </div>
-            </div>
             `;
-        }).join('');
-
-        // Bind click listeners
-        carousel.querySelectorAll('.view-details-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = btn.getAttribute('data-id');
-                const isFound = btn.getAttribute('data-is-found') === 'true';
-                window.location.href = isFound 
-                    ? `./found_report_details.html?id=${encodeURIComponent(id)}` 
-                    : `./report_details.html?id=${encodeURIComponent(id)}`;
-            });
-        });
-    } else {
-        carousel.innerHTML = `
-        <div class="w-full py-8 text-center text-on-surface-variant text-sm flex flex-col items-center justify-center">
-            <span class="material-symbols-outlined text-3xl mb-1 text-outline">search_off</span>
-            <p>Aucun signalement actif.</p>
-        </div>`;
-    }
+            const btn = card.querySelector('.view-details-btn');
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    window.location.href = isFound 
+                        ? `./found_report_details.html?id=${encodeURIComponent(report.id)}` 
+                        : `./report_details.html?id=${encodeURIComponent(report.id)}`;
+                });
+            }
+            carousel.appendChild(card);
+        } else {
+            // Update fields in place without recreating or resetting img
+            const nameEl = card.querySelector('.card-name');
+            if (nameEl) nameEl.textContent = childDisplayName;
+            const locEl = card.querySelector('.loc-val');
+            if (locEl) locEl.textContent = locText;
+            const badgeEl = card.querySelector('.card-badge');
+            if (badgeEl) {
+                badgeEl.className = `card-badge ${badgeClass} text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider`;
+                badgeEl.textContent = badgeText;
+            }
+            carousel.appendChild(card);
+        }
+    });
 
     // Update bottom card counters
     const foundCountText = document.getElementById('foundCountText');

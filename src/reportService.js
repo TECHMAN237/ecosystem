@@ -158,13 +158,19 @@ export const AFRICAN_CHILD_PORTRAITS = {
 
 export const NEUTRAL_CHILD_PHOTO_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'%3E%3Crect width='200' height='240' fill='%23F1F5F9'/%3E%3Cg fill='%2394A3B8'%3E%3Ccircle cx='100' cy='85' r='36' fill='%23CBD5E1'/%3E%3Cpath d='M40 210c0-33.137 26.863-60 60-60s60 26.863 60 60z' fill='%23CBD5E1'/%3E%3Ctext x='100' y='225' font-family='system-ui, -apple-system, sans-serif' font-size='12' font-weight='600' text-anchor='middle' fill='%2364748B'%3EPhoto non fournie%3C/text%3E%3C/g%3E%3C/svg%3E";
 
-export function getDefaultChildPortrait(gender = "", index = 0, isFound = false) {
-  if (isFound) {
-    const list = AFRICAN_CHILD_PORTRAITS.found;
-    return list[Math.abs(index) % list.length];
+export function getDefaultChildPortrait(gender = "", idOrIndex = 0, isFound = false) {
+  const list = isFound ? AFRICAN_CHILD_PORTRAITS.found : AFRICAN_CHILD_PORTRAITS.missing;
+  let idx = 0;
+  if (typeof idOrIndex === 'string') {
+    for (let i = 0; i < idOrIndex.length; i++) {
+      idx = ((idx << 5) - idx) + idOrIndex.charCodeAt(i);
+      idx |= 0;
+    }
+    idx = Math.abs(idx);
+  } else {
+    idx = Math.abs(Number(idOrIndex) || 0);
   }
-  const list = AFRICAN_CHILD_PORTRAITS.missing;
-  return list[Math.abs(index) % list.length];
+  return list[idx % list.length];
 }
 
 const DEMO_MISSING_REPORTS = [
@@ -758,12 +764,12 @@ export const reportService = {
     }
   },
 
-  async fetchMissingReports(force = true) {
+  async fetchMissingReports(force = false) {
     await this.syncReportsFromSupabase(force);
     return this.getMissingReports();
   },
 
-  async fetchFoundReports(force = true) {
+  async fetchFoundReports(force = false) {
     await this.syncReportsFromSupabase(force);
     return this.getFoundReports();
   },
@@ -1520,8 +1526,8 @@ export const reportService = {
     if (typeof window === "undefined") return;
     const now = Date.now();
     if (!force && pendingReportsSyncPromise) return pendingReportsSyncPromise;
-    if (!force && now - lastReportsSyncTime < 10000) {
-      return; // Cache fresh within 10 seconds
+    if (!force && now - lastReportsSyncTime < 20000) {
+      return; // Cache fresh within 20 seconds
     }
 
     pendingReportsSyncPromise = (async () => {
@@ -1553,7 +1559,7 @@ export const reportService = {
         const supabaseMissing = [];
         const supabaseFound = [];
 
-        (missingRows || []).forEach((row, idx) => {
+        (missingRows || []).forEach((row) => {
           const isFound = row.status === 'Trouvé' || 
             (row.physical_description && row.physical_description.includes('[TROUVÉ]')) ||
             (row.incident_description && row.incident_description.includes('[TROUVÉ]'));
@@ -1605,7 +1611,7 @@ export const reportService = {
           }
         });
 
-        (foundRows || []).forEach((row, idx) => {
+        (foundRows || []).forEach((row) => {
           let cleanPhysical = row.physical_description || '';
           let currentSafeLocation = '';
           let gps = '';
@@ -1650,16 +1656,25 @@ export const reportService = {
         const mergedMissing = mergeReports(missingLocal, supabaseMissing);
         const mergedFound = mergeReports(foundLocal, supabaseFound);
 
+        // Diff check: only write and dispatch if data actually changed
+        const currentMissingStr = localStorage.getItem("missing_reports") || "[]";
+        const currentFoundStr = localStorage.getItem("found_reports") || "[]";
+        const newMissingStr = JSON.stringify(mergedMissing);
+        const newFoundStr = JSON.stringify(mergedFound);
+        const hasChanged = (currentMissingStr !== newMissingStr) || (currentFoundStr !== newFoundStr);
+
         _inMemoryMissing = mergedMissing;
         _inMemoryFound = mergedFound;
 
-        safeSetLocalStorage("missing_reports", mergedMissing);
-        safeSetLocalStorage("found_reports", mergedFound);
+        if (hasChanged) {
+          safeSetLocalStorage("missing_reports", mergedMissing);
+          safeSetLocalStorage("found_reports", mergedFound);
 
-        console.log(`[REPORT TRACE] Sync complete. Total Missing: ${mergedMissing.length}, Total Found: ${mergedFound.length}`);
+          console.log(`[REPORT TRACE] Sync update detected. Total Missing: ${mergedMissing.length}, Total Found: ${mergedFound.length}`);
 
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('raydar:reports-synced', { detail: { missing: mergedMissing, found: mergedFound } }));
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('raydar:reports-synced', { detail: { missing: mergedMissing, found: mergedFound } }));
+          }
         }
       } catch (e) {
         console.warn("[REPORT TRACE] syncReportsFromSupabase exception:", e?.message || e);
