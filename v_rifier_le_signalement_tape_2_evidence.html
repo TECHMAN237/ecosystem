@@ -463,7 +463,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 errorBanner.classList.remove('hidden');
                 const msgSpan = errorBanner.querySelector('span:last-child');
                 if (msgSpan) {
-                    msgSpan.textContent = "Erreur lors de l'enregistrement du signalement. Veuillez vérifier votre connexion et réessayer.";
+                    const errorDetail = (savedReport && savedReport.error) ? savedReport.error : "Erreur lors de l'enregistrement du signalement. Veuillez vérifier votre connexion et réessayer.";
+                    msgSpan.textContent = errorDetail;
                 }
             }
         }

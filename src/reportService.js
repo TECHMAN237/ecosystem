@@ -551,7 +551,7 @@ export const reportService = {
   async getRecentRealReports(limit = 4) {
     try {
       const missingColumns = 'id, child_full_name, child_age, child_gender, last_seen_location, last_seen_date, last_seen_time, physical_description, clothing_description, child_photo_url, status, created_at';
-      const foundColumns = 'id, child_full_name, estimated_age, child_gender, found_location, found_date, found_time, physical_description, clothing_description, current_safe_location, child_photo_url, status, created_at';
+      const foundColumns = 'id, child_full_name, estimated_age, child_gender, found_location, found_date, found_time, physical_description, clothing_description, current_location_of_child, child_photo_url, status, created_at';
 
       const [missingRes, foundRes] = await Promise.allSettled([
         withTimeout(supabase.from('missing_reports').select(missingColumns).order('created_at', { ascending: false }).limit(limit), 6000, { data: [] }),
@@ -1528,7 +1528,7 @@ export const reportService = {
       console.log('[REPORT TRACE] syncReportsFromSupabase: Querying remote Supabase tables...');
       try {
         const listColsMissing = 'id, reporter_id, child_full_name, child_age, child_gender, last_seen_location, last_seen_date, last_seen_time, physical_description, clothing_description, child_photo_url, status, is_public, created_at';
-        const listColsFound = 'id, reporter_id, child_full_name, estimated_age, child_gender, found_location, found_date, found_time, physical_description, clothing_description, current_safe_location, current_location_of_child, child_photo_url, status, is_public, created_at';
+        const listColsFound = 'id, reporter_id, child_full_name, estimated_age, child_gender, found_location, found_date, found_time, physical_description, clothing_description, current_location_of_child, child_photo_url, status, is_public, created_at';
 
         const [missingRes, foundRes] = await Promise.allSettled([
           withTimeout(
@@ -2062,38 +2062,6 @@ export const reportService = {
         return { success: false, error: "Échec de l'enregistrement dans la table found_reports." };
       }
 
-      // 6. Mirrored persistence into missing_reports with status 'Published' and [TROUVÉ] tag
-      // Keeps search and matching engine compatible while found_reports is primary source of truth
-      try {
-        const mirroredRow = {
-          id: dbId,
-          reporter_id: supabaseReporterId || finalReporterId,
-          child_full_name: cleanName,
-          child_age: newReport.age ? Number(newReport.age) : null,
-          child_gender: newReport.gender || 'non_specifie',
-          last_seen_location: newReport.location,
-          last_seen_date: newReport.date || new Date().toISOString().split('T')[0],
-          last_seen_time: newReport.time || new Date().toTimeString().split(' ')[0],
-          physical_description: physicalDescWithFound,
-          clothing_description: newReport.clothingDescription || '',
-          incident_description: `[TROUVÉ] Enfant trouvé en sécurité à : ${safeLocationVal}`,
-          emergency_contact_name: "Centre de Protection / Découvreur",
-          emergency_contact_phone: "677000000",
-          child_photo_url: finalChildPhoto,
-          additional_photos: additionalPhotosList,
-          status: "Published",
-          is_public: true
-        };
-
-        await withTimeout(
-          supabase.from('missing_reports').upsert([mirroredRow], { onConflict: 'id' }),
-          4000,
-          { error: null }
-        );
-      } catch (mErr) {
-        console.warn("[REPORT TRACE] Notice mirroring report:", mErr);
-      }
-
       // 6. Local list immediate update - place at front
       const reports = this.getFoundReports();
       const updatedList = [newReport, ...reports.filter(r => r.id !== dbId)];
@@ -2182,7 +2150,7 @@ export const reportService = {
 
         const { data: remoteRows } = await supabase
           .from('found_reports')
-          .select('id, reporter_id, child_full_name, estimated_age, child_gender, found_location, found_date, found_time, physical_description, clothing_description, current_safe_location, child_photo_url, status, created_at')
+          .select('id, reporter_id, child_full_name, estimated_age, child_gender, found_location, found_date, found_time, physical_description, clothing_description, current_location_of_child, child_photo_url, status, created_at')
           .in('reporter_id', idsToMatch)
           .order('created_at', { ascending: false })
           .limit(MAX_RETAINED_FOUND_REPORTS);

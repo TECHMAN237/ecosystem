@@ -204,7 +204,7 @@
                     return;
                 }
 
-                container.innerHTML = reports.map(report => {
+                container.innerHTML = reports.map((report, idx) => {
                     const labelAge = report.age ? `, env. ${report.age} ans` : '';
                     let badgeClass = 'bg-[#FEF9C3] text-[#854D0E] border border-[#FEF08A]';
                     let badgeLabel = 'Recherche Famille';
@@ -218,15 +218,18 @@
                     }
 
                     const genderLabel = (report.gender || "").toLowerCase() === 'fille' ? 'Fille' : 'Garçon';
-                    const photoSrc = report.photo || '/assets/children/child-02.webp';
-                    const thumbUrl = report.thumbnail || (typeof reportService.getThumbnailUrl === 'function' ? reportService.getThumbnailUrl(photoSrc) : photoSrc) || photoSrc;
+                    const fallbackPhoto = typeof reportService.getDefaultChildPortrait === 'function'
+                        ? reportService.getDefaultChildPortrait(report.gender || '', idx, true)
+                        : '/assets/children/child-02.webp';
+                    const photoSrc = report.photo || fallbackPhoto;
+                    const thumbUrl = report.thumbnail || (typeof reportService.getThumbnailUrl === 'function' ? reportService.getThumbnailUrl(photoSrc) : photoSrc) || fallbackPhoto;
 
                     return `
                         <div class="report-card bg-white rounded-2xl p-4 flex gap-4 items-center border border-[#EAECF0] shadow-sm hover:shadow-md hover:border-[#532CE6]/30 hover:-translate-y-0.5 transition-all duration-300 relative cursor-pointer" 
                              data-id="${report.id}">
                             <div class="w-24 h-28 rounded-xl border border-[#EAECF0] p-1 flex-shrink-0 relative bg-[#F8F9FA]">
                                 <div class="w-full h-full rounded-lg overflow-hidden bg-[#F1F5F9]">
-                                    <img alt="${report.name}" loading="lazy" decoding="async" class="w-full h-full object-cover object-center" src="${thumbUrl}" onerror="if (this.src !== '${photoSrc}') { this.src = '${photoSrc}'; } else { this.onerror = null; this.src = '/assets/children/child-02.webp'; }" />
+                                    <img alt="${report.name}" loading="lazy" decoding="async" class="w-full h-full object-cover object-center" src="${thumbUrl}" onerror="this.onerror = null; this.src = '${fallbackPhoto}';" />
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0 py-0.5 flex flex-col justify-between h-28">

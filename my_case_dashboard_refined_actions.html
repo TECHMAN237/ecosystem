@@ -214,18 +214,21 @@ async function renderCases() {
         return;
     }
 
-    container.innerHTML = reports.map(report => {
+    container.innerHTML = reports.map((report, idx) => {
         const isMissing = report.type === 'missing';
         const displayLabel = isMissing ? 'MISSING' : 'FOUND';
-        const photoSrc = report.photo || (isMissing ? '/assets/children/child-01.webp' : '/assets/children/child-02.webp');
-        const thumbUrl = report.thumbnail || (typeof reportService.getThumbnailUrl === 'function' ? reportService.getThumbnailUrl(photoSrc) : photoSrc) || photoSrc;
+        const fallbackPhoto = typeof reportService.getDefaultChildPortrait === 'function'
+            ? reportService.getDefaultChildPortrait(report.gender || '', idx, !isMissing)
+            : (isMissing ? '/assets/children/child-01.webp' : '/assets/children/child-02.webp');
+        const photoSrc = report.photo || fallbackPhoto;
+        const thumbUrl = report.thumbnail || (typeof reportService.getThumbnailUrl === 'function' ? reportService.getThumbnailUrl(photoSrc) : photoSrc) || fallbackPhoto;
         
         return `
             <div class="bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(15,23,42,0.06)] border border-[#E2E8F0] active:scale-[0.99] transition-all cursor-pointer hover:border-[#532CE6]/40" data-id="${report.id}">
                 <div class="flex justify-between items-start mb-4">
                     <div class="flex items-center gap-4">
                         <div class="w-14 h-14 rounded-full overflow-hidden border border-[#E2E8F0] bg-[#F8F9FA] flex-shrink-0 shadow-sm">
-                            <img alt="${report.name}" loading="lazy" decoding="async" class="w-full h-full object-cover" src="${thumbUrl}" onerror="if (this.src !== '${photoSrc}') { this.src = '${photoSrc}'; } else { this.onerror = null; this.src = '/assets/children/child-01.webp'; }" />
+                            <img alt="${report.name}" loading="lazy" decoding="async" class="w-full h-full object-cover" src="${thumbUrl}" onerror="this.onerror = null; this.src = '${fallbackPhoto}';" />
                         </div>
                         <div>
                             <h3 class="font-bold text-sm md:text-base text-[#532CE6]"><span class="mr-1.5 font-bold">${displayLabel}:</span>${report.name} (${report.age} ans)</h3>
