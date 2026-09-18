@@ -32,11 +32,11 @@ if (typeof document !== 'undefined') {
             
             /* Mobile Layout Padding: Space for floating bottom pill */
             @media (max-width: 767px) {
-                body:not(.v2-preview-page) {
+                body:not(.v2-preview-page):not(.report-detail-page) {
                     padding-bottom: 7.5rem !important;
                 }
-                body:not(.v2-preview-page) main,
-                body:not(.v2-preview-page) .main-content-area {
+                body:not(.v2-preview-page):not(.report-detail-page) main,
+                body:not(.v2-preview-page):not(.report-detail-page) .main-content-area {
                     padding-bottom: 7.5rem !important;
                 }
             }
@@ -80,11 +80,18 @@ function renderShell() {
     // Determine active tab & special pages
     const path = window.location.pathname;
     const isV2Preview = path.includes('v2_smart_device_preview');
+    const isReportDetailPage = path.includes('report_details') || path.includes('found_report_details');
 
     if (isV2Preview) {
         document.body.classList.add('v2-preview-page');
     } else {
         document.body.classList.remove('v2-preview-page');
+    }
+
+    if (isReportDetailPage) {
+        document.body.classList.add('report-detail-page');
+    } else {
+        document.body.classList.remove('report-detail-page');
     }
 
     let activeTab = 'accueil';
@@ -176,8 +183,9 @@ function renderShell() {
             document.body.insertBefore(sidebarTemplate.firstChild, document.body.firstChild);
         }
     } else {
-        // MOBILE: Render Floating Pill-Shaped Bottom Navigation
-        const bottomNavHtml = `
+        // MOBILE: Render Floating Pill-Shaped Bottom Navigation (except on detail pages where full screen & action bar take priority)
+        if (!isReportDetailPage && !isV2Preview) {
+            const bottomNavHtml = `
             <div data-shell-element="true" class="mobile-nav-wrapper fixed bottom-5 left-0 w-full z-50 px-4 pointer-events-none flex justify-center">
                 <div class="relative w-full max-w-md pointer-events-auto">
                     <!-- Subtle ambient violet glow backing matching reference -->
@@ -214,10 +222,11 @@ function renderShell() {
                     </nav>
                 </div>
             </div>
-        `;
-        const bottomNavTemplate = document.createElement('div');
-        bottomNavTemplate.innerHTML = bottomNavHtml.trim();
-        document.body.appendChild(bottomNavTemplate.firstChild);
+            `;
+            const bottomNavTemplate = document.createElement('div');
+            bottomNavTemplate.innerHTML = bottomNavHtml.trim();
+            document.body.appendChild(bottomNavTemplate.firstChild);
+        }
     }
 }
 

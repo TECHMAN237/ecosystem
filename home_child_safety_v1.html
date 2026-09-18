@@ -210,16 +210,7 @@
       <span class="material-symbols-outlined text-[16px]">chevron_right</span>
     </button>
   </div>
-  <div id="recentMissingCarousel" class="flex overflow-x-auto gap-4 pb-3 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-5 px-5">
-    <!-- Initial Loading Skeleton -->
-    <div class="flex-shrink-0 w-[295px] snap-start bg-white rounded-[20px] p-3.5 border border-outline-variant/20 flex gap-3.5 items-center animate-pulse">
-      <div class="w-[96px] h-[112px] rounded-[14px] bg-surface-container-high shrink-0"></div>
-      <div class="flex-1 space-y-2">
-        <div class="h-4 bg-surface-container-high rounded w-3/4"></div>
-        <div class="h-3 bg-surface-container-high rounded w-1/2"></div>
-        <div class="h-6 bg-surface-container-high rounded-full w-20"></div>
-      </div>
-    </div>
+  <div id="recentMissingCarousel" class="flex overflow-x-auto gap-4 pb-3 no-scrollbar snap-x snap-mandatory scroll-smooth -mx-5 px-5 min-h-[140px]">
   </div>
 </section>
 
@@ -363,7 +354,12 @@ function renderReportCards(reportsList) {
     const carousel = document.getElementById('recentMissingCarousel');
     if (!carousel) return;
 
-    if (!reportsList || reportsList.length === 0) {
+    // Filter to strictly valid reports only (must have non-empty ID and valid name or description)
+    const validReports = Array.isArray(reportsList)
+        ? reportsList.filter(r => r && r.id && typeof r.id === 'string' && (r.name || r.child_full_name || r.childName || r.physicalDescription || r.type))
+        : [];
+
+    if (validReports.length === 0) {
         carousel.innerHTML = `
         <div class="w-full py-8 text-center text-on-surface-variant text-sm flex flex-col items-center justify-center">
             <span class="material-symbols-outlined text-3xl mb-1 text-outline">search_off</span>
@@ -372,11 +368,12 @@ function renderReportCards(reportsList) {
         return;
     }
 
-    // Clear empty state message if present
-    const emptyState = carousel.querySelector('.w-full.py-8.text-center');
-    if (emptyState) {
-        carousel.innerHTML = '';
-    }
+    // Clean any non-card elements (like old skeletons or empty states)
+    Array.from(carousel.children).forEach(child => {
+        if (!child.classList.contains('home-report-card') || !child.getAttribute('data-id')) {
+            child.remove();
+        }
+    });
 
     const currentCardMap = new Map();
     carousel.querySelectorAll('.home-report-card').forEach(card => {
@@ -384,7 +381,7 @@ function renderReportCards(reportsList) {
         if (id) currentCardMap.set(id, card);
     });
 
-    const targetIds = new Set(reportsList.map(r => r.id));
+    const targetIds = new Set(validReports.map(r => r.id));
 
     // Remove cards not in target list
     currentCardMap.forEach((card, id) => {
@@ -393,7 +390,7 @@ function renderReportCards(reportsList) {
         }
     });
 
-    reportsList.forEach((report, index) => {
+    validReports.forEach((report, index) => {
         const isFound = report.type === 'found' || report.status === 'Trouvé';
         const badgeText = isFound ? 'Trouvé' : (report.urgency || 'Urgent');
         const badgeClass = isFound ? 'bg-green-100 text-green-700' : 'bg-error-container text-error';
