@@ -171,10 +171,7 @@
   <h3 class="font-bold text-base text-[#0F172A] mb-1">Informations Personnelles</h3>
   <div class="grid grid-cols-2 gap-y-2.5 text-sm border-t border-[#EAECF0] pt-3">
     <span class="text-[#64748B] font-medium">Nom d'utilisateur :</span>
-    <span id="detailUsername" class="text-[#0F172A] font-semibold text-right">@elena_rod</span>
-    
-    <span class="text-[#64748B] font-medium">Téléphone :</span>
-    <span id="detailPhone" class="text-[#0F172A] font-semibold text-right">+237 677123456</span>
+    <span id="detailUsername" class="text-[#0F172A] font-semibold text-right">@gardien</span>
     
     <span class="text-[#64748B] font-medium">Ville :</span>
     <span id="detailCity" class="text-[#0F172A] font-semibold text-right">Yaoundé</span>
@@ -257,7 +254,7 @@ Accédez à l'historique complet de vos signalements d'enfants disparus et trouv
 </div>
 <span class="material-symbols-outlined text-outline">chevron_right</span>
 </button>
-<button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./about_safeguardian.html'">
+<button class="w-full flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors group" onclick="window.location.href='./about_raydar.html'">
 <div class="flex items-center gap-md">
 <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">info</span>
 <span class="font-body-lg text-body-lg text-on-surface">À propos</span>
@@ -310,16 +307,6 @@ Accédez à l'historique complet de vos signalements d'enfants disparus et trouv
           <input type="text" id="editUsername" class="w-full bg-surface-container border border-outline-variant/30 rounded-xl pl-8 pr-4 py-2.5 text-on-surface font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="nom_utilisateur"/>
         </div>
       </div>
-      <div class="grid grid-cols-3 gap-sm">
-        <div class="col-span-1">
-          <label class="block text-xs font-bold text-on-surface-variant uppercase mb-1" for="editCountryCode">Code Pays</label>
-          <input type="text" id="editCountryCode" class="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-3 py-2.5 text-on-surface font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="+237"/>
-        </div>
-        <div class="col-span-2">
-          <label class="block text-xs font-bold text-on-surface-variant uppercase mb-1" for="editPhoneNumber">Numéro de téléphone</label>
-          <input type="text" id="editPhoneNumber" class="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-2.5 text-on-surface font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="677123456"/>
-        </div>
-      </div>
       <div>
         <label class="block text-xs font-bold text-on-surface-variant uppercase mb-1" for="editCity">Ville</label>
         <input type="text" id="editCity" class="w-full bg-surface-container border border-outline-variant/30 rounded-xl px-4 py-2.5 text-on-surface font-semibold focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Yaoundé"/>
@@ -339,17 +326,35 @@ Accédez à l'historique complet de vos signalements d'enfants disparus et trouv
     const modeStatus = document.getElementById('mode-status');
     const modeIcon = document.getElementById('mode-icon');
 
+    // Restore saved mode from localStorage
+    const savedMode = localStorage.getItem('raydar_guardian_active_mode');
+    if (savedMode === 'active') {
+      modeToggle.checked = true;
+      modeStatus.innerText = 'Prêt à aider';
+      modeStatus.classList.remove('text-on-surface-variant');
+      modeStatus.classList.add('text-primary');
+      modeIcon.innerText = 'radar';
+    } else if (savedMode === 'passive') {
+      modeToggle.checked = false;
+      modeStatus.innerText = 'Mode Passif';
+      modeStatus.classList.remove('text-primary');
+      modeStatus.classList.add('text-on-surface-variant');
+      modeIcon.innerText = 'do_not_disturb_on';
+    }
+
     modeToggle.addEventListener('change', (e) => {
       if(e.target.checked) {
         modeStatus.innerText = 'Prêt à aider';
         modeStatus.classList.remove('text-on-surface-variant');
         modeStatus.classList.add('text-primary');
         modeIcon.innerText = 'radar';
+        localStorage.setItem('raydar_guardian_active_mode', 'active');
       } else {
         modeStatus.innerText = 'Mode Passif';
         modeStatus.classList.remove('text-primary');
         modeStatus.classList.add('text-on-surface-variant');
         modeIcon.innerText = 'do_not_disturb_on';
+        localStorage.setItem('raydar_guardian_active_mode', 'passive');
       }
     });
 
@@ -377,7 +382,30 @@ import { supabase } from "./src/supabaseClient.js";
 import { reportService, DEFAULT_AVATAR } from "./src/reportService.js";
 import { protectRoute, signOut } from "./src/authService.js";
 
-// Single authoritative route protection (prevents refresh redirect loops)
+// Toast notification helper
+function showToast(message, isError = false) {
+    let toast = document.getElementById('profileToast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'profileToast';
+        toast.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full text-sm font-semibold shadow-xl transition-all duration-300 pointer-events-none opacity-0 translate-y-4';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.className = `fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full text-sm font-semibold shadow-xl transition-all duration-300 pointer-events-none ${
+        isError ? 'bg-error text-white' : 'bg-[#0F172A] text-white'
+    }`;
+    setTimeout(() => {
+        toast.classList.remove('opacity-0', 'translate-y-4');
+        toast.classList.add('opacity-100', 'translate-y-0');
+    }, 10);
+    setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-4');
+    }, 3000);
+}
+
+// Single authoritative route protection
 await protectRoute('user');
 
 // Listen only for explicit signouts
@@ -389,21 +417,12 @@ supabase.auth.onAuthStateChange((event) => {
     }
 });
 
-const logoutBtn = document.getElementById('logoutBtn');
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        await signOut();
-    });
-}
-
 // Profile Elements
 const profileAvatar = document.getElementById('profileAvatar');
 const profileName = document.getElementById('profileName');
 const profileRole = document.getElementById('profileRole');
 
 const detailUsername = document.getElementById('detailUsername');
-const detailPhone = document.getElementById('detailPhone');
 const detailCity = document.getElementById('detailCity');
 
 // Modal Elements
@@ -422,8 +441,6 @@ const avatarStatusNotice = document.getElementById('avatarStatusNotice');
 
 const editFullName = document.getElementById('editFullName');
 const editUsername = document.getElementById('editUsername');
-const editCountryCode = document.getElementById('editCountryCode');
-const editPhoneNumber = document.getElementById('editPhoneNumber');
 const editCity = document.getElementById('editCity');
 
 let confirmedPhotoUrl = "";
@@ -439,21 +456,12 @@ async function renderProfileData() {
     if (profileName && profile.full_name) profileName.textContent = profile.full_name;
     if (profileRole && profile.role) profileRole.textContent = profile.role;
     
-    if (detailUsername && profile.username) detailUsername.textContent = '@' + profile.username;
-    if (detailPhone) {
-        if (profile.phone_number) {
-            detailPhone.textContent = (profile.phone_country_code || '+237') + ' ' + profile.phone_number;
-        } else {
-            detailPhone.textContent = 'Non renseigné';
-        }
-    }
+    if (detailUsername && profile.username) detailUsername.textContent = '@' + profile.username.replace(/^@/, '');
     if (detailCity && profile.city) detailCity.textContent = profile.city;
     
     // Populate Modal inputs
     if (editFullName) editFullName.value = profile.full_name || "";
-    if (editUsername) editUsername.value = profile.username || "";
-    if (editCountryCode) editCountryCode.value = profile.phone_country_code || "+237";
-    if (editPhoneNumber) editPhoneNumber.value = profile.phone_number || "";
+    if (editUsername) editUsername.value = (profile.username || "").replace(/^@/, '');
     if (editCity) editCity.value = profile.city || "";
     if (modalAvatarPreview) modalAvatarPreview.src = confirmedPhotoUrl;
 }
@@ -620,18 +628,21 @@ if (saveProfileBtn) {
             const updated = {
                 full_name: editFullName.value.trim() || current.full_name || "Gardien de la Sécurité",
                 username: editUsername.value.trim().replace(/^@/, "") || current.username || "gardien",
-                phone_country_code: editCountryCode.value.trim() || current.phone_country_code || "+237",
-                phone_number: editPhoneNumber.value.trim() || current.phone_number || "",
                 city: editCity.value.trim() || current.city || "Yaoundé",
                 photo: confirmedPhotoUrl || current.photo
             };
             
-            await reportService.saveProfile(updated);
-            await renderProfileData();
-            closeModal();
+            const saved = await reportService.saveProfile(updated);
+            if (saved) {
+                await renderProfileData();
+                closeModal();
+                showToast("Profil mis à jour avec succès !");
+            } else {
+                showToast("Erreur lors de l'enregistrement", true);
+            }
         } catch (err) {
             console.error("Error saving profile in UI:", err);
-            alert("Erreur lors de la mise à jour du profil : " + (err.message || "Réessayez plus tard."));
+            showToast("Erreur : " + (err.message || "Réessayez plus tard."), true);
         } finally {
             saveProfileBtn.disabled = false;
             saveProfileBtn.textContent = origText;
@@ -639,13 +650,32 @@ if (saveProfileBtn) {
     });
 }
 
-// Logout button handler
+// Logout button handler with explicit confirmation
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-        if (window.handleLogout) {
-            await window.handleLogout();
-        } else {
+    logoutBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const confirmed = confirm("Voulez-vous vraiment vous déconnecter de votre compte RAYDAR ?");
+        if (!confirmed) return;
+
+        logoutBtn.disabled = true;
+        logoutBtn.classList.add('opacity-50');
+        const origContent = logoutBtn.innerHTML;
+        logoutBtn.innerHTML = `
+            <div class="flex items-center gap-md">
+                <div class="w-10 h-10 rounded-xl bg-error/10 flex items-center justify-center text-error animate-spin">
+                    <span class="material-symbols-outlined">sync</span>
+                </div>
+                <div class="text-left">
+                    <p class="font-bold text-sm text-error">Déconnexion en cours...</p>
+                </div>
+            </div>
+        `;
+
+        try {
+            await signOut();
+        } catch (err) {
+            console.warn("Sign out notice, proceeding with redirect:", err);
             localStorage.clear();
             sessionStorage.clear();
             window.location.replace('./login_child_safety.html');

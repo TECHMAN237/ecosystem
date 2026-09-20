@@ -1,0 +1,69 @@
+name: Supabase Production Backend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - production
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/supabase_deploy.yml'
+
+jobs:
+  deploy_backend:
+    name: Deploy Migrations & Edge Functions to Supabase Cloud
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository Source of Truth
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link Supabase Project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          supabase link --project-ref ifpbdythbhlgqymsaxtz --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Apply Database Migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          echo "🚀 Applying pending SQL migrations to Supabase Cloud..."
+          supabase db push --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Deploy Supabase Edge Functions
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          echo "🚀 Deploying Edge Functions to Supabase Cloud..."
+          supabase functions deploy create-missing-report --no-verify-jwt
+          supabase functions deploy create-found-report --no-verify-jwt
+          supabase functions deploy matching-engine --no-verify-jwt
+          supabase functions deploy ai-analysis --no-verify-jwt
+          supabase functions deploy broadcast-alert --no-verify-jwt
+          supabase functions deploy admin-action --no-verify-jwt
+          supabase functions deploy email-verification --no-verify-jwt
+
+      - name: Run Post-Deployment Drift Audit
+        env:
+          SUPABASE_URL: "https://ifpbdythbhlgqymsaxtz.supabase.co"
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          npm run audit:backend

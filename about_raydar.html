@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="stylesheet" href="./ui-polish.css"/>
+<title>RAYDAR - À propos de l'application</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#532CE6",
+            "primary-container": "#F5F3FF",
+            "on-primary": "#ffffff",
+            "surface": "#ffffff",
+            "background": "#F8F9FA",
+            "on-surface": "#0F172A",
+            "on-surface-variant": "#64748B",
+            "outline-variant": "#EAECF0"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            display: ["Plus Jakarta Sans", "sans-serif"]
+          }
+        }
+      }
+    }
+</script>
+
+<script type="importmap">
+{
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+  }
+}
+</script>
+</head>
+<body class="bg-background text-on-surface font-sans min-h-screen pb-32">
+<!-- Top AppBar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-white border-b border-[#EAECF0]">
+  <div class="flex items-center justify-between px-4 h-16 w-full max-w-2xl mx-auto">
+    <div class="flex items-center gap-3">
+      <button id="backBtn" aria-label="Retour" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] active:scale-95 transition-all text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./guardian_profile_updated_my_reports.html'">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <h1 class="text-base font-bold text-[#0F172A] font-display">À Propos de RAYDAR</h1>
+    </div>
+    <button aria-label="Alertes" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] transition-colors" onclick="window.location.href='./alert_center.html'">
+      <span class="material-symbols-outlined text-[#64748B]">notifications</span>
+    </button>
+  </div>
+</header>
+
+<main class="pt-20 px-4 max-w-2xl mx-auto space-y-4">
+  <!-- Brand Hero Card -->
+  <div class="bg-white rounded-2xl border border-[#EAECF0] p-6 shadow-sm flex flex-col items-center text-center">
+    <div class="w-20 h-20 rounded-3xl bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/25 mb-3">
+      <span class="material-symbols-outlined text-[42px]" style="font-variation-settings: 'FILL' 1;">radar</span>
+    </div>
+    <h2 class="text-2xl font-extrabold text-[#0F172A] font-display tracking-tight">RAYDAR</h2>
+    <p class="text-xs text-primary font-bold tracking-wider uppercase mt-0.5">Réseau d'Alerte et de Sauvetage d'Enfants</p>
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold mt-2.5">
+      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <span>Version 1.4.2 (Build 2026.09)</span>
+    </div>
+  </div>
+
+  <!-- Mission Statement Card -->
+  <section class="bg-white rounded-2xl p-5 shadow-sm border border-[#EAECF0] space-y-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-primary-container border border-primary/15 flex items-center justify-center text-primary">
+        <span class="material-symbols-outlined text-[20px]">verified_user</span>
+      </div>
+      <div>
+        <h3 class="text-sm font-bold text-[#0F172A] font-display">Notre Mission</h3>
+        <p class="text-xs text-[#64748B]">Mobiliser chaque citoyen pour la protection de l'enfance</p>
+      </div>
+    </div>
+    <p class="text-xs text-[#64748B] leading-relaxed">
+      RAYDAR a pour vocation de réduire drastiquement le délai de réaction critique lors de la disparition d'un enfant en coordonnant instantanément la communauté de gardiens, les témoins locaux et les forces de l'ordre. Chaque seconde compte pour retrouver un enfant sain et sauf.
+    </p>
+  </section>
+
+  <!-- Technical & Compliance Specifications -->
+  <section class="bg-white rounded-2xl p-5 shadow-sm border border-[#EAECF0] space-y-3">
+    <h3 class="text-sm font-bold text-[#0F172A] font-display">Conformité & Sécurité Système</h3>
+    
+    <div class="divide-y divide-[#EAECF0] text-xs">
+      <div class="flex items-center justify-between py-2.5">
+        <span class="text-[#64748B]">Chiffrement des Données</span>
+        <span class="font-bold text-[#0F172A] flex items-center gap-1">
+          <span class="material-symbols-outlined text-emerald-600 text-[16px]">lock</span>
+          TLS 1.3 / AES-256
+        </span>
+      </div>
+
+      <div class="flex items-center justify-between py-2.5">
+        <span class="text-[#64748B]">Politique Google Play</span>
+        <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Conforme 100%</span>
+      </div>
+
+      <div class="flex items-center justify-between py-2.5">
+        <span class="text-[#64748B]">Réseau Cloud Supabase</span>
+        <span id="backendStatusBadge" class="font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Connecté (Opérationnel)</span>
+        </span>
+      </div>
+
+      <div class="flex items-center justify-between py-2.5">
+        <span class="text-[#64748B]">Mode Hors-Ligne (PWA)</span>
+        <span class="font-bold text-[#0F172A]">Prise en charge active</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Legal & Credits -->
+  <section class="bg-white rounded-2xl p-5 shadow-sm border border-[#EAECF0] space-y-2 text-center">
+    <p class="text-xs font-bold text-[#0F172A]">RAYDAR Child Safety Initiative</p>
+    <p class="text-[11px] text-[#64748B]">Développé avec dévouement pour la protection et la sécurité des familles.</p>
+    <p class="text-[10px] text-[#94A3B8] pt-2">© 2026 RAYDAR. Tous droits réservés.</p>
+  </section>
+</main>
+
+<script type="module">
+import { supabase } from "./src/supabaseClient.js";
+
+// Check live backend connectivity
+async function checkBackend() {
+    const badge = document.getElementById('backendStatusBadge');
+    try {
+        const { error } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
+        if (!error) {
+            badge.className = "font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full flex items-center gap-1";
+            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span><span>Réseau Opérationnel</span>`;
+        }
+    } catch (e) {
+        console.warn("Backend connectivity check notice:", e);
+    }
+}
+checkBackend();
+</script>
+
+<script src="./src/responsiveShell.js" type="module"></script>
+</body>
+</html>

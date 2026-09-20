@@ -1,0 +1,35 @@
+name: Supabase Backend Drift & Schema Audit
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/**'
+      - 'scripts/**'
+  push:
+    branches:
+      - dev
+      - staging
+    paths:
+      - 'supabase/**'
+
+jobs:
+  audit_backend:
+    name: Validate Migrations, Functions & Drift
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Run Backend Drift Audit
+        run: |
+          npm run audit:backend

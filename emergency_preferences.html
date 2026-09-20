@@ -1,136 +1,38 @@
 <!DOCTYPE html>
-
-<html lang="en"><head>
+<html class="light" lang="fr">
+<head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
 <link rel="stylesheet" href="./ui-polish.css"/>
-<title>Emergency Preferences - SafeGuardian</title>
+<title>RAYDAR - Préférences d'Urgence</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "primary-fixed": "#e5deff",
-                        "tertiary-fixed-dim": "#ffb68e",
-                        "surface-tint": "#532ce6",
-                        "surface-container": "#F8F9FA",
-                        "on-primary": "#ffffff",
-                        "inverse-primary": "#c8bfff",
-                        "surface-container-lowest": "#ffffff",
-                        "primary-container": "#F5F3FF",
-                        "on-error": "#ffffff",
-                        "secondary": "#64748B",
-                        "surface-dim": "#F1F5F9",
-                        "secondary-container": "#F1F5F9",
-                        "primary": "#532ce6",
-                        "on-tertiary-fixed": "#331200",
-                        "on-primary-fixed-variant": "#4321c4",
-                        "primary-fixed-dim": "#c8bfff",
-                        "on-surface-variant": "#64748B",
-                        "on-tertiary-fixed-variant": "#773300",
-                        "inverse-on-surface": "#f4eefd",
-                        "tertiary-fixed": "#ffdbca",
-                        "surface-variant": "#F1F5F9",
-                        "secondary-fixed": "#E2E8F0",
-                        "on-secondary-fixed-variant": "#475569",
-                        "on-secondary-fixed": "#0F172A",
-                        "on-error-container": "#991B1B",
-                        "on-background": "#0F172A",
-                        "error": "#DC2626",
-                        "background": "#F8F9FA",
-                        "on-secondary": "#ffffff",
-                        "surface-container-low": "#F8F9FA",
-                        "secondary-fixed-dim": "#CBD5E1",
-                        "tertiary": "#8f3e00",
-                        "surface-container-high": "#F1F5F9",
-                        "on-secondary-container": "#475569",
-                        "inverse-surface": "#1E293B",
-                        "on-primary-container": "#532ce6",
-                        "on-tertiary": "#ffffff",
-                        "on-primary-fixed": "#1e0b75",
-                        "outline-variant": "#EAECF0",
-                        "on-tertiary-container": "#ffefe9",
-                        "outline": "#94A3B8",
-                        "error-container": "#FEF2F2",
-                        "tertiary-container": "#b55100",
-                        "surface-container-highest": "#E2E8F0",
-                        "on-surface": "#0F172A",
-                        "surface": "#ffffff",
-                        "surface-bright": "#FFFFFF"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "1rem",
-                        "lg": "2rem",
-                        "xl": "3rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "xl": "32px",
-                        "sm": "12px",
-                        "md": "16px",
-                        "lg": "24px",
-                        "xs": "8px",
-                        "gutter": "16px",
-                        "base": "4px",
-                        "container-margin": "20px"
-                    },
-                    "fontFamily": {
-                        "headline-md": ["Plus Jakarta Sans"],
-                        "headline-lg": ["Plus Jakarta Sans"],
-                        "label-bold": ["Inter"],
-                        "label-sm": ["Inter"],
-                        "body-md": ["Inter"],
-                        "display": ["Plus Jakarta Sans"],
-                        "body-lg": ["Inter"]
-                    },
-                    "fontSize": {
-                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
-                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
-                        "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
-                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
-                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
-                        "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
-                    }
-                },
-            },
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#532CE6",
+            "primary-container": "#F5F3FF",
+            "on-primary": "#ffffff",
+            "surface": "#ffffff",
+            "background": "#F8F9FA",
+            "on-surface": "#0F172A",
+            "on-surface-variant": "#64748B",
+            "outline-variant": "#EAECF0",
+            "error": "#DC2626"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            display: ["Plus Jakarta Sans", "sans-serif"]
+          }
         }
-    </script>
-<style>
-        body {
-            background-color: #f7f7fa;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            display: inline-block;
-            vertical-align: middle;
-        }
-        .soft-shadow {
-            box-shadow: 0px 4px 20px rgba(108, 77, 255, 0.06);
-        }
-        .urgent-accent {
-            border-left: 4px solid #FF4D4F;
-        }
-        .custom-toggle:checked + .toggle-dot {
-            transform: translateX(100%);
-            background-color: #ffffff;
-        }
-        .custom-toggle:checked + .toggle-bg {
-            background-color: #532ce6;
-        }
-    </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
+      }
     }
-  </style>
-  
+</script>
+
 <script type="importmap">
 {
   "imports": {
@@ -138,117 +40,260 @@
   }
 }
 </script>
-
 </head>
-<body class="bg-background text-on-surface font-body-md min-h-screen">
+<body class="bg-background text-on-surface font-sans min-h-screen pb-32">
 <!-- Top AppBar -->
 <header class="sticky top-0 z-50 bg-white border-b border-[#EAECF0] h-16 w-full">
-<div class="flex items-center justify-between px-container-margin h-full max-w-7xl mx-auto">
-<div class="flex items-center gap-3">
-<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] transition-colors active:scale-95 text-[#64748B] hover:text-[#0F172A]" onclick="history.back()">
-<span class="material-symbols-outlined">arrow_back</span>
-</button>
-<h1 class="text-base font-bold text-[#0F172A]">Préférences d'Urgence</h1>
-</div>
-<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] transition-colors active:scale-95 text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./alert_center.html'">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-</div>
+  <div class="flex items-center justify-between px-4 h-full max-w-2xl mx-auto">
+    <div class="flex items-center gap-3">
+      <button id="backBtn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] transition-colors active:scale-95 text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./guardian_profile_updated_my_reports.html'">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <h1 class="text-base font-bold text-[#0F172A] font-display">Préférences d'Urgence</h1>
+    </div>
+    <button aria-label="Alertes" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] transition-colors active:scale-95 text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./alert_center.html'">
+      <span class="material-symbols-outlined">notifications</span>
+    </button>
+  </div>
 </header>
-<main class="max-w-xl mx-auto px-container-margin pt-6 pb-32 space-y-4">
-<!-- Introduction -->
-<div class="bg-white border border-[#EAECF0] rounded-2xl p-4 shadow-sm flex items-center gap-3">
-<div class="w-10 h-10 rounded-xl bg-[#FEF2F2] border border-[#DC2626]/20 flex items-center justify-center flex-shrink-0">
-<span class="material-symbols-outlined text-[#DC2626] text-[20px]" style="font-variation-settings: 'FILL' 1;">emergency</span>
-</div>
-<p class="text-xs text-[#64748B]">Configurez la réponse automatique de RAYDAR en cas d'urgence. Ces paramètres sont sécurisés et partagés uniquement avec les intervenants autorisés.</p>
-</div>
-<!-- Primary Contact Card -->
-<section class="bg-white rounded-2xl p-6 shadow-sm border border-[#EAECF0]">
-<div class="flex items-center gap-3 mb-4">
-<div class="w-10 h-10 rounded-xl bg-[#F5F3FF] border border-[#532CE6]/15 flex items-center justify-center">
-<span class="material-symbols-outlined text-[#532CE6]">contact_emergency</span>
-</div>
-<div>
-<h2 class="text-base font-bold text-[#0F172A]">Contact d'Urgence Principal</h2>
-<p class="text-xs text-[#64748B]">Personne à contacter en priorité absolue</p>
-</div>
-</div>
-<div class="space-y-3">
-<div>
-<label class="font-bold text-xs text-[#64748B] block mb-1">NOM COMPLET</label>
-<input class="w-full h-11 px-4 bg-[#F8F9FA] border border-[#EAECF0] rounded-xl focus:ring-1 focus:ring-[#532CE6] focus:border-[#532CE6] outline-none transition-all text-sm text-[#0F172A]" placeholder="Entrez le nom" type="text" value="Sarah Jenkins"/>
-</div>
-<div>
-<label class="font-bold text-xs text-[#64748B] block mb-1">NUMÉRO DE TÉLÉPHONE</label>
-<input class="w-full h-11 px-4 bg-[#F8F9FA] border border-[#EAECF0] rounded-xl focus:ring-1 focus:ring-[#532CE6] focus:border-[#532CE6] outline-none transition-all text-sm text-[#0F172A]" placeholder="Entrez le numéro" type="tel" value="+237 677 12 34 56"/>
-</div>
-</div>
-</section>
-<!-- Location Sharing Card -->
-<section class="bg-white rounded-2xl p-6 shadow-sm border border-[#EAECF0]">
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-xl bg-[#F5F3FF] border border-[#532CE6]/15 flex items-center justify-center">
-<span class="material-symbols-outlined text-[#532CE6]">location_on</span>
-</div>
-<div>
-<h2 class="text-base font-bold text-[#0F172A]">Partage de Position</h2>
-<p class="text-xs text-[#64748B]">Toujours transmettre lors des alertes</p>
-</div>
-</div>
-<label class="relative inline-flex items-center cursor-pointer">
-<input checked="" class="sr-only peer" type="checkbox"/>
-<div class="w-11 h-6 bg-[#E2E8F0] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#532CE6]"></div>
-</label>
-</div>
-</section>
-<!-- Auto-SOS Card -->
-<section class="bg-white rounded-2xl p-6 shadow-sm border border-[#EAECF0]">
-<div class="flex items-center gap-3 mb-2">
-<div class="w-10 h-10 rounded-xl bg-[#FEF2F2] border border-[#DC2626]/20 flex items-center justify-center">
-<span class="material-symbols-outlined text-[#DC2626]" style="font-variation-settings: 'FILL' 1;">sensors</span>
-</div>
-<div>
-<h2 class="text-base font-bold text-[#0F172A]">Déclenchement Auto-SOS</h2>
-<p class="text-xs text-[#64748B]">Activer les protocoles en cas d'impact ou anomalie</p>
-</div>
-</div>
-<div class="divide-y divide-[#EAECF0] mt-3">
-<div class="flex items-center justify-between py-3">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-[#64748B] text-[18px]">speed</span>
-<span class="text-xs font-semibold text-[#0F172A]">Sensibilité aux chocs</span>
-</div>
-<span class="text-xs font-bold text-[#532CE6] bg-[#F5F3FF] border border-[#532CE6]/20 px-2.5 py-0.5 rounded-md">Élevée</span>
-</div>
-<div class="flex items-center justify-between py-3">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-[#64748B] text-[18px]">timer</span>
-<span class="text-xs font-semibold text-[#0F172A]">Délai d'inactivité</span>
-</div>
-<span class="text-xs font-bold text-[#0F172A] bg-[#F8F9FA] border border-[#EAECF0] px-2.5 py-0.5 rounded-md">2 Minutes</span>
-</div>
-</div>
-</section>
-<!-- Save Button -->
-<div class="pt-2">
-<button class="w-full bg-[#532CE6] hover:bg-[#4321C4] text-white font-bold text-sm py-3.5 rounded-xl shadow-sm active:scale-95 transition-all">
-                Enregistrer les Préférences
-            </button>
-</div>
+
+<main class="max-w-2xl mx-auto px-4 pt-4 space-y-4">
+  <!-- Introduction -->
+  <div class="bg-white border border-[#EAECF0] rounded-2xl p-4 shadow-sm flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-[#FEF2F2] border border-[#DC2626]/20 flex items-center justify-center flex-shrink-0">
+      <span class="material-symbols-outlined text-[#DC2626] text-[20px]" style="font-variation-settings: 'FILL' 1;">emergency</span>
+    </div>
+    <p class="text-xs text-[#64748B] leading-relaxed">
+      Configurez vos protocoles de réaction immédiate lors d'un signalement d'urgence critique. Ces informations sont transmises en priorité lors d'un déclenchement SOS.
+    </p>
+  </div>
+
+  <!-- Primary Emergency Contact Card -->
+  <section class="bg-white rounded-2xl p-5 shadow-sm border border-[#EAECF0] space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-[#F5F3FF] border border-[#532CE6]/15 flex items-center justify-center">
+        <span class="material-symbols-outlined text-[#532CE6]">contact_emergency</span>
+      </div>
+      <div>
+        <h2 class="text-base font-bold text-[#0F172A] font-display">Contact d'Urgence Désigné</h2>
+        <p class="text-xs text-[#64748B]">Personne à avertir immédiatement en cas d'incident</p>
+      </div>
+    </div>
+
+    <div class="space-y-3 pt-1">
+      <div>
+        <label for="contactName" class="font-bold text-xs text-[#64748B] block mb-1">NOM COMPLET DU CONTACT</label>
+        <input id="contactName" class="w-full h-11 px-4 bg-[#F8F9FA] border border-[#EAECF0] rounded-xl focus:ring-1 focus:ring-[#532CE6] focus:border-[#532CE6] outline-none transition-all text-sm font-semibold text-[#0F172A]" placeholder="Ex: Marie Mbarga" type="text"/>
+      </div>
+      
+      <div>
+        <label for="contactPhone" class="font-bold text-xs text-[#64748B] block mb-1">NUMÉRO DE TÉLÉPHONE D'URGENCE</label>
+        <input id="contactPhone" class="w-full h-11 px-4 bg-[#F8F9FA] border border-[#EAECF0] rounded-xl focus:ring-1 focus:ring-[#532CE6] focus:border-[#532CE6] outline-none transition-all text-sm font-semibold text-[#0F172A]" placeholder="Ex: +237 677 12 34 56" type="tel"/>
+      </div>
+
+      <div>
+        <label for="contactRelation" class="font-bold text-xs text-[#64748B] block mb-1">LIEN DE PARENTÉ / RELATION</label>
+        <select id="contactRelation" class="w-full h-11 px-3 bg-[#F8F9FA] border border-[#EAECF0] rounded-xl focus:ring-1 focus:ring-[#532CE6] focus:border-[#532CE6] outline-none transition-all text-sm font-semibold text-[#0F172A]">
+          <option value="Conjoint(e)">Conjoint(e)</option>
+          <option value="Parent (Mère/Père)">Parent (Mère/Père)</option>
+          <option value="Frère/Sœur">Frère/Sœur</option>
+          <option value="Tuteur Légal">Tuteur Légal</option>
+          <option value="Voisin / Proche de confiance">Voisin / Proche de confiance</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Location Sharing Card -->
+  <section class="bg-white rounded-2xl p-5 shadow-sm border border-[#EAECF0]">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3 max-w-[75%]">
+        <div class="w-10 h-10 rounded-xl bg-[#F5F3FF] border border-[#532CE6]/15 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-[#532CE6]">location_on</span>
+        </div>
+        <div>
+          <h2 class="text-sm font-bold text-[#0F172A] font-display">Partage Automatique de Position GPS</h2>
+          <p class="text-xs text-[#64748B]">Transmettre les coordonnées précises lors de vos signalements de recherche.</p>
+        </div>
+      </div>
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input id="shareLocationToggle" checked class="sr-only peer" type="checkbox"/>
+        <div class="w-11 h-6 bg-[#E2E8F0] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#532CE6]"></div>
+      </label>
+    </div>
+  </section>
+
+  <!-- Auto-SOS Trigger Card -->
+  <section class="bg-white rounded-2xl p-5 shadow-sm border border-[#EAECF0] space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-[#FEF2F2] border border-[#DC2626]/20 flex items-center justify-center">
+        <span class="material-symbols-outlined text-[#DC2626]" style="font-variation-settings: 'FILL' 1;">sensors</span>
+      </div>
+      <div>
+        <h2 class="text-base font-bold text-[#0F172A] font-display">Paramètres SOS d'Alerte Immédiate</h2>
+        <p class="text-xs text-[#64748B]">Réactivité du protocole d'urgence communautaire</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 pt-1">
+      <div class="bg-[#F8F9FA] rounded-xl p-3 border border-[#EAECF0]">
+        <label for="sosRadius" class="font-bold text-[11px] text-[#64748B] uppercase tracking-wider mb-1 block">Rayon de Diffusion</label>
+        <select id="sosRadius" class="w-full bg-transparent border-0 font-bold text-sm text-[#0F172A] p-0 focus:ring-0">
+          <option value="2 km">2 km (Quartier)</option>
+          <option value="5 km" selected>5 km (Ville proche)</option>
+          <option value="10 km">10 km (Zone étendue)</option>
+        </select>
+      </div>
+
+      <div class="bg-[#F8F9FA] rounded-xl p-3 border border-[#EAECF0]">
+        <label for="sosTimeout" class="font-bold text-[11px] text-[#64748B] uppercase tracking-wider mb-1 block">Délai d'Alerte</label>
+        <select id="sosTimeout" class="w-full bg-transparent border-0 font-bold text-sm text-[#0F172A] p-0 focus:ring-0">
+          <option value="Immédiat" selected>Immédiat (0 sec)</option>
+          <option value="30 secondes">30 secondes</option>
+          <option value="1 minute">1 minute</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Official Emergency Contacts Card -->
+  <section class="bg-white rounded-2xl p-5 shadow-sm border border-[#EAECF0] space-y-3">
+    <h3 class="font-bold text-xs uppercase tracking-wider text-[#64748B]">Numéros d'Urgence Officiels (Cameroun)</h3>
+    <div class="grid grid-cols-2 gap-2">
+      <a href="tel:117" class="flex items-center gap-2 p-2.5 rounded-xl bg-[#F8F9FA] border border-[#EAECF0] hover:bg-slate-100 transition-colors">
+        <span class="material-symbols-outlined text-[#532CE6] text-[18px]">local_police</span>
+        <div>
+          <p class="text-xs font-bold text-[#0F172A]">Police Secours</p>
+          <p class="text-[11px] text-[#532CE6] font-extrabold">117 / 17</p>
+        </div>
+      </a>
+      <a href="tel:119" class="flex items-center gap-2 p-2.5 rounded-xl bg-[#F8F9FA] border border-[#EAECF0] hover:bg-slate-100 transition-colors">
+        <span class="material-symbols-outlined text-[#532CE6] text-[18px]">shield</span>
+        <div>
+          <p class="text-xs font-bold text-[#0F172A]">Gendarmerie</p>
+          <p class="text-[11px] text-[#532CE6] font-extrabold">119</p>
+        </div>
+      </a>
+      <a href="tel:119" class="flex items-center gap-2 p-2.5 rounded-xl bg-[#F8F9FA] border border-[#EAECF0] hover:bg-slate-100 transition-colors">
+        <span class="material-symbols-outlined text-[#DC2626] text-[18px]">medical_services</span>
+        <div>
+          <p class="text-xs font-bold text-[#0F172A]">SAMU / Urgences</p>
+          <p class="text-[11px] text-[#DC2626] font-extrabold">119 / 15</p>
+        </div>
+      </a>
+      <a href="tel:116" class="flex items-center gap-2 p-2.5 rounded-xl bg-[#F8F9FA] border border-[#EAECF0] hover:bg-slate-100 transition-colors">
+        <span class="material-symbols-outlined text-[#532CE6] text-[18px]">child_care</span>
+        <div>
+          <p class="text-xs font-bold text-[#0F172A]">Enfance en Danger</p>
+          <p class="text-[11px] text-[#532CE6] font-extrabold">116</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Save Button -->
+  <div class="pt-2">
+    <button id="saveEmergencyPrefsBtn" class="w-full bg-[#532CE6] hover:bg-[#4321C4] text-white font-bold text-sm py-3.5 rounded-xl shadow-sm active:scale-98 transition-all flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined text-[18px]">save</span>
+      <span>Enregistrer les Préférences d'Urgence</span>
+    </button>
+  </div>
 </main>
-<script>
-        // Micro-interactions for toggle and buttons
-        document.querySelectorAll('button').forEach(btn => {
-            btn.addEventListener('touchstart', function() {
-                this.classList.add('scale-95');
-            });
-            btn.addEventListener('touchend', function() {
-                this.classList.remove('scale-95');
-            });
-        });
-    </script>
+
+<script type="module">
+import { supabase } from "./src/supabaseClient.js";
+import { protectRoute } from "./src/authService.js";
+
+await protectRoute('user');
+
+const contactName = document.getElementById('contactName');
+const contactPhone = document.getElementById('contactPhone');
+const contactRelation = document.getElementById('contactRelation');
+const shareLocation = document.getElementById('shareLocationToggle');
+const sosRadius = document.getElementById('sosRadius');
+const sosTimeout = document.getElementById('sosTimeout');
+const saveBtn = document.getElementById('saveEmergencyPrefsBtn');
+
+// Toast helper
+function showToast(msg, isError = false) {
+    let t = document.getElementById('emergToast');
+    if (!t) {
+        t = document.createElement('div');
+        t.id = 'emergToast';
+        t.className = 'fixed bottom-10 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full text-sm font-semibold shadow-xl transition-all duration-300 pointer-events-none opacity-0 translate-y-4';
+        document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.className = `fixed bottom-10 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full text-sm font-semibold shadow-xl transition-all duration-300 pointer-events-none ${
+        isError ? 'bg-red-600 text-white' : 'bg-[#0F172A] text-white'
+    }`;
+    setTimeout(() => {
+        t.classList.remove('opacity-0', 'translate-y-4');
+        t.classList.add('opacity-100', 'translate-y-0');
+    }, 10);
+    setTimeout(() => {
+        t.classList.remove('opacity-100', 'translate-y-0');
+        t.classList.add('opacity-0', 'translate-y-4');
+    }, 3000);
+}
+
+// 1. Load preferences
+function loadPreferences() {
+    try {
+        const raw = localStorage.getItem('raydar_emergency_preferences');
+        if (raw) {
+            const p = JSON.parse(raw);
+            if (p.name) contactName.value = p.name;
+            if (p.phone) contactPhone.value = p.phone;
+            if (p.relation) contactRelation.value = p.relation;
+            if (typeof p.shareLocation === 'boolean') shareLocation.checked = p.shareLocation;
+            if (p.sosRadius) sosRadius.value = p.sosRadius;
+            if (p.sosTimeout) sosTimeout.value = p.sosTimeout;
+        }
+    } catch (e) {
+        console.warn("Could not parse emergency preferences:", e);
+    }
+}
+loadPreferences();
+
+// 2. Save preferences
+saveBtn.addEventListener('click', async () => {
+    saveBtn.disabled = true;
+    const origHtml = saveBtn.innerHTML;
+    saveBtn.innerHTML = `<span>Enregistrement en cours...</span>`;
+
+    const emergencyPrefs = {
+        name: contactName.value.trim(),
+        phone: contactPhone.value.trim(),
+        relation: contactRelation.value,
+        shareLocation: shareLocation.checked,
+        sosRadius: sosRadius.value,
+        sosTimeout: sosTimeout.value,
+        updatedAt: new Date().toISOString()
+    };
+
+    try {
+        localStorage.setItem('raydar_emergency_preferences', JSON.stringify(emergencyPrefs));
+
+        // Sync with Supabase profiles table if logged in
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+            await supabase.from('profiles').update({
+                preferences: { emergency: emergencyPrefs }
+            }).eq('user_id', session.user.id);
+        }
+
+        showToast("Préférences d'urgence enregistrées avec succès !");
+    } catch (err) {
+        console.error("Save emergency preferences error:", err);
+        showToast("Préférences enregistrées localement.");
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = origHtml;
+    }
+});
+</script>
 
 <script src="./src/responsiveShell.js" type="module"></script>
-</body></html>
+</body>
+</html>

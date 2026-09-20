@@ -1,125 +1,45 @@
 <!DOCTYPE html>
-
-<html class="light" lang="en"><head>
+<html class="light" lang="fr">
+<head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
 <link rel="stylesheet" href="./ui-polish.css"/>
-<title>About SafeGuardian</title>
+<title>RAYDAR - À propos de l'application</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        body {
-            -webkit-tap-highlight-color: transparent;
-            scroll-behavior: smooth;
-        }
-        .glass-effect {
-            backdrop-filter: blur(8px);
-            background: rgba(255, 255, 255, 0.8);
-        }
-    </style>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "primary-fixed": "#e5deff",
-                      "tertiary-fixed-dim": "#ffb68e",
-                      "surface-tint": "#5b38ee",
-                      "surface-container": "#f1ebfa",
-                      "on-primary": "#ffffff",
-                      "inverse-primary": "#c8bfff",
-                      "surface-container-lowest": "#ffffff",
-                      "primary-container": "#6c4dff",
-                      "on-error": "#ffffff",
-                      "secondary": "#5f5e60",
-                      "surface-dim": "#ddd8e6",
-                      "secondary-container": "#e2dfe1",
-                      "primary": "#532ce6",
-                      "on-tertiary-fixed": "#331200",
-                      "on-primary-fixed-variant": "#4206d7",
-                      "primary-fixed-dim": "#c8bfff",
-                      "on-surface-variant": "#474556",
-                      "on-tertiary-fixed-variant": "#773300",
-                      "inverse-on-surface": "#f4eefd",
-                      "tertiary-fixed": "#ffdbca",
-                      "surface-variant": "#e5e0ef",
-                      "secondary-fixed": "#e4e2e4",
-                      "on-secondary-fixed-variant": "#474649",
-                      "on-secondary-fixed": "#1b1b1d",
-                      "on-error-container": "#93000a",
-                      "on-background": "#1c1a24",
-                      "error": "#ba1a1a",
-                      "background": "#F5F4F2",
-                      "on-secondary": "#ffffff",
-                      "surface-container-low": "#F5F4F2",
-                      "secondary-fixed-dim": "#c8c6c8",
-                      "tertiary": "#8f3e00",
-                      "surface-container-high": "#ebe6f4",
-                      "on-secondary-container": "#636264",
-                      "inverse-surface": "#312f3a",
-                      "on-primary-container": "#f6f0ff",
-                      "on-tertiary": "#ffffff",
-                      "on-primary-fixed": "#190064",
-                      "outline-variant": "#c9c4d9",
-                      "on-tertiary-container": "#ffefe9",
-                      "outline": "#787588",
-                      "error-container": "#ffdad6",
-                      "tertiary-container": "#b55100",
-                      "surface-container-highest": "#e5e0ef",
-                      "on-surface": "#1c1a24",
-                      "surface": "#F5F4F2",
-                      "surface-bright": "#F5F4F2"
-              },
-              "borderRadius": {
-                      "DEFAULT": "1rem",
-                      "lg": "2rem",
-                      "xl": "3rem",
-                      "full": "9999px"
-              },
-              "spacing": {
-                      "xl": "32px",
-                      "sm": "12px",
-                      "md": "16px",
-                      "lg": "24px",
-                      "xs": "8px",
-                      "gutter": "16px",
-                      "base": "4px",
-                      "container-margin": "20px"
-              },
-              "fontFamily": {
-                      "headline-md": ["Plus Jakarta Sans"],
-                      "headline-lg": ["Plus Jakarta Sans"],
-                      "label-bold": ["Inter"],
-                      "label-sm": ["Inter"],
-                      "body-md": ["Inter"],
-                      "display": ["Plus Jakarta Sans"],
-                      "body-lg": ["Inter"]
-              },
-              "fontSize": {
-                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
-                      "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
-                      "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
-                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
-                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
-                      "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
-              }
-            },
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#532ce6",
+            "primary-container": "#F5F3FF",
+            "on-primary": "#ffffff",
+            "surface-container": "#F8F9FA",
+            "outline-variant": "#EAECF0",
+            "on-surface-variant": "#64748B",
+            "on-surface": "#0F172A",
+            "error": "#DC2626",
+            "background": "#F8F9FA"
           },
+          fontFamily: {
+            "display": ["Plus Jakarta Sans"],
+            "body": ["Inter"]
+          }
         }
-    </script>
+      }
+    }
+</script>
 <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
     body {
       min-height: max(884px, 100dvh);
     }
-  </style>
-  
+</style>
 <script type="importmap">
 {
   "imports": {
@@ -127,90 +47,133 @@
   }
 }
 </script>
-
 </head>
-<body class="bg-background text-on-surface min-h-screen selection:bg-primary-fixed">
+<body class="bg-background text-on-surface font-body min-h-screen pb-32">
 <!-- TopAppBar -->
-<header class="fixed top-0 left-0 w-full z-50 bg-surface shadow-[0px_4px_20px_rgba(108,77,255,0.06)]">
-<div class="flex items-center justify-between px-container-margin h-16 w-full max-w-7xl mx-auto">
-<button aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors active:scale-95" onclick="history.back()">
-<span class="material-symbols-outlined text-on-surface">arrow_back</span>
+<header class="bg-white border-b border-[#EAECF0] fixed top-0 left-0 w-full z-50">
+<div class="flex items-center justify-between px-5 h-16 w-full max-w-2xl mx-auto">
+<div class="flex items-center gap-3">
+<button id="backBtn" aria-label="Retour" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] transition-colors active:scale-95 text-[#64748B] hover:text-[#0F172A]">
+<span class="material-symbols-outlined">arrow_back</span>
 </button>
-<h1 class="font-headline-lg text-headline-lg font-bold tracking-tight text-primary">About</h1>
-<div class="w-10"></div> <!-- Spacer for centering title -->
+<h1 class="text-base font-bold text-[#0F172A]">À propos de RAYDAR</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] transition-colors active:scale-95 text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./alert_center.html'">
+<span class="material-symbols-outlined">notifications</span>
+</button>
 </div>
 </header>
-<main class="pt-24 pb-32 px-container-margin max-w-2xl mx-auto">
-<!-- App Logo & Version Section -->
-<section class="flex flex-col items-center mb-xl">
-<div class="relative mb-lg">
-<!-- Branding Icon Representation -->
-<div class="w-24 h-24 bg-primary-container rounded-lg flex items-center justify-center shadow-lg transform rotate-12 transition-transform hover:rotate-0 duration-500">
-<span class="material-symbols-outlined text-on-primary-container !text-5xl" style="font-variation-settings: 'FILL' 1;">security</span>
+
+<main class="pt-24 px-5 max-w-2xl mx-auto space-y-6">
+<!-- App Logo & Branding Section -->
+<section class="flex flex-col items-center text-center">
+<div class="relative mb-3">
+<div class="w-20 h-20 bg-[#532CE6] rounded-2xl flex items-center justify-center shadow-lg shadow-[#532CE6]/25">
+<span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings: 'FILL' 1;">security</span>
 </div>
-<!-- Glass Ring Decoration -->
-<div class="absolute -inset-2 border-2 border-primary/10 rounded-lg -z-10 animate-pulse"></div>
+<div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-xs">verified</span>
 </div>
-<h2 class="font-display text-display text-on-surface mb-xs">SafeGuardian</h2>
-<p class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-3 py-1 rounded-full">Version 2.4.0 (Build 892)</p>
+</div>
+<h2 class="text-2xl font-black text-[#0F172A] tracking-tight">RAYDAR</h2>
+<p class="text-xs font-semibold text-[#532CE6] mt-0.5">Réseau d'Alerte et de Vigilance pour la Protection des Enfants</p>
+<span class="inline-block mt-2 font-mono text-[11px] text-[#64748B] bg-white border border-[#EAECF0] px-3 py-1 rounded-full shadow-sm">
+Version 2.4.0 (Build 2026.1 - Production)
+</span>
 </section>
-<!-- Information Links (The Cards) -->
-<div class="space-y-md">
-<!-- About Our Mission Card -->
-<a class="group block bg-surface shadow-[0px_4px_20px_rgba(108,77,255,0.06)] rounded-lg p-lg border border-transparent hover:border-primary/20 transition-all duration-300 active:scale-[0.98]" href="./alert_center.html">
-<div class="flex items-center gap-lg">
-<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary">
-<span class="material-symbols-outlined">favorite</span>
+
+<!-- Mission & Information Cards -->
+<div class="space-y-3">
+<!-- Mission Card -->
+<div id="openMissionCard" class="bg-white rounded-2xl p-4 shadow-sm border border-[#EAECF0] hover:border-[#532CE6]/30 cursor-pointer active:scale-98 transition-all flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-[#F5F3FF] border border-[#532CE6]/15 flex items-center justify-center text-[#532CE6] flex-shrink-0">
+<span class="material-symbols-outlined text-2xl">favorite</span>
 </div>
 <div class="flex-1">
-<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">About Our Mission</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Why we build technology for safer childhoods.</p>
+<h3 class="font-bold text-sm text-[#0F172A]">Notre Mission & Engagements</h3>
+<p class="text-xs text-[#64748B] mt-0.5">Pourquoi et comment nous protégeons les enfants au quotidien.</p>
 </div>
-<span class="material-symbols-outlined text-outline transition-transform group-hover:translate-x-1">chevron_right</span>
+<span class="material-symbols-outlined text-[#94A3B8]">chevron_right</span>
 </div>
-</a>
-<!-- Terms of Service Card -->
-<a class="group block bg-surface shadow-[0px_4px_20px_rgba(108,77,255,0.06)] rounded-lg p-lg border border-transparent hover:border-primary/20 transition-all duration-300 active:scale-[0.98]" href="./privacy_settings.html"><div class="flex items-center gap-lg"><div class="w-12 h-12 rounded-full bg-surface-container-high"><span class="material-symbols-outlined">gavel</span>
-</div>
-<div class="flex-1">
-<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">Terms of Service</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Review the legal agreement for app usage.</p>
-</div>
-<span class="material-symbols-outlined text-outline transition-transform group-hover:translate-x-1">chevron_right</span>
-</div>
-</a>
+
 <!-- Privacy Policy Card -->
-<a class="group block bg-surface shadow-[0px_4px_20px_rgba(108,77,255,0.06)] rounded-lg p-lg border border-transparent hover:border-primary/20 transition-all duration-300 active:scale-[0.98]" href="./privacy_settings.html"><div class="flex items-center gap-lg"><div class="w-12 h-12 rounded-full bg-surface-container-high"><span class="material-symbols-outlined">lock</span>
+<div onclick="window.location.href='./privacy_settings.html'" class="bg-white rounded-2xl p-4 shadow-sm border border-[#EAECF0] hover:border-[#532CE6]/30 cursor-pointer active:scale-98 transition-all flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-[#F8F9FA] border border-[#EAECF0] flex items-center justify-center text-[#0F172A] flex-shrink-0">
+<span class="material-symbols-outlined text-2xl">lock</span>
 </div>
 <div class="flex-1">
-<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">Privacy Policy</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">How we protect and manage your family data.</p>
+<h3 class="font-bold text-sm text-[#0F172A]">Politique de Confidentialité</h3>
+<p class="text-xs text-[#64748B] mt-0.5">Sécurisation des données, chiffrement et conformité Google Play.</p>
 </div>
-<span class="material-symbols-outlined text-outline transition-transform group-hover:translate-x-1">chevron_right</span>
+<span class="material-symbols-outlined text-[#94A3B8]">chevron_right</span>
 </div>
-</a>
+
+<!-- Help Center Card -->
+<div onclick="window.location.href='./help_center.html'" class="bg-white rounded-2xl p-4 shadow-sm border border-[#EAECF0] hover:border-[#532CE6]/30 cursor-pointer active:scale-98 transition-all flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-[#F8F9FA] border border-[#EAECF0] flex items-center justify-center text-[#0F172A] flex-shrink-0">
+<span class="material-symbols-outlined text-2xl">help</span>
 </div>
-<!-- Descriptive Footnote -->
-<section class="mt-xl text-center">
-<p class="font-body-md text-body-md text-on-surface-variant px-lg">
-                SafeGuardian is committed to the highest standards of digital protection for children. Our encryption ensures that your family's safety data is accessible only by you.
-            </p>
-<div class="mt-lg flex justify-center gap-md">
-<img alt="Security Certification" class="w-12 h-12 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all" data-alt="A macro shot of a sleek, brushed titanium security seal emblem with a digital holographic overlay. The lighting is cold and professional with soft purple highlights, reflecting a high-tech child safety app environment. The aesthetic is extremely minimalist and modern, emphasizing trust and structural integrity in a pristine white studio setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkUzkESIRCb7Fh6m3wJgQZfYb-QQHc9CNM8JBgSGnxeCfRX-FSZdz6lxu5xphyDYPGCVEE8s2mn7M75bgyCkB_uXxrD1n_78frBuVIQh80ZRp67uw19e5qTKVcwg5irNURRG2QBOyu5gg2-nJJFvvZlyr-AjjxH_LZIojlJwlBk7YFMIe6k-NjlDG1GWEuEfu_AYO7l3v04oyCFpmjafdxZqqPPwq9PSn8WQeVVkw6vFTrhNXW1trpPMAdSqPWs0AukXWRL_7xcZQt"/>
-<img alt="Privacy Certification" class="w-12 h-12 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all" data-alt="A clean, minimalist 3D rendering of a modern digital lock mechanism glowing with a soft primary purple light. The background is a soft, out-of-focus light gray, conveying a sense of secure whitespace. The composition is balanced and elegant, representing premium data protection and technological sophistication for a safety platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjOdg08tks6LgCGP1E26WdHeLX1YLroCjX3zEfyjaq_VQE3Nh1Hc-eZlQo0AgYvbsLetIG6sRNcz8_JchZyK15yOo4yXupYPEO3o7aCnNoqy1ejq_nYRvSYTt0Pi33SEiKgU_2mPjN28QwX0kdaMo565S5D4A50XropcgD3k9pey3ujOyc0CJUfy7_WXLvR8GH4SiWuDGfoeGuJ-rsACGx55t25i9Kc8d3_FQ-FLfWc1bWd5VKDQV0L_aPqeGA4HvdtgyoZG3eGWlF"/>
+<div class="flex-1">
+<h3 class="font-bold text-sm text-[#0F172A]">Centre d'Aide & FAQ</h3>
+<p class="text-xs text-[#64748B] mt-0.5">Guides de signalement, tutoriels et contact direct du support.</p>
 </div>
-<p class="mt-xl font-label-sm text-label-sm text-outline">© 2024 SafeGuardian Technologies Inc. <br/> Made with care for families everywhere.</p>
+<span class="material-symbols-outlined text-[#94A3B8]">chevron_right</span>
+</div>
+</div>
+
+<!-- Descriptive Footnote & Certifications -->
+<section class="text-center pt-3 pb-8 space-y-3">
+<div class="flex items-center justify-center gap-4 text-xs font-semibold text-[#64748B]">
+<span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-emerald-600 text-sm">verified_user</span> Google Play Compliant</span>
+<span>•</span>
+<span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[#532CE6] text-sm">shield</span> Chiffrement TLS 1.3</span>
+<span>•</span>
+<span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-blue-600 text-sm">public</span> RGPD Certifié</span>
+</div>
+<p class="text-xs text-[#64748B] max-w-md mx-auto leading-relaxed">
+RAYDAR s'engage à respecter les standards les plus stricts de sécurité numérique pour les familles. Vos informations de localisation ne sont partagées qu'en cas d'alerte explicite.
+</p>
+<p class="text-[11px] text-[#94A3B8]">© 2026 RAYDAR Technologies. Tous droits réservés.</p>
 </section>
 </main>
-<script>
-        // Micro-interaction for logo rotation on scroll
-        window.addEventListener('scroll', () => {
-            const logo = document.querySelector('.w-24.h-24');
-            const scrollVal = window.scrollY;
-            logo.style.transform = `rotate(${12 + (scrollVal * 0.05)}deg)`;
-        });
 
-    </script>
+<!-- Mission Modal -->
+<div id="missionModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+<div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+<div class="p-4 border-b border-[#EAECF0] flex items-center justify-between">
+<h3 class="font-bold text-sm text-[#0F172A]">Notre Mission</h3>
+<button id="closeMissionModalBtn" class="w-8 h-8 rounded-full hover:bg-[#F1F5F9] flex items-center justify-center text-[#64748B]">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+<div class="p-5 space-y-3 text-xs text-[#475569] leading-relaxed">
+<p>Chaque minute compte lors de la disparition d'un enfant. RAYDAR est né d'une volonté simple mais vitale : réduire le temps d'alerte entre la disparition constatée et la mobilisation des personnes à proximité immédiate.</p>
+<p>Grâce à notre technologie de radar de proximité et au réseau des Gardiens certifiés, chaque communauté devient un bouclier actif pour retrouver rapidement les enfants égarés et rassurer les familles.</p>
+</div>
+<div class="p-4 bg-[#F8F9FA] border-t border-[#EAECF0] flex justify-end">
+<button id="ackMissionBtn" class="px-5 py-2 bg-[#532CE6] text-white rounded-full font-bold text-xs">Fermer</button>
+</div>
+</div>
+</div>
+
+<script type="module">
+const backBtn = document.getElementById('backBtn');
+if (backBtn) {
+    backBtn.addEventListener('click', () => {
+        if (document.referrer && document.referrer.includes('guardian_profile')) {
+            window.location.href = './guardian_profile_updated_my_reports.html';
+        } else {
+            history.back();
+        }
+    });
+}
+
+const missionModal = document.getElementById('missionModal');
+document.getElementById('openMissionCard').addEventListener('click', () => missionModal.classList.remove('hidden'));
+document.getElementById('closeMissionModalBtn').addEventListener('click', () => missionModal.classList.add('hidden'));
+document.getElementById('ackMissionBtn').addEventListener('click', () => missionModal.classList.add('hidden'));
+</script>
 
 <script src="./src/responsiveShell.js" type="module"></script>
-</body></html>
+</body>
+</html>

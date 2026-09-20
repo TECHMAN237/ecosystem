@@ -2340,7 +2340,7 @@ export const reportService = {
       localStorage.setItem("user_profile", JSON.stringify(updated));
       this.updateDOMProfile(updated);
 
-      // Non-blocking update to Supabase profiles table
+      // Update Supabase profiles table
       try {
         const { data: { session } } = await withTimeout(supabase.auth.getSession(), 3000, { data: { session: null } });
         if (session && session.user) {
@@ -2348,22 +2348,39 @@ export const reportService = {
             user_id: session.user.id,
             email: session.user.email || '',
             full_name: updated.full_name,
-            username: updated.username,
-            phone_country_code: updated.phone_country_code || "+237",
-            phone_number: updated.phone_number || "",
+            username: (updated.username || '').replace(/^@/, ''),
             city: updated.city || "",
             role: updated.role || "Guardian",
             profile_photo_url: updated.photo || updated.profile_photo_url || DEFAULT_AVATAR,
             updated_at: new Date().toISOString()
           };
+          if (updated.phone_number) {
+            payload.phone_number = updated.phone_number;
+            payload.phone_country_code = updated.phone_country_code || "+237";
+          }
+          if (updated.preferences) {
+            payload.preferences = updated.preferences;
+          }
 
-          withTimeout(
-            supabase.from('profiles').upsert(payload, { onConflict: 'user_id' }),
-            5000,
-            null
-          ).catch((e) => console.warn("Notice saving profile to Supabase:", e));
+          // 1. Direct Supabase Upsert
+          const { error: upErr } = await supabase.from('profiles').upsert(payload, { onConflict: 'user_id' });
+          if (upErr) {
+            console.warn("[RAYDAR Service] Direct Supabase upsert notice, falling back to server proxy:", upErr.message);
+          }
+
+          // 2. Server proxy update for guaranteed consistency
+          fetch('/api/profile/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify(payload)
+          }).catch((err) => console.warn("[RAYDAR Service] Notice calling /api/profile/update:", err));
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn("[RAYDAR Service] Exception during profile save sync:", e);
+      }
 
       return updated;
     } catch (e) {

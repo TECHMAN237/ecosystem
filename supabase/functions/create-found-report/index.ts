@@ -105,40 +105,26 @@ serve(async (req) => {
 
     if (foundErr) {
       console.error("Insert into found_reports error:", foundErr);
+      return new Response(
+        JSON.stringify({ error: foundErr.message || "Failed to insert into found_reports", details: foundErr }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    // Also mirror to missing_reports with status 'Published' and [TROUVÉ] tag for unified directory search & matching
-    const mirroredRow = {
-      id: reportId,
-      reporter_id: effectiveReporterId,
-      child_full_name: cleanName,
-      child_age: payload.age ? Number(payload.age) : null,
-      child_gender: payload.gender || 'non_specifie',
-      last_seen_location: payload.location.trim(),
-      last_seen_date: payload.date || new Date().toISOString().split('T')[0],
-      last_seen_time: payload.time || new Date().toTimeString().split(' ')[0],
-      physical_description: physicalDesc,
-      clothing_description: payload.clothingDescription || '',
-      incident_description: `[TROUVÉ] Enfant retrouvé en sécurité à ${safeLoc}`,
-      emergency_contact_name: "Centre de Protection / Découvreur",
-      emergency_contact_phone: "677000000",
-      child_photo_url: payload.photoUrl || null,
-      status: "Published",
-      is_public: payload.isPublic !== false
-    };
-
-    await supabaseAdmin.from('missing_reports').insert([mirroredRow]).catch(() => {});
-
-    // Broadcast community alert
-    await supabaseAdmin.from('alerts').insert([{
-      title: `Enfant trouvé et sécurisé : ${cleanName}`,
-      message: `Localisé à ${payload.location}. Actuellement en sécurité au : ${payload.currentSafeLocation || 'Centre de protection'}.`,
-      category: 'REPORT',
-      radius_km: 10
-    }]).catch(() => {});
+    // Broadcast community alert (non-blocking)
+    try {
+      await supabaseAdmin.from('alerts').insert([{
+        title: `Enfant trouvé et sécurisé : ${cleanName}`,
+        message: `Localisé à ${payload.location}. Actuellement en sécurité au : ${safeLoc}.`,
+        category: 'REPORT',
+        radius_km: 10
+      }]);
+    } catch (alertErr) {
+      console.warn("Alert emission notice:", alertErr);
+    }
 
     return new Response(
-      JSON.stringify({ success: true, report: foundData || mirroredRow }),
+      JSON.stringify({ success: true, report: foundData }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (err: any) {

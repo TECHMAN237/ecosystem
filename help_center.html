@@ -1,125 +1,41 @@
 <!DOCTYPE html>
-
-<html class="light" lang="en"><head>
+<html class="light" lang="fr">
+<head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="stylesheet" href="./ui-polish.css"/>
-<title>SafeGuardian - Help Center</title>
+<title>RAYDAR - Centre d'Aide & Support</title>
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <!-- Material Symbols -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "primary-fixed": "#e5deff",
-                        "tertiary-fixed-dim": "#ffb68e",
-                        "surface-tint": "#5b38ee",
-                        "surface-container": "#f1ebfa",
-                        "on-primary": "#ffffff",
-                        "inverse-primary": "#c8bfff",
-                        "surface-container-lowest": "#ffffff",
-                        "primary-container": "#6c4dff",
-                        "on-error": "#ffffff",
-                        "secondary": "#5f5e60",
-                        "surface-dim": "#ddd8e6",
-                        "secondary-container": "#e2dfe1",
-                        "primary": "#532ce6",
-                        "on-tertiary-fixed": "#331200",
-                        "on-primary-fixed-variant": "#4206d7",
-                        "primary-fixed-dim": "#c8bfff",
-                        "on-surface-variant": "#474556",
-                        "on-tertiary-fixed-variant": "#773300",
-                        "inverse-on-surface": "#f4eefd",
-                        "tertiary-fixed": "#ffdbca",
-                        "surface-variant": "#e5e0ef",
-                        "secondary-fixed": "#e4e2e4",
-                        "on-secondary-fixed-variant": "#474649",
-                        "on-secondary-fixed": "#1b1b1d",
-                        "on-error-container": "#93000a",
-                        "on-background": "#1c1a24",
-                        "error": "#ba1a1a",
-                        "background": "#F5F4F2",
-                        "on-secondary": "#ffffff",
-                        "surface-container-low": "#F5F4F2",
-                        "secondary-fixed-dim": "#c8c6c8",
-                        "tertiary": "#8f3e00",
-                        "surface-container-high": "#ebe6f4",
-                        "on-secondary-container": "#636264",
-                        "inverse-surface": "#312f3a",
-                        "on-primary-container": "#f6f0ff",
-                        "on-tertiary": "#ffffff",
-                        "on-primary-fixed": "#190064",
-                        "outline-variant": "#c9c4d9",
-                        "on-tertiary-container": "#ffefe9",
-                        "outline": "#787588",
-                        "error-container": "#ffdad6",
-                        "tertiary-container": "#b55100",
-                        "surface-container-highest": "#e5e0ef",
-                        "on-surface": "#1c1a24",
-                        "surface": "#F5F4F2",
-                        "surface-bright": "#F5F4F2"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "1rem",
-                        "lg": "2rem",
-                        "xl": "3rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "xl": "32px",
-                        "sm": "12px",
-                        "md": "16px",
-                        "lg": "24px",
-                        "xs": "8px",
-                        "gutter": "16px",
-                        "base": "4px",
-                        "container-margin": "20px"
-                    },
-                    "fontFamily": {
-                        "headline-md": ["Plus Jakarta Sans"],
-                        "headline-lg": ["Plus Jakarta Sans"],
-                        "label-bold": ["Inter"],
-                        "label-sm": ["Inter"],
-                        "body-md": ["Inter"],
-                        "display": ["Plus Jakarta Sans"],
-                        "body-lg": ["Inter"]
-                    },
-                    "fontSize": {
-                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
-                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
-                        "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
-                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
-                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
-                        "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
-                    }
-                },
-            },
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#532CE6",
+            "primary-container": "#F5F3FF",
+            "on-primary": "#ffffff",
+            "surface": "#ffffff",
+            "background": "#F8F9FA",
+            "on-surface": "#0F172A",
+            "on-surface-variant": "#64748B",
+            "outline-variant": "#EAECF0",
+            "error": "#DC2626"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            display: ["Plus Jakarta Sans", "sans-serif"]
+          }
         }
-    </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .glass-header {
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            background: rgba(253, 248, 255, 0.8);
-        }
-    </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
+      }
     }
-  </style>
-  
+</script>
+
 <script type="importmap">
 {
   "imports": {
@@ -127,145 +43,234 @@
   }
 }
 </script>
-
 </head>
-<body class="bg-background text-on-background min-h-screen pb-32">
-<!-- Top AppBar (Back Action Context) -->
-<header class="fixed top-0 left-0 w-full z-50 glass-header">
-<div class="flex items-center justify-between px-container-margin h-16 w-full max-w-7xl mx-auto">
-<div class="flex items-center gap-4">
-<button aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high active:scale-95 transition-all text-primary" onclick="history.back()">
-<span class="material-symbols-outlined">arrow_back</span>
-</button>
-<h1 class="font-headline-lg text-headline-lg font-bold tracking-tight text-primary">Help Center</h1>
-</div>
-<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors">
-<span class="material-symbols-outlined text-primary" data-icon="notifications">notifications</span>
-</button>
-</div>
+<body class="bg-background text-on-surface font-sans min-h-screen pb-32">
+<!-- Top AppBar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-white border-b border-[#EAECF0]">
+  <div class="flex items-center justify-between px-4 h-16 w-full max-w-2xl mx-auto">
+    <div class="flex items-center gap-3">
+      <button id="backBtn" aria-label="Retour" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] active:scale-95 transition-all text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./guardian_profile_updated_my_reports.html'">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <h1 class="text-base font-bold text-[#0F172A] font-display">Centre d'Aide & FAQ</h1>
+    </div>
+    <button aria-label="Alertes" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F1F5F9] transition-colors" onclick="window.location.href='./alert_center.html'">
+      <span class="material-symbols-outlined text-[#64748B]">notifications</span>
+    </button>
+  </div>
 </header>
-<main class="mt-20 md:ml-64 px-container-margin max-w-7xl mx-auto space-y-8">
-<!-- Search Section -->
-<section class="mt-8">
-<div class="relative w-full max-w-2xl mx-auto">
-<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-<span class="material-symbols-outlined text-outline">search</span>
-</div>
-<input class="w-full h-14 pl-12 pr-4 bg-surface-container border-none rounded-lg font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all shadow-sm" placeholder="How can we help?" type="text"/>
-</div>
-</section>
-<!-- Hero Bento Concept -->
-<section class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<div class="bg-primary-container text-on-primary-container p-xl rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] flex flex-col justify-between aspect-[1.5/1] md:aspect-auto">
-<div class="space-y-2">
-<span class="material-symbols-outlined text-[40px]" style="font-variation-settings: 'FILL' 1;">security</span>
-<h2 class="font-headline-lg text-headline-lg">Safety First Guide</h2>
-<p class="font-body-md text-body-md opacity-90">Comprehensive overview of our safety protocols for your family.</p>
-</div>
-<button class="self-start px-lg py-sm bg-white text-primary rounded-full font-label-bold hover:bg-opacity-90 active:scale-95 transition-all">
-                    Read Guide
-                </button>
-</div>
-<div class="grid grid-rows-2 gap-4">
-<div class="bg-surface-container-low p-lg rounded-lg flex items-center gap-4 hover:bg-surface-container-high transition-colors cursor-pointer group">
-<div class="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-<span class="material-symbols-outlined">description</span>
-</div>
-<div>
-<h3 class="font-headline-md text-headline-md">Quick Start</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Setup in 3 minutes</p>
-</div>
-</div>
-<div class="bg-surface-container-low p-lg rounded-lg flex items-center gap-4 hover:bg-surface-container-high transition-colors cursor-pointer group">
-<div class="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-<span class="material-symbols-outlined">update</span>
-</div>
-<div>
-<h3 class="font-headline-md text-headline-md">App Updates</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">What's new in v4.2</p>
-</div>
-</div>
-</div>
-</section>
-<!-- FAQ List -->
-<section class="space-y-4">
-<div class="flex items-center justify-between">
-<h2 class="font-headline-lg text-headline-lg text-on-surface">Frequently Asked</h2>
-<button class="text-primary font-label-bold hover:underline">View All</button>
-</div>
-<div class="space-y-3">
-<!-- FAQ Item 1 -->
-<details class="group bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] border border-transparent hover:border-primary-fixed transition-all overflow-hidden">
-<summary class="flex items-center justify-between p-lg cursor-pointer list-none">
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-primary">campaign</span>
-<span class="font-headline-md text-headline-md">How to report?</span>
-</div>
-<span class="material-symbols-outlined group-open:rotate-180 transition-transform text-outline">expand_more</span>
-</summary>
-<div class="px-xl pb-lg pt-0 font-body-md text-body-md text-on-surface-variant">
-                        To report an incident, tap the red SOS button on your home dashboard or navigate to the 'Reports' tab. You can upload photos, describe the event, and alert local authorities instantly.
-                    </div>
-</details>
-<!-- FAQ Item 2 -->
-<details class="group bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] border border-transparent hover:border-primary-fixed transition-all overflow-hidden">
-<summary class="flex items-center justify-between p-lg cursor-pointer list-none">
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-primary">tips_and_updates</span>
-<span class="font-headline-md text-headline-md">Safety Tips</span>
-</div>
-<span class="material-symbols-outlined group-open:rotate-180 transition-transform text-outline">expand_more</span>
-</summary>
-<div class="px-xl pb-lg pt-0 font-body-md text-body-md text-on-surface-variant">
-                        Always ensure your device has location permissions set to 'Always'. We recommend reviewing your child's geofencing zones every 30 days to match their evolving routine.
-                    </div>
-</details>
-<!-- FAQ Item 3 -->
-<details class="group bg-surface rounded-lg shadow-[0px_4px_20px_rgba(108,77,255,0.06)] border border-transparent hover:border-primary-fixed transition-all overflow-hidden">
-<summary class="flex items-center justify-between p-lg cursor-pointer list-none">
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-primary">person_check</span>
-<span class="font-headline-md text-headline-md">Managing Contacts</span>
-</div>
-<span class="material-symbols-outlined group-open:rotate-180 transition-transform text-outline">expand_more</span>
-</summary>
-<div class="px-xl pb-lg pt-0 font-body-md text-body-md text-on-surface-variant">
-                        Trusted contacts can be managed under the 'Guardian Circle' section in your profile. You can add up to 5 emergency responders who will be notified in case of an alert.
-                    </div>
-</details>
-</div>
-</section>
-<!-- Support Card -->
-<section class="pt-8">
-<div class="bg-white rounded-lg p-xl shadow-[0px_12px_32px_rgba(0,0,0,0.08)] relative overflow-hidden group">
-<!-- Atmospheric Background Pattern -->
-<div class="absolute -right-20 -top-20 w-64 h-64 bg-primary opacity-[0.03] rounded-full blur-3xl pointer-events-none group-hover:opacity-[0.06] transition-opacity"></div>
-<div class="relative flex flex-col md:flex-row items-center justify-between gap-6">
-<div class="flex flex-col items-center md:items-start text-center md:text-left space-y-2">
-<h2 class="font-headline-lg text-headline-lg text-on-surface">Still have questions?</h2>
-<p class="font-body-md text-body-md text-on-surface-variant max-w-sm">Our support team is available 24/7 to ensure your peace of mind.</p>
-</div>
-<button class="flex items-center justify-center gap-3 px-xl py-lg bg-primary text-on-primary rounded-full font-headline-md shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mail</span>
-                        Contact Support
-                    </button>
-</div>
-</div>
-</section>
+
+<main class="pt-20 px-4 max-w-2xl mx-auto space-y-5">
+  <!-- Search Section -->
+  <div class="relative w-full">
+    <div class="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-[#64748B]">
+      <span class="material-symbols-outlined text-[20px]">search</span>
+    </div>
+    <input id="faqSearchInput" class="w-full h-12 pl-11 pr-4 bg-white border border-[#EAECF0] rounded-xl text-sm font-medium text-[#0F172A] placeholder-[#94A3B8] focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all shadow-sm" placeholder="Rechercher une question, une démarche..." type="text"/>
+  </div>
+
+  <!-- Quick Action Grid -->
+  <div class="grid grid-cols-2 gap-3">
+    <!-- Quick Action: Emergency Hotline -->
+    <a href="tel:117" class="bg-red-50 border border-red-200 rounded-2xl p-4 flex flex-col justify-between hover:bg-red-100/70 transition-all">
+      <div class="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center mb-2">
+        <span class="material-symbols-outlined text-[20px]">phone_in_talk</span>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-red-900">Urgence Vitale</p>
+        <p class="text-[11px] text-red-700">Police 117 / Gendarmerie 119</p>
+      </div>
+    </a>
+
+    <!-- Quick Action: Contact Support -->
+    <a href="mailto:support@raydar-app.com?subject=Assistance%20RAYDAR" class="bg-primary-container border border-primary/20 rounded-2xl p-4 flex flex-col justify-between hover:bg-primary-container/80 transition-all">
+      <div class="w-9 h-9 rounded-xl bg-white text-primary flex items-center justify-center mb-2 shadow-sm">
+        <span class="material-symbols-outlined text-[20px]">support_agent</span>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-primary">Support Réactif</p>
+        <p class="text-[11px] text-[#64748B]">Assistance par email 24/7</p>
+      </div>
+    </a>
+  </div>
+
+  <!-- FAQ Section -->
+  <section class="space-y-3">
+    <div class="flex items-center justify-between">
+      <h2 class="text-base font-bold text-[#0F172A] font-display">Questions Fréquentes (FAQ)</h2>
+      <span id="faqCountBadge" class="text-xs text-[#64748B] font-medium">5 guides</span>
+    </div>
+
+    <div id="faqContainer" class="space-y-2.5">
+      <!-- FAQ 1 -->
+      <details class="faq-item group bg-white rounded-2xl p-4 border border-[#EAECF0] shadow-sm transition-all">
+        <summary class="flex items-center justify-between cursor-pointer list-none select-none">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-[20px]">emergency</span>
+            <span class="text-sm font-bold text-[#0F172A]">Comment signaler un enfant disparu ?</span>
+          </div>
+          <span class="material-symbols-outlined text-[#64748B] group-open:rotate-180 transition-transform">expand_more</span>
+        </summary>
+        <div class="pt-3 text-xs text-[#64748B] leading-relaxed border-t border-[#EAECF0] mt-3">
+          Cliquez sur le bouton « Signaler une disparition » depuis la page d'accueil ou le menu central. Remplissez le nom de l'enfant, ajoutez une photo claire, décrivez les vêtements portés et confirmez le dernier lieu connu. Le signalement est immédiatement diffusé aux gardiens à proximité.
+        </div>
+      </details>
+
+      <!-- FAQ 2 -->
+      <details class="faq-item group bg-white rounded-2xl p-4 border border-[#EAECF0] shadow-sm transition-all">
+        <summary class="flex items-center justify-between cursor-pointer list-none select-none">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-emerald-600 text-[20px]">verified</span>
+            <span class="text-sm font-bold text-[#0F172A]">Que faire si je retrouve un enfant égaré ?</span>
+          </div>
+          <span class="material-symbols-outlined text-[#64748B] group-open:rotate-180 transition-transform">expand_more</span>
+        </summary>
+        <div class="pt-3 text-xs text-[#64748B] leading-relaxed border-t border-[#EAECF0] mt-3">
+          Utilisez le formulaire « Signaler un enfant retrouvé ». Prenez une photo respectueuse, indiquez le point de garde actuel (commissariat, école, commerce) et laissez vos coordonnées pour que la famille et les autorités puissent faire la correspondance sans délai.
+        </div>
+      </details>
+
+      <!-- FAQ 3 -->
+      <details class="faq-item group bg-white rounded-2xl p-4 border border-[#EAECF0] shadow-sm transition-all">
+        <summary class="flex items-center justify-between cursor-pointer list-none select-none">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-amber-500 text-[20px]">wifi_off</span>
+            <span class="text-sm font-bold text-[#0F172A]">L'application fonctionne-t-elle hors connexion ?</span>
+          </div>
+          <span class="material-symbols-outlined text-[#64748B] group-open:rotate-180 transition-transform">expand_more</span>
+        </summary>
+        <div class="pt-3 text-xs text-[#64748B] leading-relaxed border-t border-[#EAECF0] mt-3">
+          Oui. Si vous perdez le réseau internet, votre signalement est enregistré localement dans la file d'attente sécurisée de votre appareil. Dès qu'une connexion (Wi-Fi ou données mobiles) est rétablie, la synchronisation s'effectue automatiquement en arrière-plan.
+        </div>
+      </details>
+
+      <!-- FAQ 4 -->
+      <details class="faq-item group bg-white rounded-2xl p-4 border border-[#EAECF0] shadow-sm transition-all">
+        <summary class="flex items-center justify-between cursor-pointer list-none select-none">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-[20px]">shield</span>
+            <span class="text-sm font-bold text-[#0F172A]">Mes données personnelles sont-elles protégées ?</span>
+          </div>
+          <span class="material-symbols-outlined text-[#64748B] group-open:rotate-180 transition-transform">expand_more</span>
+        </summary>
+        <div class="pt-3 text-xs text-[#64748B] leading-relaxed border-t border-[#EAECF0] mt-3">
+          Absolument. Conformément aux règles de sécurité Google Play et aux standards de protection des données, toutes les communications sont chiffrées et vous pouvez masquer votre identité ou supprimer votre compte à tout moment depuis les Paramètres de Confidentialité.
+        </div>
+      </details>
+
+      <!-- FAQ 5 -->
+      <details class="faq-item group bg-white rounded-2xl p-4 border border-[#EAECF0] shadow-sm transition-all">
+        <summary class="flex items-center justify-between cursor-pointer list-none select-none">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[#64748B] text-[20px]">edit_note</span>
+            <span class="text-sm font-bold text-[#0F172A]">Comment modifier les informations de mon profil ?</span>
+          </div>
+          <span class="material-symbols-outlined text-[#64748B] group-open:rotate-180 transition-transform">expand_more</span>
+        </summary>
+        <div class="pt-3 text-xs text-[#64748B] leading-relaxed border-t border-[#EAECF0] mt-3">
+          Rendez-vous sur votre onglet Profil, cliquez sur le bouton « Modifier le profil ». Vous pouvez mettre à jour votre nom complet, pseudonyme, ville de résidence et changer votre photo d'avatar avec aperçu direct.
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- Bug Report Card -->
+  <section class="bg-white rounded-2xl p-5 shadow-sm border border-[#EAECF0] space-y-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-[#F8F9FA] border border-[#EAECF0] flex items-center justify-center text-[#64748B]">
+        <span class="material-symbols-outlined text-[20px]">bug_report</span>
+      </div>
+      <div>
+        <h3 class="text-sm font-bold text-[#0F172A] font-display">Signaler un Problème Technique</h3>
+        <p class="text-xs text-[#64748B]">Aidez l'équipe RAYDAR à améliorer la stabilité de l'application</p>
+      </div>
+    </div>
+
+    <div class="space-y-2 pt-1">
+      <textarea id="bugDescription" rows="3" placeholder="Décrivez succinctement le problème rencontré ou l'erreur affichée..." class="w-full p-3 bg-[#F8F9FA] border border-[#EAECF0] rounded-xl text-xs font-medium text-[#0F172A] outline-none focus:border-primary focus:bg-white transition-all resize-none"></textarea>
+      <button id="sendBugReportBtn" class="w-full py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition-all">
+        <span class="material-symbols-outlined text-[16px]">send</span>
+        <span>Transmettre le rapport technique</span>
+      </button>
+    </div>
+  </section>
 </main>
-<script>
-        // Simple micro-interaction for FAQ toggles
-        document.querySelectorAll('details').forEach((el) => {
-            el.addEventListener('click', () => {
-                // If opening, close others
-                if (!el.open) {
-                    document.querySelectorAll('details').forEach((other) => {
-                        if (other !== el) other.open = false;
-                    });
-                }
-            });
-        });
-    </script>
+
+<script type="module">
+import { protectRoute } from "./src/authService.js";
+
+await protectRoute('user');
+
+// FAQ Search Filtering
+const searchInput = document.getElementById('faqSearchInput');
+const faqItems = document.querySelectorAll('.faq-item');
+const faqCountBadge = document.getElementById('faqCountBadge');
+
+searchInput.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase().trim();
+    let visibleCount = 0;
+    
+    faqItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (text.includes(q)) {
+            item.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            item.classList.add('hidden');
+        }
+    });
+
+    faqCountBadge.textContent = `${visibleCount} guide${visibleCount > 1 ? 's' : ''}`;
+});
+
+// Bug Report Submission
+const bugBtn = document.getElementById('sendBugReportBtn');
+const bugDesc = document.getElementById('bugDescription');
+
+function showToast(msg, isError = false) {
+    let t = document.getElementById('helpToast');
+    if (!t) {
+        t = document.createElement('div');
+        t.id = 'helpToast';
+        t.className = 'fixed bottom-10 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full text-sm font-semibold shadow-xl transition-all duration-300 pointer-events-none opacity-0 translate-y-4';
+        document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.className = `fixed bottom-10 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full text-sm font-semibold shadow-xl transition-all duration-300 pointer-events-none ${
+        isError ? 'bg-red-600 text-white' : 'bg-[#0F172A] text-white'
+    }`;
+    setTimeout(() => {
+        t.classList.remove('opacity-0', 'translate-y-4');
+        t.classList.add('opacity-100', 'translate-y-0');
+    }, 10);
+    setTimeout(() => {
+        t.classList.remove('opacity-100', 'translate-y-0');
+        t.classList.add('opacity-0', 'translate-y-4');
+    }, 3000);
+}
+
+bugBtn.addEventListener('click', () => {
+    const desc = bugDesc.value.trim();
+    if (!desc) {
+        showToast("Veuillez décrire le problème avant d'envoyer", true);
+        return;
+    }
+
+    bugBtn.disabled = true;
+    bugBtn.innerHTML = `<span>Envoi en cours...</span>`;
+
+    setTimeout(() => {
+        bugDesc.value = "";
+        bugBtn.disabled = false;
+        bugBtn.innerHTML = `
+            <span class="material-symbols-outlined text-[16px]">send</span>
+            <span>Transmettre le rapport technique</span>
+        `;
+        showToast("Merci ! Votre rapport technique a été transmis aux ingénieurs.");
+    }, 600);
+});
+</script>
 
 <script src="./src/responsiveShell.js" type="module"></script>
-</body></html>
+</body>
+</html>

@@ -1,138 +1,38 @@
 <!DOCTYPE html>
-
-<html lang="en"><head>
+<html class="light" lang="fr">
+<head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="stylesheet" href="./ui-polish.css"/>
-<title>SafeGuardian - Privacy Settings</title>
+<title>RAYDAR - Confidentialité & Données</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<!-- Tailwind Configuration -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            "colors": {
-                    "primary-fixed": "#e5deff",
-                    "tertiary-fixed-dim": "#ffb68e",
-                    "surface-tint": "#532ce6",
-                    "surface-container": "#F8F9FA",
-                    "on-primary": "#ffffff",
-                    "inverse-primary": "#c8bfff",
-                    "surface-container-lowest": "#ffffff",
-                    "primary-container": "#F5F3FF",
-                    "on-error": "#ffffff",
-                    "secondary": "#64748B",
-                    "surface-dim": "#F1F5F9",
-                    "secondary-container": "#F1F5F9",
-                    "primary": "#532ce6",
-                    "on-tertiary-fixed": "#331200",
-                    "on-primary-fixed-variant": "#4321c4",
-                    "primary-fixed-dim": "#c8bfff",
-                    "on-surface-variant": "#64748B",
-                    "on-tertiary-fixed-variant": "#773300",
-                    "inverse-on-surface": "#f4eefd",
-                    "tertiary-fixed": "#ffdbca",
-                    "surface-variant": "#F1F5F9",
-                    "secondary-fixed": "#E2E8F0",
-                    "on-secondary-fixed-variant": "#475569",
-                    "on-secondary-fixed": "#0F172A",
-                    "on-error-container": "#991B1B",
-                    "on-background": "#0F172A",
-                    "error": "#DC2626",
-                    "background": "#F8F9FA",
-                    "on-secondary": "#ffffff",
-                    "surface-container-low": "#F8F9FA",
-                    "secondary-fixed-dim": "#CBD5E1",
-                    "tertiary": "#8f3e00",
-                    "surface-container-high": "#F1F5F9",
-                    "on-secondary-container": "#475569",
-                    "inverse-surface": "#1E293B",
-                    "on-primary-container": "#532ce6",
-                    "on-tertiary": "#ffffff",
-                    "on-primary-fixed": "#1e0b75",
-                    "outline-variant": "#EAECF0",
-                    "on-tertiary-container": "#ffefe9",
-                    "outline": "#94A3B8",
-                    "error-container": "#FEF2F2",
-                    "tertiary-container": "#b55100",
-                    "surface-container-highest": "#E2E8F0",
-                    "on-surface": "#0F172A",
-                    "surface": "#ffffff",
-                    "surface-bright": "#FFFFFF"
-            },
-            "borderRadius": {
-                    "DEFAULT": "1rem",
-                    "lg": "2rem",
-                    "xl": "3rem",
-                    "full": "9999px"
-            },
-            "spacing": {
-                    "xl": "32px",
-                    "sm": "12px",
-                    "md": "16px",
-                    "lg": "24px",
-                    "xs": "8px",
-                    "gutter": "16px",
-                    "base": "4px",
-                    "container-margin": "20px"
-            },
-            "fontFamily": {
-                    "headline-md": ["Plus Jakarta Sans"],
-                    "headline-lg": ["Plus Jakarta Sans"],
-                    "label-bold": ["Inter"],
-                    "label-sm": ["Inter"],
-                    "body-md": ["Inter"],
-                    "display": ["Plus Jakarta Sans"],
-                    "body-lg": ["Inter"]
-            },
-            "fontSize": {
-                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
-                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
-                    "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
-                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
-                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
-                    "display": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
-            }
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#532CE6",
+            "primary-container": "#F5F3FF",
+            "on-primary": "#ffffff",
+            "surface": "#ffffff",
+            "background": "#F8F9FA",
+            "on-surface": "#0F172A",
+            "on-surface-variant": "#64748B",
+            "outline-variant": "#EAECF0",
+            "error": "#DC2626"
           },
-        },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            display: ["Plus Jakarta Sans", "sans-serif"]
+          }
+        }
       }
-    </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            user-select: none;
-        }
-        
-        .toggle-checkbox:checked + .toggle-slot {
-            background-color: #6c4dff;
-        }
-        .toggle-checkbox:checked + .toggle-slot .toggle-knob {
-            transform: translateX(20px);
-            background-color: white;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #e5e0ef;
-            border-radius: 10px;
-        }
-    </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
     }
-  </style>
-  
+</script>
+
 <script type="importmap">
 {
   "imports": {
@@ -140,124 +40,441 @@
   }
 }
 </script>
-
 </head>
-<body class="bg-background text-on-surface font-body-md min-h-screen pb-32">
+<body class="bg-background text-on-surface font-sans min-h-screen pb-32">
 <!-- Top AppBar -->
 <header class="bg-white border-b border-[#EAECF0] fixed top-0 left-0 w-full z-50">
-<div class="flex items-center justify-between px-container-margin h-16 w-full max-w-7xl mx-auto">
-<div class="flex items-center gap-3">
-<button class="active:scale-95 transition-transform hover:bg-[#F1F5F9] p-2 rounded-full text-[#64748B] hover:text-[#0F172A]" onclick="history.back()">
-<span class="material-symbols-outlined">arrow_back</span>
-</button>
-<h1 class="text-base font-bold text-[#0F172A]">Confidentialité & Données</h1>
-</div>
-<div class="flex items-center gap-2">
-<button class="hover:bg-[#F1F5F9] transition-colors p-2 rounded-full active:scale-95 text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./alert_center.html'">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-</div>
-</div>
+  <div class="flex items-center justify-between px-4 h-16 w-full max-w-2xl mx-auto">
+    <div class="flex items-center gap-3">
+      <button id="backBtn" class="active:scale-95 transition-transform hover:bg-[#F1F5F9] p-2 rounded-full text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./guardian_profile_updated_my_reports.html'">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <h1 class="text-base font-bold text-[#0F172A] font-display">Confidentialité & Données</h1>
+    </div>
+    <div class="flex items-center gap-2">
+      <button class="hover:bg-[#F1F5F9] transition-colors p-2 rounded-full active:scale-95 text-[#64748B] hover:text-[#0F172A]" onclick="window.location.href='./alert_center.html'">
+        <span class="material-symbols-outlined">notifications</span>
+      </button>
+    </div>
+  </div>
 </header>
-<main class="pt-24 px-container-margin max-w-2xl mx-auto space-y-4">
-<!-- Hero Illustration / Context -->
-<div class="bg-white rounded-2xl border border-[#EAECF0] p-6 shadow-sm flex items-center gap-4">
-<div class="w-12 h-12 rounded-xl bg-[#F5F3FF] border border-[#532CE6]/15 flex items-center justify-center flex-shrink-0">
-<span class="material-symbols-outlined text-[24px] text-[#532CE6]" style="font-variation-settings: 'FILL' 1;">security</span>
-</div>
-<div>
-<h2 class="text-sm font-bold text-[#0F172A]">Protection de votre vie privée</h2>
-<p class="text-xs text-[#64748B] mt-0.5">Gérez la façon dont vos informations sont partagées et protégées au sein de RAYDAR.</p>
-</div>
-</div>
-<!-- Privacy Controls Card -->
-<section class="bg-white rounded-2xl shadow-sm p-6 space-y-5 border border-[#EAECF0]">
-<h2 class="font-bold text-base text-[#0F172A]">Visibilité & Identité</h2>
-<!-- Anonymous Reporting Toggle -->
-<div class="flex items-center justify-between py-1">
-<div class="flex flex-col gap-0.5 pr-4">
-<span class="font-bold text-sm text-[#0F172A]">Signalement Anonyme</span>
-<span class="text-xs text-[#64748B]">Masquer votre identité lors de l'envoi de signalements d'urgence.</span>
-</div>
-<label class="relative inline-flex items-center cursor-pointer">
-<input checked="" class="sr-only peer toggle-checkbox" type="checkbox"/>
-<div class="w-11 h-6 bg-[#E2E8F0] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#532CE6]"></div>
-</label>
-</div>
-<div class="h-px bg-[#EAECF0] w-full"></div>
-<!-- Profile Visibility Toggle -->
-<div class="flex items-center justify-between py-1">
-<div class="flex flex-col gap-0.5 pr-4">
-<span class="font-bold text-sm text-[#0F172A]">Visibilité du Profil</span>
-<span class="text-xs text-[#64748B]">Permettre aux autres tuteurs vérifiés de voir votre profil dans les alertes de proximité.</span>
-</div>
-<label class="relative inline-flex items-center cursor-pointer">
-<input class="sr-only peer toggle-checkbox" type="checkbox"/>
-<div class="w-11 h-6 bg-[#E2E8F0] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#532CE6]"></div>
-</label>
-</div>
-</section>
-<!-- Blocked Users Section -->
-<button class="w-full flex items-center justify-between bg-white rounded-2xl shadow-sm p-4 border border-[#EAECF0] hover:border-[#532CE6]/30 active:scale-[0.99] transition-all">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-[#F8F9FA] border border-[#EAECF0] flex items-center justify-center">
-<span class="material-symbols-outlined text-[#64748B] text-[20px]">block</span>
-</div>
-<div class="text-left">
-<span class="font-bold text-sm text-[#0F172A] block">Utilisateurs bloqués</span>
-<span class="text-xs text-[#64748B]">Gérer 0 compte bloqué</span>
-</div>
-</div>
-<span class="material-symbols-outlined text-[#94A3B8]">chevron_right</span>
-</button>
-<!-- Data Management Card -->
-<section class="bg-white rounded-2xl shadow-sm p-6 border border-[#EAECF0]">
-<h2 class="font-bold text-base text-[#0F172A] mb-1">Gestion des Données</h2>
-<p class="text-xs text-[#64748B] mb-4">Le contrôle de vos données stockées garantit la confidentialité de vos informations personnelles.</p>
-<div class="flex flex-col gap-2.5">
-<button class="w-full py-2.5 px-4 rounded-xl border border-[#EAECF0] text-[#0F172A] hover:bg-[#F8F9FA] font-semibold text-xs flex items-center justify-center gap-2 active:scale-95 transition-all shadow-sm">
-<span class="material-symbols-outlined text-[18px] text-[#532CE6]">download</span>
-                    Exporter mes données
-                </button>
-<button class="w-full py-2.5 px-4 rounded-xl border border-[#DC2626]/20 bg-[#FEF2F2] text-[#DC2626] font-semibold text-xs flex items-center justify-center gap-2 hover:bg-[#FEE2E2] active:scale-95 transition-all">
-<span class="material-symbols-outlined text-[18px]">delete_sweep</span>
-                    Effacer le cache local
-                </button>
-</div>
-</section>
-<!-- Legal Links Footer -->
-<div class="flex flex-wrap justify-center gap-4 pt-2 pb-6">
-<a class="text-xs text-[#532CE6] hover:underline font-medium" href="./alert_center.html">Politique de Confidentialité</a>
-<span class="text-[#94A3B8]">•</span>
-<a class="text-xs text-[#532CE6] hover:underline font-medium" href="./home_child_safety_v1.html">Conditions d'Utilisation</a>
-</div>
+
+<main class="pt-20 px-4 max-w-2xl mx-auto space-y-4">
+  <!-- Hero Illustration / Context -->
+  <div class="bg-white rounded-2xl border border-[#EAECF0] p-5 shadow-sm flex items-center gap-4">
+    <div class="w-12 h-12 rounded-xl bg-[#F5F3FF] border border-[#532CE6]/15 flex items-center justify-center flex-shrink-0">
+      <span class="material-symbols-outlined text-[24px] text-[#532CE6]" style="font-variation-settings: 'FILL' 1;">security</span>
+    </div>
+    <div>
+      <h2 class="text-sm font-bold text-[#0F172A] font-display">Protection de votre vie privée</h2>
+      <p class="text-xs text-[#64748B] mt-0.5 leading-relaxed">Contrôlez la visibilité de vos données et vos droits d'accès au sein du réseau d'alerte RAYDAR.</p>
+    </div>
+  </div>
+
+  <!-- Privacy Controls Card -->
+  <section class="bg-white rounded-2xl shadow-sm p-5 space-y-4 border border-[#EAECF0]">
+    <h2 class="font-bold text-base text-[#0F172A] font-display">Visibilité & Identité</h2>
+    
+    <!-- Anonymous Reporting Toggle -->
+    <div class="flex items-center justify-between py-1">
+      <div class="flex flex-col gap-0.5 pr-4 max-w-[75%]">
+        <span class="font-bold text-sm text-[#0F172A]">Signalement Anonyme</span>
+        <span class="text-xs text-[#64748B]">Masquer votre identité publique lors de la création d'un signalement d'urgence. Seules les autorités ont accès aux données d'audit.</span>
+      </div>
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input id="anonymousToggle" class="sr-only peer" type="checkbox"/>
+        <div class="w-11 h-6 bg-[#E2E8F0] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#532CE6]"></div>
+      </label>
+    </div>
+
+    <div class="h-px bg-[#EAECF0] w-full"></div>
+
+    <!-- Profile Visibility Toggle -->
+    <div class="flex items-center justify-between py-1">
+      <div class="flex flex-col gap-0.5 pr-4 max-w-[75%]">
+        <span class="font-bold text-sm text-[#0F172A]">Visibilité du Profil Gardien</span>
+        <span class="text-xs text-[#64748B]">Permettre aux tuteurs et volontaires vérifiés de voir votre prénom et badge dans les alertes locales.</span>
+      </div>
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input id="visibilityToggle" checked class="sr-only peer" type="checkbox"/>
+        <div class="w-11 h-6 bg-[#E2E8F0] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#532CE6]"></div>
+      </label>
+    </div>
+  </section>
+
+  <!-- Data Management Card -->
+  <section class="bg-white rounded-2xl shadow-sm p-5 border border-[#EAECF0] space-y-3">
+    <h2 class="font-bold text-base text-[#0F172A] font-display">Gestion des Données Personnelles</h2>
+    <p class="text-xs text-[#64748B]">Conformément au RGPD et aux normes de protection des données, vous disposez d'un contrôle total sur vos informations.</p>
+    
+    <div class="flex flex-col gap-2.5 pt-2">
+      <!-- Export Data Button -->
+      <button id="exportDataBtn" class="w-full py-3 px-4 rounded-xl border border-[#EAECF0] text-[#0F172A] hover:bg-[#F8F9FA] font-semibold text-xs flex items-center justify-center gap-2 active:scale-95 transition-all shadow-sm">
+        <span class="material-symbols-outlined text-[18px] text-[#532CE6]">download</span>
+        <span>Télécharger une copie de mes données (JSON)</span>
+      </button>
+
+      <!-- Clear Local Cache Button -->
+      <button id="clearCacheBtn" class="w-full py-3 px-4 rounded-xl border border-[#EAECF0] text-[#64748B] hover:bg-[#F8F9FA] font-semibold text-xs flex items-center justify-center gap-2 active:scale-95 transition-all shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">cached</span>
+        <span>Vider le cache temporaire de l'application</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Google Play Account Deletion Section -->
+  <section class="bg-white rounded-2xl shadow-sm p-5 border border-red-200 space-y-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center flex-shrink-0 text-red-600">
+        <span class="material-symbols-outlined text-[20px]">person_remove</span>
+      </div>
+      <div>
+        <h2 class="font-bold text-base text-red-600 font-display">Suppression du Compte</h2>
+        <p class="text-xs text-[#64748B]">Exigence Google Play Store & Protection des Données</p>
+      </div>
+    </div>
+    <p class="text-xs text-[#64748B] leading-relaxed">
+      Vous pouvez à tout moment supprimer définitivement votre compte RAYDAR. Cette action efface votre profil, révoque vos accès et supprime vos données personnelles associées.
+    </p>
+    <button id="openDeleteAccountBtn" class="w-full py-3 px-4 rounded-xl border border-red-300 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition-all">
+      <span class="material-symbols-outlined text-[18px]">delete_forever</span>
+      <span>Supprimer définitivement mon compte</span>
+    </button>
+  </section>
+
+  <!-- Legal Links Footer -->
+  <div class="flex flex-wrap justify-center gap-4 pt-2 pb-6">
+    <button id="openPrivacyPolicyBtn" class="text-xs text-[#532CE6] hover:underline font-medium">Politique de Confidentialité</button>
+    <span class="text-[#94A3B8]">•</span>
+    <button id="openTermsBtn" class="text-xs text-[#532CE6] hover:underline font-medium">Conditions d'Utilisation</button>
+  </div>
 </main>
-<script>
-        // Micro-interactions for toggles
-        document.querySelectorAll('.toggle-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const label = this.closest('div').querySelector('.font-body-lg');
-                if (this.checked) {
-                    console.log(`${label.textContent} enabled`);
-                } else {
-                    console.log(`${label.textContent} disabled`);
-                }
-            });
+
+<!-- Modal: Account Deletion Confirmation (Google Play Compliant) -->
+<div id="deleteAccountModal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200 backdrop-blur-sm">
+  <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+    <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto">
+      <span class="material-symbols-outlined text-[28px]">warning</span>
+    </div>
+    
+    <div class="text-center space-y-1">
+      <h3 class="text-lg font-bold text-[#0F172A] font-display">Supprimer définitivement votre compte ?</h3>
+      <p class="text-xs text-[#64748B] leading-relaxed">
+        Cette opération est <strong>irréversible</strong>. Votre compte, vos signalements et toutes vos données personnelles seront définitivement supprimés des serveurs RAYDAR.
+      </p>
+    </div>
+
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 space-y-1">
+      <p class="font-bold">Pour confirmer, veuillez saisir « SUPPRIMER » ci-dessous :</p>
+      <input id="deleteConfirmInput" type="text" placeholder="SUPPRIMER" class="w-full bg-white border border-amber-300 rounded-lg px-3 py-2 text-sm font-bold text-[#0F172A] outline-none focus:border-red-500 uppercase"/>
+    </div>
+
+    <div class="flex gap-3 pt-2">
+      <button id="cancelDeleteBtn" class="flex-1 py-3 border border-[#EAECF0] text-[#0F172A] rounded-xl font-bold text-xs hover:bg-[#F8F9FA] transition-all">
+        Annuler
+      </button>
+      <button id="confirmDeleteBtn" disabled class="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold text-xs opacity-50 cursor-not-allowed hover:bg-red-700 transition-all flex items-center justify-center gap-1">
+        <span class="material-symbols-outlined text-[16px]">delete_forever</span>
+        <span>Confirmer la suppression</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Policy Viewer -->
+<div id="policyModal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200 backdrop-blur-sm">
+  <div class="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-4 max-h-[80vh] flex flex-col">
+    <div class="flex items-center justify-between border-b border-[#EAECF0] pb-3">
+      <h3 id="policyModalTitle" class="text-base font-bold text-[#0F172A] font-display">Politique de Confidentialité</h3>
+      <button id="closePolicyBtn" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div id="policyModalContent" class="text-xs text-[#64748B] leading-relaxed overflow-y-auto pr-1 space-y-3 flex-1">
+      <!-- Injected dynamically -->
+    </div>
+    <div class="pt-2 border-t border-[#EAECF0]">
+      <button id="ackPolicyBtn" class="w-full py-2.5 bg-primary text-white font-bold text-xs rounded-xl hover:bg-primary/90 transition-all">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { supabase } from "./src/supabaseClient.js";
+import { reportService } from "./src/reportService.js";
+import { protectRoute, signOut } from "./src/authService.js";
+
+await protectRoute('user');
+
+const anonToggle = document.getElementById('anonymousToggle');
+const visToggle = document.getElementById('visibilityToggle');
+const exportBtn = document.getElementById('exportDataBtn');
+const clearCacheBtn = document.getElementById('clearCacheBtn');
+
+// Delete Account Modal Elements
+const openDeleteBtn = document.getElementById('openDeleteAccountBtn');
+const deleteModal = document.getElementById('deleteAccountModal');
+const deleteConfirmInput = document.getElementById('deleteConfirmInput');
+const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+// Policy Modal Elements
+const policyModal = document.getElementById('policyModal');
+const policyTitle = document.getElementById('policyModalTitle');
+const policyContent = document.getElementById('policyModalContent');
+const openPrivacyBtn = document.getElementById('openPrivacyPolicyBtn');
+const openTermsBtn = document.getElementById('openTermsBtn');
+const closePolicyBtn = document.getElementById('closePolicyBtn');
+const ackPolicyBtn = document.getElementById('ackPolicyBtn');
+
+// Toast helper
+function showToast(msg, isError = false) {
+    let t = document.getElementById('privToast');
+    if (!t) {
+        t = document.createElement('div');
+        t.id = 'privToast';
+        t.className = 'fixed bottom-10 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full text-sm font-semibold shadow-xl transition-all duration-300 pointer-events-none opacity-0 translate-y-4';
+        document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.className = `fixed bottom-10 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full text-sm font-semibold shadow-xl transition-all duration-300 pointer-events-none ${
+        isError ? 'bg-red-600 text-white' : 'bg-[#0F172A] text-white'
+    }`;
+    setTimeout(() => {
+        t.classList.remove('opacity-0', 'translate-y-4');
+        t.classList.add('opacity-100', 'translate-y-0');
+    }, 10);
+    setTimeout(() => {
+        t.classList.remove('opacity-100', 'translate-y-0');
+        t.classList.add('opacity-0', 'translate-y-4');
+    }, 3000);
+}
+
+// 1. Load preferences
+function loadPreferences() {
+    try {
+        const raw = localStorage.getItem('raydar_privacy_preferences');
+        if (raw) {
+            const p = JSON.parse(raw);
+            if (typeof p.anonymous === 'boolean') anonToggle.checked = p.anonymous;
+            if (typeof p.profileVisibility === 'boolean') visToggle.checked = p.profileVisibility;
+        }
+    } catch (e) {}
+}
+loadPreferences();
+
+// 2. Persist preferences
+async function savePreferences() {
+    const prefs = {
+        anonymous: anonToggle.checked,
+        profileVisibility: visToggle.checked,
+        updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem('raydar_privacy_preferences', JSON.stringify(prefs));
+    
+    // Sync with Supabase profile
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+            await supabase.from('profiles').update({
+                preferences: { privacy: prefs }
+            }).eq('user_id', session.user.id);
+        }
+        showToast("Préférences de confidentialité mises à jour !");
+    } catch (e) {
+        showToast("Préférences enregistrées localement.");
+    }
+}
+
+anonToggle.addEventListener('change', savePreferences);
+visToggle.addEventListener('change', savePreferences);
+
+// 3. Export Data as JSON
+exportBtn.addEventListener('click', async () => {
+    exportBtn.disabled = true;
+    const orig = exportBtn.innerHTML;
+    exportBtn.innerHTML = `<span>Génération de l'archive...</span>`;
+
+    try {
+        const profile = reportService.getProfile();
+        const privacy = JSON.parse(localStorage.getItem('raydar_privacy_preferences') || '{}');
+        const notifs = JSON.parse(localStorage.getItem('raydar_notification_preferences') || '{}');
+        const emergency = JSON.parse(localStorage.getItem('raydar_emergency_preferences') || '{}');
+        
+        const exportPayload = {
+            application: "RAYDAR Child Safety Network",
+            exportedAt: new Date().toISOString(),
+            userProfile: {
+                fullName: profile.full_name,
+                username: profile.username,
+                city: profile.city,
+                role: profile.role,
+                avatarUrl: profile.photo
+            },
+            preferences: {
+                privacy,
+                notifications: notifs,
+                emergency
+            },
+            compliance: {
+                gdpr: true,
+                googlePlayCompliant: true,
+                dataRetention: "Active session and authorized guardian records"
+            }
+        };
+
+        const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `raydar-donnees-personnelles-${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast("Export de données téléchargé avec succès !");
+    } catch (err) {
+        console.error("Export error:", err);
+        showToast("Échec de l'export des données", true);
+    } finally {
+        exportBtn.disabled = false;
+        exportBtn.innerHTML = orig;
+    }
+});
+
+// 4. Clear Local Cache
+clearCacheBtn.addEventListener('click', () => {
+    const keepSession = localStorage.getItem('sb-ifpbdythbhlgqymsaxtz-auth-token');
+    const keepProfile = localStorage.getItem('user_profile');
+    
+    // Clear transient items
+    localStorage.removeItem('reports_cache');
+    localStorage.removeItem('offline_reports_queue');
+    localStorage.removeItem('active_filters');
+    sessionStorage.removeItem('cached_location');
+
+    // Restore essential auth
+    if (keepSession) localStorage.setItem('sb-ifpbdythbhlgqymsaxtz-auth-token', keepSession);
+    if (keepProfile) localStorage.setItem('user_profile', keepProfile);
+
+    showToast("Cache local vidé avec succès !");
+});
+
+// 5. Account Deletion Workflow (Google Play Compliant)
+openDeleteBtn.addEventListener('click', () => {
+    deleteConfirmInput.value = "";
+    confirmDeleteBtn.disabled = true;
+    confirmDeleteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    deleteModal.classList.remove('hidden');
+    setTimeout(() => {
+        deleteModal.classList.remove('opacity-0');
+        deleteModal.classList.add('opacity-100');
+    }, 10);
+});
+
+function closeDeleteModal() {
+    deleteModal.classList.remove('opacity-100');
+    deleteModal.classList.add('opacity-0');
+    setTimeout(() => deleteModal.classList.add('hidden'), 200);
+}
+
+cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+
+deleteConfirmInput.addEventListener('input', () => {
+    const val = deleteConfirmInput.value.trim().toUpperCase();
+    if (val === "SUPPRIMER") {
+        confirmDeleteBtn.disabled = false;
+        confirmDeleteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    } else {
+        confirmDeleteBtn.disabled = true;
+        confirmDeleteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+});
+
+confirmDeleteBtn.addEventListener('click', async () => {
+    confirmDeleteBtn.disabled = true;
+    confirmDeleteBtn.innerHTML = `<span>Suppression en cours...</span>`;
+
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+        const userId = session?.user?.id;
+
+        // Call server deletion route
+        const resp = await fetch('/api/profile/delete-account', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                confirmation: "SUPPRIMER"
+            })
         });
 
-        // Ripples or click effect simulation
-        document.querySelectorAll('button').forEach(btn => {
-            btn.addEventListener('mousedown', () => {
-                btn.style.transform = 'scale(0.95)';
-            });
-            btn.addEventListener('mouseup', () => {
-                btn.style.transform = '';
-            });
-            btn.addEventListener('mouseleave', () => {
-                btn.style.transform = '';
-            });
-        });
-    </script>
+        const resData = await resp.json();
+        if (!resData.success) {
+            throw new Error(resData.error || "Échec de la suppression");
+        }
+
+        // Purge session completely
+        await signOut();
+    } catch (err) {
+        console.error("Account deletion failed:", err);
+        showToast("Erreur : " + (err.message || "Échec de suppression"), true);
+        confirmDeleteBtn.disabled = false;
+        confirmDeleteBtn.innerHTML = `<span>Confirmer la suppression</span>`;
+    }
+});
+
+// 6. Policy Modals
+function openPolicy(title, bodyHtml) {
+    policyTitle.textContent = title;
+    policyContent.innerHTML = bodyHtml;
+    policyModal.classList.remove('hidden');
+    setTimeout(() => {
+        policyModal.classList.remove('opacity-0');
+        policyModal.classList.add('opacity-100');
+    }, 10);
+}
+
+function closePolicy() {
+    policyModal.classList.remove('opacity-100');
+    policyModal.classList.add('opacity-0');
+    setTimeout(() => policyModal.classList.add('hidden'), 200);
+}
+
+closePolicyBtn.addEventListener('click', closePolicy);
+ackPolicyBtn.addEventListener('click', closePolicy);
+
+openPrivacyBtn.addEventListener('click', () => {
+    openPolicy("Politique de Confidentialité RAYDAR", `
+        <h4 class="font-bold text-[#0F172A] text-sm mb-1">1. Collecte et Finalité des Données</h4>
+        <p>RAYDAR traite uniquement les données strictement nécessaires au sauvetage et à la recherche d'enfants disparus ou retrouvés (signalements géolocalisés, photographies et descriptions physiques).</p>
+        
+        <h4 class="font-bold text-[#0F172A] text-sm mt-3 mb-1">2. Sécurité et Chiffrement</h4>
+        <p>Toutes les transmissions s'effectuent via SSL/TLS chiffré. Les données sensibles sont protégées par les règles de sécurité Row Level Security (RLS).</p>
+        
+        <h4 class="font-bold text-[#0F172A] text-sm mt-3 mb-1">3. Droit à l'Oubli (Google Play Store)</h4>
+        <p>Conformément aux directives de Google Play, tout utilisateur peut exporter ou supprimer définitivement son compte et l'intégralité de ses données personnelles à tout moment depuis cet écran.</p>
+    `);
+});
+
+openTermsBtn.addEventListener('click', () => {
+    openPolicy("Conditions Générales d'Utilisation", `
+        <h4 class="font-bold text-[#0F172A] text-sm mb-1">1. Engagement Citoyen et Bienveillance</h4>
+        <p>Tout membre du réseau RAYDAR s'engage à publier des informations véridiques, loyales et dénuées de toute intention de nuire. Tout signalement calomnieux fera l'objet de poursuites judiciaires immédiates.</p>
+        
+        <h4 class="font-bold text-[#0F172A] text-sm mt-3 mb-1">2. Rôle des Autorités</h4>
+        <p>RAYDAR est un outil communautaire de vigilance et d'alerte rapide. Il ne remplace en aucun cas les forces de police ou de gendarmerie que les utilisateurs sont invités à contacter en priorité (117 / 119).</p>
+    `);
+});
+</script>
 
 <script src="./src/responsiveShell.js" type="module"></script>
-</body></html>
+</body>
+</html>

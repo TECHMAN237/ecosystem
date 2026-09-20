@@ -1057,6 +1057,121 @@ app.post("/api/reports/create-found-report", async (req, res) => {
   }
 });
 
+// Profile management endpoints (Google Play Compliance & Profile Updates)
+app.post("/api/profile/update", async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: "Supabase service client non configuré" });
+    }
+
+    let authUserId: string | null = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.replace("Bearer ", "").trim();
+      try {
+        const { data: { user } } = await supabaseAdmin.auth.getUser(token);
+        if (user?.id) authUserId = user.id;
+      } catch (e) {}
+    }
+
+    const { user_id, full_name, username, city, photo, profile_photo_url, preferences } = req.body || {};
+    const targetUserId = authUserId || user_id;
+
+    if (!targetUserId) {
+      return res.status(400).json({ success: false, error: "Identifiant utilisateur manquant ou session non valide." });
+    }
+
+    const updatePayload: Record<string, any> = {
+      updated_at: new Date().toISOString()
+    };
+    if (full_name !== undefined) updatePayload.full_name = full_name;
+    if (username !== undefined) updatePayload.username = String(username).replace(/^@/, "");
+    if (city !== undefined) updatePayload.city = city;
+    const resolvedPhoto = photo || profile_photo_url;
+    if (resolvedPhoto !== undefined) updatePayload.profile_photo_url = resolvedPhoto;
+    if (preferences !== undefined) updatePayload.preferences = preferences;
+
+    const { data: updatedProf, error: pErr } = await supabaseAdmin
+      .from("profiles")
+      .update(updatePayload)
+      .eq("user_id", targetUserId)
+      .select()
+      .maybeSingle();
+
+    if (pErr) {
+      console.error("[RAYDAR Server] Error updating profile:", pErr);
+      return res.status(500).json({ success: false, error: pErr.message });
+    }
+
+    return res.json({
+      success: true,
+      profile: updatedProf
+    });
+  } catch (err: any) {
+    console.error("[RAYDAR Server] Exception in profile update endpoint:", err);
+    return res.status(500).json({ success: false, error: err.message || "Erreur interne" });
+  }
+});
+
+app.post("/api/profile/delete-account", async (req, res) => {
+  try {
+    if (!supabaseAdmin) {
+      return res.status(500).json({ success: false, error: "Supabase service client non configuré" });
+    }
+
+    let authUserId: string | null = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.replace("Bearer ", "").trim();
+      try {
+        const { data: { user } } = await supabaseAdmin.auth.getUser(token);
+        if (user?.id) authUserId = user.id;
+      } catch (e) {}
+    }
+
+    const { user_id, confirmation } = req.body || {};
+    const targetUserId = authUserId || user_id;
+
+    if (!targetUserId) {
+      return res.status(400).json({ success: false, error: "Utilisateur non identifié ou token expiré." });
+    }
+
+    if (confirmation !== "SUPPRIMER") {
+      return res.status(400).json({ success: false, error: "Confirmation explicite 'SUPPRIMER' requise." });
+    }
+
+    console.log(`[RAYDAR Server] Processing Google Play account deletion for user: ${targetUserId}`);
+
+    // Resolve profile
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("id")
+      .eq("user_id", targetUserId)
+      .maybeSingle();
+
+    if (profile?.id) {
+      await supabaseAdmin.from("missing_reports").delete().eq("reporter_id", profile.id);
+      await supabaseAdmin.from("found_reports").delete().eq("reporter_id", profile.id);
+      await supabaseAdmin.from("profiles").delete().eq("id", profile.id);
+    }
+
+    // Delete user from auth
+    try {
+      await supabaseAdmin.auth.admin.deleteUser(targetUserId);
+    } catch (authDelErr) {
+      console.warn("[RAYDAR Server] Warning deleting user from auth.users:", authDelErr);
+    }
+
+    return res.json({
+      success: true,
+      message: "Compte utilisateur et données personnelles supprimés conformément aux exigences Google Play."
+    });
+  } catch (err: any) {
+    console.error("[RAYDAR Server] Exception in delete-account endpoint:", err);
+    return res.status(500).json({ success: false, error: err.message || "Erreur interne" });
+  }
+});
+
 // Retention management endpoints (TEMPORARY DEVELOPMENT RETENTION)
 app.get("/api/reports/retention-status", async (_req, res) => {
   try {

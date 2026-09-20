@@ -6,7 +6,8 @@
     "dev": "tsx server.ts",
     "start": "node server.ts",
     "build": "echo 'Build successful'",
-    "lint": "echo 'Linting successful'"
+    "lint": "echo 'Linting successful'",
+    "audit:backend": "tsx scripts/audit_backend_drift.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.7",
