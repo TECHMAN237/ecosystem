@@ -35,13 +35,10 @@ jobs:
         with:
           version: latest
 
-      - name: Link Supabase Project
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: |
-          supabase link --project-ref ifpbdythbhlgqymsaxtz --password "$SUPABASE_DB_PASSWORD"
-
+      # `supabase link` required SUPABASE_DB_PASSWORD to establish a DB
+      # connection and was failing at this step. It is not needed for a
+      # function-only deploy: `supabase functions deploy` accepts
+      # --project-ref directly, so the link/DB-password step is removed here.
       # TEMPORARILY DISABLED: the migration history in supabase/migrations/ does
       # not match what's already applied on Supabase Production (different
       # naming/version scheme, no overlap). Running `supabase db push` here would
@@ -66,7 +63,7 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
           echo "🚀 Deploying create-found-report to Supabase Cloud (JWT verification enabled)..."
-          supabase functions deploy create-found-report
+          supabase functions deploy create-found-report --project-ref ifpbdythbhlgqymsaxtz
 
       - name: Run Post-Deployment Drift Audit
         env:
