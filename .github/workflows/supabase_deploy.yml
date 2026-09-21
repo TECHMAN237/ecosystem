@@ -19,14 +19,16 @@ jobs:
       - name: Checkout Repository Source of Truth
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      # Project uses Bun (bun.lock), not npm — actions/setup-node with cache:'npm'
+      # was failing before any Supabase step ran because no package-lock.json/
+      # yarn.lock/npm-shrinkwrap.json exists. Switched to Bun's own setup+cache.
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: 'npm'
+          bun-version: latest
 
       - name: Install Dependencies
-        run: npm ci || npm install
+        run: bun install
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
@@ -40,30 +42,35 @@ jobs:
         run: |
           supabase link --project-ref ifpbdythbhlgqymsaxtz --password "$SUPABASE_DB_PASSWORD"
 
-      - name: Apply Database Migrations
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: |
-          echo "🚀 Applying pending SQL migrations to Supabase Cloud..."
-          supabase db push --password "$SUPABASE_DB_PASSWORD"
+      # TEMPORARILY DISABLED: the migration history in supabase/migrations/ does
+      # not match what's already applied on Supabase Production (different
+      # naming/version scheme, no overlap). Running `supabase db push` here would
+      # attempt to apply all local migrations to Production, including schema
+      # changes that have not been reviewed. Do not re-enable until the two
+      # histories have been reconciled and reviewed explicitly.
+      # - name: Apply Database Migrations
+      #   env:
+      #     SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      #     SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      #   run: |
+      #     echo "🚀 Applying pending SQL migrations to Supabase Cloud..."
+      #     supabase db push --password "$SUPABASE_DB_PASSWORD"
 
-      - name: Deploy Supabase Edge Functions
+      # Scoped to create-found-report only for this run. JWT verification is
+      # kept ON (no --no-verify-jwt). The other functions listed here previously
+      # (create-missing-report, matching-engine, ai-analysis, broadcast-alert,
+      # admin-action, email-verification) are intentionally left out — none of
+      # them are redeployed by this workflow run.
+      - name: Deploy create-found-report Edge Function
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
-          echo "🚀 Deploying Edge Functions to Supabase Cloud..."
-          supabase functions deploy create-missing-report --no-verify-jwt
-          supabase functions deploy create-found-report --no-verify-jwt
-          supabase functions deploy matching-engine --no-verify-jwt
-          supabase functions deploy ai-analysis --no-verify-jwt
-          supabase functions deploy broadcast-alert --no-verify-jwt
-          supabase functions deploy admin-action --no-verify-jwt
-          supabase functions deploy email-verification --no-verify-jwt
+          echo "🚀 Deploying create-found-report to Supabase Cloud (JWT verification enabled)..."
+          supabase functions deploy create-found-report
 
       - name: Run Post-Deployment Drift Audit
         env:
           SUPABASE_URL: "https://ifpbdythbhlgqymsaxtz.supabase.co"
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          npm run audit:backend
+          bun run audit:backend
