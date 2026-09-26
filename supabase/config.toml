@@ -38,7 +38,7 @@ enable_signup = true
 verify_jwt = false
 
 [functions.create-found-report]
-verify_jwt = false
+verify_jwt = true
 
 [functions.matching-engine]
 verify_jwt = false
