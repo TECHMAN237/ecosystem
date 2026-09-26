@@ -34,6 +34,10 @@
     {
       "src": "metadata.json",
       "use": "@vercel/static"
+    },
+    {
+      "src": "api/reports/create-found-report.js",
+      "use": "@vercel/node"
     }
   ]
 }
